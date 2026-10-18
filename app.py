@@ -1,36 +1,20 @@
-import csv
 import os
-import sys
-import time
-import importlib
-from datetime import datetime, timezone
+import random
+import sqlite3
 from pathlib import Path
+from uuid import uuid4
+
 from dotenv import load_dotenv
 
 load_dotenv(Path(__file__).parent / ".env")
 
 import streamlit as st
+from langgraph.checkpoint.sqlite import SqliteSaver
+from langgraph.types import Command
 
-# One-time module reloads per Streamlit session so code changes in retrieval.py
-# and agent.py are picked up without a full server restart.
-# retrieval is reloaded only once (resetting its model cache is expensive);
-# agent is cheap to reload so we do it on every script run.
-import tools as _tools_mod
-import agent as _agent_mod
-
-if "modules_reloaded" not in st.session_state:
-    # One-time reloads so code changes are picked up without a full server restart.
-    # retrieval + tools: reloaded once (retrieval has heavy model globals; tools has REGISTRY).
-    import retrieval as _retrieval_mod
-    importlib.reload(_retrieval_mod)
-    importlib.reload(_tools_mod)
-    st.session_state.modules_reloaded = True
-
-# agent: cheap to reload on every run (picks up prompt/tool schema changes instantly).
-importlib.reload(_agent_mod)
-from agent import run_triage
-import eval as _eval_mod
 import analyze_logs as _analyze_mod
+import eval as _eval_mod
+from graph import build_graph, initial_state
 
 st.set_page_config(
     page_title="L1 Support Agent — Limmatica AG",
@@ -43,173 +27,37 @@ if not os.environ.get("ANTHROPIC_API_KEY"):
     st.error("**ANTHROPIC_API_KEY not set.** Add it to `.env` or your shell environment.")
     st.stop()
 
-# ── Session state ───────────────────────────────────────────────────────────────
+# ── Graph + session state ───────────────────────────────────────────────────────
+CHECKPOINT_DB = Path(__file__).parent / "checkpoints.sqlite"
+
+
+@st.cache_resource
+def _get_graph():
+    # check_same_thread=False: Streamlit runs each session on its own script thread and
+    # SqliteSaver serializes access with an internal lock.
+    return build_graph(SqliteSaver(sqlite3.connect(CHECKPOINT_DB, check_same_thread=False)))
+
+
+GRAPH = _get_graph()
+
 for key, default in [
-    ("result", None),
-    ("tool_state", None),   # "pending" | "confirmed" | "cancelled"
-    ("tool_result", None),
+    ("thread_id", uuid4().hex),  # one LangGraph thread per Streamlit session
     ("query_text", ""),
     ("use_retrieval", True),
-    ("pending_log_row", None),
-    ("decline_ticket", None),
+    ("preview_ticket_id", "INC0000000"),
 ]:
     if key not in st.session_state:
         st.session_state[key] = default
 
 
-# ── Usage logging (real runs only — logs.csv starts empty, populated only here) ──
-LOG_FILE = Path(__file__).parent / "logs.csv"
-LOG_FIELDS = [
-    "timestamp", "query", "retrieved_units", "decision_path", "diagnostic_summary",
-    "tool_called", "confirmed", "escalation_queue", "priority", "response_time_sec",
-]
-
-
-def _is_header_line(line: str) -> bool:
-    # Skip bare markdown headers like "**Step 1 — Diagnose**" or "**Diagnosis**" — we
-    # want the actual sentence that follows, not the section label, as the log summary.
-    return line.startswith("**") and line.endswith("**") and line.count("**") == 2
-
-
-def _log_run(result: dict, response_time_sec: float) -> int | None:
-    """Append one row to logs.csv for a completed triage run and return its 0-indexed
-    position among data rows, so a later Confirm/Cancel can patch `confirmed` in place.
-    Skips NO_TOOLS runs — RAG-off never reaches Step 2, so there's no decision_path
-    value for it in the documented schema.
-    """
-    if result["path"] == "NO_TOOLS":
-        return None
-
-    units = result["retrieved"] or []
-    retrieved_units = ";".join(
-        u["doc"] + (f"::{u['section']}" if u["section"] else "") for u in units
-    ) or "none"
-    diagnostic_summary = next(
-        (l.strip() for l in (result["reasoning"] or "").split("\n")
-         if len(l.strip()) > 15 and not _is_header_line(l.strip())),
-        "",
-    )[:150]
-    tool_input = result["tool_input"] or {}
-    is_escalate = result["path"] == "ESCALATE"
-
-    row = {
-        "timestamp": datetime.now(timezone.utc).isoformat(),
-        "query": result.get("query", ""),
-        "retrieved_units": retrieved_units,
-        "decision_path": result["path"],
-        "diagnostic_summary": diagnostic_summary,
-        "tool_called": result["tool_name"] or "",
-        "confirmed": "",  # patched later for AUTO_FIX rows by _patch_confirmed
-        "escalation_queue": tool_input.get("queue", "") if is_escalate else "",
-        "priority": tool_input.get("priority", "") if is_escalate else "",
-        "response_time_sec": f"{response_time_sec:.2f}",
-    }
-
-    # Header goes out once — when the file doesn't exist yet, or exists but is empty
-    # (e.g. a fresh `touch` or a truncated file). Checking .exists() alone would skip
-    # the header forever on an empty-but-present file, corrupting the CSV on next read.
-    needs_header = not LOG_FILE.exists() or LOG_FILE.stat().st_size == 0
-    with open(LOG_FILE, "a", newline="") as f:
-        writer = csv.DictWriter(f, fieldnames=LOG_FIELDS)
-        if needs_header:
-            writer.writeheader()
-        writer.writerow(row)
-
-    with open(LOG_FILE, newline="") as f:
-        n_data_rows = sum(1 for _ in csv.reader(f)) - 1  # minus header
-    return n_data_rows - 1
-
-
-def _patch_confirmed(row_index: int | None, confirmed: bool) -> None:
-    """Rewrite logs.csv with `confirmed` set on one row — only meaningful for AUTO_FIX
-    rows, since that's the only path where declining actually prevents an action."""
-    if row_index is None or not LOG_FILE.exists():
-        return
-    with open(LOG_FILE, newline="") as f:
-        rows = list(csv.DictReader(f))
-    if 0 <= row_index < len(rows) and rows[row_index]["decision_path"] == "AUTO_FIX":
-        rows[row_index]["confirmed"] = "true" if confirmed else "false"
-        with open(LOG_FILE, "w", newline="") as f:
-            writer = csv.DictWriter(f, fieldnames=LOG_FIELDS)
-            writer.writeheader()
-            writer.writerows(rows)
-
-
-def _build_decline_ticket(result: dict) -> dict:
-    """Pre-fill an escalation ticket client-side after an AUTO_FIX decline — reuses the
-    diagnosis already produced in this response (result['reasoning']), no new model call.
-    """
-    declined_tool = result["tool_name"] or "unknown"
-    reason = "User declined proposed automated fix; issue persists"
-    diagnostic_summary = next(
-        (l.strip() for l in (result["reasoning"] or "").split("\n")
-         if len(l.strip()) > 15 and not _is_header_line(l.strip())),
-        "Automated fix did not run; issue not yet resolved.",
-    )
-    # Same default priority the app's other client-side ticket synthesis paths use
-    # (the safety-net ticket below and the SELF_SERVE-fallback ticket) — there's no
-    # model-assigned priority to reuse here since AUTO_FIX responses never carry one.
-    priority = "P3-Normal"
-    summary_for_ticket = f"{diagnostic_summary} {reason} (declined: {declined_tool})."[:150]
-    return {
-        "diagnostic_summary": diagnostic_summary,
-        "declined_tool": declined_tool,
-        "reason": reason,
-        "queue": "DESKTOP-SUPPORT",
-        "priority": priority,
-        "summary_for_ticket": summary_for_ticket,
-    }
+def _config() -> dict:
+    return {"configurable": {"thread_id": st.session_state.thread_id}}
 
 
 # ── Callbacks ───────────────────────────────────────────────────────────────────
-def _confirm():
-    r = st.session_state.result
-    st.session_state.tool_result = _tools_mod.dispatch(r["tool_name"], r["tool_input"] or {})
-    st.session_state.tool_state = "confirmed"
-    _patch_confirmed(st.session_state.get("pending_log_row"), confirmed=True)
-
-
-def _cancel():
-    _patch_confirmed(st.session_state.get("pending_log_row"), confirmed=False)
-    r = st.session_state.result
-    if r["path"] == "AUTO_FIX":
-        # Decline fallback: no tool call, no new model query — pre-fill an escalation
-        # ticket from the diagnosis already in this response and ask for a separate,
-        # explicit confirmation before it's actually sent.
-        import random
-        st.session_state.decline_ticket = _build_decline_ticket(r)
-        st.session_state.preview_ticket_id = f"INC{random.randint(1000000, 9999999)}"
-        st.session_state.tool_state = "declined"
-    else:
-        st.session_state.tool_state = "cancelled"
-
-
-def _send_decline_ticket():
-    ticket = st.session_state.decline_ticket
-    st.session_state.tool_result = _tools_mod.dispatch(
-        "create_escalation_ticket",
-        {"queue": ticket["queue"], "summary": ticket["summary_for_ticket"], "priority": ticket["priority"]},
-    )
-    st.session_state.tool_state = "declined_sent"
-
-
-def _cancel_decline_ticket():
-    st.session_state.tool_state = "declined_cancelled"
-
-
-def _escalate_self_serve():
-    """Convert a displayed SELF_SERVE result into an ESCALATE ticket-preview flow,
-    reusing create_escalation_ticket — no new tool or UI path."""
-    r = st.session_state.result
-    summary = f"Self-serve steps did not resolve the issue. Original query: {r.get('query', '')}"
-    r["path"] = "ESCALATE"
-    r["tool_name"] = "create_escalation_ticket"
-    r["tool_input"] = {
-        "queue": "DESKTOP-SUPPORT",
-        "summary": summary[:150],
-        "priority": "P3-Normal",
-    }
-    _init_tool_state(r)
+def _resume(answer: bool):
+    """Answer the pending interrupt (confirm_fix / confirm_ticket / self_serve_wait)."""
+    GRAPH.invoke(Command(resume=answer), _config())
 
 
 def _set_preset(q: str):
@@ -222,17 +70,6 @@ def _run_eval_cached():
     """Runs eval.py's golden set once (cached across reruns) — not per query."""
     rows = _eval_mod.run_eval()
     return rows, _eval_mod.summarize(rows)
-
-
-def _init_tool_state(result: dict):
-    import random
-    needs = result["tool_name"] is not None and result["path"] in ("AUTO_FIX", "ESCALATE")
-    st.session_state.tool_state = "pending" if needs else None
-    st.session_state.tool_result = None
-    st.session_state.decline_ticket = None
-    # Generate a stable preview ticket ID shown before and after confirmation
-    if result["path"] == "ESCALATE":
-        st.session_state.preview_ticket_id = f"INC{random.randint(1000000, 9999999)}"
 
 
 # ── Helpers ─────────────────────────────────────────────────────────────────────
@@ -267,6 +104,50 @@ def _pending_callout(label: str) -> None:
         f'<span style="font-size:0.9em;color:#78350f">{label}</span>'
         f'</div>',
         unsafe_allow_html=True,
+    )
+
+
+def _confirm_buttons(confirm_label: str) -> None:
+    c1, c2, _ = st.columns([2, 2, 3])
+    with c1:
+        st.button(confirm_label, on_click=_resume, args=(True,),
+                  type="primary", use_container_width=True)
+    with c2:
+        st.button("✗ Cancel", on_click=_resume, args=(False,), use_container_width=True)
+
+
+def _ticket_submitted(tool_result: dict, queue: str) -> None:
+    st.success(
+        f"**Ticket {st.session_state.preview_ticket_id} submitted (simulated)**\n\n"
+        f"Redirecting to ServiceNow... *(simulated)*\n\n"
+        f"On-call technician for `{queue}` notified. SLA clock started."
+    )
+    st.caption(f"Timestamp: {tool_result['timestamp']}")
+
+
+def _ticket_card(ticket: dict) -> None:
+    ticket_id = st.session_state.preview_ticket_id
+    with st.container(border=True):
+        st.markdown("**Draft ServiceNow incident — pending confirmation**")
+        st.markdown("")
+        col_l, col_r = st.columns(2)
+        with col_l:
+            st.markdown(f"**Ticket ID**\n\n`{ticket_id}`")
+            st.markdown(f"**Assignment group**\n\n`{ticket['queue']}`")
+            st.markdown(f"**Priority**\n\n`{ticket['priority']}`")
+        with col_r:
+            if ticket["source"] == "decline":
+                st.markdown(f"**Declined fix**\n\n`{ticket['declined_tool']}`")
+                st.markdown(f"**Reason**\n\n{ticket['reason']}")
+                st.markdown(f"**Diagnostic summary**\n\n{ticket['diagnostic_summary']}")
+            else:
+                st.markdown("**Requested by**\n\n`current.user`")
+                st.markdown("**Category**\n\nIT Support / Endpoint")
+                st.markdown(f"**Short description**\n\n{ticket['summary']}")
+
+    _pending_callout(
+        f"Confirm to submit this ticket to <strong>{ticket['queue']}</strong> "
+        f"and notify the on-call technician."
     )
 
 
@@ -329,36 +210,26 @@ with st.form("query_form", clear_on_submit=False):
     submitted = st.form_submit_button("Analyze →", type="primary")
 
 # ── Execute triage ──────────────────────────────────────────────────────────────
+# A new input on the same thread starts a fresh run (initial_state resets every field);
+# any interrupt left pending by the previous query is abandoned.
 if submitted and query.strip():
-    t0 = time.time()
+    st.session_state.preview_ticket_id = f"INC{random.randint(1000000, 9999999)}"
     with st.spinner("Running triage…"):
-        result = run_triage(query.strip(), st.session_state.use_retrieval)
-    response_time_sec = time.time() - t0
-    # Safety net: if model chose ESCALATE in text but skipped the tool call,
-    # synthesize a minimal ticket so the confirmation card always renders.
-    if result["path"] == "ESCALATE" and result["tool_name"] is None:
-        first_line = next(
-            (l.strip() for l in (result["reasoning"] or "").split("\n") if len(l.strip()) > 15),
-            "Issue escalated — technician review required.",
-        )
-        result["tool_name"] = "create_escalation_ticket"
-        result["tool_input"] = {
-            "queue": "DESKTOP-SUPPORT",
-            "summary": first_line[:150],
-            "priority": "P3-Normal",
-        }
-    st.session_state.result = result
-    st.session_state.pending_log_row = _log_run(result, response_time_sec)
-    _init_tool_state(result)
+        GRAPH.invoke(initial_state(query.strip(), st.session_state.use_retrieval), _config())
 
 # ── Results ─────────────────────────────────────────────────────────────────────
-if st.session_state.result:
-    result = st.session_state.result
+snapshot = GRAPH.get_state(_config())
+state = snapshot.values
+if state.get("path"):
+    pending = snapshot.interrupts[0].value if snapshot.interrupts else None
+    path = state["path"]
+    decision = state["human_decision"]
+    tool_result = state["tool_result"]
     st.divider()
 
     # 1 · Retrieval
     st.subheader("1 · Retrieval")
-    units = result["retrieved"]
+    units = state["retrieved"]
     if units:
         doc_names = {u["doc"] for u in units}
         if len(doc_names) > 1:
@@ -385,33 +256,24 @@ if st.session_state.result:
                     unsafe_allow_html=True,
                 )
     else:
-        if result["use_retrieval"]:
+        if state["use_retrieval"]:
             st.info("No KB article matched above the confidence threshold.")
         else:
             st.info("RAG is off — no retrieval performed.")
 
     # 2 · Decision
     st.subheader("2 · Decision")
-    st.markdown(_badge(result["path"]), unsafe_allow_html=True)
+    st.markdown(_badge(path), unsafe_allow_html=True)
     st.markdown("")
 
     # 3 · Agent reasoning
     st.subheader("3 · Agent reasoning")
-    st.markdown(result["reasoning"] or "_No reasoning returned._")
+    st.markdown(state["reasoning"] or "_No reasoning returned._")
 
     # 4 · Action
     st.subheader("4 · Action")
-    path = result["path"]
 
-    # ── Non-interactive paths ────────────────────────────────────────────────
-    if path == "SELF_SERVE":
-        st.success("Steps are in the reasoning above — no operator action required.")
-        st.button(
-            "This didn't resolve it — escalate to a technician.",
-            on_click=_escalate_self_serve,
-        )
-
-    elif path == "OUT_OF_SCOPE":
+    if path == "OUT_OF_SCOPE":
         st.info("Outside IT support scope — no action taken.")
 
     elif path == "NO_TOOLS":
@@ -422,135 +284,60 @@ if st.session_state.result:
             "to see the grounded, tool-capable agent."
         )
 
-    # ── Interactive paths (both require operator confirmation) ───────────────
-    elif path == "AUTO_FIX":
-        tool_name  = result["tool_name"] or "unknown"
-        tool_input = result["tool_input"] or {}
+    elif path == "SELF_SERVE":
+        if pending and pending["kind"] == "self_serve":
+            st.success("Steps are in the reasoning above — no operator action required.")
+            c1, c2, _ = st.columns([2, 3, 1])
+            with c1:
+                st.button("✓ This resolved it", on_click=_resume, args=(True,),
+                          use_container_width=True)
+            with c2:
+                st.button("This didn't resolve it — escalate to a technician.",
+                          on_click=_resume, args=(False,), use_container_width=True)
+        elif pending:  # confirm_ticket after "didn't resolve"
+            _ticket_card(pending["ticket"])
+            _confirm_buttons("✓ Confirm — submit ticket")
+        elif decision.get("resolved"):
+            st.success("Marked as resolved — no further action needed.")
+        elif decision.get("ticket"):
+            _ticket_submitted(tool_result, state["ticket_draft"]["queue"])
+        else:
+            st.warning("Escalation skipped by user. No ticket created.")
 
-        # Action card
+    elif path == "AUTO_FIX":
+        tool_input = state["tool_input"] or {}
         with st.container(border=True):
             st.markdown("**Proposed automated fix**")
-            st.markdown(f"Tool: `{tool_name}`")
-            if tool_input:
-                for k, v in tool_input.items():
-                    st.markdown(f"- `{k}`: `{v}`")
+            st.markdown(f"Tool: `{state['tool_name'] or 'unknown'}`")
+            for k, v in tool_input.items():
+                st.markdown(f"- `{k}`: `{v}`")
 
-        state = st.session_state.tool_state
-
-        if state == "pending":
+        if pending and pending["kind"] == "confirm_fix":
             _pending_callout("This fix will not run until you confirm below.")
-            c1, c2, _ = st.columns([2, 2, 3])
-            with c1:
-                st.button("✓ Confirm — run action", on_click=_confirm,
-                          type="primary", use_container_width=True)
-            with c2:
-                st.button("✗ Cancel", on_click=_cancel, use_container_width=True)
-
-        elif state == "confirmed" and st.session_state.tool_result:
-            tr = st.session_state.tool_result
-            st.success(f"**Action taken (simulated)**\n\n{tr['detail']}")
-            st.caption(f"Timestamp: {tr['timestamp']}")
-
-        elif state == "declined":
+            _confirm_buttons("✓ Confirm — run action")
+        elif pending:  # confirm_ticket after a declined fix
             st.warning(
                 "**Automated fix declined — here's a pre-filled ticket.** Built entirely "
                 "from the diagnosis above — no new model call."
             )
-            ticket = st.session_state.decline_ticket
-            ticket_id = st.session_state.get("preview_ticket_id", "INC0000000")
-
-            with st.container(border=True):
-                st.markdown("**Draft ServiceNow incident — pending confirmation**")
-                st.markdown("")
-                col_l, col_r = st.columns(2)
-                with col_l:
-                    st.markdown(f"**Ticket ID**\n\n`{ticket_id}`")
-                    st.markdown(f"**Assignment group**\n\n`{ticket['queue']}`")
-                    st.markdown(f"**Priority**\n\n`{ticket['priority']}`")
-                with col_r:
-                    st.markdown(f"**Declined fix**\n\n`{ticket['declined_tool']}`")
-                    st.markdown(f"**Reason**\n\n{ticket['reason']}")
-                    st.markdown(f"**Diagnostic summary**\n\n{ticket['diagnostic_summary']}")
-
-            _pending_callout(
-                f"Confirm to submit this ticket to <strong>{ticket['queue']}</strong> "
-                f"and notify the on-call technician."
-            )
-            c1, c2, _ = st.columns([2, 2, 3])
-            with c1:
-                st.button("✓ Send to ServiceNow", on_click=_send_decline_ticket,
-                          type="primary", use_container_width=True)
-            with c2:
-                st.button("✗ Cancel", on_click=_cancel_decline_ticket, use_container_width=True)
-
-        elif state == "declined_sent" and st.session_state.tool_result:
-            tr = st.session_state.tool_result
-            ticket_id = st.session_state.get("preview_ticket_id", "INC0000000")
-            queue = st.session_state.decline_ticket["queue"]
-            st.success(
-                f"**Ticket {ticket_id} submitted (simulated)**\n\n"
-                f"Redirecting to ServiceNow... *(simulated)*\n\n"
-                f"On-call technician for `{queue}` notified. SLA clock started."
-            )
-            st.caption(f"Timestamp: {tr['timestamp']}")
-
-        elif state == "declined_cancelled":
+            _ticket_card(pending["ticket"])
+            _confirm_buttons("✓ Send to ServiceNow")
+        elif decision.get("fix"):
+            st.success(f"**Action taken (simulated)**\n\n{tool_result['detail']}")
+            st.caption(f"Timestamp: {tool_result['timestamp']}")
+        elif decision.get("ticket"):
+            _ticket_submitted(tool_result, state["ticket_draft"]["queue"])
+        else:
             st.warning("Escalation skipped by operator. No fix applied, no ticket created.")
 
     elif path == "ESCALATE":
-        if result["tool_name"] == "create_escalation_ticket":
-            ti        = result["tool_input"] or {}
-            queue     = ti.get("queue", "DESKTOP-SUPPORT")
-            summary   = ti.get("summary", "—")
-            priority  = ti.get("priority", "P3-Normal")
-            ticket_id = st.session_state.get("preview_ticket_id", "INC0000000")
-
-            state = st.session_state.tool_state
-
-            if state in ("pending", None):
-                # ── Draft ticket preview (ITSM-style) ────────────────────────
-                with st.container(border=True):
-                    st.markdown("**Draft ServiceNow incident — pending confirmation**")
-                    st.markdown("")
-                    col_l, col_r = st.columns(2)
-                    with col_l:
-                        st.markdown(f"**Ticket ID**\n\n`{ticket_id}`")
-                        st.markdown(f"**Assignment group**\n\n`{queue}`")
-                        st.markdown(f"**Priority**\n\n`{priority}`")
-                    with col_r:
-                        st.markdown("**Requested by**\n\n`current.user`")
-                        st.markdown("**Category**\n\nIT Support / Endpoint")
-                        st.markdown(f"**Short description**\n\n{summary}")
-
-                _pending_callout(
-                    f"Confirm to submit this ticket to <strong>{queue}</strong> "
-                    f"and notify the on-call technician."
-                )
-                c1, c2, _ = st.columns([2, 2, 3])
-                with c1:
-                    st.button("✓ Confirm — submit ticket", on_click=_confirm,
-                              type="primary", use_container_width=True)
-                with c2:
-                    st.button("✗ Cancel", on_click=_cancel, use_container_width=True)
-
-            elif state == "confirmed" and st.session_state.tool_result:
-                tr = st.session_state.tool_result
-                st.success(
-                    f"**Ticket {ticket_id} submitted (simulated)**\n\n"
-                    f"Redirecting to ServiceNow... *(simulated)*\n\n"
-                    f"On-call technician for `{queue}` notified. SLA clock started."
-                )
-                st.caption(f"Timestamp: {tr['timestamp']}")
-
-            elif state == "cancelled":
-                st.warning("Escalation skipped by user. No ticket created.")
-
+        if pending:
+            _ticket_card(pending["ticket"])
+            _confirm_buttons("✓ Confirm — submit ticket")
+        elif decision.get("ticket"):
+            _ticket_submitted(tool_result, state["tool_input"]["queue"])
         else:
-            # Fallback: agent chose ESCALATE but didn't call the ticket tool.
-            st.warning(
-                "The agent recommends escalation but did not propose a specific ticket. "
-                "Review the reasoning above and raise a ticket manually if needed."
-            )
+            st.warning("Escalation skipped by user. No ticket created.")
 
 # ── Stats: live session usage vs. fixed golden-set eval ──────────────────────────
 # These are two different things, shown side by side but never merged into one number:
