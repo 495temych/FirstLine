@@ -34,7 +34,7 @@ Most L1 tickets aren't hard — they're just troubleshooting simple, repetitive 
 For SME customers specifically, remote resolution via SELF_SERVE/AUTO_FIX removes the travel leg entirely for automatable tickets — this is not just faster resolution, it's a dispatch trip that never has to happen. Not netted against this figure: knowledge-base curation/maintenance effort, LLM inference cost per ticket, and technician review overhead during AUTO_FIX confirmation.
 
 ### Data potential
-Every triage run appends a row to `logs.csv` — query, retrieved units, decision path, diagnostic summary, tool called, operator confirmation, escalation queue/priority, response time — and the app's "Live session stats" panel turns that into a running summary (path distribution, automation rate, avg response time) shown alongside the golden-set eval (see [Evaluation](#evaluation)). Over time, the same log supports:
+Every completed triage run (one that reaches a final state; RAG-off runs, which have no decision path, are not logged) appends a row to `logs.csv` — query, retrieved units, decision path, diagnostic summary, tool called, operator confirmation, escalation queue/priority, response time — and the app's "Live session stats" panel turns that into a running summary (path distribution, automation rate, avg response time) shown alongside the golden-set eval (see [Evaluation](#evaluation)). Over time, the same log supports:
 - Retrieval threshold tuning, per category
 - Cost-per-resolution-path analysis (AUTO_FIX cost vs. ESCALATE technician-hour cost)
 - A natural link to quantitative/pricing-style analysis of automation vs. human dispatch
@@ -44,27 +44,59 @@ Every triage run appends a row to `logs.csv` — query, retrieved units, decisio
 ## Architecture
 
 ```mermaid
-flowchart LR
-    A["🔤 Intake\nUser query"] --> Z{"RAG toggle"}
-    Z -- On --> B["🔍 Retrieval\nall-MiniLM-L6-v2\n12 docs → 17 units\ntop-k 2, threshold 0.35"]
-    Z -- Off --> N["📝 No tools offered\nungrounded reasoning only"]
-    N --> O["NO_TOOLS badge\ngeneric advice, no action"]
-    B --> C["🧠 Reasoning\nClaude Haiku\n+ retrieved context"]
-    C --> D{"Decision"}
-    D -- SELF_SERVE --> E["📋 Return steps\nUser acts directly"]
-    D -- AUTO_FIX --> F["🔧 Propose fix\ntool call"]
-    D -- ESCALATE --> G["🎫 Draft ticket\ncreate_escalation_ticket"]
-    D -- OUT_OF_SCOPE --> H["🚫 Decline\npolitely"]
-    E -. "didn't resolve it" button .-> G
-    F --> I["👤 Human confirmation\nConfirm / Cancel"]
-    G --> I
-    I -- Confirmed --> J["⚡ Action\nmocked tool / ticket"]
-    I -- "Cancelled (ESCALATE)" --> K["Skipped\nno ticket created"]
-    I -- "Cancelled (AUTO_FIX)" --> L["📝 Pre-filled ticket\nfrom existing diagnosis\nno new model call"]
-    L --> M["👤 Confirm / Cancel\nSend to ServiceNow"]
-    M -- Confirmed --> J
-    M -- Cancelled --> K
+---
+config:
+  flowchart:
+    curve: linear
+---
+graph TD;
+	__start__([<p>__start__</p>]):::first
+	retrieve(retrieve)
+	triage(triage)
+	no_tools(no_tools)
+	confirm_fix(confirm_fix)
+	confirm_ticket(confirm_ticket)
+	self_serve_wait(self_serve_wait)
+	execute_tool(execute_tool)
+	draft_ticket(draft_ticket)
+	create_ticket(create_ticket)
+	log(log)
+	__end__([<p>__end__</p>]):::last
+	__start__ -.-> no_tools;
+	__start__ -.-> retrieve;
+	confirm_fix -.-> draft_ticket;
+	confirm_fix -.-> execute_tool;
+	confirm_ticket -.-> create_ticket;
+	confirm_ticket -.-> log;
+	create_ticket --> log;
+	draft_ticket --> confirm_ticket;
+	execute_tool --> log;
+	retrieve --> triage;
+	self_serve_wait -.-> draft_ticket;
+	self_serve_wait -.-> log;
+	triage -.-> confirm_fix;
+	triage -.-> confirm_ticket;
+	triage -.-> log;
+	triage -.-> self_serve_wait;
+	log --> __end__;
+	no_tools --> __end__;
+	classDef default fill:#f2f0ff,line-height:1.2
+	classDef first fill-opacity:0
+	classDef last fill:#bfb6fc
 ```
+
+*Generated from the compiled graph (`build_graph(...).get_graph().draw_mermaid()`), so it cannot drift from the code. Dotted edges are conditional routers (`graph.py`: `route_start`, `route_after_triage`, `route_after_confirm_fix`, `route_after_confirm_ticket`, `route_after_self_serve`); `confirm_fix`, `confirm_ticket` and `self_serve_wait` are the human gates.*
+
+### Why LangGraph
+
+The triage flow has three human gates, and which one comes next depends on earlier answers (decline a fix → draft a ticket → confirm the ticket). Before, that lived in a string state machine in `app.py` (`tool_state`, `decline_ticket`, `pending_log_row`) plus a function that patched `logs.csv` after the fact. As a `StateGraph`:
+
+- **Gates are nodes.** `confirm_*` and `self_serve_wait` only call `interrupt()` and store the answer; the side effects (`execute_tool`, `create_ticket`) are separate nodes that can only run after an answer exists.
+- **One typed state, one log write.** `GraphState` carries everything; the `log` node writes the row once, from the final state, so `confirmed` is known when it is written.
+- **Testable routing.** Routers are pure functions with `Literal` return types, and `parse_path` is a pure function. `tests/test_graph.py` covers both, plus every flow end-to-end with a fake model.
+- **Durable pauses.** The app uses a SQLite checkpointer, so a pending confirmation is part of the stored thread state rather than Streamlit session variables. `triage` retries transient Anthropic API errors only (`RetryPolicy`).
+
+Trade-off: a run is logged when it reaches a final state, so a run left sitting at a confirmation card and abandoned by starting a new query is not logged.
 
 | Path | When | Operator action required? |
 |---|---|---|
@@ -75,9 +107,9 @@ flowchart LR
 
 **Scope check:** OUT_OF_SCOPE is reserved for requests unrelated to workplace technology (weather, personal advice, general knowledge, creative tasks). An IT-related request that needs identity/access-management, security-team, or admin-level action beyond user self-service — adding someone to a security group, granting elevated permissions, a suspected account compromise — is not out of scope. It's real IT work that exceeds desktop-support scope, so it routes to ESCALATE, not OUT_OF_SCOPE.
 
-**SELF_SERVE fallback:** if the returned steps don't fix it, a button on the result ("This didn't resolve it — escalate to a technician") converts the result in place into the same ESCALATE ticket-preview/Confirm/Cancel flow — reusing `create_escalation_ticket` rather than adding a new tool. The generated summary explicitly notes self-serve was already attempted, so the receiving technician doesn't repeat those steps; queue defaults to `DESKTOP-SUPPORT`, priority `P3-Normal`.
+**SELF_SERVE fallback:** if the returned steps don't fix it, the run waits at `self_serve_wait` with two buttons, "This resolved it" (logs and ends) and "This didn't resolve it — escalate to a technician", which routes through `draft_ticket` into the same ticket-preview/Confirm/Cancel gate as ESCALATE — reusing `create_escalation_ticket` rather than adding a new tool. The generated summary explicitly notes self-serve was already attempted, so the receiving technician doesn't repeat those steps; queue defaults to `DESKTOP-SUPPORT`, priority `P3-Normal`.
 
-**AUTO_FIX decline:** declining a proposed fix doesn't end the flow either. The app pre-fills an escalation ticket client-side from the diagnosis already produced in that response — no second model call — carrying the declined tool's name, a fixed reason ("User declined proposed automated fix; issue persists"), the existing diagnostic summary, and a `P3-Normal` default priority. That ticket gets its own, separate Confirm ("Send to ServiceNow") / Cancel step before `create_escalation_ticket` actually runs. Accepting AUTO_FIX and declining it both end up at the same human-confirmation pattern — they diverge only in what's being confirmed, not in whether confirmation is required.
+**AUTO_FIX decline:** declining a proposed fix doesn't end the flow either. The `draft_ticket` node pre-fills an escalation ticket from the diagnosis already produced in that response — no second model call — carrying the declined tool's name, a fixed reason ("User declined proposed automated fix; issue persists"), the existing diagnostic summary, and a `P3-Normal` default priority. That ticket gets its own, separate Confirm ("Send to ServiceNow") / Cancel step before `create_escalation_ticket` actually runs. Accepting AUTO_FIX and declining it both end up at the same human-confirmation pattern — they diverge only in what's being confirmed, not in whether confirmation is required.
 
 **RAG off:** none of the four paths above apply. The agent is given no tools at all for that call, so it cannot classify or act — it just returns hedged, ungrounded text, and the UI shows a distinct `NO TOOLS (RAG OFF)` badge instead of a path badge.
 
@@ -85,7 +117,7 @@ flowchart LR
 
 ## How it works
 
-**Stack:** Claude API (generation + tool-use), `sentence-transformers` with `all-MiniLM-L6-v2` (local embeddings — no API cost per query), Streamlit (frontend + session state for HITL confirmation).
+**Stack:** Claude API via `langchain-anthropic` (generation + tool-use), LangGraph (orchestration, human-in-the-loop interrupts, SQLite checkpointer), `sentence-transformers` with `all-MiniLM-L6-v2` (local embeddings — no API cost per query), Streamlit (frontend driven by graph state).
 
 **Knowledge base:** 12 Markdown files. 11 are single-issue playbooks, each embedded whole as one retrieval unit. The 12th, `company-profile.md`, is a multi-topic org reference (systems, escalation queues, policies) — it's split into one unit per `##` section instead, so a query can match its one relevant section directly rather than the whole mixed-topic file. 17 retrievable units total. `retrieve()` returns up to the top 2 units (cosine similarity, threshold 0.35 per unit) ranked together regardless of source doc — this is what lets one query pull both an issue playbook and a policy section in the same call. Within each matched unit, individual lines are re-scored against the same query embedding for sentence-level highlighting (threshold 0.25) — same model, no extra inference cost, no additional dependencies.
 
@@ -214,7 +246,7 @@ The tools here are called via Anthropic's native tool-use API (`tools=` in `mess
 - **Single-turn only.** Some real L1 issues genuinely require back-and-forth. The current architecture can't handle those — single-turn is a constraint, not just a design choice.
 - **No feedback loop for threshold tuning.** The 0.35 threshold is set by inspection. Production would use operator-confirmed outcomes (was the retrieval actually helpful?) to tune it per-category. This connects directly to RAG-on vs. RAG-off cost tradeoff analysis.
 - **RAG cost/latency tradeoff not measured.** RAG-on adds one embedding inference + file I/O per query. For high-volume deployments, a cost/latency comparison of RAG-on vs. RAG-off is a valid economic input — the toggle in the demo makes this comparison observable but not quantified.
-- **MCP as natural evolution.** The current function-calling tools are hardcoded in `agent.py`. MCP would replace this with a discoverable, credential-isolated connector layer — making tool updates a config change rather than a code change.
+- **MCP as natural evolution.** The current function-calling tool schemas are hardcoded in `tool_schemas.py`. MCP would replace this with a discoverable, credential-isolated connector layer — making tool updates a config change rather than a code change.
 - **German-language support missing.** Limmatica AG is a Swiss company. KB articles and the triage prompt are English-only. A production deployment needs multilingual embeddings and a German prompt.
 - **ITSM schema alignment is partial.** The escalation ticket maps to ServiceNow's incident schema but omits `impact`, `urgency`, `cmdb_ci` (configuration item), and `work_notes`. A complete integration would populate these from the KB article and device context.
 - **Fixed top-k, not top-p.** Retrieval always returns up to 2 units (gated by the 0.35 threshold). Top-p (nucleus) retrieval over normalized scores — keep units until cumulative similarity mass crosses a cutoff — would give adaptive breadth instead: one obviously-dominant match returns alone, a genuinely ambiguous query can pull more than 2. Not implemented; the corpus is too small right now to tell the two approaches apart empirically.
@@ -232,5 +264,7 @@ pip install -r requirements.txt
 echo "ANTHROPIC_API_KEY=sk-ant-..." > .env
 streamlit run app.py
 ```
+
+Offline tests (no API calls): `pip install pytest && pytest`.
 
 First run downloads `all-MiniLM-L6-v2` (~90 MB) and builds document embeddings. Both are cached in memory for the session.
