@@ -1,38 +1,10 @@
 # Label review
 
-Check each row against the knowledge base. Change anything you disagree with in `data/evals/`, then delete this file.
+Review the development labels in the app's Tickets tab. Turn on **Only labels to check** to see the four that need a decision first.
 
-**Look at these first:** `T-001` (the KB lists several causes, so AUTO_FIX alone may be too strict), `T-017` and `H-002` (two accepted paths), `T-018` (known floor 5 congestion, so ticket or just logged?), `T-006` (an existing label, made `records`).
+Check the held-out rows below against the knowledge base. Change anything you disagree with in `data/evals/`, then delete this file.
 
-## Development
-
-| Id | Requester | Ticket | Answer | Tool or queue | Difficulty | Note |
-|---|---|---|---|---|---|---|
-| T-001 | Client Services, floor 5 | My VPN keeps disconnecting | AUTO_FIX | reset_vpn_profile | hard | Existing label. The KB lists several causes, so review it. |
-| T-002 | Operations, floor 4 | Teams shows me as offline to everyone | AUTO_FIX | clear_teams_cache | routine |  |
-| T-003 (tiny) | Client Services, floor 5 | Floor 5 print queue is stuck | AUTO_FIX | restart_print_spooler | routine |  |
-| T-004 | Risk, floor 6 | VPN cert error, gateway confirmed correct, offline for a month | AUTO_FIX | reset_vpn_profile | routine |  |
-| T-005 | Operations, floor 3 | Need Zoom installed, no admin rights, it's in Company Portal | AUTO_FIX | push_approved_software | routine |  |
-| T-006 | Client Services, floor 4, **2 lockouts** | I'm locked out of my account | ESCALATE | SEC-INCIDENT | records | 2 lockouts in 24 hours in the records. |
-| T-007 (tiny) | Compliance, floor 3 | Locked out twice already today | ESCALATE | SEC-INCIDENT | routine |  |
-| T-008 | Finance, floor 5 | My OneDrive has been stuck syncing for two days | ESCALATE | M365-SYNC | hard |  |
-| T-009 | Client Services, floor 6 | My external monitor isn't detected when docked | SELF_SERVE or ESCALATE | any | hard | The KB supports either path. |
-| T-010 (tiny) | Legal, floor 7 | What's the weather like today? | OUT_OF_SCOPE | any | routine |  |
-| T-011 | Compliance, floor 3 | Outlook keeps asking for my password, and my Okta session was renewed yesterday. | AUTO_FIX | clear_credential_manager | routine |  |
-| T-012 | Legal, floor 7 | Outlook has prompted me to sign in all morning. My last full Okta login was about three months ago. | SELF_SERVE | any | hard | Expected 90-day expiry: the user re-authenticates. |
-| T-013 (tiny) | Risk, floor 6 | My laptop is crawling right now and Task Manager shows CSFalconService using most of the CPU. | SELF_SERVE | any | routine | Expected scan: tell the user it clears in about 20 minutes. |
-| T-014 | Operations, floor 4 | My disk is almost full and OneDrive seems to keep every file on the laptop. | AUTO_FIX | enable_onedrive_files_on_demand | routine |  |
-| T-015 | Finance, floor 5 | My mapped drives have disappeared. VPN is connected and everything else works. | AUTO_FIX | remap_drives | routine |  |
-| T-016 | Finance, floor 5 | The Finance share on FS01 is down for our whole team and it's Wednesday afternoon. | ESCALATE | INFRA-FS01 | routine | Outside the Tuesday maintenance window. |
-| T-017 | Client Services, floor 5 | Can I get Photoshop? It isn't in Company Portal. | SELF_SERVE or ESCALATE | any | hard | Needs SR-SOFTWARE with manager approval. |
-| T-018 | Client Services, floor 6 | Wi-Fi keeps dropping for several of us near the open-plan area on floor 5. | ESCALATE | NET-WIFI | routine | Known congestion: log it for tracking. |
-| T-019 | Operations, floor 3 | Please give me local admin rights so I can install my own tools. | ESCALATE | any | hard | Access requests are escalated (SEC-07). |
-| T-020 (tiny) | Operations, floor 3, **3 lockouts** | Locked out again, can you unlock me please? | ESCALATE | SEC-INCIDENT | records | 3 lockouts in 24 hours in the records. |
-| T-021 | Risk, floor 6, **1 lockouts** | My account got locked after I mistyped my new password following the rotation reminder. | AUTO_FIX or SELF_SERVE | unlock_ad_account | records | Only 1 lockout in the records, so routine. |
-| T-022 | Compliance, floor 3, **image 2025-11** | My Wi-Fi keeps dropping at my desk. Nobody else seems affected. | AUTO_FIX | push_wifi_driver_update | records | Device image is pre-2026-05 in the records. |
-| T-023 | Client Services, floor 5, **3y old, battery 52%** | My laptop battery barely lasts an hour now. | ESCALATE | HW-REPLACE | records | 3-year-old device with 52% battery health in the records. |
-| T-024 | Legal, floor 7 | My monitor says no signal since someone swapped it at my desk. The dock cable clicks in fine. | SELF_SERVE | any | hard | Input source should be USB-C. |
-| T-025 | Legal, floor 7 | Can you recommend a good restaurant near Sihlquai for a team lunch? | OUT_OF_SCOPE | any | routine |  |
+**Look at this first:** `H-002` (two accepted paths).
 
 ## Held-out
 

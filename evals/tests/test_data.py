@@ -11,7 +11,7 @@ from agent.tool_schemas import TOOLS
 from evals import runner
 
 SETS = ["dev", "held_out"]
-USERS = json.loads((config.ROOT / "data" / "records" / "users.json").read_text())
+USERS = json.loads(config.USERS_FILE.read_text())
 PATHS = {"SELF_SERVE", "AUTO_FIX", "ESCALATE", "OUT_OF_SCOPE"}
 
 

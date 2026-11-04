@@ -31,6 +31,7 @@ Our goal is to resolve routine tickets remotely, before anyone travels, and to h
 - After a self-serve answer, a way to say it worked, or that it did not and should go to a technician.
 - Live statistics from real use: tickets by path, the share resolved without a technician, response times.
 - A Scoreboard with the results of our evaluations.
+- A Tickets tab to review the development tickets, their labels, the requester's records and the latest result.
 - A switch that turns retrieval off, so we can show what the agent does without our knowledge base.
 
 ## Rules

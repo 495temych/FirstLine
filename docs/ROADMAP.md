@@ -18,7 +18,7 @@ Both produce the same decision format, follow the same rules in the same backend
 ## The briefs
 
 1. ~~FOUNDATION~~: packages, checks, CI, docs. Done.
-2. **EVALS**: records, labelled tickets, cost tracking, Scoreboard. Today's agent becomes the baseline.
+2. **EVALS**: records, labelled tickets, cost tracking, Scoreboard, Tickets tab. Today's agent becomes the baseline.
 3. **BACKEND**: FastAPI, SQLite tickets, audit trail, rules enforced in code. Triage gets the user's records.
 4. **AGENT**: the loop with read-only tools, the Inbox tab, a dispatcher with no model, a review queue.
 5. **HARDEN**: traces, budget cap, prompt-injection tests, personal data out of logs.

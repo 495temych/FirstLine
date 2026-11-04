@@ -39,6 +39,7 @@ Each package keeps its tests in its own `tests/` folder.
 ## Code standards
 
 - Keep it simple, and build only what the documents ask for.
+- MVP rule: ship one focused version at a time, fully working and tested, before starting the next.
 - Nodes return partial state and never mutate `state`. Routers are pure functions.
 - Side effects never live in an `interrupt()` node, because it re-runs from its first line on resume.
 - Paths and settings go in `agent/config.py`.

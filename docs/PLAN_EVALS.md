@@ -24,8 +24,16 @@ Triage and Scoreboard tabs. The evaluation panel goes, so opening the app makes 
 - [x] `uv run -m evals --tiny` saves a result the Scoreboard shows in the browser.
 - [x] `uv run poe check` passes.
 
-## Phase 4: baseline (after the label review)
+## Phase 4: Tickets tab
 
-- [ ] A person has reviewed the labels.
+A read-only tab for reviewing the development labels. The held-out set stays out of the app.
+
+- [x] Smoke tests cover the table, filters, the labels to check and the latest result.
+- [x] Selecting a row opens that ticket in the browser.
+- [x] `uv run poe check` passes.
+
+## Phase 5: baseline (after the label review)
+
+- [ ] A person has reviewed the labels, and the `review` flags are gone.
 - [ ] Development set, held-out set and one stronger model are run and committed.
 - [ ] The README's "Results" section is filled in.

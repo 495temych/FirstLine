@@ -10,7 +10,7 @@ from langgraph.types import Command
 
 from agent import config
 from agent.graph import build_graph, initial_state
-from app import scoreboard
+from app import explorer, scoreboard
 from app import stats as _analyze_mod
 
 st.set_page_config(
@@ -186,10 +186,13 @@ st.title("L1 Support Agent")
 st.caption("Limmatica AG · internal IT triage demo · powered by Claude")
 st.divider()
 
-triage_tab, scoreboard_tab = st.tabs(["Triage", "Scoreboard"])
+triage_tab, scoreboard_tab, tickets_tab = st.tabs(["Triage", "Scoreboard", "Tickets"])
 
 with scoreboard_tab:
     scoreboard.render()
+
+with tickets_tab:
+    explorer.render()
 
 with triage_tab:
     # ── Global RAG toggle ───────────────────────────────────────────────────────────

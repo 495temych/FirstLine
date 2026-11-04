@@ -9,7 +9,7 @@ from streamlit.testing.v1 import AppTest
 
 from agent import config, graph
 from agent.tests.fakes import UNIT, FakeLLM, text, tool
-from app import stats
+from app import explorer, stats
 from evals import runner
 
 MAIN = str(Path(__file__).parent.parent / "main.py")
@@ -86,7 +86,7 @@ def test_the_app_loads_and_reads_the_log(app):
     app.run()
     assert not app.exception
     assert app.title[0].value == "L1 Support Agent"
-    assert [t.label for t in app.tabs] == ["Triage", "Scoreboard"]
+    assert [t.label for t in app.tabs] == ["Triage", "Scoreboard", "Tickets"]
     assert any("Total logged queries" in m.label for m in app.metric)
 
 
@@ -102,6 +102,53 @@ def test_the_scoreboard_shows_a_saved_run(app, monkeypatch):
     assert not app.exception
     assert len(app.tabs[1].dataframe) == 3
     assert "assumptions" in app.tabs[1].caption[0].value
+
+
+def test_tickets_shows_the_development_set_and_the_first_ticket(app):
+    app.run()
+    tab = app.tabs[2]
+    table = tab.dataframe[0].value
+    assert len(table) == 25
+    assert table["Ticket"].str.startswith("T-").all()
+    assert (table["Latest run"] == "not run").all()
+    assert tab.subheader[0].value == "My VPN keeps disconnecting"
+    assert "Check this label" in tab.warning[0].title
+    assert "reset_vpn_profile" in "".join(m.value for m in tab.markdown)
+
+
+def test_tickets_can_be_filtered(app):
+    app.run()
+    app.button_group(key="tickets_difficulty").set_value("records").run()
+    assert len(app.tabs[2].dataframe[0].value) == 5
+    app.button_group(key="tickets_path").set_value("OUT_OF_SCOPE").run()
+    assert "No tickets match" in app.tabs[2].info[0].value
+
+
+def test_tickets_can_show_only_the_labels_to_check(app):
+    app.run()
+    app.toggle(key="tickets_to_check").set_value(True).run()
+    table = app.tabs[2].dataframe[0].value
+    assert list(table["Ticket"]) == ["T-001", "T-006", "T-017", "T-018"]
+
+
+def test_tickets_shows_the_latest_result(app, monkeypatch):
+    monkeypatch.setattr(runner, "run_triage", stub_triage)
+    runner.save_run(runner.evaluate("dev", tiny=True))
+    app.run()
+    table = app.tabs[2].dataframe[0].value.set_index("Ticket")
+    assert table.loc["T-003", "Latest run"] == "✗"
+    assert table.loc["T-001", "Latest run"] == "not run"
+
+
+def test_latest_results_keeps_the_newest_and_skips_the_held_out_set():
+    runs = [
+        {"set": "held_out", "tickets": [{"id": "H-001"}]},
+        {"set": "dev", "tickets": [{"id": "T-001", "action_correct": True}]},
+        {"set": "dev", "tickets": [{"id": "T-001", "action_correct": False}]},
+    ]
+    assert explorer.latest_results(runs) == {
+        "T-001": {"id": "T-001", "action_correct": True}
+    }
 
 
 def test_a_missing_key_stops_the_app_with_a_message(app, monkeypatch):

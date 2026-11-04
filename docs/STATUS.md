@@ -1,8 +1,8 @@
 # Status
 
-TriagePilot triages one ticket at a time in a Streamlit app, with a Scoreboard tab for saved evaluations. Each ticket gets one model call, grounded in the top 2 knowledge base units, and ends on one of four paths behind human confirmation gates. All 10 remediation tools are simulated. `docs/ROADMAP.md` says what comes next.
+TriagePilot triages one ticket at a time in a Streamlit app, with a Scoreboard tab for saved evaluations and a read-only Tickets tab for the development tickets and their labels. Each ticket gets one model call, grounded in the top 2 knowledge base units, and ends on one of four paths behind human confirmation gates. All 10 remediation tools are simulated. `docs/ROADMAP.md` says what comes next.
 
-The EVALS code is built. The baseline is waiting for the label review in `briefs/LABEL_REVIEW.md`.
+The EVALS code is built. The baseline is waiting for the label review, in the Tickets tab for the development set and `briefs/LABEL_REVIEW.md` for the held-out set. The held-out set stays out of the app.
 
 ## How to run it
 

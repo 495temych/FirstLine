@@ -13,7 +13,8 @@
     ],
     "difficulty": "hard",
     "tiny": false,
-    "note": "Existing label. The KB lists several causes, so review it."
+    "note": "Existing label. The KB lists several causes, so review it.",
+    "review": "The KB lists several causes, so AUTO_FIX alone may be too strict."
   },
   {
     "id": "T-002",
@@ -93,7 +94,8 @@
     ],
     "difficulty": "records",
     "tiny": false,
-    "note": "2 lockouts in 24 hours in the records."
+    "note": "2 lockouts in 24 hours in the records.",
+    "review": "An existing label, now marked records. The agent can't see the lockout count yet."
   },
   {
     "id": "T-007",
@@ -261,7 +263,8 @@
     ],
     "difficulty": "hard",
     "tiny": false,
-    "note": "Needs SR-SOFTWARE with manager approval."
+    "note": "Needs SR-SOFTWARE with manager approval.",
+    "review": "Two accepted paths. Should one be enough?"
   },
   {
     "id": "T-018",
@@ -277,7 +280,8 @@
     ],
     "difficulty": "routine",
     "tiny": false,
-    "note": "Known congestion: log it for tracking."
+    "note": "Known congestion: log it for tracking.",
+    "review": "Known floor 5 congestion. Should it be a ticket, or just logged?"
   },
   {
     "id": "T-019",

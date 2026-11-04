@@ -9,6 +9,7 @@ ROOT = Path(__file__).resolve().parent.parent
 KB_DIR = ROOT / "data" / "kb"
 LOG_FILE = ROOT / "logs.csv"
 CHECKPOINT_DB = ROOT / "checkpoints.sqlite"
+USERS_FILE = ROOT / "data" / "records" / "users.json"
 DEFAULT_MODEL = "claude-haiku-4-5-20251001"
 
 # US dollars per million tokens: (input, output).
