@@ -49,7 +49,7 @@ Our goal is to resolve routine tickets remotely, before anyone travels, and to h
 
 ## Our records
 
-- `docs/` today, `data/kb/` after the foundation work: Limmatica's knowledge base, 11 single-issue playbooks and the company profile, which is split by section.
+- `data/kb/`: Limmatica's knowledge base, 11 single-issue playbooks and the company profile, which is split by section.
 - `logs.csv`: real usage from the app, one row per finished run. It is not in git.
 - The evaluation set: 10 tickets with the expected path and the knowledge base units that should be found.
 

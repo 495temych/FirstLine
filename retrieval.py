@@ -3,7 +3,7 @@ from pathlib import Path
 import numpy as np
 from sentence_transformers import SentenceTransformer
 
-DOCS_DIR = Path(__file__).parent / "docs"
+DOCS_DIR = Path(__file__).parent / "data" / "kb"
 SIMILARITY_THRESHOLD = 0.35
 TOP_K = 2
 

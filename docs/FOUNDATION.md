@@ -4,20 +4,17 @@ From our engineering lead.
 
 ## Where we're heading
 
-TriagePilot works, and the pilot in `docs/SPEC.md` describes what it does. Next we want evaluations we can trust, a ticket queue, an agent that can investigate before it decides, and batch triage. Each of those comes as its own brief. Before any of them, the project needs the base a production team would expect: documents a coding agent can work from, one command that checks everything, and a layout with room to grow.
+TriagePilot works, and the pilot in `docs/SPEC.md` describes what it does. Next we want evaluations we can trust, a backend that enforces our rules, an agent that can investigate before it decides, and batch triage. `docs/ROADMAP.md` sets out the order, and each step comes as its own brief. Before any of them, the project needs the base a production team would expect: documents a coding agent can work from, one command that checks everything, and a layout with room to grow.
 
 **Nothing the user or the technician sees changes in this brief.** Same paths, same tools, same instructions, same model, same screens.
 
 ## What we want
 
 1. **Documents for the coding agent.**
-   - `AGENTS.md` at the root, and a `CLAUDE.md` that holds only `@AGENTS.md`. It gives the context, a "Start here" list of the documents below to read in full before any work, the plan-then-implement process, the folders, and the rules.
+   - `AGENTS.md` at the root, and a `CLAUDE.md` that holds only `@AGENTS.md`. It gives the context, a "Start here" list of the documents below to read in full before any work, the tech choices, the code standards, the plan-then-implement process, the folders, and the rules. Keep it short enough to read in full.
    - In `docs/`:
      - `SPEC.md`: moved from `briefs/SPEC.md`
-     - `TECH_STACK.md`: the tech choices
-     - `CODE_STANDARDS.md`: how to write the code
-     - `PROCESS.md`: how to plan, build and check
-     - `BRAND.md`: the app's look and tone as they are today
+     - `ROADMAP.md`: moved from `briefs/ROADMAP.md`
      - `STATUS.md`: what is built and how to run it
      - `DECISIONS.md`: one short entry for each design decision already made, each with its reason and its trade-off, taken from the README. These are LangGraph, single-shot triage, local embeddings, mixed-granularity retrieval, the 0.35 threshold with top 2, no tools with retrieval off, the SQLite checkpointer, and logging from the final state. The README's known limitations go here too.
    - In `STATUS.md`, list each rule in `docs/SPEC.md` and say whether the code enforces it or only the agent's instructions do. Later briefs close those gaps.
@@ -45,6 +42,7 @@ TriagePilot works, and the pilot in `docs/SPEC.md` describes what it does. Next 
   - pytest with coverage of `agent/` and `evals/` at 80% or more
   - Streamlit's `AppTest` smoke tests for `app/`
 - **A pre-commit hook** (the `pre-commit` framework) runs the same checks on every commit. Never skip it with `--no-verify`.
+- **GitHub Actions** runs `uv run poe check` on every push and pull request, with no API key.
 - **Never lower a threshold**, turn off a rule or exclude a file to get a green run. Fix the code, or stop and ask.
 - **The model**: `claude-haiku-4-5-20251001` by default, or the model in `MODEL_NAME` if set. Add a `.env.example` with `ANTHROPIC_API_KEY` and `MODEL_NAME` and no values.
 - **Tests never call a model.** They use a stub, as `tests/test_graph.py` does today.
@@ -65,6 +63,7 @@ TriagePilot works, and the pilot in `docs/SPEC.md` describes what it does. Next 
 - After `uv sync`, `.venv` is still a link to `.venv.nosync`.
 - `docs/` holds only project documents, and `knowledge-base/` is gone.
 - The pre-commit hook blocks a commit that fails a check.
+- The GitHub Actions workflow is in place, and the same checks pass in a fresh clone with no `.env`.
 - `uv run streamlit run app/main.py` starts the app. One ticket for each of the four paths behaves as it did before, and the stats panel still reads the existing `logs.csv`.
 - `uv run -m evals` gives the same path and retrieval results as `python eval.py` did before the move, within the known run-to-run variation on "My VPN keeps disconnecting".
 - `docs/STATUS.md` is up to date, and `AGENTS.md` lists every document in `docs/`.

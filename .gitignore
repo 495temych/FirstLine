@@ -9,3 +9,12 @@ checkpoints.sqlite*
 .pytest_cache/
 .venv
 .venv.nosync/
+.env.*
+!.env.example
+.ruff_cache/
+.coverage
+htmlcov/
+.streamlit/secrets.toml
+.agents/
+.claude/skills/
+.claude/settings.local.json
