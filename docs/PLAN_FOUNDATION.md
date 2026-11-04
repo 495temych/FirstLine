@@ -60,13 +60,13 @@ Today's check findings are small and mechanical: 87 long lines, 9 files to forma
 
 **Success criteria**
 
-- [ ] `uv run poe check` passes with coverage at 80% or more, and `grep -rn "noqa\|type: ignore" agent app evals conftest.py` finds nothing.
-- [ ] `agent/prompt.md`, the JSON of `TOOLS` and the graph's Mermaid output match commit `ef89ead`, checked by a short script.
-- [ ] `golden.json` holds the same 10 tickets and labels as `eval.py` at `ef89ead`.
-- [ ] Tests show the default model with `MODEL_NAME` unset or blank, and the override when set.
-- [ ] Running the tests leaves `logs.csv` and `checkpoints.sqlite` unchanged.
-- [ ] A staged file with an unused import makes `git commit` fail, and a clean commit passes with no `--no-verify`.
-- [ ] `uv run poe check` passes in a fresh clone in a temporary folder, with no `.env`, and `.github/workflows/check.yml` runs that same command.
+- [x] `uv run poe check` passes with coverage at 80% or more, and `grep -rn "noqa\|type: ignore" agent app evals conftest.py` finds nothing.
+- [x] `agent/prompt.md`, the JSON of `TOOLS` and the graph's Mermaid output match commit `ef89ead`, checked by a short script.
+- [x] `golden.json` holds the same 10 tickets and labels as `eval.py` at `ef89ead`.
+- [x] Tests show the default model with `MODEL_NAME` unset or blank, and the override when set.
+- [x] Running the tests leaves `logs.csv` and `checkpoints.sqlite` unchanged.
+- [x] A staged file with an unused import makes `git commit` fail, and a clean commit passes with no `--no-verify`.
+- [x] `uv run poe check` passes in a fresh clone in a temporary folder, with no `.env`, and `.github/workflows/check.yml` runs that same command.
 
 ## Phase 3: documents and the before-and-after check
 
