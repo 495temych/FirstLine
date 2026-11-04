@@ -1,5 +1,7 @@
 # Status
 
+The foundation work is finished: `uv run -m evals` matched the pre-move baseline exactly (retrieval 100%, path 90%), and one ticket for each path behaved as before in the browser.
+
 TriagePilot triages one ticket at a time in a Streamlit app. Each ticket gets one model call, grounded in the top 2 knowledge base units, and ends on one of four paths behind human confirmation gates. All 10 remediation tools are simulated. `docs/ROADMAP.md` says what comes next.
 
 ## How to run it

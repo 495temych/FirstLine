@@ -31,7 +31,7 @@ Finished briefs and their plans stay in `docs/` as a record: `docs/FOUNDATION.md
 - `data/kb/`: the knowledge base
 - `data/evals/`: the evaluation set
 - `docs/`: project documents
-- `briefs/`: briefs not yet started
+- `briefs/`: briefs not yet started, when there are any
 
 Each package keeps its tests in its own `tests/` folder.
 

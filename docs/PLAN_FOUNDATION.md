@@ -81,10 +81,10 @@ Back up `logs.csv` and `checkpoints.sqlite` before the live UI run, and restore 
 
 **Success criteria**
 
-- [ ] `AGENTS.md` names every file in `docs/`.
-- [ ] `docs/STATUS.md` covers all 11 rules, and `docs/DECISIONS.md` has all 8 decisions and all 11 limitations.
-- [ ] The README has an empty "Results" heading, its links resolve, and no document outside `FOUNDATION.md` and this plan still says `python eval.py`, `pip install` or `streamlit run app.py`.
-- [ ] `uv run -m evals` matches `briefs/baseline-eval.txt`, allowing for the known variation on "My VPN keeps disconnecting".
-- [ ] In the browser, one ticket for each path behaves as before, a declined fix gives a pre-filled ticket, and the stats panel shows the existing runs from the root `logs.csv`.
-- [ ] On a copy of `checkpoints.sqlite`, the 3 paused threads load and resume to the end.
-- [ ] `briefs/baseline-eval.txt` is deleted, `uv run poe check` passes on the final commit, and nothing has been pushed.
+- [x] `AGENTS.md` names every file in `docs/`.
+- [x] `docs/STATUS.md` covers all 11 rules, and `docs/DECISIONS.md` has all 8 decisions and all 11 limitations.
+- [x] The README has an empty "Results" heading, its links resolve, and no document outside `FOUNDATION.md` and this plan still says `python eval.py`, `pip install` or `streamlit run app.py`.
+- [x] `uv run -m evals` matches `briefs/baseline-eval.txt`, allowing for the known variation on "My VPN keeps disconnecting".
+- [x] In the browser, one ticket for each path behaves as before, a declined fix gives a pre-filled ticket, and the stats panel shows the existing runs from the root `logs.csv`.
+- [x] On a copy of `checkpoints.sqlite`, the 3 paused threads load and resume to the end.
+- [x] `briefs/baseline-eval.txt` is deleted, `uv run poe check` passes on the final commit, and nothing has been pushed.
