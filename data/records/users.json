@@ -1,0 +1,364 @@
+[
+  {
+    "id": "s.keller",
+    "name": "Sandra Keller",
+    "department": "Client Services",
+    "floor": 4,
+    "lockouts_24h": 2,
+    "device": {
+      "id": "LT-SKELLER",
+      "model": "ThinkPad T14 Gen 4",
+      "image": "2026-06",
+      "age_years": 1,
+      "battery_health": 92,
+      "dock": "WD22TB4"
+    },
+    "groups": [],
+    "recent_tickets": [
+      "Account lockout, 1 of 2 in the last 24 hours",
+      "Account lockout, 2 of 2 in the last 24 hours"
+    ]
+  },
+  {
+    "id": "l.frei",
+    "name": "Luca Frei",
+    "department": "Operations",
+    "floor": 3,
+    "lockouts_24h": 3,
+    "device": {
+      "id": "LT-LFREI",
+      "model": "ThinkPad T14 Gen 4",
+      "image": "2026-06",
+      "age_years": 1,
+      "battery_health": 92,
+      "dock": "WD22TB4"
+    },
+    "groups": [],
+    "recent_tickets": [
+      "Account lockout, 1 of 3 in the last 24 hours",
+      "Account lockout, 2 of 3 in the last 24 hours",
+      "Account lockout, 3 of 3 in the last 24 hours"
+    ]
+  },
+  {
+    "id": "m.huber",
+    "name": "Marco Huber",
+    "department": "Risk",
+    "floor": 6,
+    "lockouts_24h": 1,
+    "device": {
+      "id": "LT-MHUBER",
+      "model": "ThinkPad T14 Gen 4",
+      "image": "2026-06",
+      "age_years": 1,
+      "battery_health": 92,
+      "dock": "WD22TB4"
+    },
+    "groups": [],
+    "recent_tickets": [
+      "Account lockout, 1 of 1 in the last 24 hours"
+    ]
+  },
+  {
+    "id": "j.wyss",
+    "name": "Julia Wyss",
+    "department": "Compliance",
+    "floor": 3,
+    "lockouts_24h": 0,
+    "device": {
+      "id": "LT-JWYSS",
+      "model": "ThinkPad T14 Gen 4",
+      "image": "2025-11",
+      "age_years": 2,
+      "battery_health": 92,
+      "dock": "WD22TB4"
+    },
+    "groups": [],
+    "recent_tickets": []
+  },
+  {
+    "id": "r.vogel",
+    "name": "Reto Vogel",
+    "department": "Client Services",
+    "floor": 5,
+    "lockouts_24h": 0,
+    "device": {
+      "id": "LT-RVOGEL",
+      "model": "ThinkPad T14 Gen 4",
+      "image": "2026-06",
+      "age_years": 3,
+      "battery_health": 52,
+      "dock": "WD22TB4"
+    },
+    "groups": [],
+    "recent_tickets": [
+      "Laptop slow, startup items cleaned"
+    ]
+  },
+  {
+    "id": "n.graf",
+    "name": "Nina Graf",
+    "department": "Operations",
+    "floor": 4,
+    "lockouts_24h": 2,
+    "device": {
+      "id": "LT-NGRAF",
+      "model": "ThinkPad T14 Gen 4",
+      "image": "2026-06",
+      "age_years": 1,
+      "battery_health": 92,
+      "dock": "WD22TB4"
+    },
+    "groups": [],
+    "recent_tickets": [
+      "Account lockout, 1 of 2 in the last 24 hours",
+      "Account lockout, 2 of 2 in the last 24 hours"
+    ]
+  },
+  {
+    "id": "d.meili",
+    "name": "David Meili",
+    "department": "Risk",
+    "floor": 6,
+    "lockouts_24h": 1,
+    "device": {
+      "id": "LT-DMEILI",
+      "model": "ThinkPad T14 Gen 4",
+      "image": "2026-06",
+      "age_years": 1,
+      "battery_health": 92,
+      "dock": "WD22TB4"
+    },
+    "groups": [],
+    "recent_tickets": [
+      "Account lockout, 1 of 1 in the last 24 hours"
+    ]
+  },
+  {
+    "id": "c.suter",
+    "name": "Carla Suter",
+    "department": "Legal",
+    "floor": 7,
+    "lockouts_24h": 0,
+    "device": {
+      "id": "LT-CSUTER",
+      "model": "ThinkPad T14 Gen 4",
+      "image": "2026-06",
+      "age_years": 1,
+      "battery_health": 92,
+      "dock": "CalDigit TS3+"
+    },
+    "groups": [],
+    "recent_tickets": []
+  },
+  {
+    "id": "p.bianchi",
+    "name": "Paolo Bianchi",
+    "department": "Finance",
+    "floor": 5,
+    "lockouts_24h": 0,
+    "device": {
+      "id": "LT-PBIANCHI",
+      "model": "ThinkPad T14 Gen 4",
+      "image": "2026-06",
+      "age_years": 1,
+      "battery_health": 92,
+      "dock": "WD22TB4"
+    },
+    "groups": [
+      "LIMMATICA\\Fin-Users"
+    ],
+    "recent_tickets": []
+  },
+  {
+    "id": "a.kunz",
+    "name": "Anna Kunz",
+    "department": "Client Services",
+    "floor": 4,
+    "lockouts_24h": 0,
+    "device": {
+      "id": "LT-AKUNZ",
+      "model": "ThinkPad T14 Gen 4",
+      "image": "2026-03",
+      "age_years": 2,
+      "battery_health": 92,
+      "dock": "WD22TB4"
+    },
+    "groups": [],
+    "recent_tickets": []
+  },
+  {
+    "id": "t.steiner",
+    "name": "Tom Steiner",
+    "department": "Finance",
+    "floor": 5,
+    "lockouts_24h": 0,
+    "device": {
+      "id": "LT-TSTEINER",
+      "model": "ThinkPad T14 Gen 4",
+      "image": "2026-06",
+      "age_years": 1,
+      "battery_health": 92,
+      "dock": "WD22TB4"
+    },
+    "groups": [
+      "LIMMATICA\\Finance-RW"
+    ],
+    "recent_tickets": []
+  },
+  {
+    "id": "e.moser",
+    "name": "Eva Moser",
+    "department": "Finance",
+    "floor": 5,
+    "lockouts_24h": 0,
+    "device": {
+      "id": "LT-EMOSER",
+      "model": "ThinkPad T14 Gen 4",
+      "image": "2026-06",
+      "age_years": 1,
+      "battery_health": 92,
+      "dock": "WD22TB4"
+    },
+    "groups": [
+      "LIMMATICA\\Finance-RW"
+    ],
+    "recent_tickets": []
+  },
+  {
+    "id": "b.brunner",
+    "name": "Ben Brunner",
+    "department": "Legal",
+    "floor": 7,
+    "lockouts_24h": 0,
+    "device": {
+      "id": "LT-BBRUNNER",
+      "model": "ThinkPad T14 Gen 4",
+      "image": "2026-06",
+      "age_years": 1,
+      "battery_health": 92,
+      "dock": "WD22TB4"
+    },
+    "groups": [],
+    "recent_tickets": []
+  },
+  {
+    "id": "k.roth",
+    "name": "Katja Roth",
+    "department": "Legal",
+    "floor": 7,
+    "lockouts_24h": 0,
+    "device": {
+      "id": "LT-KROTH",
+      "model": "ThinkPad T14 Gen 4",
+      "image": "2026-06",
+      "age_years": 1,
+      "battery_health": 92,
+      "dock": "WD22TB4"
+    },
+    "groups": [],
+    "recent_tickets": []
+  },
+  {
+    "id": "f.gerber",
+    "name": "Fabio Gerber",
+    "department": "Operations",
+    "floor": 3,
+    "lockouts_24h": 0,
+    "device": {
+      "id": "LT-FGERBER",
+      "model": "ThinkPad T14 Gen 4",
+      "image": "2026-06",
+      "age_years": 1,
+      "battery_health": 92,
+      "dock": "WD22TB4"
+    },
+    "groups": [],
+    "recent_tickets": []
+  },
+  {
+    "id": "h.widmer",
+    "name": "Hanna Widmer",
+    "department": "Compliance",
+    "floor": 3,
+    "lockouts_24h": 0,
+    "device": {
+      "id": "LT-HWIDMER",
+      "model": "ThinkPad T14 Gen 4",
+      "image": "2026-06",
+      "age_years": 1,
+      "battery_health": 92,
+      "dock": "WD22TB4"
+    },
+    "groups": [],
+    "recent_tickets": []
+  },
+  {
+    "id": "o.lang",
+    "name": "Oliver Lang",
+    "department": "Client Services",
+    "floor": 5,
+    "lockouts_24h": 0,
+    "device": {
+      "id": "LT-OLANG",
+      "model": "ThinkPad T14 Gen 4",
+      "image": "2026-06",
+      "age_years": 1,
+      "battery_health": 92,
+      "dock": "WD22TB4"
+    },
+    "groups": [],
+    "recent_tickets": []
+  },
+  {
+    "id": "v.marti",
+    "name": "Vera Marti",
+    "department": "Risk",
+    "floor": 6,
+    "lockouts_24h": 0,
+    "device": {
+      "id": "LT-VMARTI",
+      "model": "ThinkPad T14 Gen 4",
+      "image": "2026-06",
+      "age_years": 1,
+      "battery_health": 92,
+      "dock": "WD22TB4"
+    },
+    "groups": [],
+    "recent_tickets": []
+  },
+  {
+    "id": "g.ammann",
+    "name": "Gian Ammann",
+    "department": "Operations",
+    "floor": 4,
+    "lockouts_24h": 0,
+    "device": {
+      "id": "LT-GAMMANN",
+      "model": "ThinkPad T14 Gen 4",
+      "image": "2026-06",
+      "age_years": 1,
+      "battery_health": 92,
+      "dock": "WD22TB4"
+    },
+    "groups": [],
+    "recent_tickets": []
+  },
+  {
+    "id": "i.bosshard",
+    "name": "Irene Bosshard",
+    "department": "Client Services",
+    "floor": 6,
+    "lockouts_24h": 0,
+    "device": {
+      "id": "LT-IBOSSHARD",
+      "model": "ThinkPad T14 Gen 4",
+      "image": "2026-06",
+      "age_years": 1,
+      "battery_health": 92,
+      "dock": "WD22TB4"
+    },
+    "groups": [],
+    "recent_tickets": []
+  }
+]

@@ -22,3 +22,12 @@ def test_usage_files_stay_at_the_repo_root():
     assert config.LOG_FILE == config.ROOT / "logs.csv"
     assert config.CHECKPOINT_DB == config.ROOT / "checkpoints.sqlite"
     assert (config.ROOT / "pyproject.toml").exists()
+
+
+def test_cost_uses_the_price_table():
+    cost = config.cost_usd("claude-haiku-4-5-20251001", 1_000_000, 1_000_000)
+    assert cost == 6.0
+
+
+def test_a_model_with_no_price_has_no_cost():
+    assert config.cost_usd("unpriced", 100, 100) is None

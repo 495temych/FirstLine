@@ -13,15 +13,6 @@ from app import stats
 from evals import runner
 
 MAIN = str(Path(__file__).parent.parent / "main.py")
-EVAL_ROW = {
-    "query": "q",
-    "expected_units": {"vpn"},
-    "retrieved_units": ["vpn"],
-    "top1_correct": True,
-    "expected_path": {"AUTO_FIX"},
-    "actual_path": "AUTO_FIX",
-    "path_correct": True,
-}
 AUTO_FIX = [text("Reset the profile."), tool("reset_vpn_profile", username="a.b")]
 ESCALATE = [
     text("Needs review."),
@@ -49,12 +40,23 @@ def app(tmp_path, monkeypatch):
     monkeypatch.setattr(graph, "LOG_FILE", log)
     monkeypatch.setattr(stats, "LOG_FILE", log)
     monkeypatch.setattr(graph, "retrieve", lambda q: [UNIT])
-    monkeypatch.setattr(runner, "run_eval", lambda: [EVAL_ROW])
+    monkeypatch.setattr(runner, "RUNS_DIR", tmp_path / "runs")
     st.cache_resource.clear()
     st.cache_data.clear()
     yield AppTest.from_file(MAIN, default_timeout=30)
     st.cache_resource.clear()
     st.cache_data.clear()
+
+
+def stub_triage(text, use_retrieval):
+    return {
+        "path": "AUTO_FIX",
+        "retrieved": [],
+        "tool_name": "clear_teams_cache",
+        "tool_input": {"username": "a.b"},
+        "usage": {"input_tokens": 10, "output_tokens": 5},
+        "response_time_sec": 1.0,
+    }
 
 
 def analyze(at, monkeypatch, blocks):
@@ -84,7 +86,22 @@ def test_the_app_loads_and_reads_the_log(app):
     app.run()
     assert not app.exception
     assert app.title[0].value == "L1 Support Agent"
-    assert any(m.label == "Path accuracy" for m in app.metric)
+    assert [t.label for t in app.tabs] == ["Triage", "Scoreboard"]
+    assert any("Total logged queries" in m.label for m in app.metric)
+
+
+def test_the_scoreboard_says_when_there_are_no_runs(app):
+    app.run()
+    assert "No evaluations yet" in app.tabs[1].info[0].value
+
+
+def test_the_scoreboard_shows_a_saved_run(app, monkeypatch):
+    monkeypatch.setattr(runner, "run_triage", stub_triage)
+    runner.save_run(runner.evaluate("dev", tiny=True))
+    app.run()
+    assert not app.exception
+    assert len(app.tabs[1].dataframe) == 3
+    assert "assumptions" in app.tabs[1].caption[0].value
 
 
 def test_a_missing_key_stops_the_app_with_a_message(app, monkeypatch):

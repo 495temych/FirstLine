@@ -11,9 +11,24 @@ LOG_FILE = ROOT / "logs.csv"
 CHECKPOINT_DB = ROOT / "checkpoints.sqlite"
 DEFAULT_MODEL = "claude-haiku-4-5-20251001"
 
+# US dollars per million tokens: (input, output).
+PRICES = {
+    "claude-haiku-4-5-20251001": (1.00, 5.00),
+    "claude-haiku-5-5": (0.10, 0.50),
+    "claude-sonnet-5-5": (2.00, 10.00),
+}
+
 load_dotenv(ROOT / ".env")
 
 
 def model_name() -> str:
     """Return the model in MODEL_NAME, or the default if it is unset or blank."""
     return os.getenv("MODEL_NAME") or DEFAULT_MODEL
+
+
+def cost_usd(model: str, input_tokens: int, output_tokens: int) -> float | None:
+    """Return what a call cost, or None if the model has no price."""
+    if model not in PRICES:
+        return None
+    input_price, output_price = PRICES[model]
+    return (input_tokens * input_price + output_tokens * output_price) / 1_000_000

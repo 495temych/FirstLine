@@ -34,5 +34,7 @@ def run_triage(query: str, use_retrieval: bool) -> dict:
         "reasoning": out["reasoning"],
         "tool_name": out["tool_name"],
         "tool_input": out["tool_input"],
+        "usage": out["usage"],
+        "response_time_sec": out["response_time_sec"],
         "query": query,
     }

@@ -13,7 +13,7 @@ IMPORTANT: before you plan, build or change anything, read each of these in full
 3. `docs/STATUS.md`: what's built, how to run it, and which rules code enforces
 4. `docs/DECISIONS.md`: design decisions, their trade-offs and the known limitations
 
-Finished briefs and their plans stay in `docs/` as a record: `docs/FOUNDATION.md` and `docs/PLAN_FOUNDATION.md`.
+Finished briefs and their plans stay in `docs/` as a record: `docs/FOUNDATION.md`, `docs/PLAN_FOUNDATION.md`, `docs/EVALS.md` and `docs/PLAN_EVALS.md`.
 
 ## Tech stack
 
@@ -27,9 +27,10 @@ Finished briefs and their plans stay in `docs/` as a record: `docs/FOUNDATION.md
 
 - `agent/`: the graph, tools, tool schemas, retrieval and instructions. `run_triage` is the entry point, and `config.py` holds paths and settings
 - `app/`: the Streamlit app and usage statistics
-- `evals/`: the evaluation runner
+- `evals/`: the evaluation runner and scoring
 - `data/kb/`: the knowledge base
-- `data/evals/`: the evaluation set
+- `data/records/`: invented client records
+- `data/evals/`: labelled tickets, their answers, and saved runs
 - `docs/`: project documents
 - `briefs/`: briefs not yet started, when there are any
 
@@ -60,7 +61,8 @@ Briefs start in `briefs/`, written in the customer's voice, and move to `docs/` 
 - Never push without asking.
 - Ask before anything irreversible.
 - Keep `docs/STATUS.md` up to date.
-- Live runs cost money, and opening the app runs the evaluation. Use them only when a check needs them.
+- Live runs cost money. Use them only when a check needs them.
+- Never open the held-out set when changing the instructions, and never give the agent an answer file.
 - `logs.csv` and `checkpoints.sqlite` are real usage data. Keep them out of tests.
 
 ## This machine

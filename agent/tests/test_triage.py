@@ -1,5 +1,7 @@
 """The run_triage entry point."""
 
+from langchain_core.messages import AIMessage
+
 from agent import graph, run_triage
 from agent.tests.fakes import UNIT, FakeLLM, text, tool
 
@@ -17,4 +19,13 @@ def test_run_triage_stops_at_the_first_gate_and_logs_nothing(tmp_path, monkeypat
     assert result["tool_name"] == "reset_vpn_profile"
     assert result["tool_input"] == {"username": "a.b"}
     assert result["retrieved"] == [UNIT]
+    assert result["usage"] == {"input_tokens": 0, "output_tokens": 0}
     assert not log.exists()
+
+
+def test_usage_comes_from_the_model_reply():
+    msg = AIMessage(
+        content="",
+        usage_metadata={"input_tokens": 12, "output_tokens": 3, "total_tokens": 15},
+    )
+    assert graph.usage_of(msg) == {"input_tokens": 12, "output_tokens": 3}

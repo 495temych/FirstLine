@@ -50,6 +50,12 @@ Each design decision so far, with its reason and its trade-off. The background b
 - **Reason:** `confirmed` is known by then, and there is a single place that writes the log.
 - **Trade-off:** a run left at a confirmation card and abandoned for a new query is never logged.
 
+## Mistake costs
+
+- **Decision:** score mistakes in CHF, not just accuracy.
+- **Reason:** a routine unlock on a possible compromise is far worse than a needless escalation, and a plain accuracy score treats them the same.
+- **Trade-off:** the costs are assumptions. CHF 120 comes from 2 hours at CHF 60, and CHF 2,000 is an estimate that dominates the total.
+
 ## Known limitations
 
 - **Synthetic knowledge base.** All KB articles were written for this demo. Real deployment needs actual company documentation.
@@ -128,16 +134,9 @@ The tool schema (`create_escalation_ticket`) is already structured to map 1-to-1
 
 The app surfaces two independent measurements side by side, each in its own expander, clearly labeled — neither stands in for the other.
 
-**Golden-set evaluation** (`evals/runner.py`) runs a hand-labeled set of 10 queries — the same ones in the table above — directly against `retrieve()` and `run_triage()`, no UI involved. **This is a labeled set of 10 we wrote ourselves, not an external or third-party benchmark** — treat the numbers as a regression check on this specific KB and prompt, not a generalizable retrieval-quality claim. Run it yourself: `uv run -m evals`.
+**Evaluations** (`evals/`) run a labelled set through the real pipeline and save the result for the Scoreboard. The 25 development tickets are for working on the agent. The 25 held-out tickets check that a change generalizes. Both sets are ours, not an external benchmark. Scoring is plain code.
 
-| Metric | Result | What it measures |
-|---|---|---|
-| Retrieval accuracy (top-1) | 100% | The single best-ranked unit is a correct match for the query |
-| Path accuracy | 90–100%\* | Fraction of queries classified into the stated expected path |
-
-Only these two metrics are reported. Precision/recall-style set-overlap metrics don't fit this retrieval design: because top-k=2 deliberately pulls from more than one source when relevant (an issue playbook plus a company-profile.md section, or two playbooks together), a correctly grounded answer can legitimately come back with a second, tangentially related unit alongside the strictly-required one — a set-overlap metric scores that as a false positive even though nothing is actually wrong, so top-1 retrieval accuracy is the metric that reflects retrieval quality here.
-
-\* Path accuracy varies run to run (observed 90% and 100% across repeated runs) — it is not retrieval that's unstable (retrieval is deterministic given fixed embeddings and scores 100% consistently above), it's LLM sampling on the one genuinely underspecified query in the set (see the VPN row footnote above). This is exactly the kind of case single-shot classification handles by escalating with stated reasoning rather than guessing — which is arguably still a "correct" outcome the golden set's single expected-path label doesn't fully capture.
+Path accuracy can vary from run to run on underspecified tickets such as "My VPN keeps disconnecting". Retrieval is deterministic.
 
 **Live session stats** (`app/stats.py`, reading `logs.csv`) is a different measurement: real usage, not a fixed test set. `logs.csv` starts empty, and one row is appended after every query actually run through the app — timestamp, query, retrieved units, decision path, diagnostic summary, tool called, operator confirmation (AUTO_FIX rows only), escalation queue/priority (ESCALATE rows only), and measured response time. The app's "Live session stats" expander reads this file fresh on every render — never cached, unlike the golden-set numbers above — and reports total logged queries, count and % by decision path, automation rate (SELF_SERVE + AUTO_FIX over total minus OUT_OF_SCOPE), and average response time by path, labeled explicitly as **"Agent response time (proxy for MTTR — measures decision latency, not full ticket resolution)"** since it only times the model call that produces a decision, not how long a human then takes to act on it. Below five logged queries, the panel says the sample is too small for a stable rate rather than presenting a percentage as reliable. Run it standalone: `uv run -m app.stats`.
 

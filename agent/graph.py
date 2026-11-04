@@ -76,6 +76,7 @@ class GraphState(TypedDict):
     ticket_draft: dict | None
     tool_result: dict | None
     response_time_sec: float
+    usage: dict | None
 
 
 def initial_state(query: str, use_retrieval: bool) -> GraphState:
@@ -93,6 +94,7 @@ def initial_state(query: str, use_retrieval: bool) -> GraphState:
         "ticket_draft": None,
         "tool_result": None,
         "response_time_sec": 0.0,
+        "usage": None,
     }
 
 
@@ -313,9 +315,21 @@ def retrieve_node(state: GraphState) -> dict:
     return {"retrieved": retrieve(state["query"])}
 
 
+def usage_of(msg: AIMessage) -> dict:
+    meta = msg.usage_metadata or {}
+    return {
+        "input_tokens": meta.get("input_tokens", 0),
+        "output_tokens": meta.get("output_tokens", 0),
+    }
+
+
 def triage(state: GraphState) -> dict:
     msg, elapsed = _call_model(state)
-    return {**parse_path(message_blocks(msg)), "response_time_sec": elapsed}
+    return {
+        **parse_path(message_blocks(msg)),
+        "response_time_sec": elapsed,
+        "usage": usage_of(msg),
+    }
 
 
 def no_tools(state: GraphState) -> dict:
@@ -411,7 +425,7 @@ def create_ticket(state: GraphState) -> dict:
 
 def log(state: GraphState, config: RunnableConfig) -> dict:
     """Append one row with the final state. Callers that only want the decision (eval)
-    pass configurable `log_runs=False` so golden-set runs don't pollute logs.csv."""
+    pass configurable `log_runs=False` so evaluations don't pollute logs.csv."""
     if not config.get("configurable", {}).get("log_runs", True):
         return {}
     row = build_log_row(state, datetime.now(UTC))

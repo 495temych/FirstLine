@@ -10,8 +10,8 @@ from langgraph.types import Command
 
 from agent import config
 from agent.graph import build_graph, initial_state
+from app import scoreboard
 from app import stats as _analyze_mod
-from evals import runner as _eval_mod
 
 st.set_page_config(
     page_title="L1 Support Agent — Limmatica AG",
@@ -63,13 +63,6 @@ def _resume(answer: bool):
 def _set_preset(q: str):
     """Populate the text field with the preset query; user still clicks Analyze."""
     st.session_state.query_text = q
-
-
-@st.cache_data(show_spinner="Running golden-set evaluation…")
-def _run_eval_cached():
-    """Runs the golden set once (cached across reruns) — not per query."""
-    rows = _eval_mod.run_eval()
-    return rows, _eval_mod.summarize(rows)
 
 
 # ── Helpers ─────────────────────────────────────────────────────────────────────
@@ -193,274 +186,262 @@ st.title("L1 Support Agent")
 st.caption("Limmatica AG · internal IT triage demo · powered by Claude")
 st.divider()
 
-# ── Global RAG toggle ───────────────────────────────────────────────────────────
-st.toggle("Use retrieval (RAG)", key="use_retrieval")
-st.markdown("")
+triage_tab, scoreboard_tab = st.tabs(["Triage", "Scoreboard"])
 
-# ── Preset buttons ──────────────────────────────────────────────────────────────
-st.markdown("**Quick examples**")
-cols = st.columns(3)
-for i, preset in enumerate(PRESETS):
-    cols[i % 3].button(
-        preset,
-        key=f"preset_{i}",
-        on_click=_set_preset,
-        args=(preset,),
-        use_container_width=True,
-    )
+with scoreboard_tab:
+    scoreboard.render()
 
-st.markdown("---")
-
-# ── Free-text form ──────────────────────────────────────────────────────────────
-with st.form("query_form", clear_on_submit=False):
-    query = st.text_area(
-        "Or describe a custom issue:",
-        value=st.session_state.query_text,
-        placeholder="e.g.  My VPN keeps disconnecting since the migration last month",
-        height=90,
-    )
-    submitted = st.form_submit_button("Analyze →", type="primary")
-
-# ── Execute triage ──────────────────────────────────────────────────────────────
-# A new input on the same thread starts a fresh run (initial_state resets every field);
-# any interrupt left pending by the previous query is abandoned.
-if submitted and query and query.strip():
-    st.session_state.preview_ticket_id = f"INC{secrets.randbelow(9000000) + 1000000}"
-    with st.spinner("Running triage…"):
-        GRAPH.invoke(
-            initial_state(query.strip(), st.session_state.use_retrieval), _config()
-        )
-
-# ── Results ─────────────────────────────────────────────────────────────────────
-snapshot = GRAPH.get_state(_config())
-state = snapshot.values
-if state.get("path"):
-    pending = snapshot.interrupts[0].value if snapshot.interrupts else None
-    path = state["path"]
-    decision = state["human_decision"]
-    tool_result = state["tool_result"]
-    st.divider()
-
-    # 1 · Retrieval
-    st.subheader("1 · Retrieval")
-    units = state["retrieved"]
-    if units:
-        doc_names = {u["doc"] for u in units}
-        if len(doc_names) > 1:
-            st.caption(
-                "🔗 Matched units from **different KB documents** — cross-document "
-                "grounding."
-            )
-
-        for u in units:
-            label = u["doc"] + (f" § {u['section']}" if u["section"] else "")
-            badge = " · *reference section*" if u["section"] else ""
-            with st.expander(
-                f"**{label}** — similarity {u['score']:.2f}{badge}", expanded=False
-            ):
-                st.markdown(u["text"])
-
-            highlights = u.get("highlights", [])
-            if highlights:
-                st.markdown(f"**Why {label} matched — top passages:**")
-            for h in highlights:
-                # Strip markdown characters for plain text in the highlight strip
-                clean = h["text"].replace("**", "").replace("`", "").replace("*", "")
-                st.markdown(
-                    f'<div style="background:#fffbeb;border-left:3px solid #f59e0b;'
-                    f"padding:5px 10px;margin:3px "
-                    f'0;font-size:0.88em;line-height:1.4;color:#78350f;">'
-                    f'<code style="color:#92400e;font-size:0.82em;background:none">'
-                    f"{h['score']:.2f}</code>"
-                    f"&ensp;{clean}</div>",
-                    unsafe_allow_html=True,
-                )
-    elif state["use_retrieval"]:
-        st.info("No KB article matched above the confidence threshold.")
-    else:
-        st.info("RAG is off — no retrieval performed.")
-
-    # 2 · Decision
-    st.subheader("2 · Decision")
-    st.markdown(_badge(path), unsafe_allow_html=True)
+with triage_tab:
+    # ── Global RAG toggle ───────────────────────────────────────────────────────────
+    st.toggle("Use retrieval (RAG)", key="use_retrieval")
     st.markdown("")
 
-    # 3 · Agent reasoning
-    st.subheader("3 · Agent reasoning")
-    st.markdown(state["reasoning"] or "_No reasoning returned._")
-
-    # 4 · Action
-    st.subheader("4 · Action")
-
-    if path == "OUT_OF_SCOPE":
-        st.info("Outside IT support scope — no action taken.")
-
-    elif path == "NO_TOOLS":
-        st.info(
-            "RAG is off, so the agent had no tools and no company-specific grounding "
-            "for this call — it could only respond with generic, ungrounded advice. "
-            "No structured decision or action is available. Turn retrieval back on "
-            "to see the grounded, tool-capable agent."
+    # ── Preset buttons ──────────────────────────────────────────────────────────────
+    st.markdown("**Quick examples**")
+    cols = st.columns(3)
+    for i, preset in enumerate(PRESETS):
+        cols[i % 3].button(
+            preset,
+            key=f"preset_{i}",
+            on_click=_set_preset,
+            args=(preset,),
+            use_container_width=True,
         )
 
-    elif path == "SELF_SERVE":
-        if pending and pending["kind"] == "self_serve":
-            st.success(
-                "Steps are in the reasoning above — no operator action required."
+    st.markdown("---")
+
+    # ── Free-text form ──────────────────────────────────────────────────────────────
+    with st.form("query_form", clear_on_submit=False):
+        query = st.text_area(
+            "Or describe a custom issue:",
+            value=st.session_state.query_text,
+            placeholder=(
+                "e.g.  My VPN keeps disconnecting since the migration last month"
+            ),
+            height=90,
+        )
+        submitted = st.form_submit_button("Analyze →", type="primary")
+
+    # ── Execute triage ──────────────────────────────────────────────────────────────
+    # A new input on the same thread starts a fresh run (initial_state resets every
+    # field); any interrupt left pending by the previous query is abandoned.
+    if submitted and query and query.strip():
+        st.session_state.preview_ticket_id = (
+            f"INC{secrets.randbelow(9000000) + 1000000}"
+        )
+        with st.spinner("Running triage…"):
+            GRAPH.invoke(
+                initial_state(query.strip(), st.session_state.use_retrieval), _config()
             )
-            c1, c2, _ = st.columns([2, 3, 1])
-            with c1:
-                st.button(
-                    "✓ This resolved it",
-                    on_click=_resume,
-                    args=(True,),
-                    use_container_width=True,
+
+    # ── Results ─────────────────────────────────────────────────────────────────────
+    snapshot = GRAPH.get_state(_config())
+    state = snapshot.values
+    if state.get("path"):
+        pending = snapshot.interrupts[0].value if snapshot.interrupts else None
+        path = state["path"]
+        decision = state["human_decision"]
+        tool_result = state["tool_result"]
+        st.divider()
+
+        # 1 · Retrieval
+        st.subheader("1 · Retrieval")
+        units = state["retrieved"]
+        if units:
+            doc_names = {u["doc"] for u in units}
+            if len(doc_names) > 1:
+                st.caption(
+                    "🔗 Matched units from **different KB documents** — cross-document "
+                    "grounding."
                 )
-            with c2:
-                st.button(
-                    "This didn't resolve it — escalate to a technician.",
-                    on_click=_resume,
-                    args=(False,),
-                    use_container_width=True,
+
+            for u in units:
+                label = u["doc"] + (f" § {u['section']}" if u["section"] else "")
+                badge = " · *reference section*" if u["section"] else ""
+                with st.expander(
+                    f"**{label}** — similarity {u['score']:.2f}{badge}", expanded=False
+                ):
+                    st.markdown(u["text"])
+
+                highlights = u.get("highlights", [])
+                if highlights:
+                    st.markdown(f"**Why {label} matched — top passages:**")
+                for h in highlights:
+                    # Strip markdown characters for plain text in the highlight strip
+                    clean = (
+                        h["text"].replace("**", "").replace("`", "").replace("*", "")
+                    )
+                    st.markdown(
+                        f'<div style="background:#fffbeb;border-left:3px solid #f59e0b;'
+                        f"padding:5px 10px;margin:3px "
+                        f'0;font-size:0.88em;line-height:1.4;color:#78350f;">'
+                        f'<code style="color:#92400e;font-size:0.82em;background:none">'
+                        f"{h['score']:.2f}</code>"
+                        f"&ensp;{clean}</div>",
+                        unsafe_allow_html=True,
+                    )
+        elif state["use_retrieval"]:
+            st.info("No KB article matched above the confidence threshold.")
+        else:
+            st.info("RAG is off — no retrieval performed.")
+
+        # 2 · Decision
+        st.subheader("2 · Decision")
+        st.markdown(_badge(path), unsafe_allow_html=True)
+        st.markdown("")
+
+        # 3 · Agent reasoning
+        st.subheader("3 · Agent reasoning")
+        st.markdown(state["reasoning"] or "_No reasoning returned._")
+
+        # 4 · Action
+        st.subheader("4 · Action")
+
+        if path == "OUT_OF_SCOPE":
+            st.info("Outside IT support scope — no action taken.")
+
+        elif path == "NO_TOOLS":
+            st.info(
+                "RAG is off, so the agent had no tools and no company-specific "
+                "grounding "
+                "for this call — it could only respond with generic, ungrounded "
+                "advice. "
+                "No structured decision or action is available. Turn retrieval back on "
+                "to see the grounded, tool-capable agent."
+            )
+
+        elif path == "SELF_SERVE":
+            if pending and pending["kind"] == "self_serve":
+                st.success(
+                    "Steps are in the reasoning above — no operator action required."
                 )
-        elif pending:  # confirm_ticket after "didn't resolve"
-            _ticket_card(pending["ticket"])
-            _confirm_buttons("✓ Confirm — submit ticket")
-        elif decision.get("resolved"):
-            st.success("Marked as resolved — no further action needed.")
-        elif decision.get("ticket"):
-            _ticket_submitted(tool_result, state["ticket_draft"]["queue"])
+                c1, c2, _ = st.columns([2, 3, 1])
+                with c1:
+                    st.button(
+                        "✓ This resolved it",
+                        on_click=_resume,
+                        args=(True,),
+                        use_container_width=True,
+                    )
+                with c2:
+                    st.button(
+                        "This didn't resolve it — escalate to a technician.",
+                        on_click=_resume,
+                        args=(False,),
+                        use_container_width=True,
+                    )
+            elif pending:  # confirm_ticket after "didn't resolve"
+                _ticket_card(pending["ticket"])
+                _confirm_buttons("✓ Confirm — submit ticket")
+            elif decision.get("resolved"):
+                st.success("Marked as resolved — no further action needed.")
+            elif decision.get("ticket"):
+                _ticket_submitted(tool_result, state["ticket_draft"]["queue"])
+            else:
+                st.warning("Escalation skipped by user. No ticket created.")
+
+        elif path == "AUTO_FIX":
+            tool_input = state["tool_input"] or {}
+            with st.container(border=True):
+                st.markdown("**Proposed automated fix**")
+                st.markdown(f"Tool: `{state['tool_name'] or 'unknown'}`")
+                for k, v in tool_input.items():
+                    st.markdown(f"- `{k}`: `{v}`")
+
+            if pending and pending["kind"] == "confirm_fix":
+                _pending_callout("This fix will not run until you confirm below.")
+                _confirm_buttons("✓ Confirm — run action")
+            elif pending:  # confirm_ticket after a declined fix
+                st.warning(
+                    "**Automated fix declined — here's a pre-filled ticket.** Built "
+                    "entirely "
+                    "from the diagnosis above — no new model call."
+                )
+                _ticket_card(pending["ticket"])
+                _confirm_buttons("✓ Send to ServiceNow")
+            elif decision.get("fix"):
+                st.success(f"**Action taken (simulated)**\n\n{tool_result['detail']}")
+                st.caption(f"Timestamp: {tool_result['timestamp']}")
+            elif decision.get("ticket"):
+                _ticket_submitted(tool_result, state["ticket_draft"]["queue"])
+            else:
+                st.warning(
+                    "Escalation skipped by operator. No fix applied, no ticket created."
+                )
+
+        elif path == "ESCALATE":
+            if pending:
+                _ticket_card(pending["ticket"])
+                _confirm_buttons("✓ Confirm — submit ticket")
+            elif decision.get("ticket"):
+                _ticket_submitted(tool_result, state["tool_input"]["queue"])
+            else:
+                st.warning("Escalation skipped by user. No ticket created.")
+
+    # ── Stats: live session usage ──────────────────────────────────────────────
+    st.divider()
+
+    with st.expander(
+        "📊 Live session stats — from logs.csv (real queries run through this app)",
+        expanded=False,
+    ):
+        live = _analyze_mod.summary_stats()
+        st.caption(
+            "Real usage logged by this app during testing/demo — not an evaluation. "
+            "logs.csv starts empty; every row here came from an actual query "
+            "submitted above. Run standalone: `uv run -m app.stats`."
+        )
+
+        if live["n"] == 0:
+            st.info("No queries logged yet — run a query above to populate logs.csv.")
         else:
-            st.warning("Escalation skipped by user. No ticket created.")
+            if live["low_sample"]:
+                st.warning(
+                    f"Only {live['n']} quer{'y' if live['n'] == 1 else 'ies'} logged — "
+                    f"sample size too small for a stable rate. Numbers below are "
+                    f"illustrative "
+                    f"only, not a reliable rate."
+                )
 
-    elif path == "AUTO_FIX":
-        tool_input = state["tool_input"] or {}
-        with st.container(border=True):
-            st.markdown("**Proposed automated fix**")
-            st.markdown(f"Tool: `{state['tool_name'] or 'unknown'}`")
-            for k, v in tool_input.items():
-                st.markdown(f"- `{k}`: `{v}`")
-
-        if pending and pending["kind"] == "confirm_fix":
-            _pending_callout("This fix will not run until you confirm below.")
-            _confirm_buttons("✓ Confirm — run action")
-        elif pending:  # confirm_ticket after a declined fix
-            st.warning(
-                "**Automated fix declined — here's a pre-filled ticket.** Built "
-                "entirely "
-                "from the diagnosis above — no new model call."
-            )
-            _ticket_card(pending["ticket"])
-            _confirm_buttons("✓ Send to ServiceNow")
-        elif decision.get("fix"):
-            st.success(f"**Action taken (simulated)**\n\n{tool_result['detail']}")
-            st.caption(f"Timestamp: {tool_result['timestamp']}")
-        elif decision.get("ticket"):
-            _ticket_submitted(tool_result, state["ticket_draft"]["queue"])
-        else:
-            st.warning(
-                "Escalation skipped by operator. No fix applied, no ticket created."
+            c1, c2 = st.columns(2)
+            c1.metric("Total logged queries", live["n"])
+            c2.metric(
+                "Automation rate (SELF_SERVE+AUTO_FIX / non-OUT_OF_SCOPE)",
+                f"{live['automation_rate']:.0f}%"
+                if live["automation_rate"] is not None
+                else "n/a",
             )
 
-    elif path == "ESCALATE":
-        if pending:
-            _ticket_card(pending["ticket"])
-            _confirm_buttons("✓ Confirm — submit ticket")
-        elif decision.get("ticket"):
-            _ticket_submitted(tool_result, state["tool_input"]["queue"])
-        else:
-            st.warning("Escalation skipped by user. No ticket created.")
-
-# ── Stats: live session usage vs. fixed golden-set eval ──────────────────────────
-# These are two different things, shown side by side but never merged into one number:
-# live stats are real queries actually run through this app (logs.csv, grows over time);
-# the eval below is a fixed 10-query regression check (evals), independent of usage.
-st.divider()
-
-with st.expander(
-    "📊 Live session stats — from logs.csv (real queries run through this app)",
-    expanded=False,
-):
-    live = _analyze_mod.summary_stats()
-    st.caption(
-        "Real usage logged by this app during testing/demo — not the fixed golden-set "
-        "eval below. logs.csv starts empty; every row here came from an actual query "
-        "submitted above. Run standalone: `uv run -m app.stats`."
-    )
-
-    if live["n"] == 0:
-        st.info("No queries logged yet — run a query above to populate logs.csv.")
-    else:
-        if live["low_sample"]:
-            st.warning(
-                f"Only {live['n']} quer{'y' if live['n'] == 1 else 'ies'} logged — "
-                f"sample size too small for a stable rate. Numbers below are "
-                f"illustrative "
-                f"only, not a reliable rate."
+            st.markdown("**Count and % by decision path**")
+            st.dataframe(
+                [
+                    {
+                        "Path": p,
+                        "Count": live["counts"][p],
+                        "%": f"{live['pct'][p]:.0f}%",
+                    }
+                    for p in _analyze_mod.PATHS
+                ],
+                width="stretch",
+                hide_index=True,
             )
 
-        c1, c2 = st.columns(2)
-        c1.metric("Total logged queries", live["n"])
-        c2.metric(
-            "Automation rate (SELF_SERVE+AUTO_FIX / non-OUT_OF_SCOPE)",
-            f"{live['automation_rate']:.0f}%"
-            if live["automation_rate"] is not None
-            else "n/a",
-        )
-
-        st.markdown("**Count and % by decision path**")
-        st.dataframe(
-            [
-                {"Path": p, "Count": live["counts"][p], "%": f"{live['pct'][p]:.0f}%"}
-                for p in _analyze_mod.PATHS
-            ],
-            width="stretch",
-            hide_index=True,
-        )
-
-        st.markdown(
-            "**Agent response time** (proxy for MTTR — measures decision latency, "
-            "not full ticket resolution), avg by path"
-        )
-        st.dataframe(
-            [
-                {
-                    "Path": p,
-                    "Avg response time (s)": (
-                        f"{live['avg_response_time_sec'][p]:.2f}"
-                        if live["avg_response_time_sec"][p] is not None
-                        else "n/a"
-                    ),
-                }
-                for p in _analyze_mod.PATHS
-            ],
-            width="stretch",
-            hide_index=True,
-        )
-
-with st.expander("🧪 Evaluation — golden-set results", expanded=False):
-    eval_rows, eval_summary = _run_eval_cached()
-    st.caption(
-        f"{eval_summary['n']} hand-labeled queries — a regression check on this KB "
-        f"and prompt, not an external benchmark. Run standalone: `uv run -m evals`."
-    )
-    m1, m2 = st.columns(2)
-    m1.metric("Retrieval accuracy", f"{eval_summary['retrieval_accuracy']:.0%}")
-    m2.metric("Path accuracy", f"{eval_summary['path_accuracy']:.0%}")
-
-    st.dataframe(
-        [
-            {
-                "Query": r["query"],
-                "Expected units": ", ".join(sorted(r["expected_units"])) or "(none)",
-                "Retrieved units": ", ".join(r["retrieved_units"]) or "(none)",
-                "Top-1": "✓" if r["top1_correct"] else "✗",
-                "Expected path": "/".join(sorted(r["expected_path"])),
-                "Actual path": r["actual_path"],
-                "Path": "✓" if r["path_correct"] else "✗",
-            }
-            for r in eval_rows
-        ],
-        width="stretch",
-        hide_index=True,
-    )
+            st.markdown(
+                "**Agent response time** (proxy for MTTR — measures decision latency, "
+                "not full ticket resolution), avg by path"
+            )
+            st.dataframe(
+                [
+                    {
+                        "Path": p,
+                        "Avg response time (s)": (
+                            f"{live['avg_response_time_sec'][p]:.2f}"
+                            if live["avg_response_time_sec"][p] is not None
+                            else "n/a"
+                        ),
+                    }
+                    for p in _analyze_mod.PATHS
+                ],
+                width="stretch",
+                hide_index=True,
+            )

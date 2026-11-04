@@ -1,0 +1,389 @@
+[
+  {
+    "id": "H-001",
+    "paths": [
+      "AUTO_FIX"
+    ],
+    "tools": [
+      "reset_vpn_profile"
+    ],
+    "queues": [],
+    "units": [
+      "vpn"
+    ],
+    "difficulty": "routine",
+    "tiny": false,
+    "note": ""
+  },
+  {
+    "id": "H-002",
+    "paths": [
+      "SELF_SERVE",
+      "AUTO_FIX"
+    ],
+    "tools": [
+      "reset_vpn_profile"
+    ],
+    "queues": [],
+    "units": [
+      "vpn"
+    ],
+    "difficulty": "hard",
+    "tiny": false,
+    "note": "Legacy portal entry."
+  },
+  {
+    "id": "H-003",
+    "paths": [
+      "ESCALATE"
+    ],
+    "tools": [],
+    "queues": [
+      "NET-VPN"
+    ],
+    "units": [
+      "vpn"
+    ],
+    "difficulty": "routine",
+    "tiny": false,
+    "note": ""
+  },
+  {
+    "id": "H-004",
+    "paths": [
+      "SELF_SERVE"
+    ],
+    "tools": [],
+    "queues": [],
+    "units": [
+      "vpn"
+    ],
+    "difficulty": "hard",
+    "tiny": false,
+    "note": ""
+  },
+  {
+    "id": "H-005",
+    "paths": [
+      "AUTO_FIX"
+    ],
+    "tools": [
+      "restart_print_spooler"
+    ],
+    "queues": [],
+    "units": [
+      "printer"
+    ],
+    "difficulty": "routine",
+    "tiny": true,
+    "note": ""
+  },
+  {
+    "id": "H-006",
+    "paths": [
+      "ESCALATE"
+    ],
+    "tools": [],
+    "queues": [
+      "NET-PRINT"
+    ],
+    "units": [
+      "printer"
+    ],
+    "difficulty": "routine",
+    "tiny": true,
+    "note": ""
+  },
+  {
+    "id": "H-007",
+    "paths": [
+      "SELF_SERVE"
+    ],
+    "tools": [],
+    "queues": [],
+    "units": [
+      "printer"
+    ],
+    "difficulty": "routine",
+    "tiny": true,
+    "note": ""
+  },
+  {
+    "id": "H-008",
+    "paths": [
+      "AUTO_FIX"
+    ],
+    "tools": [
+      "clear_teams_cache"
+    ],
+    "queues": [],
+    "units": [
+      "teams"
+    ],
+    "difficulty": "routine",
+    "tiny": false,
+    "note": ""
+  },
+  {
+    "id": "H-009",
+    "paths": [
+      "ESCALATE"
+    ],
+    "tools": [],
+    "queues": [
+      "M365-TENANT"
+    ],
+    "units": [
+      "teams"
+    ],
+    "difficulty": "hard",
+    "tiny": false,
+    "note": ""
+  },
+  {
+    "id": "H-010",
+    "paths": [
+      "ESCALATE"
+    ],
+    "tools": [],
+    "queues": [
+      "M365-PROFILE"
+    ],
+    "units": [
+      "outlook"
+    ],
+    "difficulty": "hard",
+    "tiny": false,
+    "note": ""
+  },
+  {
+    "id": "H-011",
+    "paths": [
+      "AUTO_FIX"
+    ],
+    "tools": [
+      "push_approved_software"
+    ],
+    "queues": [],
+    "units": [
+      "software-install"
+    ],
+    "difficulty": "routine",
+    "tiny": false,
+    "note": ""
+  },
+  {
+    "id": "H-012",
+    "paths": [
+      "ESCALATE"
+    ],
+    "tools": [],
+    "queues": [
+      "DESKTOP-URGENT"
+    ],
+    "units": [
+      "software-install"
+    ],
+    "difficulty": "hard",
+    "tiny": false,
+    "note": ""
+  },
+  {
+    "id": "H-013",
+    "paths": [
+      "ESCALATE"
+    ],
+    "tools": [],
+    "queues": [],
+    "units": [
+      "shared-drive"
+    ],
+    "difficulty": "hard",
+    "tiny": false,
+    "note": "Access requests are escalated."
+  },
+  {
+    "id": "H-014",
+    "paths": [
+      "AUTO_FIX"
+    ],
+    "tools": [
+      "enable_onedrive_files_on_demand"
+    ],
+    "queues": [],
+    "units": [
+      "laptop-performance",
+      "onedrive"
+    ],
+    "difficulty": "routine",
+    "tiny": false,
+    "note": ""
+  },
+  {
+    "id": "H-015",
+    "paths": [
+      "SELF_SERVE"
+    ],
+    "tools": [],
+    "queues": [],
+    "units": [
+      "laptop-performance"
+    ],
+    "difficulty": "routine",
+    "tiny": false,
+    "note": ""
+  },
+  {
+    "id": "H-016",
+    "paths": [
+      "SELF_SERVE"
+    ],
+    "tools": [],
+    "queues": [],
+    "units": [
+      "onedrive"
+    ],
+    "difficulty": "routine",
+    "tiny": false,
+    "note": ""
+  },
+  {
+    "id": "H-017",
+    "paths": [
+      "ESCALATE"
+    ],
+    "tools": [],
+    "queues": [
+      "INFRA-FS01"
+    ],
+    "units": [
+      "shared-drive"
+    ],
+    "difficulty": "routine",
+    "tiny": false,
+    "note": ""
+  },
+  {
+    "id": "H-018",
+    "paths": [
+      "SELF_SERVE"
+    ],
+    "tools": [],
+    "queues": [],
+    "units": [
+      "shared-drive"
+    ],
+    "difficulty": "routine",
+    "tiny": false,
+    "note": ""
+  },
+  {
+    "id": "H-019",
+    "paths": [
+      "ESCALATE"
+    ],
+    "tools": [],
+    "queues": [
+      "HW-REPLACE"
+    ],
+    "units": [
+      "hardware-peripherals"
+    ],
+    "difficulty": "routine",
+    "tiny": false,
+    "note": ""
+  },
+  {
+    "id": "H-020",
+    "paths": [
+      "ESCALATE"
+    ],
+    "tools": [],
+    "queues": [
+      "SEC-INCIDENT"
+    ],
+    "units": [
+      "account-access"
+    ],
+    "difficulty": "records",
+    "tiny": true,
+    "note": "2 lockouts in 24 hours in the records."
+  },
+  {
+    "id": "H-021",
+    "paths": [
+      "AUTO_FIX",
+      "SELF_SERVE"
+    ],
+    "tools": [
+      "unlock_ad_account"
+    ],
+    "queues": [],
+    "units": [
+      "account-access"
+    ],
+    "difficulty": "records",
+    "tiny": false,
+    "note": "Only 1 lockout in the records, so routine."
+  },
+  {
+    "id": "H-022",
+    "paths": [
+      "ESCALATE"
+    ],
+    "tools": [],
+    "queues": [
+      "HW-REPLACE"
+    ],
+    "units": [
+      "hardware-peripherals"
+    ],
+    "difficulty": "records",
+    "tiny": false,
+    "note": "Legacy CalDigit dock in the records."
+  },
+  {
+    "id": "H-023",
+    "paths": [
+      "ESCALATE"
+    ],
+    "tools": [],
+    "queues": [
+      "INFRA-FS01"
+    ],
+    "units": [
+      "shared-drive"
+    ],
+    "difficulty": "records",
+    "tiny": false,
+    "note": "Still in the deprecated Fin-Users group in the records."
+  },
+  {
+    "id": "H-024",
+    "paths": [
+      "AUTO_FIX"
+    ],
+    "tools": [
+      "push_wifi_driver_update"
+    ],
+    "queues": [],
+    "units": [
+      "wifi"
+    ],
+    "difficulty": "records",
+    "tiny": false,
+    "note": "Device image is pre-2026-05 in the records."
+  },
+  {
+    "id": "H-025",
+    "paths": [
+      "OUT_OF_SCOPE"
+    ],
+    "tools": [],
+    "queues": [],
+    "units": [],
+    "difficulty": "routine",
+    "tiny": true,
+    "note": ""
+  }
+]

@@ -1,8 +1,8 @@
 # Status
 
-The foundation work is finished: `uv run -m evals` matched the pre-move baseline exactly (retrieval 100%, path 90%), and one ticket for each path behaved as before in the browser.
+TriagePilot triages one ticket at a time in a Streamlit app, with a Scoreboard tab for saved evaluations. Each ticket gets one model call, grounded in the top 2 knowledge base units, and ends on one of four paths behind human confirmation gates. All 10 remediation tools are simulated. `docs/ROADMAP.md` says what comes next.
 
-TriagePilot triages one ticket at a time in a Streamlit app. Each ticket gets one model call, grounded in the top 2 knowledge base units, and ends on one of four paths behind human confirmation gates. All 10 remediation tools are simulated. `docs/ROADMAP.md` says what comes next.
+The EVALS code is built. The baseline is waiting for the label review in `briefs/LABEL_REVIEW.md`.
 
 ## How to run it
 
@@ -15,9 +15,8 @@ uv run streamlit run app/main.py
 
 - Put your key in `.env` as `ANTHROPIC_API_KEY`. `MODEL_NAME` is optional.
 - Checks: `uv run poe check`. Tests never call a model.
-- Evaluation: `uv run -m evals`. This calls the model 10 times.
+- Evaluation: `uv run -m evals` makes 25 model calls. `--tiny` makes 5, and `--set held_out` runs the held-out set.
 - Usage statistics: `uv run -m app.stats`.
-- Opening the app also runs the evaluation once, because the code in its collapsed expander still runs. That is 10 model calls per app start.
 - The first run downloads `all-MiniLM-L6-v2` (~90 MB).
 
 ## Who enforces each rule

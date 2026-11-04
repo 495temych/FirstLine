@@ -1,5 +1,6 @@
-"""The golden-set runner, with a stub run_triage."""
+"""The runner, with a stub run_triage."""
 
+import json
 import runpy
 
 import pytest
@@ -7,57 +8,78 @@ import pytest
 from evals import runner
 
 
-def result_for(query: str, use_retrieval: bool) -> dict:
-    """Answers every ticket correctly except the VPN one."""
-    case = next(c for c in runner.load_golden() if c["query"] == query)
-    retrieved = [
-        {"doc": u.split("::")[0], "section": (u.split("::") + [None])[1]}
-        for u in sorted(case["expected_units"])
-    ]
-    path = "ESCALATE" if "VPN keeps" in query else sorted(case["expected_path"])[0]
-    return {"retrieved": retrieved, "path": path}
+def result(path, tool=None, tool_input=None):
+    return {
+        "path": path,
+        "retrieved": [{"doc": "vpn", "section": None}],
+        "tool_name": tool,
+        "tool_input": tool_input,
+        "usage": {"input_tokens": 1000, "output_tokens": 200},
+        "response_time_sec": 1.5,
+    }
+
+
+def always_escalate(text, use_retrieval):
+    queue = {"queue": "SEC-INCIDENT", "summary": "s", "priority": "P2-High"}
+    return result("ESCALATE", "create_escalation_ticket", queue)
 
 
 @pytest.fixture
-def stubbed(monkeypatch):
-    monkeypatch.setattr(runner, "run_triage", result_for)
-
-
-def test_golden_set_loads_with_labels_as_sets():
-    cases = runner.load_golden()
-    assert len(cases) == 10
-    assert all(isinstance(c["expected_path"], set) for c in cases)
-    assert all(isinstance(c["expected_units"], set) for c in cases)
-
-
-def test_unit_ids_name_the_section_when_there_is_one():
-    assert runner._unit_id({"doc": "vpn", "section": None}) == "vpn"
-    assert runner._unit_id({"doc": "co", "section": "Sec"}) == "co::Sec"
-
-
-def test_top1_is_correct_when_it_is_an_expected_unit():
-    assert runner._top1_correct({"vpn"}, ["vpn", "teams"])
-    assert not runner._top1_correct({"vpn"}, ["teams", "vpn"])
-
-
-def test_top1_with_nothing_expected_is_correct_only_when_nothing_returned():
-    assert runner._top1_correct(set(), [])
-    assert not runner._top1_correct(set(), ["vpn"])
+def stubbed(tmp_path, monkeypatch):
+    monkeypatch.setattr(runner, "RUNS_DIR", tmp_path)
+    monkeypatch.setattr(runner, "run_triage", always_escalate)
+    monkeypatch.delenv("MODEL_NAME", raising=False)
+    return tmp_path
 
 
 @pytest.mark.usefixtures("stubbed")
-def test_run_and_summarize():
-    summary = runner.summarize(runner.run_eval())
-    assert summary["n"] == 10
-    assert summary["retrieval_accuracy"] == 1.0
-    assert summary["path_accuracy"] == 0.9
+def test_a_run_records_what_was_measured():
+    run = runner.evaluate("dev", tiny=True)
+    assert run["set"] == "dev"
+    assert run["tiny"] is True
+    assert run["version"] == runner.version()
+    assert len(run["version"]) == 8
+    assert run["summary"]["n"] == 5
+    first = run["tickets"][0]
+    assert first["input_tokens"] == 1000
+    assert first["cost_usd"] == pytest.approx(0.002)
+    assert first["time_sec"] == 1.5
 
 
 @pytest.mark.usefixtures("stubbed")
-def test_the_module_entry_point_prints_the_report(capsys):
+def test_a_failed_ticket_counts_as_an_escalation_and_the_run_goes_on(monkeypatch):
+    def fail_once(text, use_retrieval):
+        monkeypatch.setattr(runner, "run_triage", always_escalate)
+        raise TimeoutError("no answer")
+
+    monkeypatch.setattr(runner, "run_triage", fail_once)
+    run = runner.evaluate("dev", tiny=True)
+    assert run["summary"]["n"] == 5
+    assert run["summary"]["failed"] == 1
+    first = run["tickets"][0]
+    assert first["path"] == "ESCALATE"
+    assert first["error"] == "TimeoutError: no answer"
+    assert first["cost_usd"] == 0
+
+
+@pytest.mark.usefixtures("stubbed")
+def test_an_unknown_model_has_an_unknown_cost(monkeypatch):
+    monkeypatch.setenv("MODEL_NAME", "a-model-with-no-price")
+    run = runner.evaluate("dev", tiny=True)
+    assert run["summary"]["cost_per_ticket_usd"] is None
+
+
+def test_runs_load_newest_first(stubbed):
+    stubbed.joinpath("20260101T000000-dev.json").write_text(json.dumps({"id": "old"}))
+    runner.save_run({"id": "20270101T000000-dev"})
+    assert [r["id"] for r in runner.load_runs()] == ["20270101T000000-dev", "old"]
+
+
+def test_the_command_saves_and_reports(stubbed, monkeypatch, capsys):
+    monkeypatch.setattr("sys.argv", ["evals", "--set", "held_out", "--tiny"])
     runpy.run_module("evals", run_name="__main__")
     out = capsys.readouterr().out
-    assert "Golden-set evaluation — 10 queries" in out
-    assert "retrieval_accuracy=100%" in out
-    assert "path_accuracy=90%" in out
-    assert "✗ path" in out
+    assert "-held_out-tiny" in out
+    assert "cost per ticket $0.0020" in out
+    assert "CHF" in out
+    assert len(list(stubbed.glob("*.json"))) == 1

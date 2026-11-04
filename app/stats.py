@@ -1,7 +1,7 @@
 """Summary statistics over logs.csv — real usage from actual runs through the app,
-not synthetic data and not the evals golden set. Standalone: `uv run -m app.stats`.
+not synthetic data and not an evaluation. Standalone: `uv run -m app.stats`.
 Also imported by the app to show live-session stats in the UI, next to (but clearly
-distinct from) the fixed golden-set numbers.
+distinct from) the Scoreboard's evaluations.
 """
 
 import csv
@@ -59,7 +59,7 @@ def print_summary(stats: dict | None = None) -> None:
     stats = stats if stats is not None else summary_stats()
     print(
         f"Live session stats — {stats['n']} logged queries from actual app runs "
-        f"(logs.csv). This is NOT the evals golden set.\n"
+        f"(logs.csv). This is NOT an evaluation.\n"
     )
 
     if stats["n"] == 0:

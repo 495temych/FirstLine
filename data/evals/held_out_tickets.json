@@ -1,0 +1,127 @@
+[
+  {
+    "id": "H-001",
+    "requester": "o.lang",
+    "text": "VPN says certificate error. The gateway is vpn-gp.limmatica.corp and I've been on leave for two months."
+  },
+  {
+    "id": "H-002",
+    "requester": "g.ammann",
+    "text": "GlobalProtect shows vpn.limmatica.corp as my gateway and can't connect."
+  },
+  {
+    "id": "H-003",
+    "requester": "v.marti",
+    "text": "VPN still fails. Gateway is right, my cert is valid and I synced Okta Verify."
+  },
+  {
+    "id": "H-004",
+    "requester": "h.widmer",
+    "text": "VPN rejects me with no error, and I noticed the clock in Okta Verify is a few minutes off."
+  },
+  {
+    "id": "H-005",
+    "requester": "f.gerber",
+    "text": "Nobody on floor 4 can print since this morning."
+  },
+  {
+    "id": "H-006",
+    "requester": "v.marti",
+    "text": "The spooler was restarted 20 minutes ago but floor 6 still can't print."
+  },
+  {
+    "id": "H-007",
+    "requester": "k.roth",
+    "text": "One document is stuck in my own print queue. Colleagues can print fine."
+  },
+  {
+    "id": "H-008",
+    "requester": "i.bosshard",
+    "text": "Teams shows me as away while I'm working. I'm on the latest build and restarted it."
+  },
+  {
+    "id": "H-009",
+    "requester": "b.brunner",
+    "text": "Clearing the Teams cache didn't hold, and several colleagues report the same thing today."
+  },
+  {
+    "id": "H-010",
+    "requester": "e.moser",
+    "text": "Outlook won't stop prompting. Okta session is fresh, Credential Manager was cleared yesterday, and my PST archive is 12 GB."
+  },
+  {
+    "id": "H-011",
+    "requester": "g.ammann",
+    "text": "I need 7-Zip. It's in Company Portal but the Portal won't open."
+  },
+  {
+    "id": "H-012",
+    "requester": "o.lang",
+    "text": "I have a client demo in one hour and need Tableau. My manager pre-approved it."
+  },
+  {
+    "id": "H-013",
+    "requester": "f.gerber",
+    "text": "Please add me to the Legal-RW group."
+  },
+  {
+    "id": "H-014",
+    "requester": "h.widmer",
+    "text": "My laptop is slow and the disk is 97% full. OneDrive seems to store everything locally."
+  },
+  {
+    "id": "H-015",
+    "requester": "i.bosshard",
+    "text": "My ThinkPad got slow after I added some browser toolbars. Lots of apps start with Windows now."
+  },
+  {
+    "id": "H-016",
+    "requester": "e.moser",
+    "text": "OneDrive fails only on Q3_Budget#v2.xlsx. Everything else syncs."
+  },
+  {
+    "id": "H-017",
+    "requester": "b.brunner",
+    "text": "All of Legal can't reach the path on FS01, and it's Thursday morning."
+  },
+  {
+    "id": "H-018",
+    "requester": "k.roth",
+    "text": "I can't reach the Legal drive from home. I haven't connected to the VPN yet."
+  },
+  {
+    "id": "H-019",
+    "requester": "v.marti",
+    "text": "My dock's keyboard and mouse are dead. Device Manager shows nothing, even after reseating the cable and updating firmware."
+  },
+  {
+    "id": "H-020",
+    "requester": "n.graf",
+    "text": "Unlock my account please, it's urgent."
+  },
+  {
+    "id": "H-021",
+    "requester": "d.meili",
+    "text": "I'm locked out. I forgot my password over the weekend."
+  },
+  {
+    "id": "H-022",
+    "requester": "c.suter",
+    "text": "My external display goes black every time my laptop wakes from sleep."
+  },
+  {
+    "id": "H-023",
+    "requester": "p.bianchi",
+    "text": "I can't open the Finance share since the group changes in June."
+  },
+  {
+    "id": "H-024",
+    "requester": "a.kunz",
+    "text": "Wi-Fi keeps dropping on my laptop."
+  },
+  {
+    "id": "H-025",
+    "requester": "o.lang",
+    "text": "What's a good way to learn Italian before my holiday?"
+  }
+]

@@ -1,0 +1,127 @@
+[
+  {
+    "id": "T-001",
+    "requester": "o.lang",
+    "text": "My VPN keeps disconnecting"
+  },
+  {
+    "id": "T-002",
+    "requester": "g.ammann",
+    "text": "Teams shows me as offline to everyone"
+  },
+  {
+    "id": "T-003",
+    "requester": "o.lang",
+    "text": "Floor 5 print queue is stuck"
+  },
+  {
+    "id": "T-004",
+    "requester": "v.marti",
+    "text": "VPN cert error, gateway confirmed correct, offline for a month"
+  },
+  {
+    "id": "T-005",
+    "requester": "f.gerber",
+    "text": "Need Zoom installed, no admin rights, it's in Company Portal"
+  },
+  {
+    "id": "T-006",
+    "requester": "s.keller",
+    "text": "I'm locked out of my account"
+  },
+  {
+    "id": "T-007",
+    "requester": "h.widmer",
+    "text": "Locked out twice already today"
+  },
+  {
+    "id": "T-008",
+    "requester": "t.steiner",
+    "text": "My OneDrive has been stuck syncing for two days"
+  },
+  {
+    "id": "T-009",
+    "requester": "i.bosshard",
+    "text": "My external monitor isn't detected when docked"
+  },
+  {
+    "id": "T-010",
+    "requester": "k.roth",
+    "text": "What's the weather like today?"
+  },
+  {
+    "id": "T-011",
+    "requester": "h.widmer",
+    "text": "Outlook keeps asking for my password, and my Okta session was renewed yesterday."
+  },
+  {
+    "id": "T-012",
+    "requester": "b.brunner",
+    "text": "Outlook has prompted me to sign in all morning. My last full Okta login was about three months ago."
+  },
+  {
+    "id": "T-013",
+    "requester": "v.marti",
+    "text": "My laptop is crawling right now and Task Manager shows CSFalconService using most of the CPU."
+  },
+  {
+    "id": "T-014",
+    "requester": "g.ammann",
+    "text": "My disk is almost full and OneDrive seems to keep every file on the laptop."
+  },
+  {
+    "id": "T-015",
+    "requester": "e.moser",
+    "text": "My mapped drives have disappeared. VPN is connected and everything else works."
+  },
+  {
+    "id": "T-016",
+    "requester": "t.steiner",
+    "text": "The Finance share on FS01 is down for our whole team and it's Wednesday afternoon."
+  },
+  {
+    "id": "T-017",
+    "requester": "o.lang",
+    "text": "Can I get Photoshop? It isn't in Company Portal."
+  },
+  {
+    "id": "T-018",
+    "requester": "i.bosshard",
+    "text": "Wi-Fi keeps dropping for several of us near the open-plan area on floor 5."
+  },
+  {
+    "id": "T-019",
+    "requester": "f.gerber",
+    "text": "Please give me local admin rights so I can install my own tools."
+  },
+  {
+    "id": "T-020",
+    "requester": "l.frei",
+    "text": "Locked out again, can you unlock me please?"
+  },
+  {
+    "id": "T-021",
+    "requester": "m.huber",
+    "text": "My account got locked after I mistyped my new password following the rotation reminder."
+  },
+  {
+    "id": "T-022",
+    "requester": "j.wyss",
+    "text": "My Wi-Fi keeps dropping at my desk. Nobody else seems affected."
+  },
+  {
+    "id": "T-023",
+    "requester": "r.vogel",
+    "text": "My laptop battery barely lasts an hour now."
+  },
+  {
+    "id": "T-024",
+    "requester": "k.roth",
+    "text": "My monitor says no signal since someone swapped it at my desk. The dock cable clicks in fine."
+  },
+  {
+    "id": "T-025",
+    "requester": "b.brunner",
+    "text": "Can you recommend a good restaurant near Sihlquai for a team lunch?"
+  }
+]

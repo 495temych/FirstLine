@@ -30,7 +30,7 @@ Our goal is to resolve routine tickets remotely, before anyone travels, and to h
 - A confirmation card before any fix runs or any ticket is created.
 - After a self-serve answer, a way to say it worked, or that it did not and should go to a technician.
 - Live statistics from real use: tickets by path, the share resolved without a technician, response times.
-- The results of our evaluation set.
+- A Scoreboard with the results of our evaluations.
 - A switch that turns retrieval off, so we can show what the agent does without our knowledge base.
 
 ## Rules
@@ -51,7 +51,8 @@ Our goal is to resolve routine tickets remotely, before anyone travels, and to h
 
 - `data/kb/`: Limmatica's knowledge base, 11 single-issue playbooks and the company profile, which is split by section.
 - `logs.csv`: real usage from the app, one row per finished run. It is not in git.
-- The evaluation set: 10 tickets with the expected path and the knowledge base units that should be found.
+- `data/records/`: invented records of Limmatica's users, their devices and recent lockouts. The agent doesn't use them yet.
+- `data/evals/`: two labelled sets of 25 tickets. The agent never sees the answers.
 
 ## Not for now
 

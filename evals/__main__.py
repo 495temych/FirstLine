@@ -1,4 +1,4 @@
-"""Run the golden-set evaluation: `uv run -m evals`."""
+"""Run an evaluation: `uv run -m evals`."""
 
 from evals.runner import main
 
