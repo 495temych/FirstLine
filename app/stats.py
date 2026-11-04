@@ -1,12 +1,13 @@
 """Summary statistics over logs.csv — real usage from actual runs through the app,
-not synthetic data and not the eval.py golden set. Standalone: `python analyze_logs.py`.
-Also imported by app.py to show live-session stats in the UI, next to (but clearly
-distinct from) eval.py's fixed golden-set numbers.
+not synthetic data and not the evals golden set. Standalone: `uv run -m app.stats`.
+Also imported by the app to show live-session stats in the UI, next to (but clearly
+distinct from) the fixed golden-set numbers.
 """
-import csv
-from pathlib import Path
 
-LOG_FILE = Path(__file__).parent / "logs.csv"
+import csv
+
+from agent.config import LOG_FILE
+
 PATHS = ["SELF_SERVE", "AUTO_FIX", "ESCALATE", "OUT_OF_SCOPE"]
 MIN_ROWS_FOR_STABLE_RATE = 5
 
@@ -37,7 +38,11 @@ def summary_stats() -> dict:
 
     avg_response_time_sec = {}
     for p in PATHS:
-        times = [float(r["response_time_sec"]) for r in by_path[p] if r.get("response_time_sec")]
+        times = [
+            float(r["response_time_sec"])
+            for r in by_path[p]
+            if r.get("response_time_sec")
+        ]
         avg_response_time_sec[p] = (sum(times) / len(times)) if times else None
 
     return {
@@ -52,29 +57,39 @@ def summary_stats() -> dict:
 
 def print_summary(stats: dict | None = None) -> None:
     stats = stats if stats is not None else summary_stats()
-    print(f"Live session stats — {stats['n']} logged queries from actual app runs "
-          f"(logs.csv). This is NOT the eval.py golden set.\n")
+    print(
+        f"Live session stats — {stats['n']} logged queries from actual app runs "
+        f"(logs.csv). This is NOT the evals golden set.\n"
+    )
 
     if stats["n"] == 0:
         print("No queries logged yet. Run some queries through the app first.")
         return
 
     if stats["low_sample"]:
-        print(f"Sample size too small for a stable rate (< {MIN_ROWS_FOR_STABLE_RATE} rows) "
-              f"— numbers below are illustrative only, not a reliable rate.\n")
+        print(
+            f"Sample size too small for a stable rate (< {MIN_ROWS_FOR_STABLE_RATE} "
+            f"rows) "
+            f"— numbers below are illustrative only, not a reliable rate.\n"
+        )
 
     print("Count and % by decision path:")
     for p in PATHS:
         print(f"  {p:12s} {stats['counts'][p]:3d}  ({stats['pct'][p]:.0f}%)")
 
     if stats["automation_rate"] is not None:
-        print(f"\nAutomation rate (SELF_SERVE + AUTO_FIX, over total minus OUT_OF_SCOPE): "
-              f"{stats['automation_rate']:.0f}%")
+        print(
+            f"\nAutomation rate (SELF_SERVE + AUTO_FIX, over total minus "
+            f"OUT_OF_SCOPE): "
+            f"{stats['automation_rate']:.0f}%"
+        )
     else:
         print("\nAutomation rate: n/a (no non-OUT_OF_SCOPE queries logged yet)")
 
-    print("\nAgent response time (proxy for MTTR — measures decision latency, not full "
-          "ticket resolution), avg by path:")
+    print(
+        "\nAgent response time (proxy for MTTR — measures decision latency, not full "
+        "ticket resolution), avg by path:"
+    )
     for p in PATHS:
         t = stats["avg_response_time_sec"][p]
         print(f"  {p:12s} {f'{t:.2f}s' if t is not None else 'n/a'}")

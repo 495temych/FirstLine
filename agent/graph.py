@@ -3,27 +3,30 @@
 Flow (see README for the rendered diagram):
 
     START ─ use_retrieval? ─ off → no_tools → END
-                           └ on  → retrieve → triage ─ path ─ OUT_OF_SCOPE → log
-                                                             ├ SELF_SERVE   → self_serve_wait
-                                                             ├ AUTO_FIX     → confirm_fix
-                                                             └ ESCALATE     → confirm_ticket
+                           └ on  → retrieve → triage ─ path:
+        OUT_OF_SCOPE → log
+        SELF_SERVE   → self_serve_wait
+        AUTO_FIX     → confirm_fix
+        ESCALATE     → confirm_ticket
 
 Rules this module follows:
   * Nodes return partial state updates and never mutate `state` in place.
   * `interrupt()` nodes (confirm_fix, confirm_ticket, self_serve_wait) do nothing else:
     on resume LangGraph re-runs the node from its first line, so side effects live in
-    separate nodes (execute_tool, create_ticket) that only run after the answer is stored.
-  * Routers are pure functions of state that return node names from a closed Literal set.
+    separate nodes (execute_tool, create_ticket) that only run after the answer is
+    stored.
+  * Routers are pure functions of state that return node names from a closed Literal
+    set.
 """
+
 import csv
 import time
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from functools import cache
 from pathlib import Path
-from typing import Literal
+from typing import Any, Literal
 
 import anthropic
-from dotenv import load_dotenv
 from langchain_anthropic import ChatAnthropic
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 from langchain_core.runnables import RunnableConfig
@@ -31,20 +34,28 @@ from langgraph.graph import END, START, StateGraph
 from langgraph.types import RetryPolicy, interrupt
 from typing_extensions import TypedDict
 
-import tools
-from retrieval import retrieve
-from tool_schemas import TOOLS
-
-load_dotenv(Path(__file__).parent / ".env")
+from agent import tools
+from agent.config import LOG_FILE, model_name
+from agent.retrieval import retrieve
+from agent.tool_schemas import TOOLS
 
 _PROMPT_FILE = Path(__file__).parent / "prompt.md"
-MODEL = "claude-haiku-4-5-20251001"
 
-LOG_FILE = Path(__file__).parent / "logs.csv"
 LOG_FIELDS = [
-    "timestamp", "query", "retrieved_units", "decision_path", "diagnostic_summary",
-    "tool_called", "confirmed", "escalation_queue", "priority", "response_time_sec",
+    "timestamp",
+    "query",
+    "retrieved_units",
+    "decision_path",
+    "diagnostic_summary",
+    "tool_called",
+    "confirmed",
+    "escalation_queue",
+    "priority",
+    "response_time_sec",
 ]
+
+HEADER_MARKERS = 2  # the opening and closing ** of a bare markdown header
+MIN_SUMMARY_CHARS = 15  # shorter lines are labels, not a diagnosis
 
 PATH_KEYWORDS = ("OUT_OF_SCOPE", "SELF_SERVE", "AUTO_FIX", "ESCALATE")
 
@@ -55,7 +66,8 @@ class GraphState(TypedDict):
     use_retrieval: bool
     retrieved: list[dict]
     reasoning: str
-    path: str  # SELF_SERVE | AUTO_FIX | ESCALATE | OUT_OF_SCOPE | NO_TOOLS ("" before triage)
+    # SELF_SERVE | AUTO_FIX | ESCALATE | OUT_OF_SCOPE | NO_TOOLS ("" before triage)
+    path: str
     tool_name: str | None
     tool_input: dict | None
     # Operator answers keyed by gate: "fix" (confirm_fix), "ticket" (confirm_ticket),
@@ -90,14 +102,16 @@ def build_user_message(query: str, retrieved: list[dict], use_retrieval: bool) -
         blocks = []
         for u in retrieved:
             label = u["doc"] + (f" § {u['section']}" if u["section"] else "")
-            blocks.append(f"**{label}** (similarity score: {u['score']:.2f})\n\n{u['text']}")
+            blocks.append(
+                f"**{label}** (similarity score: {u['score']:.2f})\n\n{u['text']}"
+            )
         n = len(retrieved)
         return (
             f"User issue: {query}\n\n"
             f"---\n"
             f"Retrieved KB context — {n} unit{'s' if n != 1 else ''} "
-            f"(may be from different source documents; synthesize across all of them):\n\n"
-            + "\n\n---\n\n".join(blocks)
+            f"(may be from different source documents; synthesize across all of "
+            f"them):\n\n" + "\n\n---\n\n".join(blocks)
         )
     if use_retrieval:
         return (
@@ -112,14 +126,22 @@ def build_user_message(query: str, retrieved: list[dict], use_retrieval: bool) -
 def _is_header_line(line: str) -> bool:
     # Skip bare markdown headers like "**Step 1 — Diagnose**" — we want the sentence
     # that follows, not the section label.
-    return line.startswith("**") and line.endswith("**") and line.count("**") == 2
+    return (
+        line.startswith("**")
+        and line.endswith("**")
+        and line.count("**") == HEADER_MARKERS
+    )
 
 
 def diagnostic_summary(reasoning: str, default: str = "") -> str:
     """First substantive line of the model's reasoning."""
     return next(
-        (l.strip() for l in (reasoning or "").split("\n")
-         if len(l.strip()) > 15 and not _is_header_line(l.strip())),
+        (
+            line.strip()
+            for line in (reasoning or "").split("\n")
+            if len(line.strip()) > MIN_SUMMARY_CHARS
+            and not _is_header_line(line.strip())
+        ),
         default,
     )
 
@@ -130,10 +152,13 @@ def message_blocks(msg: AIMessage) -> list[dict]:
     if isinstance(content, str):
         blocks = [{"type": "text", "text": content}] if content else []
     else:
-        blocks = [{"type": "text", "text": b} if isinstance(b, str) else b for b in content]
+        blocks = [
+            {"type": "text", "text": b} if isinstance(b, str) else b for b in content
+        ]
     if not any(b.get("type") == "tool_use" for b in blocks):
         blocks += [
-            {"type": "tool_use", "name": tc["name"], "input": tc["args"]} for tc in msg.tool_calls
+            {"type": "tool_use", "name": tc["name"], "input": tc["args"]}
+            for tc in msg.tool_calls
         ]
     return blocks
 
@@ -172,7 +197,11 @@ def parse_path(blocks: list[dict]) -> dict:
     if path == "ESCALATE" and tool_name is None:
         tool_name = "create_escalation_ticket"
         first_line = next(
-            (l.strip() for l in (reasoning or "").split("\n") if len(l.strip()) > 15),
+            (
+                line.strip()
+                for line in (reasoning or "").split("\n")
+                if len(line.strip()) > MIN_SUMMARY_CHARS
+            ),
             "Issue escalated — technician review required.",
         )
         tool_input = {
@@ -181,14 +210,20 @@ def parse_path(blocks: list[dict]) -> dict:
             "priority": "P3-Normal",
         }
 
-    return {"path": path, "reasoning": reasoning, "tool_name": tool_name, "tool_input": tool_input}
+    return {
+        "path": path,
+        "reasoning": reasoning,
+        "tool_name": tool_name,
+        "tool_input": tool_input,
+    }
 
 
 def ticket_for(state: GraphState) -> dict:
     """The ticket the operator is being asked to confirm: a drafted one (declined fix /
     self-serve fallback) or the model's own create_escalation_ticket call."""
-    if state.get("ticket_draft"):
-        return state["ticket_draft"]
+    draft = state.get("ticket_draft")
+    if draft:
+        return draft
     ti = state["tool_input"] or {}
     return {
         "source": "escalate",
@@ -200,9 +235,12 @@ def ticket_for(state: GraphState) -> dict:
 
 def build_log_row(state: GraphState, now: datetime) -> dict:
     units = state["retrieved"] or []
-    retrieved_units = ";".join(
-        u["doc"] + (f"::{u['section']}" if u["section"] else "") for u in units
-    ) or "none"
+    retrieved_units = (
+        ";".join(
+            u["doc"] + (f"::{u['section']}" if u["section"] else "") for u in units
+        )
+        or "none"
+    )
     tool_input = state["tool_input"] or {}
     is_escalate = state["path"] == "ESCALATE"
     # `confirmed` is only meaningful for AUTO_FIX, the one path where declining prevents
@@ -228,14 +266,23 @@ def build_log_row(state: GraphState, now: datetime) -> dict:
 def _get_llm() -> ChatAnthropic:
     # max_retries=0: transient API errors are retried by the node's RetryPolicy, not
     # twice over by the SDK as well.
-    return ChatAnthropic(model=MODEL, max_tokens=1024, max_retries=0)
+    settings: dict[str, Any] = {
+        "model": model_name(),
+        "max_tokens": 1024,
+        "max_retries": 0,
+    }
+    return ChatAnthropic(**settings)
 
 
 def _is_api_error(exc: BaseException) -> bool:
     """Retry transient Anthropic failures only (network, timeout, 429, 5xx/529)."""
     return isinstance(
         exc,
-        (anthropic.APIConnectionError, anthropic.RateLimitError, anthropic.InternalServerError),
+        (
+            anthropic.APIConnectionError,
+            anthropic.RateLimitError,
+            anthropic.InternalServerError,
+        ),
     )
 
 
@@ -250,7 +297,11 @@ def _call_model(state: GraphState) -> tuple[AIMessage, float]:
         llm = llm.bind_tools(TOOLS)
     messages = [
         SystemMessage(_PROMPT_FILE.read_text()),
-        HumanMessage(build_user_message(state["query"], state["retrieved"], state["use_retrieval"])),
+        HumanMessage(
+            build_user_message(
+                state["query"], state["retrieved"], state["use_retrieval"]
+            )
+        ),
     ]
     t0 = time.perf_counter()
     msg = llm.invoke(messages)
@@ -270,7 +321,9 @@ def triage(state: GraphState) -> dict:
 def no_tools(state: GraphState) -> dict:
     """RAG off: one plain-text call with no tools, so there is nothing to classify."""
     msg, elapsed = _call_model(state)
-    reasoning = "".join(b["text"] for b in message_blocks(msg) if b.get("type") == "text")
+    reasoning = "".join(
+        b["text"] for b in message_blocks(msg) if b.get("type") == "text"
+    )
     return {
         "retrieved": [],
         "path": "NO_TOOLS",
@@ -282,11 +335,13 @@ def no_tools(state: GraphState) -> dict:
 
 
 def confirm_fix(state: GraphState) -> dict:
-    approved = interrupt({
-        "kind": "confirm_fix",
-        "tool_name": state["tool_name"],
-        "tool_input": state["tool_input"] or {},
-    })
+    approved = interrupt(
+        {
+            "kind": "confirm_fix",
+            "tool_name": state["tool_name"],
+            "tool_input": state["tool_input"] or {},
+        }
+    )
     return {"human_decision": {**state["human_decision"], "fix": bool(approved)}}
 
 
@@ -301,19 +356,27 @@ def self_serve_wait(state: GraphState) -> dict:
 
 
 def execute_tool(state: GraphState) -> dict:
-    return {"tool_result": tools.dispatch(state["tool_name"], state["tool_input"] or {})}
+    tool_name = state["tool_name"]
+    if tool_name is None:
+        raise ValueError("execute_tool needs a proposed tool")
+    return {"tool_result": tools.dispatch(tool_name, state["tool_input"] or {})}
 
 
 def draft_ticket(state: GraphState) -> dict:
-    """Pre-fill an escalation ticket from the diagnosis already in state — no model call."""
+    """Pre-fill a ticket from the diagnosis already in state, with no model call."""
     if state["path"] == "SELF_SERVE":
-        summary = f"Self-serve steps did not resolve the issue. Original query: {state['query']}"
-        return {"ticket_draft": {
-            "source": "self_serve",
-            "queue": "DESKTOP-SUPPORT",
-            "priority": "P3-Normal",
-            "summary": summary[:150],
-        }}
+        summary = (
+            "Self-serve steps did not resolve the issue. "
+            f"Original query: {state['query']}"
+        )
+        return {
+            "ticket_draft": {
+                "source": "self_serve",
+                "queue": "DESKTOP-SUPPORT",
+                "priority": "P3-Normal",
+                "summary": summary[:150],
+            }
+        }
 
     declined_tool = state["tool_name"] or "unknown"
     reason = "User declined proposed automated fix; issue persists"
@@ -321,33 +384,37 @@ def draft_ticket(state: GraphState) -> dict:
         state["reasoning"], default="Automated fix did not run; issue not yet resolved."
     )
     ticket_summary = f"{summary} {reason} (declined: {declined_tool})."
-    return {"ticket_draft": {
-        "source": "decline",
-        "queue": "DESKTOP-SUPPORT",
-        # No model-assigned priority exists on this path, so use the same default as
-        # the other synthesized tickets.
-        "priority": "P3-Normal",
-        "summary": ticket_summary[:150],
-        "declined_tool": declined_tool,
-        "reason": reason,
-        "diagnostic_summary": summary,
-    }}
+    return {
+        "ticket_draft": {
+            "source": "decline",
+            "queue": "DESKTOP-SUPPORT",
+            # No model-assigned priority exists on this path, so use the same default as
+            # the other synthesized tickets.
+            "priority": "P3-Normal",
+            "summary": ticket_summary[:150],
+            "declined_tool": declined_tool,
+            "reason": reason,
+            "diagnostic_summary": summary,
+        }
+    }
 
 
 def create_ticket(state: GraphState) -> dict:
     t = ticket_for(state)
-    return {"tool_result": tools.dispatch(
-        "create_escalation_ticket",
-        {"queue": t["queue"], "summary": t["summary"], "priority": t["priority"]},
-    )}
+    return {
+        "tool_result": tools.dispatch(
+            "create_escalation_ticket",
+            {"queue": t["queue"], "summary": t["summary"], "priority": t["priority"]},
+        )
+    }
 
 
 def log(state: GraphState, config: RunnableConfig) -> dict:
     """Append one row with the final state. Callers that only want the decision (eval)
     pass configurable `log_runs=False` so golden-set runs don't pollute logs.csv."""
-    if not config["configurable"].get("log_runs", True):
+    if not config.get("configurable", {}).get("log_runs", True):
         return {}
-    row = build_log_row(state, datetime.now(timezone.utc))
+    row = build_log_row(state, datetime.now(UTC))
     # Header goes out once — when the file doesn't exist yet or is empty.
     needs_header = not LOG_FILE.exists() or LOG_FILE.stat().st_size == 0
     with open(LOG_FILE, "a", newline="") as f:
@@ -358,23 +425,27 @@ def log(state: GraphState, config: RunnableConfig) -> dict:
     return {}
 
 
+TriageRoute = Literal["log", "self_serve_wait", "confirm_fix", "confirm_ticket"]
+
+
 # ── Routers (pure) ──────────────────────────────────────────────────────────────
 def route_start(state: GraphState) -> Literal["retrieve", "no_tools"]:
     return "retrieve" if state["use_retrieval"] else "no_tools"
 
 
-def route_after_triage(
-    state: GraphState,
-) -> Literal["log", "self_serve_wait", "confirm_fix", "confirm_ticket"]:
-    return {
+def route_after_triage(state: GraphState) -> TriageRoute:
+    routes: dict[str, TriageRoute] = {
         "OUT_OF_SCOPE": "log",
         "SELF_SERVE": "self_serve_wait",
         "AUTO_FIX": "confirm_fix",
         "ESCALATE": "confirm_ticket",
-    }[state["path"]]
+    }
+    return routes[state["path"]]
 
 
-def route_after_confirm_fix(state: GraphState) -> Literal["execute_tool", "draft_ticket"]:
+def route_after_confirm_fix(
+    state: GraphState,
+) -> Literal["execute_tool", "draft_ticket"]:
     return "execute_tool" if state["human_decision"]["fix"] else "draft_ticket"
 
 
