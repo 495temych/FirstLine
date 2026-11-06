@@ -1,8 +1,8 @@
-# TriagePilot
+# FirstLine
 
 ## The context
 
-TriagePilot is an L1 IT support triage agent for Sihlwerk IT AG, a fictional Swiss IT service provider. Its first client is the fictional Limmatica AG. It is built as a portfolio project for Swiss employers, the way a production team would build it. The owner reviews plans and builds, and you plan, build and check the work.
+FirstLine is an L1 IT support triage agent for Sihlwerk IT AG, a fictional Swiss IT service provider. Its first client is the fictional Limmatica AG. It is built as a portfolio project for Swiss employers, the way a production team would build it. The owner reviews plans and builds, and you plan, build and check the work.
 
 ## Start here
 

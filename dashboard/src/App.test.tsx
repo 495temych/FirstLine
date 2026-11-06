@@ -71,7 +71,7 @@ async function triage(run: Partial<Run> = {}) {
 
 it("shows the three tabs and the example tickets", () => {
   render(<App />);
-  expect(screen.getByRole("heading", { name: "TriagePilot" })).toBeDefined();
+  expect(screen.getByRole("heading", { name: "FirstLine" })).toBeDefined();
   for (const tab of ["Triage", "Scoreboard", "Tickets"]) {
     expect(screen.getByRole("button", { name: tab })).toBeDefined();
   }

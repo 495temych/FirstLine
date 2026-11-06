@@ -13,7 +13,7 @@ export function App() {
     <>
       <header className="masthead">
         <div>
-          <h1>TriagePilot</h1>
+          <h1>FirstLine</h1>
           <p>L1 IT support for Limmatica AG</p>
         </div>
         <nav aria-label="Sections">

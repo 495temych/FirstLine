@@ -1,5 +1,5 @@
 [project]
-name = "triagepilot"
+name = "firstline"
 version = "0.1.0"
 description = "An L1 IT support triage agent"
 requires-python = ">=3.12"

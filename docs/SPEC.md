@@ -1,4 +1,4 @@
-# TriagePilot: the L1 triage pilot
+# FirstLine: the L1 triage pilot
 
 From the head of service delivery at Sihlwerk IT AG.
 
@@ -10,7 +10,7 @@ One L1 technician covers several client sites. For each ticket they read the req
 
 ## The pilot
 
-We want an agent, TriagePilot, to do the first pass on a ticket the way a good L1 technician does. For each ticket it should:
+We want an agent, FirstLine, to do the first pass on a ticket the way a good L1 technician does. For each ticket it should:
 
 - look up the relevant playbooks and policies in the client's knowledge base
 - choose exactly one path:

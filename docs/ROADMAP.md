@@ -1,6 +1,6 @@
 # Roadmap
 
-TriagePilot is an L1 IT support agent for a Swiss IT service provider, built as a portfolio project for Zurich employers. UnderCover is the model for the engineering practice, not the product.
+FirstLine is an L1 IT support agent for a Swiss IT service provider, built as a portfolio project for Zurich employers. UnderCover is the model for the engineering practice, not the product.
 
 **The idea: the agent proposes, the system enforces, and a scoreboard proves it works.**
 
@@ -80,7 +80,7 @@ The number after each one is the commit that meets it.
 
 Not now. It solves a problem we don't have. UnderCover's data governance team hands seven files to an agent behind an AWS Gateway, so the files need an MCP server of their own and a record of where each came from. We have one agent, one client and one process.
 
-| UnderCover | TriagePilot today | Verdict |
+| UnderCover | FirstLine today | Verdict |
 |---|---|---|
 | `policy_wording.md`, `claims_manual.md` | `data/kb/` | Already have it |
 | `claim_rules.yaml` | SEC-04 in the text of `company-profile.md` | Only the rule we enforce needs a value. It's a constant in `agent/rules.py` for now |

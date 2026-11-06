@@ -1,6 +1,6 @@
-# TriagePilot — L1 IT Support Agent
+# FirstLine — L1 IT Support Agent
 
-TriagePilot does the first pass on L1 IT support tickets for a Swiss IT service provider: it looks up the client's knowledge base, picks one path, and proposes the next step for a technician to confirm.
+FirstLine does the first pass on L1 IT support tickets for a Swiss IT service provider: it looks up the client's knowledge base, picks one path, and proposes the next step for a technician to confirm.
 
 ### Problem
 
@@ -10,7 +10,7 @@ Most L1 tickets aren't hard — they're just troubleshooting simple, repetitive 
 - **In Swiss SMEs, dispatch means travel.** A single technician often supports multiple client locations, since a small office can't justify a full-time on-site IT presence. Travel time to and from site is frequently a larger cost than the fix itself.
 - **Skilled IT hours are expensive and scarce in this region.** Time spent traveling and pattern-matching a known issue is time not spent on the complex work only that technician can do.
 
-**TriagePilot targets exactly that slice: high-frequency, well-documented, low-novelty tickets — resolved remotely, before a trip is even needed.**
+**FirstLine targets exactly that slice: high-frequency, well-documented, low-novelty tickets — resolved remotely, before a trip is even needed.**
 
 ### Stakeholder Profiles Breakdown
 

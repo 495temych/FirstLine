@@ -1,4 +1,4 @@
-"""LangGraph orchestration for TriagePilot: state, nodes, routers, build_graph().
+"""LangGraph orchestration for FirstLine: state, nodes, routers, build_graph().
 
 Flow (see README for the rendered diagram):
 

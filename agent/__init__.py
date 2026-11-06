@@ -1,4 +1,4 @@
-"""The TriagePilot agent."""
+"""The FirstLine agent."""
 
 from agent.triage import run_triage
 

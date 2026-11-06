@@ -1,4 +1,4 @@
-"""The TriagePilot API. It's thin: the graph holds all the triage logic."""
+"""The FirstLine API. It's thin: the graph holds all the triage logic."""
 
 import json
 import os
@@ -33,7 +33,7 @@ RUN_FIELDS = [
     "tool_result",
 ]
 
-app = FastAPI(title="TriagePilot")
+app = FastAPI(title="FirstLine")
 
 _gate_lock = Lock()  # two answers to one gate must not both pass its check
 
