@@ -80,8 +80,7 @@ class GraphState(TypedDict):
 
 
 def initial_state(query: str, use_retrieval: bool) -> GraphState:
-    """Full input for a new run. Every field is reset because the Streamlit app reuses
-    one thread_id per session — anything omitted would leak in from the previous run."""
+    """Full input for a new run. Every field is set, so nothing is left to chance."""
     return {
         "query": query,
         "use_retrieval": use_retrieval,

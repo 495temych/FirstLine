@@ -5,6 +5,7 @@ description = "An L1 IT support triage agent"
 requires-python = ">=3.12"
 dependencies = [
     "anthropic>=2.4.0",
+    "fastapi>=0.162.0",
     "langchain-anthropic>=1.7.10",
     "langchain-core>=1.0.0",
     "langgraph>=1.2.19",
@@ -12,11 +13,12 @@ dependencies = [
     "numpy>=2.5.4",
     "python-dotenv>=1.2.4",
     "sentence-transformers>=6.2.0",
-    "streamlit>=1.66.1",
+    "uvicorn>=0.54.0",
 ]
 
 [dependency-groups]
 dev = [
+    "httpx>=0.28.1",
     "poethepoet>=0.30.0",
     "pre-commit>=4.0.0",
     "pyright>=1.1.390",
@@ -30,17 +32,19 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-packages = ["agent", "app", "evals"]
+packages = ["agent", "backend", "evals"]
 
 [tool.poe.tasks]
 format = "ruff format --check"
 lint = "ruff check"
 types = "pyright"
 test = "pytest"
-check = ["format", "lint", "types", "test"]
+ts = "npm run check:ts"
+e2e = "npm run e2e"
+check = ["format", "lint", "types", "test", "ts", "e2e"]
 
 [tool.ruff]
-include = ["agent/**/*.py", "app/**/*.py", "evals/**/*.py", "conftest.py"]
+include = ["agent/**/*.py", "backend/**/*.py", "evals/**/*.py", "e2e/**/*.py", "conftest.py"]
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "B", "SIM", "UP", "PL", "S", "PT", "C90"]
@@ -52,19 +56,19 @@ max-complexity = 10
 "*/tests/*" = ["S101", "PLR2004"]
 
 [tool.pytest.ini_options]
-testpaths = ["agent", "app", "evals"]
+testpaths = ["agent", "backend", "evals"]
 pythonpath = ["."]
 addopts = "--import-mode=importlib --cov --cov-report=term-missing"
 
 [tool.coverage.run]
-source = ["agent", "evals"]
+source = ["agent", "backend", "evals"]
 omit = ["*/tests/*"]
 
 [tool.coverage.report]
 fail_under = 80
 
 [tool.pyright]
-include = ["agent", "app", "evals", "conftest.py"]
+include = ["agent", "backend", "evals", "e2e", "conftest.py"]
 venvPath = "."
 venv = ".venv"
 pythonVersion = "3.12"

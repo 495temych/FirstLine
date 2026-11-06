@@ -9,66 +9,36 @@ TriagePilot is an L1 IT support triage agent for Sihlwerk IT AG, a fictional Swi
 IMPORTANT: before you plan, build or change anything, read each of these in full:
 
 1. `docs/SPEC.md`: what the business needs
-2. `docs/ROADMAP.md`: where the product is heading
-3. `docs/STATUS.md`: what's built, how to run it, and which rules code enforces
-4. `docs/DECISIONS.md`: design decisions, their trade-offs and the known limitations
+2. `docs/ROADMAP.md`: the current sprint and where the product is heading
+3. `docs/TECH_STACK.md`: the tech choices
+4. `docs/CODE_STANDARDS.md`: how to write the code
+5. `docs/PROCESS.md`: how to run, plan, build and check the work
+6. `docs/STATUS.md`: what's built and which rules code enforces
+7. `docs/DECISIONS.md`: design decisions, their trade-offs and the known limitations
+8. `docs/BRAND.md`: how the dashboard looks, before any dashboard work
 
-Finished briefs and their plans stay in `docs/` as a record: `docs/FOUNDATION.md`, `docs/PLAN_FOUNDATION.md`, `docs/EVALS.md` and `docs/PLAN_EVALS.md`.
-
-## Tech stack
-
-- Python 3.12 with uv, all in `pyproject.toml`
-- LangGraph with `langchain-anthropic`. The model is `claude-haiku-4-5-20251001`, or `MODEL_NAME` if set
-- `sentence-transformers` for local embeddings
-- Streamlit for the app
-- SQLite for checkpoints, and CSV for the usage log
+Until the baseline is done, also read `docs/EVALS.md` and `docs/PLAN_EVALS.md`.
 
 ## Folders
 
 - `agent/`: the graph, tools, tool schemas, retrieval and instructions. `run_triage` is the entry point, and `config.py` holds paths and settings
-- `app/`: the Streamlit app and usage statistics
+- `backend/`: the FastAPI app and usage statistics
+- `dashboard/`: the React app
+- `e2e/`: browser tests, and the stub server they run against
 - `evals/`: the evaluation runner and scoring
 - `data/kb/`: the knowledge base
 - `data/records/`: invented client records
 - `data/evals/`: labelled tickets, their answers, and saved runs
 - `docs/`: project documents
-- `briefs/`: briefs not yet started, when there are any
+- `briefs/`: notes waiting for a sprint, when there are any
 
 Each package keeps its tests in its own `tests/` folder.
-
-## Code standards
-
-- Keep it simple, and build only what the documents ask for.
-- MVP rule: ship one focused version at a time, fully working and tested, before starting the next.
-- Nodes return partial state and never mutate `state`. Routers are pure functions.
-- Side effects never live in an `interrupt()` node, because it re-runs from its first line on resume.
-- Paths and settings go in `agent/config.py`.
-- Add no `# noqa` or `# type: ignore`.
-
-## Process
-
-Briefs start in `briefs/`, written in the customer's voice, and move to `docs/` when their work begins.
-
-- **"Please plan X"** writes `docs/PLAN_X.md`, with phases and checkbox success criteria you can verify yourself. Then stop for review.
-- **"Please implement the plan for X"** builds the phases in order. For each phase: build it with tests, check every criterion, tick it off, update `docs/STATUS.md`, and commit.
-
-`uv run poe check` runs ruff, pyright and pytest with 80% coverage. The pre-commit hook and GitHub Actions run the same command.
-
-## Rules
-
-- Tests never call a model. Use a stub. `conftest.py` makes an unstubbed model raise.
-- Never lower a threshold, turn off a rule or exclude a file to get a green run. Fix the code, or stop and ask.
-- Never use `git commit --no-verify`.
-- Never push without asking.
-- Ask before anything irreversible.
-- Keep `docs/STATUS.md` up to date.
-- Live runs cost money. Use them only when a check needs them.
-- Never open the held-out set when changing the instructions, and never give the agent an answer file.
-- `logs.csv` and `checkpoints.sqlite` are real usage data. Keep them out of tests.
 
 ## This machine
 
 The repository is in an iCloud-synced folder.
 
 - The virtual environment must stay in `.venv.nosync`, with `.venv` a link to it. iCloud skips `*.nosync`. Never rebuild it as a plain `.venv`.
+- `node_modules` must likewise be a link to `node_modules.nosync`. `npm install` replaces the link with a real folder, so after any install that does, run `rm -rf node_modules.nosync && mv node_modules node_modules.nosync && ln -s node_modules.nosync node_modules`.
+- If `prettier: command not found` appears, or a link called `node_modules 2`, iCloud has restored an old copy of the folder. `node_modules.nosync` is still complete. Run `rm -f "node_modules 2"; mv node_modules node_modules.old.nosync && ln -s node_modules.nosync node_modules`. Don't `rm -rf` or move the restored folder out of the repository first, because both hang on files iCloud hasn't downloaded.
 - If anything hangs, check for offloaded files first: `find . -flags +dataless | wc -l`.

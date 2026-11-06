@@ -36,7 +36,7 @@ Most L1 tickets aren't hard — they're just troubleshooting simple, repetitive 
 For SME customers specifically, remote resolution via SELF_SERVE/AUTO_FIX removes the travel leg entirely for automatable tickets — this is not just faster resolution, it's a dispatch trip that never has to happen. Not netted against this figure: knowledge-base curation/maintenance effort, LLM inference cost per ticket, and technician review overhead during AUTO_FIX confirmation.
 
 ### Data potential
-Every completed triage run (one that reaches a final state; RAG-off runs, which have no decision path, are not logged) appends a row to `logs.csv` — query, retrieved units, decision path, diagnostic summary, tool called, operator confirmation, escalation queue/priority, response time — and the app's "Live session stats" panel turns that into a running summary (path distribution, automation rate, avg response time) shown alongside the golden-set eval (see [Evaluation](#evaluation)). Over time, the same log supports:
+Every completed triage run (one that reaches a final state; RAG-off runs, which have no decision path, are not logged) appends a row to `logs.csv` — query, retrieved units, decision path, diagnostic summary, tool called, operator confirmation, escalation queue/priority, response time — and the dashboard's "Live usage statistics" panel turns that into a running summary (path distribution, automation rate, avg response time). Over time, the same log supports:
 - Retrieval threshold tuning, per category
 - Cost-per-resolution-path analysis (AUTO_FIX cost vs. ESCALATE technician-hour cost)
 - A natural link to quantitative/pricing-style analysis of automation vs. human dispatch
@@ -91,8 +91,8 @@ graph TD;
 
 | Path | When | Operator action required? |
 |---|---|---|
-| **SELF_SERVE** | Fix is documented, safe, and user-executable | No — steps returned directly; "didn't resolve it" button escalates (see below) |
-| **AUTO_FIX** | Fix is documented, reversible, better run by the agent | Yes — Confirm runs the tool; Cancel pre-fills an escalation ticket instead of just dropping the issue (see below) |
+| **SELF_SERVE** | Fix is documented, safe, and user-executable | No — steps returned directly; "didn't resolve it" button escalates |
+| **AUTO_FIX** | Fix is documented, reversible, better run by the agent | Yes — Confirm runs the tool; Cancel pre-fills an escalation ticket instead of just dropping the issue |
 | **ESCALATE** | Info missing, infra-/hardware-/IAM-side issue, or low confidence | Yes — Confirm or Cancel before ticket is created |
 | **OUT_OF_SCOPE** | Not a workplace-technology request at all | No — declined immediately |
 
@@ -102,8 +102,9 @@ graph TD;
 
 ```bash
 uv sync
+npm install
 cp .env.example .env    # then add your ANTHROPIC_API_KEY
-uv run streamlit run app/main.py
+npm run dev             # http://localhost:5173
 ```
 
 Checks, with no API key needed: `uv run poe check`.
@@ -111,7 +112,11 @@ Checks, with no API key needed: `uv run poe check`.
 ## Documentation
 
 - [What it must do](docs/SPEC.md)
-- [Where it's heading](docs/ROADMAP.md)
+- [The current sprint and where it's heading](docs/ROADMAP.md)
+- [The tech choices](docs/TECH_STACK.md)
+- [How the dashboard looks](docs/BRAND.md)
+- [How to write the code](docs/CODE_STANDARDS.md)
+- [How to run, plan and check the work](docs/PROCESS.md)
 - [What's built, and which rules code enforces](docs/STATUS.md)
 - [Design decisions and known limitations](docs/DECISIONS.md)
 

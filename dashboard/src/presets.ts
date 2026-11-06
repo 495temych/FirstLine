@@ -1,0 +1,15 @@
+export const presets = [
+  "My VPN cert error persists, I've confirmed the gateway is correct and I was offline for a month",
+  "Teams shows me as offline to everyone",
+  "Floor 5 print queue is stuck, several people can't print",
+  "I need Zoom installed but I don't have admin rights — it's listed in Company Portal",
+  "I'm locked out of my account",
+  "My external monitor isn't detected when docked",
+  "I've been locked out of my account twice already today",
+  "My OneDrive won't sync one of my report files, I'm in Finance and we use # in filenames for versions",
+  "My mapped network drive for Finance is gone since this morning, VPN is connected fine",
+  "Outlook keeps asking me to sign in again and again today",
+  "Wi-Fi keeps dropping for everyone near the open-plan area on floor 5, seems like too many devices on one access point",
+  "My laptop has been unbearably slow since this weekend, fans running constantly",
+  "What's the weather like today?",
+];

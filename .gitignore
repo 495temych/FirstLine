@@ -14,7 +14,15 @@ checkpoints.sqlite*
 .ruff_cache/
 .coverage*
 htmlcov/
-.streamlit/secrets.toml
 .agents/
 .claude/skills/
 .claude/settings.local.json
+node_modules
+node_modules [0-9]*
+*.nosync/
+.vite/
+*.tsbuildinfo
+coverage/
+dist/
+test-results/
+playwright-report/

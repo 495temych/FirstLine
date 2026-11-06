@@ -4,6 +4,7 @@ import numpy as np
 import pytest
 
 from agent import retrieval
+from agent.config import ROOT
 
 
 def test_kb_has_17_units_from_12_docs():
@@ -14,14 +15,9 @@ def test_kb_has_17_units_from_12_docs():
 
 def test_no_unit_comes_from_a_project_document():
     docs = {u["doc"] for u in retrieval._get_units()}
-    assert not docs & {
-        "SPEC",
-        "ROADMAP",
-        "STATUS",
-        "DECISIONS",
-        "FOUNDATION",
-        "PLAN_FOUNDATION",
-    }
+    project_docs = {p.stem for p in (ROOT / "docs").glob("*.md")}
+    assert project_docs
+    assert not docs & project_docs
 
 
 WORDS = ["vpn", "printer", "gateway"]

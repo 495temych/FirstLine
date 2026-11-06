@@ -1,6 +1,6 @@
 """Summary statistics over logs.csv — real usage from actual runs through the app,
-not synthetic data and not an evaluation. Standalone: `uv run -m app.stats`.
-Also imported by the app to show live-session stats in the UI, next to (but clearly
+not synthetic data and not an evaluation. Standalone: `uv run -m backend.stats`.
+Also served by the API to the dashboard, next to (but clearly
 distinct from) the Scoreboard's evaluations.
 """
 
