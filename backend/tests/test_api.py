@@ -11,7 +11,7 @@ from fastapi.testclient import TestClient
 from agent import config, graph, tools
 from agent.tests.fakes import UNIT, FakeLLM, text, tool
 from backend import main, stats
-from evals import runner
+from evals import retrieval_score, runner
 
 AUTO_FIX = [text("Reset the profile."), tool("reset_vpn_profile", username="a.b")]
 ESCALATE = [
@@ -41,6 +41,7 @@ def client(tmp_path, log, monkeypatch):
     monkeypatch.setattr(stats, "LOG_FILE", log)
     monkeypatch.setattr(graph, "retrieve", lambda q: [UNIT])
     monkeypatch.setattr(runner, "RUNS_DIR", tmp_path / "runs")
+    monkeypatch.setattr(retrieval_score, "RUNS_DIR", tmp_path / "retrieval")
     main._graph.cache_clear()
     yield TestClient(main.app)
     main._graph.cache_clear()
@@ -227,6 +228,13 @@ def test_evaluations_show_a_saved_run(client, monkeypatch):
     runs = client.get("/api/evaluations").json()["runs"]
     assert len(runs) == 1
     assert runs[0]["summary"]["n"] == 5
+
+
+def test_evaluations_show_saved_retrieval_scores(client):
+    assert client.get("/api/evaluations").json()["retrieval"] == []
+    run = {"id": "20261107-retrieval-dev", "set": "dev"}
+    retrieval_score.save_run(run)
+    assert client.get("/api/evaluations").json()["retrieval"] == [run]
 
 
 def test_tickets_are_the_development_set_with_requesters(client):

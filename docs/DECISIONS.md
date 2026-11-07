@@ -86,6 +86,24 @@ Each design decision so far, with its reason and its trade-off.
 - **Reason:** a fixed labelled set measures quality, and real usage shows volume and speed.
 - **Trade-off:** response time covers the agent's decision only, not the fix, so it is a proxy for time to resolution. Below five logged runs the app says the sample is too small.
 
+## The Queue is the core product
+
+- **Decision:** build around a first pass on every ticket, with the Queue as the core and the Assistant as a front door. The headline measure is technician time per ticket against model cost.
+- **Reason:** only about a third of tickets show failures L1 could fix alone, so most of the value is in right-first-time routing and investigation, not in resolving tickets.
+- **Trade-off:** that third is a rough measure from who owns each failing check, and the time saved rests on assumed minutes, because the records have no handling times.
+
+## No trained model
+
+- **Decision:** the dataset supplies the knowledge base, evaluations, simulated checks and a privacy test. We train nothing except a simple classifier, which is a yardstick and never decides a ticket.
+- **Reason:** 745 templated synthetic tickets would teach a model the generator's pattern. A free classifier shows whether Claude earns its cost on routing.
+- **Trade-off:** the classifier may score very well on tickets this alike, which says as much about the data as about Claude. Its value then rests on investigation and write-ups.
+
+## A thin Queue before a hardened one
+
+- **Decision:** Sprint 2 ends with one agent working a batch through to review. Concurrency, crash recovery, spending limits and the hold on hidden instructions wait for Sprint 3.
+- **Reason:** the workflow is what proves the product's value, so it should exist before we harden it.
+- **Trade-off:** until Sprint 3 the Queue is a demo, and it doesn't yet meet the production rules in `docs/SPEC.md`.
+
 ## Known limitations
 
 - **Synthetic knowledge base.** A real deployment needs real client documentation.

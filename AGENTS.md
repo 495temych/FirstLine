@@ -27,8 +27,9 @@ Until the baseline is done, also read `docs/EVALS.md` and `docs/PLAN_EVALS.md`.
 - `e2e/`: browser tests, and the stub server they run against
 - `evals/`: the evaluation runner and scoring
 - `data/kb/`: the knowledge base
+- `data/tickets/`: the imported tickets and their fixed splits
 - `data/records/`: invented client records
-- `data/evals/`: labelled tickets, their answers, and saved runs
+- `data/evals/`: labelled tickets, their answers, incident answers, and saved runs and retrieval scores
 - `docs/`: project documents
 - `briefs/`: notes waiting for a sprint, when there are any
 

@@ -8,6 +8,9 @@ export const pathLabels: Record<string, string> = {
 
 export const percent = (share: number) => `${(share * 100).toFixed(0)}%`;
 
+export const rate = (share: number | null) =>
+  share === null ? "n/a" : percent(share);
+
 export const money = (usd: number | null) =>
   usd === null ? "unknown" : `$${usd.toFixed(4)}`;
 

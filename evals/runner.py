@@ -2,6 +2,7 @@
 
 `uv run -m evals` runs the development set. `--set held_out` runs the held-out set,
 and `--tiny` runs only its five trial tickets. Results go to data/evals/runs/.
+`--retrieval` scores retrieval instead, with no model calls.
 """
 
 import argparse
@@ -11,7 +12,7 @@ from datetime import UTC, datetime
 
 from agent import config, run_triage
 from agent.tool_schemas import TOOLS
-from evals import scoring
+from evals import retrieval_score, scoring
 
 EVALS_DIR = config.ROOT / "data" / "evals"
 RUNS_DIR = EVALS_DIR / "runs"
@@ -146,7 +147,20 @@ def main() -> None:
     parser = argparse.ArgumentParser(prog="evals", description=__doc__)
     parser.add_argument("--set", choices=sorted(PREFIXES), default="dev", dest="name")
     parser.add_argument("--tiny", action="store_true", help="five trial tickets")
+    parser.add_argument(
+        "--retrieval", action="store_true", help="score retrieval, with no model calls"
+    )
+    parser.add_argument(
+        "--split",
+        action="append",
+        choices=retrieval_score.SPLITS,
+        help="a set to score retrieval on, instead of the development sets",
+    )
+    parser.add_argument("--save", action="store_true", help="keep the retrieval score")
     args = parser.parse_args()
+    if args.retrieval:
+        retrieval_score.main(args.split, args.save)
+        return
     run = evaluate(args.name, args.tiny)
     save_run(run)
     print_report(run)

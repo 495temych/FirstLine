@@ -18,7 +18,7 @@ from pydantic import BaseModel, StringConstraints
 from agent import config
 from agent.graph import build_graph, initial_state
 from backend import stats
-from evals import runner, scoring
+from evals import retrieval_score, runner, scoring
 
 RUN_FIELDS = [
     "query",
@@ -127,9 +127,10 @@ def answer_gate(run_id: str, answer: GateAnswer) -> dict:
 
 @app.get("/api/evaluations", operation_id="list_evaluations")
 def list_evaluations() -> dict:
-    """List saved evaluations, newest first, with the assumed mistake costs."""
+    """List saved evaluations and retrieval scores, with the assumed mistake costs."""
     return {
         "runs": runner.load_runs(),
+        "retrieval": retrieval_score.load_runs(),
         "costs": {
             "security": scoring.COST_SECURITY,
             "wrong": scoring.COST_WRONG,

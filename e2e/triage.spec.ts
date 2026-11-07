@@ -65,6 +65,8 @@ test("the scoreboard shows a saved evaluation", async ({ page }) => {
   await page.getByRole("button", { name: "Scoreboard" }).click();
   await expect(page.getByText("development (tiny)")).toBeVisible();
   await expect(page.getByLabel("Open an evaluation")).toBeVisible();
+  await expect(page.getByText("unseen, development")).toBeVisible();
+  await expect(page.getByLabel("Open a retrieval score")).toBeVisible();
 });
 
 test("the tickets tab can be filtered", async ({ page }) => {

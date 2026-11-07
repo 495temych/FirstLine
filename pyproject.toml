@@ -39,9 +39,10 @@ format = "ruff format --check"
 lint = "ruff check"
 types = "pyright"
 test = "pytest"
+retrieval = "python -m evals --retrieval"
 ts = "npm run check:ts"
 e2e = "npm run e2e"
-check = ["format", "lint", "types", "test", "ts", "e2e"]
+check = ["format", "lint", "types", "test", "retrieval", "ts", "e2e"]
 
 [tool.ruff]
 include = ["agent/**/*.py", "backend/**/*.py", "evals/**/*.py", "e2e/**/*.py", "conftest.py"]

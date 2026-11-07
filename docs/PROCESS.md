@@ -15,6 +15,7 @@ Put your key in `.env` as `ANTHROPIC_API_KEY`. `MODEL_NAME` is optional. `npm ru
 - ruff (format and lint)
 - pyright
 - pytest with 80% coverage of `agent/`, `backend/` and `evals/`
+- the retrieval score, which runs the local embedding model and no chat model
 - Prettier, ESLint, `tsc` and vitest with 80% coverage of `dashboard/`
 - Playwright, against the real API and graph with a stub model, on ports 8010 and 5183
 
@@ -24,6 +25,8 @@ Other commands:
 
 - `npm run format` formats the Python and TypeScript.
 - `uv run -m evals` evaluates the development set, with 25 model calls. `--tiny` makes 5, and `--set held_out` runs the held-out set.
+- `uv run -m evals --retrieval` scores retrieval on the development sets, with no model calls. `--split` picks another set, and `--save` keeps the result for the Scoreboard.
+- `uv run -m evals.import_tickets` imports the tickets again, as `data/tickets/SOURCE.md` explains.
 - `uv run -m backend.stats` prints the usage statistics.
 - `uv run uvicorn backend.main:app` runs the backend alone, with its API at http://127.0.0.1:8000/docs.
 

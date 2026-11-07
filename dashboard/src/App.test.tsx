@@ -257,10 +257,25 @@ it("says when no statistics exist yet", async () => {
 });
 
 it("says when the scoreboard has no evaluations", async () => {
-  replies["/api/evaluations"] = { ...evaluations, runs: [] };
+  replies["/api/evaluations"] = { ...evaluations, runs: [], retrieval: [] };
   render(<App />);
   click("Scoreboard");
   expect(await screen.findByText(/No evaluations yet/)).toBeDefined();
+});
+
+it("shows retrieval scores with no evaluations, and opens another one", async () => {
+  replies["/api/evaluations"] = { ...evaluations, runs: [] };
+  render(<App />);
+  click("Scoreboard");
+  expect(await screen.findByText("unseen, development")).toBeDefined();
+  expect(screen.queryByLabelText("Open an evaluation")).toBeNull();
+  expect(screen.getByText("Account lockout")).toBeDefined();
+  fireEvent.change(screen.getByLabelText("Open a retrieval score"), {
+    target: { value: "20261107-retrieval-unseen_dev" },
+  });
+  expect(screen.getByText("Certificate expiry")).toBeDefined();
+  expect(screen.getByText("93%")).toBeDefined();
+  expect(screen.queryByText("Account lockout")).toBeNull();
 });
 
 it("shows saved evaluations and opens another one", async () => {

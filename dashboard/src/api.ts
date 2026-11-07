@@ -91,8 +91,33 @@ export interface Evaluation {
   tickets: ScoredTicket[];
 }
 
+export interface RetrievalSummary {
+  n: number;
+  covered: number;
+  uncovered: number;
+  hit_rate: number | null;
+  false_match_rate: number | null;
+}
+
+export interface RetrievalFamily extends RetrievalSummary {
+  name: string;
+  doc: string | null;
+}
+
+export interface RetrievalRun {
+  id: string;
+  date: string;
+  set: string;
+  kb_version: string;
+  threshold: number;
+  top_k: number;
+  summary: RetrievalSummary;
+  by_family: Record<string, RetrievalFamily>;
+}
+
 export interface Evaluations {
   runs: Evaluation[];
+  retrieval: RetrievalRun[];
   costs: { security: number; wrong: number; minor: number };
 }
 

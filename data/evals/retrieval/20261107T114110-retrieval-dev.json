@@ -1,0 +1,125 @@
+{
+  "id": "20261107T114110-retrieval-dev",
+  "date": "2026-11-07T11:41:10+00:00",
+  "set": "dev",
+  "kb_version": "5b52d0ab",
+  "threshold": 0.35,
+  "top_k": 2,
+  "summary": {
+    "n": 129,
+    "covered": 90,
+    "uncovered": 39,
+    "hit_rate": 0.9444444444444444,
+    "false_match_rate": 0.8461538461538461
+  },
+  "by_family": {
+    "ALP": {
+      "n": 12,
+      "covered": 12,
+      "uncovered": 0,
+      "hit_rate": 1.0,
+      "false_match_rate": null,
+      "name": "Account lockout and password",
+      "doc": "account-access"
+    },
+    "DCP": {
+      "n": 9,
+      "covered": 0,
+      "uncovered": 9,
+      "hit_rate": null,
+      "false_match_rate": 0.8888888888888888,
+      "name": "Device compliance",
+      "doc": null
+    },
+    "DRF": {
+      "n": 11,
+      "covered": 0,
+      "uncovered": 11,
+      "hit_rate": null,
+      "false_match_rate": 0.5454545454545454,
+      "name": "DNS",
+      "doc": null
+    },
+    "EDE": {
+      "n": 10,
+      "covered": 0,
+      "uncovered": 10,
+      "hit_rate": null,
+      "false_match_rate": 1.0,
+      "name": "Disk encryption",
+      "doc": null
+    },
+    "LPD": {
+      "n": 12,
+      "covered": 12,
+      "uncovered": 0,
+      "hit_rate": 0.8333333333333334,
+      "false_match_rate": null,
+      "name": "Laptop performance",
+      "doc": "laptop-performance"
+    },
+    "OES": {
+      "n": 10,
+      "covered": 10,
+      "uncovered": 0,
+      "hit_rate": 1.0,
+      "false_match_rate": null,
+      "name": "Outlook sync",
+      "doc": "outlook"
+    },
+    "PDQ": {
+      "n": 11,
+      "covered": 11,
+      "uncovered": 0,
+      "hit_rate": 1.0,
+      "false_match_rate": null,
+      "name": "Printing",
+      "doc": "printer"
+    },
+    "SDA": {
+      "n": 10,
+      "covered": 10,
+      "uncovered": 0,
+      "hit_rate": 1.0,
+      "false_match_rate": null,
+      "name": "Shared drive access",
+      "doc": "shared-drive"
+    },
+    "SIB": {
+      "n": 12,
+      "covered": 12,
+      "uncovered": 0,
+      "hit_rate": 0.75,
+      "false_match_rate": null,
+      "name": "Software install",
+      "doc": "software-install"
+    },
+    "SML": {
+      "n": 9,
+      "covered": 0,
+      "uncovered": 9,
+      "hit_rate": null,
+      "false_match_rate": 1.0,
+      "name": "SSO and MFA",
+      "doc": null
+    },
+    "VDA": {
+      "n": 12,
+      "covered": 12,
+      "uncovered": 0,
+      "hit_rate": 1.0,
+      "false_match_rate": null,
+      "name": "VPN access",
+      "doc": "vpn"
+    },
+    "WCI": {
+      "n": 11,
+      "covered": 11,
+      "uncovered": 0,
+      "hit_rate": 1.0,
+      "false_match_rate": null,
+      "name": "Wi-Fi",
+      "doc": "wifi"
+    }
+  }
+}

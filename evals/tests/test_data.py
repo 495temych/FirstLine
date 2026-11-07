@@ -76,11 +76,13 @@ def test_there_are_20_users():
     assert len(USERS) == 20
 
 
-@pytest.mark.parametrize("package", ["agent", "app"])
+@pytest.mark.parametrize("package", ["agent", "backend"])
 def test_only_the_evals_open_the_answers(package):
     sources = (config.ROOT / package).rglob("*.py")
     assert not [p for p in sources if _names_answers(p)]
 
 
 def _names_answers(path: Path) -> bool:
-    return "answers.json" in path.read_text() and "tests" not in path.parts
+    text = path.read_text()
+    named = "answers.json" in text or "incidents.json" in text
+    return named and "tests" not in path.parts

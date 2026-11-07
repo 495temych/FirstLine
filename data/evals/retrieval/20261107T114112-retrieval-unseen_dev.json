@@ -1,0 +1,35 @@
+{
+  "id": "20261107T114112-retrieval-unseen_dev",
+  "date": "2026-11-07T11:41:12+00:00",
+  "set": "unseen_dev",
+  "kb_version": "5b52d0ab",
+  "threshold": 0.35,
+  "top_k": 2,
+  "summary": {
+    "n": 52,
+    "covered": 0,
+    "uncovered": 52,
+    "hit_rate": null,
+    "false_match_rate": 0.9615384615384616
+  },
+  "by_family": {
+    "AIT": {
+      "n": 24,
+      "covered": 0,
+      "uncovered": 24,
+      "hit_rate": null,
+      "false_match_rate": 1.0,
+      "name": "API timeouts",
+      "doc": null
+    },
+    "CES": {
+      "n": 28,
+      "covered": 0,
+      "uncovered": 28,
+      "hit_rate": null,
+      "false_match_rate": 0.9285714285714286,
+      "name": "Certificate expiry",
+      "doc": null
+    }
+  }
+}

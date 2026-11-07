@@ -1,11 +1,126 @@
 import { useState } from "react";
-import { api, type Evaluation, type Evaluations, type Summary } from "./api";
-import { chf, dateTime, money, pathLabels, percent } from "./format";
+import {
+  api,
+  type Evaluation,
+  type Evaluations,
+  type RetrievalRun,
+  type Summary,
+} from "./api";
+import { chf, dateTime, money, pathLabels, percent, rate } from "./format";
 import { useLoad } from "./useLoad";
 
+const setNames: Record<string, string> = {
+  kb: "knowledge base",
+  dev: "development",
+  held_out: "held-out",
+  unseen_dev: "unseen, development",
+  unseen_held_out: "unseen, held-out",
+};
+
 function setName(run: Evaluation) {
-  const name = run.set === "held_out" ? "held-out" : "development";
+  const name = setNames[run.set];
   return run.tiny ? `${name} (tiny)` : name;
+}
+
+function RetrievalRuns({ runs }: Readonly<{ runs: RetrievalRun[] }>) {
+  return (
+    <div className="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            {[
+              "Date",
+              "Set",
+              "Knowledge base",
+              "Tickets",
+              "Hit rate",
+              "False matches",
+            ].map((name) => (
+              <th key={name} scope="col">
+                {name}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {runs.map((run) => (
+            <tr key={run.id}>
+              <td>{dateTime(run.date)}</td>
+              <td>{setNames[run.set]}</td>
+              <td>
+                <code>{run.kb_version}</code>
+              </td>
+              <td>{run.summary.n}</td>
+              <td>{rate(run.summary.hit_rate)}</td>
+              <td>{rate(run.summary.false_match_rate)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function RetrievalFamilies({ run }: Readonly<{ run: RetrievalRun }>) {
+  return (
+    <div className="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            {["Family", "Playbook", "Tickets", "Hit rate", "False matches"].map(
+              (name) => (
+                <th key={name} scope="col">
+                  {name}
+                </th>
+              ),
+            )}
+          </tr>
+        </thead>
+        <tbody>
+          {Object.entries(run.by_family).map(([code, family]) => (
+            <tr key={code}>
+              <td>{family.name}</td>
+              <td>
+                <code>{family.doc ?? "None"}</code>
+              </td>
+              <td>{family.n}</td>
+              <td>{rate(family.hit_rate)}</td>
+              <td>{rate(family.false_match_rate)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function Retrieval({ runs }: Readonly<{ runs: RetrievalRun[] }>) {
+  const [chosen, setChosen] = useState(runs[0].id);
+  const run = runs.find((candidate) => candidate.id === chosen) ?? runs[0];
+  return (
+    <>
+      <h2>Retrieval</h2>
+      <RetrievalRuns runs={runs} />
+      <p className="caption">
+        The hit rate is the share of tickets whose top match is their family's
+        playbook. False matches are tickets from a family with no playbook that
+        still matched something. These scores need no model calls.
+      </p>
+      <label htmlFor="retrieval">Open a retrieval score</label>
+      <select
+        id="retrieval"
+        value={chosen}
+        onChange={(event) => {
+          setChosen(event.target.value);
+        }}
+      >
+        {runs.map((candidate) => (
+          <option key={candidate.id}>{candidate.id}</option>
+        ))}
+      </select>
+      <RetrievalFamilies run={run} />
+    </>
+  );
 }
 
 function Runs({ runs }: Readonly<{ runs: Evaluation[] }>) {
@@ -150,8 +265,8 @@ function RunTickets({ run }: Readonly<{ run: Evaluation }>) {
   );
 }
 
-function Board({ runs, costs }: Readonly<Evaluations>) {
-  const [chosen, setChosen] = useState(runs[0]?.id);
+function Board({ runs, costs }: Readonly<Pick<Evaluations, "runs" | "costs">>) {
+  const [chosen, setChosen] = useState(runs[0].id);
   const run = runs.find((candidate) => candidate.id === chosen);
   return (
     <>
@@ -191,7 +306,7 @@ export function Scoreboard() {
   const { data, error } = useLoad(api.evaluations);
   if (error) return <p className="notice alert">{error}</p>;
   if (!data) return null;
-  if (data.runs.length === 0) {
+  if (data.runs.length === 0 && data.retrieval.length === 0) {
     return (
       <p className="notice">
         No evaluations yet. Run <code>uv run -m evals --tiny</code> to create
@@ -199,5 +314,10 @@ export function Scoreboard() {
       </p>
     );
   }
-  return <Board runs={data.runs} costs={data.costs} />;
+  return (
+    <>
+      {data.runs.length > 0 && <Board runs={data.runs} costs={data.costs} />}
+      {data.retrieval.length > 0 && <Retrieval runs={data.retrieval} />}
+    </>
+  );
 }
