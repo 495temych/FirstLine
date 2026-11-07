@@ -1,6 +1,6 @@
 # Evaluations we can trust
 
-From the head of service delivery at Sihlwerk IT AG.
+From the head of service delivery at CorpLabs AG.
 
 Before we change how the agent works, we need a number for how good it is today. Our 10 demo tickets can't give us that: the prompt was tuned on them, they say nothing about cost, and they run every time someone opens the app.
 
@@ -8,7 +8,7 @@ Before we change how the agent works, we need a number for how good it is today.
 
 ## What we want
 
-1. **Records.** About 20 invented Limmatica users in `data/records/`: department, device, recent tickets and lockouts in the last 24 hours. The agent doesn't see them yet.
+1. **Records.** About 20 invented CorpLabs users in `data/records/`: department, device, recent tickets and lockouts in the last 24 hours. The agent doesn't see them yet.
 2. **Two labelled sets.** 25 development tickets (the 10 existing plus 15 new) and 25 held-out tickets, with answers in separate files the agent never reads. Answers come from the knowledge base and records, never from the agent. Each has a difficulty: `routine`, `hard` or `records` (only the records can settle it). Five in each set are `tiny`, for cheap trials.
 3. **Cost and version.** Each evaluated ticket records tokens, cost and time. Each evaluation records its set, date, model and a hash of the instructions and tools.
 4. **Evaluations from the command line.** `uv run -m evals`, with options for the held-out set and `tiny`. Results are saved in `data/evals/runs/`. A failed ticket counts as an escalation and doesn't stop the run.

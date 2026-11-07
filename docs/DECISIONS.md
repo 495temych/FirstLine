@@ -138,6 +138,6 @@ Each design decision so far, with its reason and its trade-off.
 - **Retrieval's cost and latency aren't measured.** The on/off switch shows the difference but doesn't quantify it.
 - **Fixed top 2.** A weak second unit still comes back if it clears the threshold, and an ambiguous ticket can't pull a third.
 - **Hardcoded tool schemas.** They live in `agent/tool_schemas.py`. MCP would make them discoverable and keep credentials out of the agent.
-- **English only.** Limmatica is Swiss, so production needs multilingual embeddings and German instructions.
+- **English only.** CorpLabs is Swiss, so production needs multilingual embeddings and German instructions.
 - **Partial ITSM alignment.** The ticket maps to ServiceNow's incident schema but omits `impact`, `urgency`, `cmdb_ci` and `work_notes`.
 - **Paths vary on underspecified tickets.** "My VPN keeps disconnecting" has three documented causes, so it can land on different paths from run to run. Retrieval is deterministic.

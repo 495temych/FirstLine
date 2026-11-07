@@ -17,4 +17,4 @@
 2. If session is fresh and prompts continue: clear entries starting `MicrosoftOffice16_Data` in Credential Manager, restart Outlook
 3. Only if step 2 doesn't hold after 24h: profile rebuild required (Control Panel > Mail > Show Profiles > New)
 
-**Escalation:** Profile rebuild is desktop-support-assisted only if user has PST archives >5GB (data migration risk) — escalate to `M365-PROFILE` queue in that case.
+**Escalation:** Profile rebuild is desktop-support-assisted only if user has PST archives >5GB (data migration risk) — escalate to `APP-M365` queue in that case.

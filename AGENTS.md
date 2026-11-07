@@ -2,7 +2,7 @@
 
 ## The context
 
-FirstLine is an L1 IT support triage agent for Sihlwerk IT AG, a fictional Swiss IT service provider. Its first client is the fictional Limmatica AG. It is built as a portfolio project for Swiss employers, the way a production team would build it. The owner reviews plans and builds, and you plan, build and check the work.
+FirstLine is an L1 IT support triage agent for CorpLabs AG, a fictional company headquartered in Zürich. It is built as a portfolio project for Swiss employers, the way a production team would build it. The owner reviews plans and builds, and you plan, build and check the work.
 
 ## Start here
 
@@ -28,7 +28,7 @@ Until the baseline is done, also read `docs/EVALS.md` and `docs/PLAN_EVALS.md`.
 - `evals/`: the evaluation runner and scoring
 - `data/kb/`: the knowledge base
 - `data/tickets/`: the imported tickets and their fixed splits
-- `data/records/`: invented client records
+- `data/records/`: staff records, with invented devices, groups and lockouts
 - `data/evals/`: labelled tickets, their answers, incident answers, and saved runs and retrieval scores
 - `docs/`: project documents
 - `briefs/`: notes waiting for a sprint, when there are any

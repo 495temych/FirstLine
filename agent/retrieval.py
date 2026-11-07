@@ -42,7 +42,7 @@ def _chunk_by_heading(text: str) -> list[dict]:
 def _get_units() -> list[dict]:
     """Each unit is {"doc", "section" (None for atomic), "text"}."""
     units = []
-    for p in sorted(KB_DIR.glob("*.md")):
+    for p in sorted(KB_DIR.rglob("*.md")):
         text = p.read_text()
         if p.stem in REFERENCE_DOCS:
             units.extend(

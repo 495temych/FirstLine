@@ -3,7 +3,7 @@
 
 **Category:** Peripherals | **Owner team:** Desktop Support | **Last updated:** 2026-07-02 by T. Iten
 
-**Environment:** Limmatica AG print fleet is Konica Minolta bizhub C4051i, managed via PaperCut MF. Print server: `PRINT01.limmatica.corp`.
+**Environment:** CorpLabs AG print fleet is HP LaserJet, managed via PaperCut MF. Print server: `PS-PRINT01.corplabs.internal`.
 
 **Recurring pattern:** Spooler service (`spoolsv.exe`) hangs after the nightly PaperCut sync job (runs 02:00 CET) roughly 2x/month, affecting all users on a given floor's print queue simultaneously — this is the key signal distinguishing a spooler issue from a single dead print job.
 
@@ -14,7 +14,7 @@
 
 **Verified resolution steps:**
 1. Check if issue is floor-wide (Teams channel #it-floor-status) or single-user — determines which path below applies
-2. Floor-wide: restart Print Spooler service on `PRINT01` (Desktop Support has remote access) — do NOT ask user to restart locally, this won't fix a server-side hang
-3. Single-user: clear local queue via `services.msc` > Print Spooler > restart, then re-add printer via PaperCut portal `print.limmatica.corp`
+2. Floor-wide: restart Print Spooler service on `PS-PRINT01` (Desktop Support has remote access) — do NOT ask user to restart locally, this won't fix a server-side hang
+3. Single-user: clear local queue via `services.msc` > Print Spooler > restart, then re-add printer via PaperCut portal `print.corplabs.internal`
 
-**Escalation:** If floor-wide and spooler restart doesn't clear it within 15 min, escalate to `NET-PRINT` — possible PaperCut sync job failure requiring vendor support ticket.
+**Escalation:** If floor-wide and spooler restart doesn't clear it within 15 min, escalate to `SD-PRINT` — possible PaperCut sync job failure requiring vendor support ticket.

@@ -7,10 +7,16 @@ from agent import retrieval
 from agent.config import ROOT
 
 
-def test_kb_has_17_units_from_12_docs():
+def test_kb_has_a_unit_for_each_document_and_profile_section():
     units = retrieval._get_units()
-    assert len(units) == 17
-    assert len({u["doc"] for u in units}) == 12
+    assert len(units) == 20
+    assert len({u["doc"] for u in units}) == 17
+
+
+def test_policies_are_retrievable_on_their_own():
+    docs = {u["doc"] for u in retrieval._get_units()}
+    assert "sec-04-account-lockout" in docs
+    assert "escalation-queues" in docs
 
 
 def test_no_unit_comes_from_a_project_document():

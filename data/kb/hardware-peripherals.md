@@ -18,7 +18,7 @@
 1. Confirm dock model first — WD22TB4 or legacy CalDigit TS3+ (check label on underside of dock). Determines which path below applies.
 2. **WD22TB4:** reseat the Thunderbolt cable fully (should click), check firmware version via Dell Peripheral Manager — update to v5.4+ if below
 3. **U2723QE showing "no signal":** check input source is set to USB-C (labeled "DP Alt Mode" in the monitor's OSD menu), not DP
-4. **Legacy CalDigit TS3+:** if issue is post-sleep display drop, this is a known unfixable limitation — log for `HW-REPLACE` queue rather than troubleshooting further
+4. **Legacy CalDigit TS3+:** if issue is post-sleep display drop, this is a known unfixable limitation — log for `DESK-HARDWARE` queue rather than troubleshooting further
 5. Test peripheral (keyboard/mouse/USB) directly on the laptop's own USB-C port, bypassing the dock, to isolate dock-vs-device fault
 
-**Escalation:** If Device Manager shows no device detected at all (not even "unrecognized device") after confirming cable seating and firmware, this is physical hardware failure — escalate to `HW-REPLACE`. Do not attempt further remote troubleshooting; replacement dock/cable required, technician must bring a spare WD22TB4 for swap-test on site.
+**Escalation:** If Device Manager shows no device detected at all (not even "unrecognized device") after confirming cable seating and firmware, this is physical hardware failure — escalate to `DESK-HARDWARE`. Do not attempt further remote troubleshooting; replacement dock/cable required, technician must bring a spare WD22TB4 for swap-test on site.

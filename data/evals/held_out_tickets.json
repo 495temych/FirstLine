@@ -2,12 +2,12 @@
   {
     "id": "H-001",
     "requester": "o.lang",
-    "text": "VPN says certificate error. The gateway is vpn-gp.limmatica.corp and I've been on leave for two months."
+    "text": "VPN says certificate error. The gateway is vpn-gp.corplabs.internal and I've been on leave for two months."
   },
   {
     "id": "H-002",
     "requester": "g.ammann",
-    "text": "GlobalProtect shows vpn.limmatica.corp as my gateway and can't connect."
+    "text": "GlobalProtect shows vpn.corplabs.internal as my gateway and can't connect."
   },
   {
     "id": "H-003",
@@ -82,7 +82,7 @@
   {
     "id": "H-017",
     "requester": "b.brunner",
-    "text": "All of Legal can't reach the path on FS01, and it's Thursday morning."
+    "text": "All of Legal can't reach the path on FS-CORP-02, and it's Thursday morning."
   },
   {
     "id": "H-018",

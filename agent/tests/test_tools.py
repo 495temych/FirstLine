@@ -5,9 +5,10 @@ import re
 import pytest
 
 from agent import tools
-from agent.tool_schemas import TOOLS
+from agent.tool_schemas import ROUTINE, SENSITIVE, TOOL_POLICY, TOOLS
 
 SAMPLE_ARGS = {
+    "group": "FIN_SHARE",
     "username": "current.user",
     "device_id": "current.device",
     "floor": "5",
@@ -48,3 +49,53 @@ def test_escalation_ticket_has_a_number_and_keeps_its_queue():
 def test_an_unknown_tool_is_refused():
     with pytest.raises(KeyError):
         tools.dispatch("format_the_disk", {})
+
+
+def test_every_tool_has_a_tier_and_an_owner():
+    assert TOOL_POLICY.keys() == {t["name"] for t in TOOLS}
+    for policy in TOOL_POLICY.values():
+        assert policy["tier"] in {ROUTINE, SENSITIVE}
+        assert policy["owner"]
+
+
+def test_tools_that_touch_access_or_security_need_a_technician():
+    for name in [
+        "unlock_ad_account",
+        "add_user_to_share_group",
+        "escrow_bitlocker_key",
+    ]:
+        assert TOOL_POLICY[name]["tier"] == SENSITIVE
+
+
+def test_every_family_l1_can_fix_has_a_tool():
+    covered = {f for p in TOOL_POLICY.values() for f in p["families"]}
+    assert covered == {
+        "ALP",
+        "DCP",
+        "EDE",
+        "LPD",
+        "OES",
+        "PDQ",
+        "SDA",
+        "SIB",
+        "VDA",
+        "WCI",
+    }
+
+
+@pytest.mark.parametrize(
+    ("name", "arguments"),
+    [
+        ("reinstall_print_driver", {"queue": "ZRH-3F"}),
+        ("reset_mobile_mail_profile", {"username": "amy"}),
+        ("push_wifi_profile", {"device_id": "LT-AMY"}),
+        ("add_user_to_share_group", {"username": "amy", "group": "FIN_SHARE"}),
+        ("force_intune_sync", {"device_id": "LT-AMY"}),
+        ("escrow_bitlocker_key", {"device_id": "LT-AMY"}),
+        ("clean_temp_files", {"device_id": "LT-AMY"}),
+    ],
+)
+def test_new_tools_are_simulated(name, arguments):
+    result = tools.dispatch(name, arguments)
+    assert result["simulated"]
+    assert result["status"] == "success"

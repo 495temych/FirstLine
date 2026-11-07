@@ -9,6 +9,10 @@ from evals import import_tickets as importer
 
 SET_NAMES = {"kb", "dev", "held_out", "unseen_dev", "unseen_held_out"}
 ANSWER_FIELDS = {"correspondence", "diagnostics", "root_cause", "resolution"}
+DIRECTORY = [
+    {"username": "amy", "display_name": "Amy Lee", "email": "amy@corplabs.com"},
+    {"username": "bo", "display_name": "Bo Berg", "email": "bo@corplabs.com"},
+]
 
 
 def row(ticket_id: str = "INC-ALP-0001") -> dict:
@@ -76,17 +80,73 @@ def test_the_order_of_the_input_does_not_change_the_split():
     assert importer.split_ids(ids) == importer.split_ids(reversed(ids))
 
 
-def test_the_import_writes_tickets_answers_and_splits(tmp_path):
-    source = tmp_path / "source.csv"
-    with source.open("w", newline="") as file:
+def test_the_requester_is_the_account_named_first():
+    pii = [{"value": "bo"}, {"value": "Amy Lee"}, {"value": "Portland"}]
+    assert importer.find_requester("Amy Lee here, bo agrees", pii, DIRECTORY) == "amy"
+
+
+def test_a_requester_can_come_from_a_later_record():
+    pii = [{"value": "bo"}]
+    assert importer.find_requester("My VPN is down", pii, DIRECTORY) == "bo"
+
+
+def test_no_named_account_means_no_requester():
+    assert importer.find_requester("My VPN is down", [], DIRECTORY) is None
+
+
+def test_invented_details_stay_the_same_and_keep_the_real_ones():
+    first = importer.invent_record(DIRECTORY[0], "Sales")
+    assert first == importer.invent_record(DIRECTORY[0], "Sales")
+    assert first["name"] == "Amy Lee"
+    assert first["department"] == "Sales"
+    assert first["device"]["id"] == "LT-AMY"
+
+
+def test_a_repeated_username_keeps_its_first_person():
+    twins = [*DIRECTORY, {**DIRECTORY[0], "display_name": "Amy Lund"}]
+    records = importer.build_records(twins, [], [])
+    assert [r["name"] for r in records] == ["Amy Lee", "Bo Berg"]
+
+
+def test_lockout_history_matches_the_count():
+    history = importer._lockout_history(2)
+    assert history[1] == "Account lockout, 2 of 2 in the last 24 hours"
+
+
+def test_the_import_writes_tickets_answers_splits_and_records(tmp_path):
+    source = tmp_path / "source"
+    source.mkdir()
+    with (source / "itsm_ticket_corpus_flat.csv").open("w", newline="") as file:
         writer = csv.DictWriter(file, fieldnames=list(row()))
         writer.writeheader()
         writer.writerows(row(f"INC-ALP-{n:04}") for n in range(5))
-    importer.import_tickets(source, tmp_path / "tickets", tmp_path / "evals")
-    tickets = json.loads((tmp_path / "tickets" / "tickets.json").read_text())
-    incidents = json.loads((tmp_path / "evals" / "incidents.json").read_text())
+    (source / "pii.json").write_text(
+        json.dumps(
+            [
+                {"ticket_id": f"INC-ALP-{n:04}", "pii_instances": [{"value": "amy"}]}
+                for n in range(5)
+            ]
+        )
+    )
+    (source / "users_directory.json").write_text(json.dumps({"users": DIRECTORY}))
+    users = tmp_path / "users.json"
+    users.write_text(json.dumps([{"id": "s.keller"}]))
+    tickets_dir, evals_dir = tmp_path / "tickets", tmp_path / "evals"
+    importer.import_tickets(source, tickets_dir, evals_dir, users)
+    tickets = json.loads((tickets_dir / "tickets.json").read_text())
+    incidents = json.loads((evals_dir / "incidents.json").read_text())
     assert len(tickets) == len(incidents) == 5
-    assert (tmp_path / "tickets" / "splits.json").exists()
+    assert tickets[0]["requester"] == "amy"
+    assert (tickets_dir / "splits.json").exists()
+    records = json.loads(users.read_text())
+    assert [r["id"] for r in records] == ["amy", "bo", "s.keller"]
+    assert records[2]["office"] == "Zürich"
+    assert records[0]["department"] in importer.DEPARTMENTS
+
+
+def test_every_ticket_links_to_a_staff_record():
+    ids = {u["id"] for u in json.loads(config.USERS_FILE.read_text())}
+    assert all(t["requester"] in ids for t in saved_tickets())
 
 
 def test_all_745_tickets_are_in_exactly_one_set():

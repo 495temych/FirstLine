@@ -29,7 +29,7 @@ OFF_TOPIC = answer(["OUT_OF_SCOPE"])
         (SECURITY, "AUTO_FIX", "unlock_ad_account", None, 2000),
         (SECURITY, "SELF_SERVE", None, None, 2000),
         (TICKET, "AUTO_FIX", "reset_vpn_profile", None, 120),
-        (FIX, "ESCALATE", None, "M365-TENANT", 120),
+        (FIX, "ESCALATE", None, "APP-M365", 120),
         (FIX, "OUT_OF_SCOPE", None, None, 120),
         (FIX, "AUTO_FIX", "remap_drives", None, 60),
         (TICKET, "ESCALATE", None, "DESKTOP-SUPPORT", 60),

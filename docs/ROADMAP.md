@@ -53,12 +53,12 @@ Week 3 asks where each kind of data belongs. Each store has one job, so nothing 
 
 **Week 1 in one line: start from a business problem you can measure, label the data, and test models on your own task against a simple baseline.**
 
-Everything runs locally, with no new services. Done so far: the FastAPI and React stack, the rename to FirstLine, and commit 1.
+Everything runs locally, with no new services. Done so far: the FastAPI and React stack, the rename to FirstLine, and commits 1 and 2.
 
 | # | Commit | What you can see afterwards |
 |---|---|---|
 | 1 | ✅ **Tickets.** Import the 745 incidents, split them, and score retrieval for free | A "before" retrieval score on the Scoreboard |
-| 2 | **CorpLabs.** Company, policies, queues, tools and staff records replace Limmatica | The Assistant answers as CorpLabs, with no old names left |
+| 2 | ✅ **CorpLabs.** Company, policies, queues, tools and staff records replace the old client | The Assistant answers as CorpLabs, with no old names left |
 | 3 | **Playbooks.** 12 playbooks on one template, with section-level retrieval | The same score beside the "before", on tickets the playbooks never saw |
 | 4 | **Labels.** Named causes with paths, reviewed by you, and the rules set relabelled | The Tickets page shows each ticket's cause and expected path |
 | 5 | **Baseline.** Structured decisions, scored against the most common answer and a simple classifier | The first real numbers, including whether Claude beats the yardsticks |
@@ -77,14 +77,14 @@ The number after each one is the commit that meets it.
 - [x] (1) `data/tickets/tickets.json` holds only what's known at submission. `data/evals/incidents.json` holds `root_cause`, `resolution`, `correspondence` and the `diagnostics` summary.
 - [x] (1) `data/tickets/splits.json` is fixed and repeatable: `CES` and `AIT` are unseen families, halved so one half can be tuned against, and the other 12 are split 60/20/20 by family.
 - [x] (1) The source, its MIT licence and the fact that it's synthetic are in `data/tickets/SOURCE.md`. The import can be re-run.
-- [ ] (2) `data/records/users.json` holds the 769 directory accounts, plus the 20 rules-set users, with invented devices, groups and lockouts. Tickets that name a requester link to a record (737 of 745 do).
+- [x] (2) `data/records/users.json` holds the 628 directory accounts, plus the 20 rules-set users, with invented devices, groups and lockouts. All 745 tickets link to a requester's record.
 - [ ] (4) Each ticket has one named cause, and each cause has accepted paths, tools, queues and required checks. You have reviewed every cause.
 - [ ] (4) Our 50 tickets are moved to CorpLabs queues and renamed the rules set, with no `review` flag left.
 - [ ] (7) `data/tickets/checks.json` holds each check's recorded result and nothing that gives away the answer. A test proves no `diagnostics` summary, `root_cause`, `resolution` or `correspondence` text is in it.
 
 **Knowledge base (`data/kb/`)**
 
-- [ ] (2) `company-profile.md`, `policies/` and the escalation queues describe CorpLabs, taken from the tickets' systems and teams. No file in the repository names Limmatica or Sihlwerk, checked by a test.
+- [x] (2) `company-profile.md`, `policies/` and the escalation queues describe CorpLabs, taken from the tickets' systems and teams. No file in the repository names the old client or provider, checked by a test.
 - [ ] (3) 12 playbooks plus `onedrive`, `teams` and `hardware-peripherals` follow one template, and a test fails on a missing section or field.
 - [ ] (3) A test proves `CES` and `AIT` have no playbook, and that no held-out or development ticket id appears in `data/kb/`.
 - [ ] (3) Each error code in a playbook comes from a knowledge base split ticket.
@@ -98,7 +98,7 @@ The number after each one is the commit that meets it.
 
 **Agent: LangGraph and Claude (`agent/`)**
 
-- [ ] (2) `agent/prompt.md` and the tools describe CorpLabs. Each tool has a risk tier and an owner in `agent/tool_schemas.py`, and there's a tool for each fix L1 may run in the 12 families.
+- [x] (2) `agent/prompt.md` and the tools describe CorpLabs. Each tool has a risk tier and an owner in `agent/tool_schemas.py`, and there's a tool for each fix L1 may run in the 12 families.
 - [ ] (5) The decision is a Pydantic class, with the rationale first, so the model reasons before it decides.
 - [ ] (6) `run_triage` takes a requester, and the model sees that user's record. With no requester it behaves as it does today.
 - [ ] (6) `agent/rules.py` holds pure functions that both modes call. A user with 2+ lockouts on a lockout ticket ends at `SEC-INCIDENT`, and a sensitive tool in the Assistant becomes a ticket.

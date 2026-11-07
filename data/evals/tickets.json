@@ -77,7 +77,7 @@
   {
     "id": "T-016",
     "requester": "t.steiner",
-    "text": "The Finance share on FS01 is down for our whole team and it's Wednesday afternoon."
+    "text": "The Finance share on FS-CORP-02 is down for our whole team and it's Wednesday afternoon."
   },
   {
     "id": "T-017",
@@ -122,6 +122,6 @@
   {
     "id": "T-025",
     "requester": "b.brunner",
-    "text": "Can you recommend a good restaurant near Sihlquai for a team lunch?"
+    "text": "Can you recommend a good restaurant near Zürich for a team lunch?"
   }
 ]

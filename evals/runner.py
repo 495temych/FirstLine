@@ -11,7 +11,7 @@ import json
 from datetime import UTC, datetime
 
 from agent import config, run_triage
-from agent.tool_schemas import TOOLS
+from agent.tool_schemas import TOOL_POLICY, TOOLS
 from evals import retrieval_score, scoring
 
 EVALS_DIR = config.ROOT / "data" / "evals"
@@ -32,7 +32,7 @@ def load_set(name: str, tiny: bool = False) -> list[tuple[dict, dict]]:
 def version() -> str:
     """A short hash of what the model is given: the instructions and the tools."""
     prompt = (config.ROOT / "agent" / "prompt.md").read_bytes()
-    tools = json.dumps(TOOLS, sort_keys=True).encode()
+    tools = json.dumps([TOOLS, TOOL_POLICY], sort_keys=True).encode()
     return hashlib.sha256(prompt + tools).hexdigest()[:8]
 
 

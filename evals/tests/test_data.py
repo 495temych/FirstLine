@@ -13,6 +13,7 @@ from evals import runner
 SETS = ["dev", "held_out"]
 USERS = json.loads(config.USERS_FILE.read_text())
 PATHS = {"SELF_SERVE", "AUTO_FIX", "ESCALATE", "OUT_OF_SCOPE"}
+TEXT_FILES = {".css", ".json", ".md", ".py", ".ts", ".tsx"}
 
 
 def known_units() -> set[str]:
@@ -23,7 +24,7 @@ def known_units() -> set[str]:
 
 
 def known_queues() -> set[str]:
-    text = "\n".join(p.read_text() for p in config.KB_DIR.glob("*.md"))
+    text = "\n".join(p.read_text() for p in config.KB_DIR.rglob("*.md"))
     return set(re.findall(r"`([A-Z0-9]+-[A-Z0-9-]+)`", text))
 
 
@@ -72,8 +73,27 @@ def test_lockout_labels_match_the_records():
                 assert lockouts[ticket["requester"]] == 1
 
 
-def test_there_are_20_users():
-    assert len(USERS) == 20
+def test_records_hold_the_directory_and_the_rules_set_users():
+    assert len(USERS) == 648
+    assert len({u["id"] for u in USERS}) == 648
+
+
+def test_every_record_has_what_the_tickets_page_shows():
+    for user in USERS:
+        assert user.keys() >= {"id", "name", "department", "floor", "lockouts_24h"}
+        assert user["device"]["id"]
+
+
+def test_the_old_client_is_gone():
+    old = re.compile("|".join(["limm" + "atica", "sihl" + "werk"]), re.IGNORECASE)
+    folders = ["agent", "backend", "briefs", "dashboard/src", "docs", "e2e", "evals"]
+    paths = [p for f in folders for p in (config.ROOT / f).rglob("*") if p.is_file()]
+    paths += [
+        p for p in (config.ROOT / "data").rglob("*") if p.suffix in {".md", ".json"}
+    ]
+    paths += [config.ROOT / "AGENTS.md", config.ROOT / "README.md"]
+    text_files = [p for p in paths if p.suffix in TEXT_FILES]
+    assert not [p for p in text_files if old.search(p.read_text())]
 
 
 @pytest.mark.parametrize("package", ["agent", "backend"])

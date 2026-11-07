@@ -12,7 +12,7 @@ CHECKPOINT_DB = ROOT / "checkpoints.sqlite"
 USERS_FILE = ROOT / "data" / "records" / "users.json"
 TICKETS_DIR = ROOT / "data" / "tickets"
 EVALS_DIR = ROOT / "data" / "evals"
-TICKET_SOURCE = ROOT / "labs" / "synthetic_tickets" / "itsm_ticket_corpus_flat.csv"
+SOURCE_DIR = ROOT / "labs" / "synthetic_tickets"
 DEFAULT_MODEL = "claude-haiku-4-5-20251001"
 
 # US dollars per million tokens: (input, output).

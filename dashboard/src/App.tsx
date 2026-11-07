@@ -14,7 +14,7 @@ export function App() {
       <header className="masthead">
         <div>
           <h1>FirstLine</h1>
-          <p>L1 IT support for Limmatica AG</p>
+          <p>L1 IT support for CorpLabs AG</p>
         </div>
         <nav aria-label="Sections">
           {tabs.map((name) => (

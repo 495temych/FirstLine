@@ -1,9 +1,9 @@
 <!-- docs/wifi.md -->
-# KB-0156 — Wi-Fi: Drops on LIMMATICA-CORP SSID
+# KB-0156 — Wi-Fi: Drops on CORPLABS-CORP SSID
 
 **Category:** Network | **Owner team:** Network Ops | **Last updated:** 2026-06-30 by M. Rohner
 
-**Environment:** Corporate SSID `LIMMATICA-CORP` (WPA2-Enterprise, Aruba APs, floors 3-7 of Sihlquai office). Guest network `LIMMATICA-GUEST` is separate infrastructure and unaffected by these issues.
+**Environment:** Corporate SSID `CORPLABS-CORP` (WPA2-Enterprise, Aruba APs, floors 3-7 of Zürich office). Guest network `CORPLABS-GUEST` is separate infrastructure and unaffected by these issues.
 
 **Recurring pattern:** Floor 5 has a known AP congestion issue near the open-plan area (>40 concurrent devices on one Aruba AP-515) — logged as a known limitation pending Q4 2026 AP density upgrade, not a per-ticket fixable issue.
 

@@ -15,4 +15,4 @@
 2. If up to date: fully quit Teams (not just close window — check Task Manager for lingering `ms-teams.exe`), clear LocalCache folder, relaunch
 3. Confirm presence resolves within 2 min of relaunch
 
-**Escalation:** If cache clear doesn't hold and multiple users on the same tenant report simultaneously, escalate to `M365-TENANT` — likely a Microsoft-side service health issue, check M365 Service Health dashboard first before escalating.
+**Escalation:** If cache clear doesn't hold and multiple users on the same tenant report simultaneously, escalate to `APP-M365` — likely a Microsoft-side service health issue, check M365 Service Health dashboard first before escalating.

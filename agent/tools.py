@@ -18,14 +18,15 @@ def reset_vpn_profile(username: str) -> dict:
         "reset_vpn_profile",
         f"Ran \\\\IT-TOOLS\\Scripts\\reset-vpn-profile.ps1 for {username}. "
         "SCEP certificate regenerated (~90 s). Gateway confirmed as "
-        "vpn-gp.limmatica.corp.",
+        "vpn-gp.corplabs.internal.",
     )
 
 
 def restart_print_spooler(floor: str = "unknown") -> dict:
     return _ok(
         "restart_print_spooler",
-        f"Print Spooler restarted on PRINT01.limmatica.corp (reported floor: {floor}). "
+        f"Print Spooler restarted on PS-PRINT01.corplabs.internal "
+        f"(reported floor: {floor}). "
         "Queue cleared. PaperCut sync verified.",
     )
 
@@ -69,7 +70,7 @@ def remap_drives(username: str, department: str = "") -> dict:
 def unlock_ad_account(username: str) -> dict:
     return _ok(
         "unlock_ad_account",
-        f"Unlock-ADAccount executed for {username} on LIMMATICA domain. "
+        f"Unlock-ADAccount executed for {username} on CORPLABS domain. "
         "Account active. Okta sync propagates within ~2 min.",
     )
 
@@ -88,6 +89,59 @@ def push_approved_software(username: str, software_name: str) -> dict:
         f"Intune 'Required' assignment created: {software_name} → {username}'s device. "
         "Install will trigger within 15 min on next policy sync. Logged in Intune "
         "under device compliance.",
+    )
+
+
+def reinstall_print_driver(queue: str) -> dict:
+    return _ok(
+        "reinstall_print_driver",
+        f"Reinstalled the approved HP Universal Print Driver for {queue} on "
+        "PS-PRINT01. Test page printed.",
+    )
+
+
+def reset_mobile_mail_profile(username: str) -> dict:
+    return _ok(
+        "reset_mobile_mail_profile",
+        f"Removed the stale Outlook mobile partnership for {username}. "
+        "The phone syncs again after the next sign-in.",
+    )
+
+
+def push_wifi_profile(device_id: str) -> dict:
+    return _ok(
+        "push_wifi_profile",
+        f"Pushed the current CORPLABS-CORP profile and certificate to {device_id} "
+        "via Intune. Applies on next policy sync (~15 min).",
+    )
+
+
+def add_user_to_share_group(username: str, group: str) -> dict:
+    return _ok(
+        "add_user_to_share_group",
+        f"Added {username} to {group}. Access applies at next sign-in.",
+    )
+
+
+def force_intune_sync(device_id: str) -> dict:
+    return _ok(
+        "force_intune_sync",
+        f"Forced an Intune sync and compliance evaluation for {device_id}.",
+    )
+
+
+def escrow_bitlocker_key(device_id: str) -> dict:
+    return _ok(
+        "escrow_bitlocker_key",
+        f"Backed up the BitLocker recovery key for {device_id} to the management "
+        "service.",
+    )
+
+
+def clean_temp_files(device_id: str) -> dict:
+    return _ok(
+        "clean_temp_files",
+        f"Cleared temporary files on {device_id}. User documents were not touched.",
     )
 
 
@@ -116,6 +170,13 @@ REGISTRY: dict[str, Callable[..., dict]] = {
     "unlock_ad_account": unlock_ad_account,
     "enable_onedrive_files_on_demand": enable_onedrive_files_on_demand,
     "push_approved_software": push_approved_software,
+    "reinstall_print_driver": reinstall_print_driver,
+    "reset_mobile_mail_profile": reset_mobile_mail_profile,
+    "push_wifi_profile": push_wifi_profile,
+    "add_user_to_share_group": add_user_to_share_group,
+    "force_intune_sync": force_intune_sync,
+    "escrow_bitlocker_key": escrow_bitlocker_key,
+    "clean_temp_files": clean_temp_files,
     "create_escalation_ticket": create_escalation_ticket,
 }
 

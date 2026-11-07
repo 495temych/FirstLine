@@ -4,7 +4,7 @@ From the head of IT service delivery at CorpLabs.
 
 ## How support works today
 
-CorpLabs AG is headquartered in Zürich, with about 770 staff accounts across offices in the US and in Frankfurt, Munich and Milan. Our service desk takes every IT request first and passes what it can't fix to the desktop support, network, identity, application or security teams.
+CorpLabs AG is headquartered in Zürich, with about 630 staff accounts across offices in the US and in Frankfurt, Munich and Milan. Our service desk takes every IT request first and passes what it can't fix to the desktop support, network, identity, application or security teams.
 
 For each ticket, a technician reads the request, works out which known issue it is, runs the usual checks, and then fixes it, sends the user steps, or hands it to the right team. Most tickets are routine, and they fall into 14 families, from account lockouts to expired certificates. The fix is rarely hard. The time goes on the wait for a technician, on repeating the same checks, and on handovers that the next team has to redo.
 
@@ -190,7 +190,7 @@ Our records stay safe:
 
 - `data/kb/`: the CorpLabs knowledge base.
 - `data/tickets/`: our 745 closed incidents and their splits. They are a public synthetic set, under its MIT licence, and we say so.
-- `data/records/`: the staff directory of 769 accounts, with invented devices, groups and recent lockouts added.
+- `data/records/`: the staff directory of 628 accounts, with invented devices, groups and recent lockouts added.
 - `data/evals/`: labels, the answer files and saved runs. The agent never sees the answers.
 - `logs.csv`: real usage, one row per finished run. It is not in git. Our database replaces it once it's in place.
 

@@ -108,7 +108,8 @@
     ],
     "units": [
       "account-access",
-      "company-profile::Governing policies referenced across KB articles"
+      "sec-04-account-lockout",
+      "sec-07-software-and-admin-rights"
     ],
     "difficulty": "routine",
     "tiny": true,
@@ -121,7 +122,7 @@
     ],
     "tools": [],
     "queues": [
-      "M365-SYNC"
+      "APP-M365"
     ],
     "units": [
       "onedrive"
@@ -241,7 +242,7 @@
     ],
     "tools": [],
     "queues": [
-      "INFRA-FS01"
+      "SD-FILES"
     ],
     "units": [
       "shared-drive"
@@ -353,7 +354,7 @@
     ],
     "tools": [],
     "queues": [
-      "HW-REPLACE"
+      "DESK-HARDWARE"
     ],
     "units": [
       "laptop-performance"

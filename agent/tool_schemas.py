@@ -1,5 +1,8 @@
 """Tool JSON schemas Claude may call. Execution lives in tools.py (REGISTRY)."""
 
+ROUTINE = "routine"  # a person may confirm this for their own account or device
+SENSITIVE = "sensitive"  # touches access, security or shared systems: a technician only
+
 # Tools Claude may call for AUTO_FIX paths
 TOOLS: list[dict] = [
     {
@@ -26,7 +29,7 @@ TOOLS: list[dict] = [
     {
         "name": "restart_print_spooler",
         "description": (
-            "Restart the Print Spooler service on PRINT01.limmatica.corp. "
+            "Restart the Print Spooler service on PS-PRINT01.corplabs.internal. "
             "Use only for floor-wide failures after the nightly PaperCut sync job — "
             "not for single-user print queue issues."
         ),
@@ -195,6 +198,140 @@ TOOLS: list[dict] = [
         },
     },
     {
+        "name": "reinstall_print_driver",
+        "description": (
+            "Reinstall the approved HP Universal Print Driver on PS-PRINT01 for one "
+            "shared queue. Use when jobs fail with a driver error across a queue. "
+            "Queues drop briefly, so it affects everyone using that queue."
+        ),
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "queue": {
+                    "type": "string",
+                    "description": "Shared print queue name",
+                },
+            },
+            "required": ["queue"],
+        },
+    },
+    {
+        "name": "reset_mobile_mail_profile",
+        "description": (
+            "Remove a stale Outlook mobile partnership for a user so the phone can "
+            "sync again. Use when desktop Outlook syncs but Outlook on the phone does "
+            "not, and the device is compliant. Reversible: the user signs in again."
+        ),
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "username": {
+                    "type": "string",
+                    "description": "AD username; use 'current.user' if not stated in "
+                    "the query",
+                },
+            },
+            "required": ["username"],
+        },
+    },
+    {
+        "name": "push_wifi_profile",
+        "description": (
+            "Push the current corporate Wi-Fi profile and certificate to a device via "
+            "Intune. Use when one device can't join CORPLABS-CORP and its profile or "
+            "certificate is out of date."
+        ),
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "device_id": {
+                    "type": "string",
+                    "description": "Intune device ID or hostname; use 'current.device' "
+                    "if not stated in the query",
+                },
+            },
+            "required": ["device_id"],
+        },
+    },
+    {
+        "name": "add_user_to_share_group",
+        "description": (
+            "Add a user to the AD security group behind a shared drive. Use only when "
+            "the data owner or manager has approved it on the ticket, under SEC-11."
+        ),
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "username": {
+                    "type": "string",
+                    "description": "AD username; use 'current.user' if not stated in "
+                    "the query",
+                },
+                "group": {
+                    "type": "string",
+                    "description": "AD security group that grants the access",
+                },
+            },
+            "required": ["username", "group"],
+        },
+    },
+    {
+        "name": "force_intune_sync",
+        "description": (
+            "Force an Intune sync and a new compliance evaluation for one device. Use "
+            "when a device is out of date or reports noncompliant after its settings "
+            "changed. Changes nothing else on the device."
+        ),
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "device_id": {
+                    "type": "string",
+                    "description": "Intune device ID or hostname; use 'current.device' "
+                    "if not stated in the query",
+                },
+            },
+            "required": ["device_id"],
+        },
+    },
+    {
+        "name": "escrow_bitlocker_key",
+        "description": (
+            "Back up a device's BitLocker recovery key to the management service. Use "
+            "when a device reports noncompliant because its key isn't escrowed, and "
+            "TPM and encryption are healthy."
+        ),
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "device_id": {
+                    "type": "string",
+                    "description": "Intune device ID or hostname; use 'current.device' "
+                    "if not stated in the query",
+                },
+            },
+            "required": ["device_id"],
+        },
+    },
+    {
+        "name": "clean_temp_files",
+        "description": (
+            "Clear temporary files on one device. Use when a laptop is slow and free "
+            "disk space is low. Doesn't touch user documents."
+        ),
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "device_id": {
+                    "type": "string",
+                    "description": "Intune device ID or hostname; use 'current.device' "
+                    "if not stated in the query",
+                },
+            },
+            "required": ["device_id"],
+        },
+    },
+    {
         "name": "create_escalation_ticket",
         "description": (
             "Open a ServiceNow escalation ticket when the issue cannot be resolved at "
@@ -209,9 +346,9 @@ TOOLS: list[dict] = [
                 "queue": {
                     "type": "string",
                     "description": (
-                        "ServiceNow queue to route to (e.g. NET-VPN, M365-PROFILE, "
-                        "SEC-INCIDENT, INFRA-FS01, NET-PRINT, M365-SYNC, HW-REPLACE, "
-                        "DESKTOP-URGENT, M365-TENANT, NET-WIFI)"
+                        "ServiceNow queue to route to: SD-PRINT, SD-FILES, SD-DEVICE, "
+                        "DESK-SUPPORT, DESK-HARDWARE, NET-VPN, NET-WIFI, NET-DNS, "
+                        "IAM-ACCESS, APP-M365, APP-SUPPORT, SEC-POLICY or SEC-INCIDENT"
                     ),
                 },
                 "summary": {
@@ -230,3 +367,81 @@ TOOLS: list[dict] = [
         },
     },
 ]
+
+# Who owns each tool, how risky it is, and the issue families it can fix.
+# DRF and SML have no tool, because the network and identity teams own those fixes.
+TOOL_POLICY: dict[str, dict] = {
+    "reset_vpn_profile": {
+        "tier": ROUTINE,
+        "owner": "service_desk",
+        "families": ["VDA"],
+    },
+    "restart_print_spooler": {
+        "tier": SENSITIVE,
+        "owner": "service_desk",
+        "families": ["PDQ"],
+    },
+    "reinstall_print_driver": {
+        "tier": SENSITIVE,
+        "owner": "service_desk",
+        "families": ["PDQ"],
+    },
+    "clear_credential_manager": {
+        "tier": ROUTINE,
+        "owner": "service_desk",
+        "families": ["OES"],
+    },
+    "reset_mobile_mail_profile": {
+        "tier": ROUTINE,
+        "owner": "service_desk",
+        "families": ["OES"],
+    },
+    "clear_teams_cache": {"tier": ROUTINE, "owner": "service_desk", "families": []},
+    "push_wifi_driver_update": {
+        "tier": ROUTINE,
+        "owner": "service_desk",
+        "families": ["WCI"],
+    },
+    "push_wifi_profile": {
+        "tier": ROUTINE,
+        "owner": "service_desk",
+        "families": ["WCI"],
+    },
+    "remap_drives": {"tier": ROUTINE, "owner": "service_desk", "families": ["SDA"]},
+    "add_user_to_share_group": {
+        "tier": SENSITIVE,
+        "owner": "service_desk",
+        "families": ["SDA"],
+    },
+    "unlock_ad_account": {
+        "tier": SENSITIVE,
+        "owner": "service_desk",
+        "families": ["ALP"],
+    },
+    "enable_onedrive_files_on_demand": {
+        "tier": ROUTINE,
+        "owner": "service_desk",
+        "families": [],
+    },
+    "clean_temp_files": {"tier": ROUTINE, "owner": "service_desk", "families": ["LPD"]},
+    "push_approved_software": {
+        "tier": ROUTINE,
+        "owner": "service_desk",
+        "families": ["SIB"],
+    },
+    "force_intune_sync": {
+        "tier": ROUTINE,
+        "owner": "service_desk",
+        "families": ["DCP", "SIB"],
+    },
+    "escrow_bitlocker_key": {
+        "tier": SENSITIVE,
+        "owner": "desktop_support",
+        "families": ["EDE"],
+    },
+    "create_escalation_ticket": {
+        "tier": ROUTINE,
+        "owner": "service_desk",
+        "families": [],
+    },
+}

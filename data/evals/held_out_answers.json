@@ -85,7 +85,7 @@
     ],
     "tools": [],
     "queues": [
-      "NET-PRINT"
+      "SD-PRINT"
     ],
     "units": [
       "printer"
@@ -131,7 +131,7 @@
     ],
     "tools": [],
     "queues": [
-      "M365-TENANT"
+      "APP-M365"
     ],
     "units": [
       "teams"
@@ -147,7 +147,7 @@
     ],
     "tools": [],
     "queues": [
-      "M365-PROFILE"
+      "APP-M365"
     ],
     "units": [
       "outlook"
@@ -179,7 +179,7 @@
     ],
     "tools": [],
     "queues": [
-      "DESKTOP-URGENT"
+      "DESK-SUPPORT"
     ],
     "units": [
       "software-install"
@@ -254,7 +254,7 @@
     ],
     "tools": [],
     "queues": [
-      "INFRA-FS01"
+      "SD-FILES"
     ],
     "units": [
       "shared-drive"
@@ -284,7 +284,7 @@
     ],
     "tools": [],
     "queues": [
-      "HW-REPLACE"
+      "DESK-HARDWARE"
     ],
     "units": [
       "hardware-peripherals"
@@ -333,7 +333,7 @@
     ],
     "tools": [],
     "queues": [
-      "HW-REPLACE"
+      "DESK-HARDWARE"
     ],
     "units": [
       "hardware-peripherals"
@@ -349,7 +349,7 @@
     ],
     "tools": [],
     "queues": [
-      "INFRA-FS01"
+      "SD-FILES"
     ],
     "units": [
       "shared-drive"

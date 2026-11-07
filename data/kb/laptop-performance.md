@@ -16,4 +16,4 @@
 2. Check disk space — if low, verify OneDrive Files On-Demand is enabled (Settings > OneDrive > Save space)
 3. Check startup items via Task Manager > Startup apps
 
-**Escalation:** If device is >2 years old and Vantage reports battery health <60%, escalate to `HW-REPLACE` for battery/device replacement — not a software fix.
+**Escalation:** If device is >2 years old and Vantage reports battery health <60%, escalate to `DESK-HARDWARE` for battery/device replacement — not a software fix.

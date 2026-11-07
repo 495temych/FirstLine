@@ -19,4 +19,4 @@
 
 **IT-push (AUTO_FIX alternative):** If the user cannot reach Company Portal or needs a faster path, IT can push any approved catalog title directly to the device via Intune "Required" assignment — use `push_approved_software` tool. This bypasses the portal UI while keeping the install logged in Intune.
 
-**Escalation:** Pre-approved but urgent one-off need (e.g. client demo in 1 hour) → `DESKTOP-URGENT` queue for temporary elevated install via Intune "Run script" — requires team lead sign-off per `SEC-07` exception process, logged and time-boxed to 24h.
+**Escalation:** Pre-approved but urgent one-off need (e.g. client demo in 1 hour) → `DESK-SUPPORT` queue for temporary elevated install via Intune "Run script" — requires team lead sign-off per `SEC-07` exception process, logged and time-boxed to 24h.
