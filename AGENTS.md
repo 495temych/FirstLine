@@ -8,14 +8,15 @@ FirstLine is an L1 IT support triage agent for CorpLabs AG, a fictional company 
 
 IMPORTANT: before you plan, build or change anything, read each of these in full:
 
-1. `docs/SPEC.md`: what the business needs
-2. `docs/ROADMAP.md`: the current sprint and where the product is heading
-3. `docs/TECH_STACK.md`: the tech choices
-4. `docs/CODE_STANDARDS.md`: how to write the code
-5. `docs/PROCESS.md`: how to run, plan, build and check the work
-6. `docs/STATUS.md`: what's built and which rules code enforces
-7. `docs/DECISIONS.md`: design decisions, their trade-offs and the known limitations
-8. `docs/BRAND.md`: how the dashboard looks, before any dashboard work
+1. `docs/BUSINESS_GOAL.md`: what success means, and how we count it
+2. `docs/SPEC.md`: what the business needs
+3. `docs/ROADMAP.md`: the current sprint and where the product is heading
+4. `docs/TECH_STACK.md`: the tech choices
+5. `docs/CODE_STANDARDS.md`: how to write the code
+6. `docs/PROCESS.md`: how to run, plan, build and check the work
+7. `docs/STATUS.md`: what's built and which rules code enforces
+8. `docs/DECISIONS.md`: design decisions, their trade-offs and the known limitations
+9. `docs/BRAND.md`: how the dashboard looks, before any dashboard work
 
 Until the baseline is done, also read `docs/EVALS.md` and `docs/PLAN_EVALS.md`.
 

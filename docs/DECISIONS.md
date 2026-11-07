@@ -114,6 +114,24 @@ Each design decision so far, with its reason and its trade-off.
 - **Reason:** 745 templated synthetic tickets would teach a model the generator's pattern. A free classifier shows whether Claude earns its cost on routing.
 - **Trade-off:** the classifier may score very well on tickets this alike, which says as much about the data as about Claude. Its value then rests on investigation and write-ups.
 
+## Checks in code before a loop
+
+- **Decision:** commit 7 tests a fixed workflow beside one call and the loop. Code runs the family's checks, then one model call decides. The loop stays only if it beats that by more than the noise, for its extra cost.
+- **Reason:** in the knowledge base split, every family has the same three checks on every ticket, and a fixed workflow belongs in code.
+- **Trade-off:** one more design to build and score. The sameness may come from the synthetic data, so a real desk may need the loop more.
+
+## Code writes the facts in a handover
+
+- **Decision:** code fills in what it knows, including checks and evidence from tool results. The model writes only the likely cause, what's ruled out and the next step, citing that evidence.
+- **Reason:** a one-sentence summary can't save the next team any work, and a model writing the facts could invent them.
+- **Trade-off:** a larger ticket format, and the handover's quality needs its own measure.
+
+## Run the check again after a fix
+
+- **Decision:** after an approved fix, the check that failed runs again. The ticket closes if it passes, and escalates with both results if not.
+- **Reason:** a tool that reports success doesn't prove the problem has gone, and a checkable result is what later autonomy has to rest on.
+- **Trade-off:** the records hold no results from after a fix, so this is simulated, and the demo has to say so.
+
 ## Three sprints, one per course week
 
 - **Decision:** Sprint 1 proves the agent locally, Sprint 2 makes it a system with Qdrant, Supabase and Langfuse, and Sprint 3 delivers it on Azure.

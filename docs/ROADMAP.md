@@ -8,17 +8,7 @@ The project runs in three sprints, one for each week of the AI FDE course. This 
 
 ## The business goal
 
-**Every ticket gets a correct first pass before a technician touches it.**
-
-Only about a third of tickets show failures L1 could fix alone. That's a rough measure from who owns each failing check. So FirstLine can't be judged only on tickets it resolves: most of its value is sending the rest to the right team, already investigated.
-
-| Outcome | Tickets | Measure |
-|---|---|---|
-| Routine tickets close with one approval | About a third | Share a technician would approve unchanged, by family |
-| Other tickets reach the right team first time, already investigated | About two thirds | Right team first time, and required checks run |
-| Nothing unsafe happens | All | Zero rule breaks |
-
-The headline number is **technician time per ticket against model cost, in CHF**. Our records have no handling times, so the minutes are an assumption, and the Scoreboard says so.
+**Every ticket gets a correct first pass before a technician touches it.** `docs/BUSINESS_GOAL.md` holds the outcomes, the money, the baselines and the success criteria.
 
 The dataset does four jobs, and none of them is training a model:
 
@@ -63,7 +53,7 @@ Everything runs locally, with no new services. Done so far: the FastAPI and Reac
 | 4 | **Labels.** Named causes with paths, reviewed by you, and the rules set relabelled | The Tickets page shows each ticket's cause and expected path |
 | 5 | **Baseline.** Structured decisions, scored against the most common answer and a simple classifier | The first real numbers, including whether Claude beats the yardsticks |
 | 6 | **Rules in code.** Requester records, tool risk tiers and the SEC-04 guard | Pick a user: the same lockout gets a different answer |
-| 7 | **Investigate.** One agent loop with read-only tools and simulated checks, scored on the development set | What investigating adds over one call, for what extra cost |
+| 7 | **Investigate.** Three designs on the same tickets: one call, code runs the family's checks before one call, and one agent loop with read-only tools. Each writes a full handover | What investigating adds over one call, and whether a loop beats a fixed workflow, for what extra cost |
 | 8 | **Choices.** Test models and reasoning effort, rank the families by RICE, and record plans B and C | A written choice of model and design, backed by numbers |
 
 Commit 4 needs you: the path labels are your judgement, and everything after it depends on them. After commit 5, `docs/EVALS.md`, `docs/PLAN_EVALS.md` and `briefs/LABEL_REVIEW.md` are deleted.
@@ -106,6 +96,8 @@ The number after each one is the commit that meets it.
 - [ ] (7) `agent/queue.py` investigates one ticket with four read-only tools: search the knowledge base, look up the requester, find similar incidents and run a check. It ends in the same decision format as the Assistant.
 - [ ] (7) The loop stops at its limits on steps and cost and escalates with what it found. A check the ticket doesn't have returns no result.
 - [ ] (7) A test proves the loop can't reach a tool that changes a system, and that similar-incident search reads knowledge base split tickets only.
+- [ ] (7) A fixed workflow runs a family's playbook checks in code, then makes one model call. With no matching playbook it runs no checks and escalates.
+- [ ] (7) An escalation carries a full handover. Code fills in the requester, device, priority, SLA deadline, applications, checks with their evidence, similar incidents and what's unknown. The model writes only the likely cause, what's ruled out and the next step, citing that evidence.
 
 **Evaluations (`evals/`)**
 
@@ -114,7 +106,7 @@ The number after each one is the commit that meets it.
 - [ ] (5) Scores show a margin of error, and each run records the versions of the instructions, tools and knowledge base.
 - [ ] (5) The development set is run and committed. A full one-call run should cost under CHF 3, which is an estimate to confirm.
 - [ ] (6) Safety scores are zero failures, and SEC-04 scores come from the rules set.
-- [ ] (7) The same sets run through the loop, scored the same way, plus required checks run and steps per ticket. Evidence cited must come from a tool result.
+- [ ] (7) The same sets run through the fixed workflow and the loop, scored the same way, plus required checks run and steps per ticket. Evidence cited must come from a tool result. The loop stays only if it beats the fixed workflow by more than the noise, for its extra cost.
 - [ ] (8) At least two models, and reasoning effort where it applies, are run on the development set, more than once. A chart shows accuracy against the cost of the whole task, and the choice is in `docs/DECISIONS.md`.
 - [ ] (8) Families are ranked by RICE from measured volume and scores, and the ranking says where to start.
 - [ ] (8) The held-out set runs once, at sprint review.
@@ -126,7 +118,7 @@ The number after each one is the commit that meets it.
 - [ ] (5) Tickets and evaluations return the new labels and measures. Held-out tickets stay out of every route, checked by a test.
 - [ ] (5) Triage is renamed Assistant, and the Scoreboard shows measures by family, the yardsticks, and CHF for mistakes.
 - [ ] (6) Starting a triage takes a requester, and a picker sits on the Assistant. The page shows when a rule changed the agent's decision. The gate rules are unchanged.
-- [ ] (7) The Scoreboard shows the loop beside the one-call run.
+- [ ] (7) The Scoreboard shows the fixed workflow and the loop beside the one-call run.
 
 **Checks and CI**
 
@@ -152,12 +144,14 @@ Redaction comes first, because tickets start leaving the Mac in this sprint. The
 | 2 | **Langfuse.** One trace per ticket, tagged runs, and scores on traces | Open any decision and follow it | Traces, datasets, experiments and scores |
 | 3 | **Qdrant.** Sections and past incidents move to Qdrant, with hybrid search for error codes | Before and after retrieval scores, plus false matches | Search by meaning, and retrieval evals |
 | 4 | **Supabase.** Postgres replaces SQLite and `logs.csv`, including LangGraph's checkpoints | A paused ticket survives a restart, on Postgres | Checkpoints in Postgres, and a system of record |
-| 5 | **Queue and review.** Load a batch, order it in code, and approve, correct or reject in three lists | The full workflow, and technician time per ticket | The human's step |
+| 5 | **Queue and review.** Load a batch, order it in code, and approve, correct or reject in three lists. After a fix, the failed check runs again: the ticket closes if it passes, and escalates with both results if not | The full workflow, and technician time per ticket | The human's step |
 | 6 | **Durable at scale.** A dispatcher with no model, N agents, retries, no repeated actions, and spending limits | Kill a batch mid-run, and it carries on without doing anything twice | Dispatcher, `Send`, idempotency, `RetryPolicy` |
 | 7 | **Clean evals.** A Langfuse experiment for each change, repeated runs, a judge checked against your grades, and a release gate | A change either passes the gate or doesn't | Three kinds of evals, noise, and an LLM judge |
 | 8 | **Self-improvement, if time allows.** An improver proposes changes, you approve them, and evals keep or roll them back | A proposed change with its evidence | The improver, keep or roll back, held-out data |
 
 The improver needs one safeguard. It sees mistakes from part of the development set, and decides on a separate part that it never sees. That keeps the held-out set for sprint review.
+
+The records hold no results from after a fix, so the re-check in commit 5 is simulated, and the demo says so.
 
 Tests stay free and offline: Qdrant has a local mode with no server, and Postgres can run in a container in CI. Commit 3 must confirm that local mode covers hybrid search. Commit 2 needs your Langfuse keys, commit 3 a Qdrant key, and commit 4 a Supabase project.
 
@@ -196,7 +190,7 @@ To check before Sprint 3 starts: whether Container Apps runs in Switzerland Nort
 |---|---|---|
 | 1 | Score against a simple baseline | Most common answer, and a classifier |
 | 1 | Weigh mistakes by business cost | Mistake costs in CHF |
-| 1 | Fixed workflow? One call can beat an agent | The Assistant is one call, and commit 7 tests what a loop adds |
+| 1 | Fixed workflow? One call can beat an agent | The Assistant is one call, and commit 7 tests a loop against checks run in code |
 | 1 | Structured outputs, rationale first | The decision class |
 | 1 | Test models on the customer's task | Sprint 1, commit 8 |
 | 1 | Agents need a harness | Instructions, tools, limits and a human handoff |
@@ -207,7 +201,7 @@ To check before Sprint 3 starts: whether Container Apps runs in Switzerland Nort
 | 2 | Decide on held-out data | The improver's safeguard |
 | 3 | Lethal trifecta | Ticket text is untrusted and records are private, so Queue tools only read, and a person approves anything that leaves |
 | 3 | Provenance | Owner and review date on every playbook |
-| 3 | Agree success criteria at the start | The business goal above, measured at handover |
+| 3 | Agree success criteria at the start | The criteria in `docs/BUSINESS_GOAL.md`, measured at handover |
 
 We're leaving some things out on purpose, and each is a choice we can defend:
 
