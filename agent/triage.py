@@ -32,6 +32,7 @@ def run_triage(query: str, use_retrieval: bool) -> dict:
         "use_retrieval": use_retrieval,
         "path": out["path"],
         "reasoning": out["reasoning"],
+        "cause": out["cause"],
         "tool_name": out["tool_name"],
         "tool_input": out["tool_input"],
         "usage": out["usage"],

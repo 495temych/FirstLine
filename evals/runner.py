@@ -1,7 +1,8 @@
 """Runs the agent over a labelled set, scores it and saves the result.
 
-`uv run -m evals` runs the rules set. `--set rules_held_out` runs its held-out half,
-and `--tiny` runs only its five trial tickets. Results go to data/evals/runs/.
+`uv run -m evals` runs the rules set. `--set` picks another set, such as `dev` or
+`unseen_dev`, and `--tiny` runs only the rules set's five trial tickets. Each run also
+scores the two yardsticks, for free. Results go to data/evals/runs/.
 `--retrieval` scores retrieval instead, with no model calls.
 """
 
@@ -11,12 +12,14 @@ import json
 from datetime import UTC, datetime
 
 from agent import config, run_triage
+from agent.decision import DECISION_TOOL
 from agent.tool_schemas import TOOL_POLICY, TOOLS
-from evals import retrieval_score, scoring
+from evals import retrieval_score, scoring, yardsticks
 
 EVALS_DIR = config.ROOT / "data" / "evals"
 RUNS_DIR = EVALS_DIR / "runs"
 PREFIXES = {"rules": "rules_", "rules_held_out": "rules_held_out_"}
+IMPORTED_SETS = ("dev", "held_out", "unseen_dev", "unseen_held_out")
 REVIEW_SPLITS = ("dev", "unseen_dev")  # the imported tickets a person may read
 
 
@@ -61,20 +64,38 @@ def load_imported(split: str) -> list[tuple[dict, dict]]:
     return pairs
 
 
+def load_any(name: str, tiny: bool = False) -> list[tuple[dict, dict]]:
+    """Return (ticket, answer) pairs for any set the agent can be scored on."""
+    if name in IMPORTED_SETS:
+        return load_imported(name)
+    return [
+        (ticket, {**answer, "family": "Rules set", "cause": None})
+        for ticket, answer in load_set(name, tiny)
+    ]
+
+
 def load_review_tickets() -> list[tuple[dict, dict]]:
     """The tickets a person reviews. Held-out tickets stay out."""
-    rules = [
-        (ticket, {**answer, "family": "Rules set", "cause": None, "checks": []})
-        for ticket, answer in load_set("rules")
-    ]
+    rules = [(ticket, {**answer, "checks": []}) for ticket, answer in load_any("rules")]
     return rules + [p for split in REVIEW_SPLITS for p in load_imported(split)]
 
 
+def _hash(content: bytes) -> str:
+    return hashlib.sha256(content).hexdigest()[:8]
+
+
+def instructions_version() -> str:
+    return _hash((config.ROOT / "agent" / "prompt.md").read_bytes())
+
+
+def tools_version() -> str:
+    tools = [DECISION_TOOL, TOOLS, TOOL_POLICY]
+    return _hash(json.dumps(tools, sort_keys=True).encode())
+
+
 def version() -> str:
-    """A short hash of what the model is given: the instructions and the tools."""
-    prompt = (config.ROOT / "agent" / "prompt.md").read_bytes()
-    tools = json.dumps([TOOLS, TOOL_POLICY], sort_keys=True).encode()
-    return hashlib.sha256(prompt + tools).hexdigest()[:8]
+    """One short hash of what the model is given: the instructions and the tools."""
+    return _hash(f"{instructions_version()}{tools_version()}".encode())
 
 
 def _unit_id(u: dict) -> str:
@@ -88,6 +109,7 @@ def _attempt(text: str) -> dict:
     except Exception as exc:  # one bad ticket must never stop an evaluation
         return {
             "path": "ESCALATE",
+            "cause": None,
             "retrieved": [],
             "tool_name": None,
             "tool_input": None,
@@ -108,18 +130,18 @@ def score_ticket(ticket: dict, answer: dict, result: dict, model: str) -> dict:
         "text": ticket["text"],
         "requester": ticket["requester"],
         "difficulty": answer["difficulty"],
+        "cause": result["cause"],
+        "expected_cause": answer["cause"],
         "expected_paths": answer["paths"],
         "expected_tools": answer["tools"],
         "expected_queues": answer["queues"],
         "expected_units": answer["units"],
-        "path": path,
+        **scoring.score_decision(answer, path, tool, queue),
         "tool": tool,
         "queue": queue,
         "retrieved": retrieved,
-        "path_correct": path in answer["paths"],
-        "action_correct": scoring.action_correct(answer, path, tool, queue),
+        "cause_correct": scoring.cause_correct(answer, result["cause"]),
         "retrieval_correct": scoring.retrieval_correct(answer, retrieved),
-        "mistake_cost_chf": scoring.mistake_cost(answer, path, tool, queue),
         **usage,
         "cost_usd": config.cost_usd(
             model, usage["input_tokens"], usage["output_tokens"]
@@ -132,9 +154,10 @@ def score_ticket(ticket: dict, answer: dict, result: dict, model: str) -> dict:
 def evaluate(name: str, tiny: bool = False) -> dict:
     """Run a set through the agent and return the evaluation."""
     model = config.model_name()
+    pairs = load_any(name, tiny)
     rows = [
         score_ticket(ticket, answer, _attempt(ticket["text"]), model)
-        for ticket, answer in load_set(name, tiny)
+        for ticket, answer in pairs
     ]
     now = datetime.now(UTC)
     return {
@@ -144,8 +167,15 @@ def evaluate(name: str, tiny: bool = False) -> dict:
         "tiny": tiny,
         "model": model,
         "version": version(),
+        "instructions_version": instructions_version(),
+        "tools_version": tools_version(),
+        "kb_version": retrieval_score.kb_version(),
         "summary": scoring.summarize(rows),
+        "yardsticks": yardsticks.score(pairs, load_imported(yardsticks.TRAINING_SPLIT)),
+        "confusion": scoring.confusion(rows),
+        "per_path": scoring.per_path(rows),
         "by_difficulty": scoring.by_difficulty(rows),
+        "by_family": scoring.by_family(rows),
         "tickets": rows,
     }
 
@@ -157,25 +187,45 @@ def save_run(run: dict) -> None:
 
 
 def load_runs() -> list[dict]:
-    """Saved evaluations, newest first."""
+    """Saved evaluations, newest first. Runs from before the yardsticks are left out."""
     paths = sorted(RUNS_DIR.glob("*.json"), reverse=True)
-    return [json.loads(p.read_text()) for p in paths]
+    runs = [json.loads(p.read_text()) for p in paths]
+    return [run for run in runs if "yardsticks" in run]
+
+
+def _percent(share: float | None) -> str:
+    return "n/a" if share is None else f"{share:.0%}"
+
+
+def _with_margin(summary: dict, measure: str) -> str:
+    share = summary[f"{measure}_accuracy"]
+    if share is None:
+        return "n/a"
+    return f"{share:.0%} ±{summary[f'{measure}_margin']:.0%}"
 
 
 def print_report(run: dict) -> None:
     s = run["summary"]
-    cost = s["cost_per_ticket_usd"]
+    cost = s["cost_per_ticket_chf"]
     print(f"{run['id']}  {run['model']}  version {run['version']}\n")
     print(
-        f"path {s['path_accuracy']:.0%}  action {s['action_accuracy']:.0%}  "
+        f"path {_with_margin(s, 'path')}  action {_with_margin(s, 'action')}  "
+        f"team {_with_margin(s, 'team')}  cause {_percent(s['cause_accuracy'])}  "
         f"retrieval {s['retrieval_accuracy']:.0%}  "
-        f"automation {s['automation_rate']:.0%}"
+        f"automation {s['automation_rate']:.0%}  kappa {s['kappa']:.2f}"
     )
     print(
         f"mistakes CHF {s['mistake_cost_chf']:,}  "
-        f"cost per ticket {'unknown' if cost is None else f'${cost:.4f}'}  "
+        f"cost per ticket {'unknown' if cost is None else f'CHF {cost:.4f}'}  "
         f"time per ticket {s['time_per_ticket_sec']:.1f}s  failed {s['failed']}\n"
     )
+    for name, y in run["yardsticks"].items():
+        print(
+            f"{name}: path {_with_margin(y, 'path')}  "
+            f"action {_with_margin(y, 'action')}  team {_with_margin(y, 'team')}  "
+            f"kappa {y['kappa']:.2f}  mistakes CHF {y['mistake_cost_chf']:,}"
+        )
+    print()
     for t in run["tickets"]:
         if t["mistake_cost_chf"]:
             expected = "/".join(t["expected_paths"])
@@ -186,7 +236,8 @@ def print_report(run: dict) -> None:
 def main() -> None:
     """Run the evaluation, save it and print the report."""
     parser = argparse.ArgumentParser(prog="evals", description=__doc__)
-    parser.add_argument("--set", choices=sorted(PREFIXES), default="rules", dest="name")
+    sets = sorted([*PREFIXES, *IMPORTED_SETS])
+    parser.add_argument("--set", choices=sets, default="rules", dest="name")
     parser.add_argument("--tiny", action="store_true", help="five trial tickets")
     parser.add_argument(
         "--retrieval", action="store_true", help="score retrieval, with no model calls"
@@ -202,6 +253,8 @@ def main() -> None:
     if args.retrieval:
         retrieval_score.main(args.split, args.save)
         return
+    if args.tiny and args.name in IMPORTED_SETS:
+        parser.error("--tiny only applies to the rules sets")
     run = evaluate(args.name, args.tiny)
     save_run(run)
     print_report(run)

@@ -18,8 +18,6 @@ IMPORTANT: before you plan, build or change anything, read each of these in full
 8. `docs/DECISIONS.md`: design decisions, their trade-offs and the known limitations
 9. `docs/BRAND.md`: how the dashboard looks, before any dashboard work
 
-Until the baseline is done, also read `docs/EVALS.md` and `docs/PLAN_EVALS.md`.
-
 ## Folders
 
 - `agent/`: the graph, tools, tool schemas, retrieval and instructions. `run_triage` is the entry point, and `config.py` holds paths and settings

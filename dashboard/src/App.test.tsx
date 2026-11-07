@@ -61,7 +61,7 @@ const click = (name: string | RegExp) => {
 async function triage(run: Partial<Run> = {}) {
   replies["/api/triage"] = { ...baseRun, ...run };
   render(<App />);
-  await screen.findByRole("button", { name: "Triage" });
+  await screen.findByRole("button", { name: "Assistant" });
   fireEvent.change(screen.getByLabelText("Describe the issue"), {
     target: { value: "My VPN fails" },
   });
@@ -72,7 +72,7 @@ async function triage(run: Partial<Run> = {}) {
 it("shows the three tabs and the example tickets", () => {
   render(<App />);
   expect(screen.getByRole("heading", { name: "FirstLine" })).toBeDefined();
-  for (const tab of ["Triage", "Scoreboard", "Tickets"]) {
+  for (const tab of ["Assistant", "Scoreboard", "Tickets"]) {
     expect(screen.getByRole("button", { name: tab })).toBeDefined();
   }
   expect(screen.getAllByRole("listitem")).toHaveLength(presets.length);
@@ -88,7 +88,7 @@ it("fills the ticket from an example without running it", () => {
 
 it("sends the retrieval switch with the ticket", async () => {
   render(<App />);
-  await screen.findByRole("button", { name: "Triage" });
+  await screen.findByRole("button", { name: "Assistant" });
   fireEvent.click(screen.getByRole("switch"));
   fireEvent.change(screen.getByLabelText("Describe the issue"), {
     target: { value: "Help" },
@@ -210,7 +210,7 @@ it("explains a run with retrieval off", async () => {
 it("shows a failed triage", async () => {
   replies["/api/triage"] = 502;
   render(<App />);
-  await screen.findByRole("button", { name: "Triage" });
+  await screen.findByRole("button", { name: "Assistant" });
   fireEvent.change(screen.getByLabelText("Describe the issue"), {
     target: { value: "Help" },
   });
@@ -285,6 +285,10 @@ it("shows saved evaluations and opens another one", async () => {
   expect(screen.getByText("rules set, held-out")).toBeDefined();
   expect(screen.getByText(/CHF 120 for a wrong fix/)).toBeDefined();
   expect(screen.getByText("My VPN keeps disconnecting")).toBeDefined();
+  expect(screen.getByText("Simple classifier")).toBeDefined();
+  expect(screen.getByText("Chose Auto-fix")).toBeDefined();
+  expect(screen.getByText("VPN access")).toBeDefined();
+  expect(screen.getAllByText("80% ±10%").length).toBeGreaterThan(0);
   fireEvent.change(screen.getByLabelText("Open an evaluation"), {
     target: { value: "20261103-held_out" },
   });

@@ -1,4 +1,7 @@
-"""Scores one evaluated ticket against its answer. Plain code, no model."""
+"""Scores evaluated tickets against their answers. Plain code, no model."""
+
+from collections import Counter
+from math import sqrt
 
 SECURITY_QUEUE = "SEC-INCIDENT"
 AUTOMATED = {"AUTO_FIX", "SELF_SERVE"}
@@ -7,6 +10,9 @@ AUTOMATED = {"AUTO_FIX", "SELF_SERVE"}
 COST_SECURITY = 2000
 COST_WRONG = 120
 COST_MINOR = 60
+USD_TO_CHF = 0.80  # an assumption, for showing model cost in francs
+Z_95 = 1.96  # for a 95% margin of error
+PATHS = ("SELF_SERVE", "AUTO_FIX", "ESCALATE", "OUT_OF_SCOPE")
 
 
 def action_correct(
@@ -39,12 +45,118 @@ def retrieval_correct(answer: dict, retrieved: list[str]) -> bool:
     return top in answer["units"] if answer["units"] else top is None
 
 
+def team_correct(answer: dict, path: str, queue: str | None) -> bool | None:
+    """Did it reach the right team? None if the answer names no team."""
+    if not answer["queues"]:
+        return None
+    return path == "ESCALATE" and queue in answer["queues"]
+
+
+def cause_correct(answer: dict, cause: str | None) -> bool | None:
+    """Did it name the labelled cause? None if the ticket has no labelled cause."""
+    expected = answer.get("cause")
+    if expected is None:
+        return None
+    return (cause or "").strip().casefold() == expected.casefold()
+
+
+def expected_path(answer: dict, path: str) -> str:
+    """The one expected path: the agent's, if accepted, or else the first accepted."""
+    return path if path in answer["paths"] else answer["paths"][0]
+
+
+def score_decision(
+    answer: dict, path: str, tool: str | None, queue: str | None
+) -> dict:
+    """The measures any decision-maker gets, whether the agent or a yardstick."""
+    return {
+        "family": answer["family"],
+        "expected_path": expected_path(answer, path),
+        "path": path,
+        "path_correct": path in answer["paths"],
+        "action_correct": action_correct(answer, path, tool, queue),
+        "team_correct": team_correct(answer, path, queue),
+        "mistake_cost_chf": mistake_cost(answer, path, tool, queue),
+    }
+
+
+def margin(share: float, n: int) -> float:
+    """The 95% margin of error on a share of n tickets, by the Wilson interval."""
+    if n == 0:
+        return 0.0
+    spread = share * (1 - share) / n + Z_95**2 / (4 * n**2)
+    return Z_95 * sqrt(spread) / (1 + Z_95**2 / n)
+
+
 def _share(rows: list[dict], key: str) -> float:
     return sum(r[key] for r in rows) / len(rows)
 
 
+def _share_or_none(rows: list[dict], key: str) -> float | None:
+    """The share among tickets where this measure applies."""
+    scored = [r for r in rows if r.get(key) is not None]
+    return _share(scored, key) if scored else None
+
+
 def _average(values: list[float]) -> float | None:
     return sum(values) / len(values) if values else None
+
+
+def confusion(rows: list[dict]) -> dict[str, dict[str, int]]:
+    """How many tickets of each expected path got each chosen path."""
+    pairs = Counter((r["expected_path"], r["path"]) for r in rows)
+    return {
+        expected: {chosen: pairs[(expected, chosen)] for chosen in PATHS}
+        for expected in PATHS
+    }
+
+
+def per_path(rows: list[dict]) -> dict[str, dict]:
+    """Precision and recall for each path. None where there's nothing to divide by."""
+    measures = {}
+    for path in PATHS:
+        right = sum(r["path"] == path == r["expected_path"] for r in rows)
+        chosen = sum(r["path"] == path for r in rows)
+        actual = sum(r["expected_path"] == path for r in rows)
+        measures[path] = {
+            "precision": right / chosen if chosen else None,
+            "recall": right / actual if actual else None,
+            "n": actual,
+        }
+    return measures
+
+
+def cohens_kappa(rows: list[dict]) -> float | None:
+    """Agreement beyond chance. A constant answer scores 0."""
+    n = len(rows)
+    if not n:
+        return None
+    observed = sum(r["path"] == r["expected_path"] for r in rows) / n
+    chance = sum(
+        sum(r["path"] == path for r in rows)
+        * sum(r["expected_path"] == path for r in rows)
+        for path in PATHS
+    ) / (n * n)
+    return (observed - chance) / (1 - chance) if chance < 1 else 0.0
+
+
+def decisions(rows: list[dict]) -> dict:
+    """The measures shared by the agent and the yardsticks."""
+    n = len(rows)
+    path, action = _share(rows, "path_correct"), _share(rows, "action_correct")
+    team_rows = [r for r in rows if r["team_correct"] is not None]
+    team = _share_or_none(rows, "team_correct")
+    return {
+        "n": n,
+        "path_accuracy": path,
+        "path_margin": margin(path, n),
+        "action_accuracy": action,
+        "action_margin": margin(action, n),
+        "team_accuracy": team,
+        "team_margin": None if team is None else margin(team, len(team_rows)),
+        "mistake_cost_chf": sum(r["mistake_cost_chf"] for r in rows),
+        "kappa": cohens_kappa(rows),
+    }
 
 
 def summarize(rows: list[dict]) -> dict:
@@ -52,16 +164,24 @@ def summarize(rows: list[dict]) -> dict:
     in_scope = [r for r in rows if r["path"] != "OUT_OF_SCOPE"]
     automated = [r for r in in_scope if r["path"] in AUTOMATED]
     costs = [r["cost_usd"] for r in rows if r["cost_usd"] is not None]
+    usd = _average(costs) if len(costs) == len(rows) else None
     return {
-        "n": len(rows),
-        "path_accuracy": _share(rows, "path_correct"),
-        "action_accuracy": _share(rows, "action_correct"),
+        **decisions(rows),
+        "cause_accuracy": _share_or_none(rows, "cause_correct"),
         "retrieval_accuracy": _share(rows, "retrieval_correct"),
         "automation_rate": len(automated) / len(in_scope) if in_scope else 0.0,
-        "mistake_cost_chf": sum(r["mistake_cost_chf"] for r in rows),
-        "cost_per_ticket_usd": _average(costs) if len(costs) == len(rows) else None,
+        "cost_per_ticket_usd": usd,
+        "cost_per_ticket_chf": None if usd is None else usd * USD_TO_CHF,
         "time_per_ticket_sec": _average([r["time_sec"] for r in rows]),
         "failed": sum(r["error"] is not None for r in rows),
+    }
+
+
+def by_family(rows: list[dict]) -> dict:
+    """The same measures for each family."""
+    return {
+        family: summarize([r for r in rows if r["family"] == family])
+        for family in sorted({r["family"] for r in rows})
     }
 
 

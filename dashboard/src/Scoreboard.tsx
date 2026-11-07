@@ -2,11 +2,12 @@ import { useState } from "react";
 import {
   api,
   type Evaluation,
+  type Decisions,
   type Evaluations,
   type RetrievalRun,
   type Summary,
 } from "./api";
-import { chf, dateTime, money, pathLabels, percent, rate } from "./format";
+import { chf, dateTime, pathLabels, percent, rappen, rate } from "./format";
 import { useLoad } from "./useLoad";
 
 const setNames: Record<string, string> = {
@@ -18,6 +19,11 @@ const setNames: Record<string, string> = {
   unseen_dev: "unseen, development",
   unseen_held_out: "unseen, held-out",
 };
+
+function withMargin(share: number | null, margin: number | null) {
+  if (share === null || margin === null) return "n/a";
+  return `${percent(share)} ±${percent(margin)}`;
+}
 
 function setName(run: Evaluation) {
   const name = setNames[run.set];
@@ -145,6 +151,8 @@ function Runs({ runs }: Readonly<{ runs: Evaluation[] }>) {
               "Tickets",
               "Path",
               "Action",
+              "Team",
+              "Cause",
               "Retrieval",
               "Automation",
               "Mistakes (CHF)",
@@ -171,12 +179,14 @@ function Runs({ runs }: Readonly<{ runs: Evaluation[] }>) {
                   <code>{run.version}</code>
                 </td>
                 <td>{s.n}</td>
-                <td>{percent(s.path_accuracy)}</td>
-                <td>{percent(s.action_accuracy)}</td>
+                <td>{withMargin(s.path_accuracy, s.path_margin)}</td>
+                <td>{withMargin(s.action_accuracy, s.action_margin)}</td>
+                <td>{withMargin(s.team_accuracy, s.team_margin)}</td>
+                <td>{rate(s.cause_accuracy)}</td>
                 <td>{percent(s.retrieval_accuracy)}</td>
                 <td>{percent(s.automation_rate)}</td>
                 <td>{chf(s.mistake_cost_chf)}</td>
-                <td>{money(s.cost_per_ticket_usd)}</td>
+                <td>{rappen(s.cost_per_ticket_chf)}</td>
                 <td>{s.time_per_ticket_sec.toFixed(1)} s</td>
               </tr>
             );
@@ -187,31 +197,111 @@ function Runs({ runs }: Readonly<{ runs: Evaluation[] }>) {
   );
 }
 
-function ByDifficulty({
-  levels,
-}: Readonly<{ levels: Record<string, Summary> }>) {
+function Head({ names }: Readonly<{ names: string[] }>) {
+  return (
+    <thead>
+      <tr>
+        {names.map((name) => (
+          <th key={name} scope="col">
+            {name}
+          </th>
+        ))}
+      </tr>
+    </thead>
+  );
+}
+
+function Yardsticks({ run }: Readonly<{ run: Evaluation }>) {
+  const rows: [string, Decisions][] = [
+    ["FirstLine", run.summary],
+    ["Simple classifier", run.yardsticks.classifier],
+    ["Most common answer", run.yardsticks.most_common],
+  ];
   return (
     <div className="table-scroll">
       <table>
-        <thead>
-          <tr>
-            {["Difficulty", "Tickets", "Path", "Action", "Mistakes (CHF)"].map(
-              (name) => (
-                <th key={name} scope="col">
-                  {name}
-                </th>
-              ),
-            )}
-          </tr>
-        </thead>
+        <Head
+          names={["Who", "Path", "Action", "Team", "Kappa", "Mistakes (CHF)"]}
+        />
         <tbody>
-          {Object.entries(levels).map(([level, s]) => (
-            <tr key={level}>
-              <td>{level}</td>
+          {rows.map(([who, s]) => (
+            <tr key={who}>
+              <td>{who}</td>
+              <td>{withMargin(s.path_accuracy, s.path_margin)}</td>
+              <td>{withMargin(s.action_accuracy, s.action_margin)}</td>
+              <td>{withMargin(s.team_accuracy, s.team_margin)}</td>
+              <td>{s.kappa === null ? "n/a" : s.kappa.toFixed(2)}</td>
+              <td>{chf(s.mistake_cost_chf)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function Confusion({ run }: Readonly<{ run: Evaluation }>) {
+  const paths = Object.keys(run.confusion);
+  return (
+    <div className="table-scroll">
+      <table>
+        <Head
+          names={[
+            "Expected",
+            ...paths.map((path) => `Chose ${pathLabels[path]}`),
+            "Tickets",
+            "Precision",
+            "Recall",
+          ]}
+        />
+        <tbody>
+          {paths.map((expected) => (
+            <tr key={expected}>
+              <td>{pathLabels[expected]}</td>
+              {paths.map((chosen) => (
+                <td key={chosen}>{run.confusion[expected][chosen]}</td>
+              ))}
+              <td>{run.per_path[expected].n}</td>
+              <td>{rate(run.per_path[expected].precision)}</td>
+              <td>{rate(run.per_path[expected].recall)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function ByGroup({
+  label,
+  groups,
+}: Readonly<{ label: string; groups: Record<string, Summary> }>) {
+  return (
+    <div className="table-scroll">
+      <table>
+        <Head
+          names={[
+            label,
+            "Tickets",
+            "Path",
+            "Action",
+            "Team",
+            "Cause",
+            "Mistakes (CHF)",
+            "Cost per ticket",
+          ]}
+        />
+        <tbody>
+          {Object.entries(groups).map(([group, s]) => (
+            <tr key={group}>
+              <td>{group}</td>
               <td>{s.n}</td>
               <td>{percent(s.path_accuracy)}</td>
               <td>{percent(s.action_accuracy)}</td>
+              <td>{rate(s.team_accuracy)}</td>
+              <td>{rate(s.cause_accuracy)}</td>
               <td>{chf(s.mistake_cost_chf)}</td>
+              <td>{rappen(s.cost_per_ticket_chf)}</td>
             </tr>
           ))}
         </tbody>
@@ -300,8 +390,20 @@ function Board({ runs, costs }: Readonly<Pick<Evaluations, "runs" | "costs">>) {
       </select>
       {run && (
         <>
+          <h2>Against the yardsticks</h2>
+          <Yardsticks run={run} />
+          <p className="caption">
+            Both yardsticks are free and learn from the knowledge base split.
+            Kappa is agreement beyond chance, so always giving one answer scores
+            0. The ± is the 95% margin of error, and a smaller gap than that may
+            be noise.
+          </p>
+          <h2>Paths</h2>
+          <Confusion run={run} />
+          <h2>By family</h2>
+          <ByGroup label="Family" groups={run.by_family} />
           <h2>By difficulty</h2>
-          <ByDifficulty levels={run.by_difficulty} />
+          <ByGroup label="Difficulty" groups={run.by_difficulty} />
           <h2>By ticket</h2>
           <RunTickets run={run} />
         </>

@@ -32,7 +32,7 @@ OFF_TOPIC = answer(["OUT_OF_SCOPE"])
         (FIX, "ESCALATE", None, "APP-M365", 120),
         (FIX, "OUT_OF_SCOPE", None, None, 120),
         (FIX, "AUTO_FIX", "remap_drives", None, 60),
-        (TICKET, "ESCALATE", None, "DESKTOP-SUPPORT", 60),
+        (TICKET, "ESCALATE", None, "DESK-SUPPORT", 60),
         (FIX, "SELF_SERVE", None, None, 60),
         (OFF_TOPIC, "SELF_SERVE", None, None, 60),
     ],
@@ -63,6 +63,10 @@ def test_with_no_expected_unit_nothing_should_match():
 def row(path="AUTO_FIX", **fields):
     defaults = {
         "path": path,
+        "expected_path": path,
+        "family": "VPN access",
+        "team_correct": None,
+        "cause_correct": None,
         "path_correct": True,
         "action_correct": True,
         "retrieval_correct": True,
@@ -105,3 +109,98 @@ def test_an_unknown_price_leaves_the_cost_unknown():
 
 def test_a_set_with_nothing_in_scope_has_no_automation():
     assert scoring.summarize([row("OUT_OF_SCOPE")])["automation_rate"] == 0.0
+
+
+ANSWER = {
+    "family": "VPN access",
+    "paths": ["AUTO_FIX", "SELF_SERVE"],
+    "tools": ["reset_vpn_profile"],
+    "queues": ["NET-VPN"],
+    "cause": "Stale VPN profile",
+}
+
+
+def decided(expected, chosen):
+    return {"expected_path": expected, "path": chosen}
+
+
+def test_team_is_only_scored_when_the_answer_names_one():
+    assert scoring.team_correct({"queues": []}, "ESCALATE", "NET-VPN") is None
+    assert scoring.team_correct(ANSWER, "ESCALATE", "NET-VPN") is True
+    assert scoring.team_correct(ANSWER, "ESCALATE", "NET-DNS") is False
+    assert scoring.team_correct(ANSWER, "SELF_SERVE", None) is False
+
+
+def test_cause_ignores_case_and_skips_unlabelled_tickets():
+    assert scoring.cause_correct(ANSWER, " stale vpn PROFILE ") is True
+    assert scoring.cause_correct(ANSWER, "Unknown") is False
+    assert scoring.cause_correct(ANSWER, None) is False
+    assert scoring.cause_correct({"cause": None}, "Anything") is None
+
+
+def test_an_accepted_path_counts_as_the_expected_one():
+    assert scoring.expected_path(ANSWER, "SELF_SERVE") == "SELF_SERVE"
+    assert scoring.expected_path(ANSWER, "ESCALATE") == "AUTO_FIX"
+
+
+def test_the_margin_shrinks_with_more_tickets():
+    assert scoring.margin(0.8, 25) > scoring.margin(0.8, 129) > 0
+    assert 0.06 < scoring.margin(0.8, 129) < 0.08
+    assert scoring.margin(1.0, 129) > 0
+    assert scoring.margin(0.5, 0) == 0
+
+
+def test_the_confusion_matrix_counts_each_pair():
+    matrix = scoring.confusion([decided("AUTO_FIX", "ESCALATE")] * 2)
+    assert matrix["AUTO_FIX"]["ESCALATE"] == 2
+    assert matrix["AUTO_FIX"]["AUTO_FIX"] == 0
+    assert set(matrix) == set(scoring.PATHS)
+
+
+def test_precision_and_recall_per_path():
+    rows = [
+        decided("AUTO_FIX", "AUTO_FIX"),
+        decided("ESCALATE", "AUTO_FIX"),
+        decided("AUTO_FIX", "ESCALATE"),
+    ]
+    fixes = scoring.per_path(rows)["AUTO_FIX"]
+    assert fixes == {"precision": 0.5, "recall": 0.5, "n": 2}
+    assert scoring.per_path(rows)["OUT_OF_SCOPE"]["precision"] is None
+    assert scoring.per_path(rows)["OUT_OF_SCOPE"]["recall"] is None
+
+
+def test_kappa_gives_a_constant_answer_nothing():
+    rows = [decided("AUTO_FIX", "AUTO_FIX"), decided("ESCALATE", "AUTO_FIX")]
+    assert scoring.cohens_kappa(rows) == 0
+
+
+def test_kappa_rewards_perfect_agreement_and_handles_the_edges():
+    rows = [decided("AUTO_FIX", "AUTO_FIX"), decided("ESCALATE", "ESCALATE")]
+    assert scoring.cohens_kappa(rows) == 1
+    assert scoring.cohens_kappa([]) is None
+    assert scoring.cohens_kappa([decided("AUTO_FIX", "AUTO_FIX")]) == 0
+
+
+def test_measures_leave_out_tickets_they_do_not_apply_to():
+    row = {
+        **scoring.score_decision(ANSWER, "AUTO_FIX", "reset_vpn_profile", None),
+        "team_correct": None,
+    }
+    summary = scoring.decisions([row])
+    assert summary["team_accuracy"] is None
+    assert summary["team_margin"] is None
+    assert summary["path_accuracy"] == 1
+
+
+def test_families_are_summarised_apart():
+    row = {
+        **scoring.score_decision(ANSWER, "AUTO_FIX", "reset_vpn_profile", None),
+        "cause_correct": True,
+        "retrieval_correct": True,
+        "cost_usd": 0.01,
+        "time_sec": 1.0,
+        "error": None,
+    }
+    family = scoring.by_family([row])["VPN access"]
+    assert family["cause_accuracy"] == 1
+    assert family["cost_per_ticket_chf"] == pytest.approx(0.008)

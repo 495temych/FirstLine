@@ -165,7 +165,7 @@ main > *,
   min-width: 0;
 }
 
-/* Triage: the ticket on the left, its route on the right */
+/* Assistant: the ticket on the left, its route on the right */
 
 .triage {
   display: grid;

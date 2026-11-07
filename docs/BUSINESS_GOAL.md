@@ -46,8 +46,8 @@ Every ticket costs a review. A ticket the technician rejects also costs the full
 | First pass by hand | 15 minutes | Assumption. The records have no handling times. The first and last messages on a ticket are a median of 14 minutes apart, which is a rough check at best |
 | Review of one decision | 2 minutes | Assumption, to be replaced by real review times in Sprint 2 |
 | Technician rate | CHF 60 an hour | Assumption, for the owner to change |
-| Share approved unchanged | Unknown | Measured from the baseline on, first by comparing with the labels, then from real reviews |
-| Model cost | About USD 0.005 per ticket so far | Measured on 5 tickets with Haiku and the old knowledge base, so it will rise. The loop's limit starts at CHF 0.10 |
+| Share approved unchanged | 68% on the development set | Measured against the labels at the baseline, so it's a stand-in until real reviews replace it |
+| Model cost | About CHF 0.005 per ticket | Measured on 206 tickets with Haiku and one call. The loop's limit starts at CHF 0.10 |
 | Routine fix on a possible compromise | CHF 2,000 | Assumption, and it dominates the total |
 | Wrong fix, needless escalation, or a real request declined | CHF 120 | Assumption: 2 hours at CHF 60 |
 | Right path, wrong tool or queue | CHF 60 | Assumption: 1 hour at CHF 60 |
@@ -87,12 +87,12 @@ We compare against something at each level, and "better than nothing" doesn't co
 | Baseline | What it answers | Status |
 |---|---|---|
 | Today's process | Does it save technician time? | The 15-minute assumption, until a client's real numbers replace it |
-| Always the most common answer | Is the agent better than a constant? | Sprint 1, commit 5 |
-| A simple classifier, trained on the knowledge base split | Is it better than a free, cheap model on routing? | Sprint 1, commit 5. It's a yardstick and never decides a ticket |
+| Always the most common answer | Is the agent better than a constant? | Measured in commit 5. The agent beats it everywhere |
+| A simple classifier, trained on the knowledge base split | Is it better than a free, cheap model on routing? | Measured in commit 5. It beats the agent on the templated development tickets and loses on short requests and unseen teams. It's a yardstick and never decides a ticket |
 | One model call | Does investigating add more than it costs? | The Assistant today, compared with checks run in code and with the loop in commit 7 |
 | Retrieval before the playbooks | Did the knowledge base get better? | Measured: hit rate 94%, false matches 96%. Now 100% and 4% |
 
-The path labels come first. Until commit 4 is reviewed there's no agent baseline, so this project doesn't yet know how accurate its agent is.
+The first agent baseline is in the README's "Results". It rests on labels the owner hasn't finished reading, so it's run again once they are confirmed.
 
 ## How we evaluate
 

@@ -14,6 +14,9 @@ export const rate = (share?: number | null) =>
 export const money = (usd: number | null) =>
   usd === null ? "unknown" : `$${usd.toFixed(4)}`;
 
+export const rappen = (amount: number | null) =>
+  amount === null ? "unknown" : `CHF ${amount.toFixed(4)}`;
+
 export const chf = (amount: number) => amount.toLocaleString("de-CH");
 
 export const dateTime = (iso: string) =>

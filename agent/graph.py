@@ -36,8 +36,15 @@ from typing_extensions import TypedDict
 
 from agent import tools
 from agent.config import LOG_FILE, model_name
+from agent.decision import (
+    DECISION_TOOL,
+    DECISION_TOOL_NAME,
+    DEFAULT_PRIORITY,
+    DEFAULT_QUEUE,
+    read_decision,
+    tool_guide,
+)
 from agent.retrieval import retrieve
-from agent.tool_schemas import TOOLS
 
 _PROMPT_FILE = Path(__file__).parent / "prompt.md"
 
@@ -57,8 +64,6 @@ LOG_FIELDS = [
 HEADER_MARKERS = 2  # the opening and closing ** of a bare markdown header
 MIN_SUMMARY_CHARS = 15  # shorter lines are labels, not a diagnosis
 
-PATH_KEYWORDS = ("OUT_OF_SCOPE", "SELF_SERVE", "AUTO_FIX", "ESCALATE")
-
 
 # ── State ───────────────────────────────────────────────────────────────────────
 class GraphState(TypedDict):
@@ -66,6 +71,7 @@ class GraphState(TypedDict):
     use_retrieval: bool
     retrieved: list[dict]
     reasoning: str
+    cause: str
     # SELF_SERVE | AUTO_FIX | ESCALATE | OUT_OF_SCOPE | NO_TOOLS ("" before triage)
     path: str
     tool_name: str | None
@@ -86,6 +92,7 @@ def initial_state(query: str, use_retrieval: bool) -> GraphState:
         "use_retrieval": use_retrieval,
         "retrieved": [],
         "reasoning": "",
+        "cause": "",
         "path": "",
         "tool_name": None,
         "tool_input": None,
@@ -164,59 +171,10 @@ def message_blocks(msg: AIMessage) -> list[dict]:
     return blocks
 
 
-def parse_path(blocks: list[dict]) -> dict:
-    """Decide the triage path from the model's content blocks. Pure; no I/O.
-
-    Text blocks set the path via keyword scan; tool_use blocks always win. If the model
-    chose ESCALATE in text but never called the ticket tool, a minimal ticket is
-    synthesized so the confirmation card can always render.
-    Returns: path, reasoning, tool_name, tool_input.
-    """
-    path = "ESCALATE"
-    reasoning = ""
-    tool_name = None
-    tool_input = None
-
-    for block in blocks:
-        if block.get("type") == "text":
-            reasoning = block["text"]
-            if tool_name is None:  # don't let text override a tool-use decision
-                # Use the LAST occurrence of any path keyword — the agent's final
-                # "Path chosen: X" sentence wins over earlier mentions in reasoning.
-                last_pos, chosen = -1, None
-                for candidate in PATH_KEYWORDS:
-                    pos = block["text"].rfind(candidate)
-                    if pos > last_pos:
-                        last_pos, chosen = pos, candidate
-                if chosen:
-                    path = chosen
-        elif block.get("type") == "tool_use":
-            tool_name = block["name"]
-            tool_input = block["input"]
-            path = "ESCALATE" if tool_name == "create_escalation_ticket" else "AUTO_FIX"
-
-    if path == "ESCALATE" and tool_name is None:
-        tool_name = "create_escalation_ticket"
-        first_line = next(
-            (
-                line.strip()
-                for line in (reasoning or "").split("\n")
-                if len(line.strip()) > MIN_SUMMARY_CHARS
-            ),
-            "Issue escalated — technician review required.",
-        )
-        tool_input = {
-            "queue": "DESKTOP-SUPPORT",
-            "summary": first_line[:150],
-            "priority": "P3-Normal",
-        }
-
-    return {
-        "path": path,
-        "reasoning": reasoning,
-        "tool_name": tool_name,
-        "tool_input": tool_input,
-    }
+def decision_arguments(msg: AIMessage) -> dict | None:
+    """The arguments of the model's decision, if it recorded one."""
+    calls = [b for b in message_blocks(msg) if b.get("type") == "tool_use"]
+    return calls[0]["input"] if calls else None
 
 
 def ticket_for(state: GraphState) -> dict:
@@ -228,8 +186,8 @@ def ticket_for(state: GraphState) -> dict:
     ti = state["tool_input"] or {}
     return {
         "source": "escalate",
-        "queue": ti.get("queue", "DESKTOP-SUPPORT"),
-        "priority": ti.get("priority", "P3-Normal"),
+        "queue": ti.get("queue", DEFAULT_QUEUE),
+        "priority": ti.get("priority", DEFAULT_PRIORITY),
         "summary": ti.get("summary", "—"),
     }
 
@@ -269,7 +227,7 @@ def _get_llm() -> ChatAnthropic:
     # twice over by the SDK as well.
     settings: dict[str, Any] = {
         "model": model_name(),
-        "max_tokens": 1024,
+        "max_tokens": 2048,
         "max_retries": 0,
     }
     return ChatAnthropic(**settings)
@@ -292,12 +250,14 @@ _API_RETRY = RetryPolicy(max_attempts=3, retry_on=_is_api_error)
 
 def _call_model(state: GraphState) -> tuple[AIMessage, float]:
     llm = _get_llm()
+    instructions = _PROMPT_FILE.read_text()
     if state["use_retrieval"]:
         # Tools are withheld entirely when RAG is off, not just retrieval — the agent
         # must reason in plain text only and cannot propose or execute any action.
-        llm = llm.bind_tools(TOOLS)
+        llm = llm.bind_tools([DECISION_TOOL], tool_choice=DECISION_TOOL_NAME)
+        instructions += f"\n\n**Remediation tools**\n{tool_guide()}"
     messages = [
-        SystemMessage(_PROMPT_FILE.read_text()),
+        SystemMessage(instructions),
         HumanMessage(
             build_user_message(
                 state["query"], state["retrieved"], state["use_retrieval"]
@@ -325,7 +285,7 @@ def usage_of(msg: AIMessage) -> dict:
 def triage(state: GraphState) -> dict:
     msg, elapsed = _call_model(state)
     return {
-        **parse_path(message_blocks(msg)),
+        **read_decision(decision_arguments(msg)),
         "response_time_sec": elapsed,
         "usage": usage_of(msg),
     }
@@ -385,8 +345,8 @@ def draft_ticket(state: GraphState) -> dict:
         return {
             "ticket_draft": {
                 "source": "self_serve",
-                "queue": "DESKTOP-SUPPORT",
-                "priority": "P3-Normal",
+                "queue": DEFAULT_QUEUE,
+                "priority": DEFAULT_PRIORITY,
                 "summary": summary[:150],
             }
         }
@@ -400,10 +360,10 @@ def draft_ticket(state: GraphState) -> dict:
     return {
         "ticket_draft": {
             "source": "decline",
-            "queue": "DESKTOP-SUPPORT",
+            "queue": DEFAULT_QUEUE,
             # No model-assigned priority exists on this path, so use the same default as
             # the other synthesized tickets.
-            "priority": "P3-Normal",
+            "priority": DEFAULT_PRIORITY,
             "summary": ticket_summary[:150],
             "declined_tool": declined_tool,
             "reason": reason,

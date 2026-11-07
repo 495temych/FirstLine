@@ -10,22 +10,14 @@ import pytest
 from fastapi.testclient import TestClient
 
 from agent import config, graph, tools
-from agent.tests.fakes import UNIT, FakeLLM, text, tool
+from agent.tests.fakes import UNIT, FakeLLM, escalate, fix, out_of_scope, steps, text
 from backend import main, stats
 from evals import retrieval_score, runner
 
-AUTO_FIX = [text("Reset the profile."), tool("reset_vpn_profile", username="a.b")]
-ESCALATE = [
-    text("Needs review."),
-    tool(
-        "create_escalation_ticket",
-        queue="SEC-INCIDENT",
-        summary="Repeat lockout",
-        priority="P2-High",
-    ),
-]
-SELF_SERVE = [text("1. Reseat the cable.\nPath chosen: SELF_SERVE")]
-OUT_OF_SCOPE = [text("OUT_OF_SCOPE: not an IT question.")]
+AUTO_FIX = fix("reset_vpn_profile", "Reset the profile.", username="a.b")
+ESCALATE = escalate("SEC-INCIDENT", "Needs review.")
+SELF_SERVE = steps("Reseat the cable.")
+OUT_OF_SCOPE = out_of_scope()
 
 
 @pytest.fixture
@@ -75,6 +67,7 @@ def stub_triage(text, use_retrieval):
         "tool_input": {"username": "a.b"},
         "usage": {"input_tokens": 10, "output_tokens": 5},
         "response_time_sec": 1.0,
+        "cause": "Unknown",
     }
 
 
@@ -265,6 +258,13 @@ def test_held_out_tickets_stay_out_of_the_review(client):
     ids = {t["id"] for t in client.get("/api/tickets").json()}
     assert not ids & closed
     assert not any(i.startswith("H-") for i in ids)
+
+
+def test_a_held_out_run_shows_its_scores_but_no_tickets(client, monkeypatch):
+    run = {"set": "held_out", "summary": {"n": 1}, "tickets": [{"id": "INC-1"}]}
+    monkeypatch.setattr(main.runner, "load_runs", lambda: [run])
+    assert client.get("/api/evaluations").json()["runs"] == [{**run, "tickets": []}]
+    assert all(t["latest"] is None for t in client.get("/api/tickets").json())
 
 
 def test_latest_results_keeps_the_newest_and_skips_the_held_out_set():

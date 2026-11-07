@@ -14,7 +14,7 @@ function remember(id: string | null) {
   window.history.replaceState(null, "", url);
 }
 
-export function Triage() {
+export function Assistant() {
   const [text, setText] = useState("");
   const [useRetrieval, setUseRetrieval] = useState(true);
   const [run, setRun] = useState<Run>();

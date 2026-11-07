@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { Scoreboard } from "./Scoreboard";
 import { Tickets } from "./Tickets";
-import { Triage } from "./Triage";
+import { Assistant } from "./Assistant";
 
-const tabs = ["Triage", "Scoreboard", "Tickets"] as const;
+const tabs = ["Assistant", "Scoreboard", "Tickets"] as const;
 type Tab = (typeof tabs)[number];
 
 export function App() {
-  const [tab, setTab] = useState<Tab>("Triage");
+  const [tab, setTab] = useState<Tab>("Assistant");
 
   return (
     <>
@@ -32,8 +32,8 @@ export function App() {
         </nav>
       </header>
       <main>
-        <div hidden={tab !== "Triage"}>
-          <Triage />
+        <div hidden={tab !== "Assistant"}>
+          <Assistant />
         </div>
         {tab === "Scoreboard" && <Scoreboard />}
         {tab === "Tickets" && <Tickets />}

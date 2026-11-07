@@ -14,7 +14,7 @@ SAMPLE_ARGS = {
     "floor": "5",
     "department": "Finance",
     "software_name": "Zoom",
-    "queue": "DESKTOP-SUPPORT",
+    "queue": "DESK-SUPPORT",
     "summary": "A summary",
     "priority": "P3-Normal",
 }

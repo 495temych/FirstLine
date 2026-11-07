@@ -3,7 +3,24 @@
 ROUTINE = "routine"  # a person may confirm this for their own account or device
 SENSITIVE = "sensitive"  # touches access, security or shared systems: a technician only
 
-# Tools Claude may call for AUTO_FIX paths
+ESCALATION_TOOL = "create_escalation_ticket"
+QUEUES = [
+    "SD-PRINT",
+    "SD-FILES",
+    "SD-DEVICE",
+    "DESK-SUPPORT",
+    "DESK-HARDWARE",
+    "NET-VPN",
+    "NET-WIFI",
+    "NET-DNS",
+    "IAM-ACCESS",
+    "APP-M365",
+    "APP-SUPPORT",
+    "SEC-POLICY",
+    "SEC-INCIDENT",
+]
+
+# What code can run once a person confirms it. The model proposes these by name.
 TOOLS: list[dict] = [
     {
         "name": "reset_vpn_profile",
@@ -370,6 +387,8 @@ TOOLS: list[dict] = [
 
 # Who owns each tool, how risky it is, and the issue families it can fix.
 # DRF and SML have no tool, because the network and identity teams own those fixes.
+FIX_TOOLS = [tool for tool in TOOLS if tool["name"] != ESCALATION_TOOL]
+
 TOOL_POLICY: dict[str, dict] = {
     "reset_vpn_profile": {
         "tier": ROUTINE,

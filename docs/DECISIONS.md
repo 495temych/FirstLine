@@ -174,6 +174,24 @@ Each design decision so far, with its reason and its trade-off.
 - **Reason:** Swiss enterprises often run on Microsoft, and doing it on a different cloud from the course shows the ideas are understood, not copied.
 - **Trade-off:** Claude in Foundry has no Swiss or EU data zone that we could confirm, and a global deployment can route requests to the US. So the app can be Swiss-hosted while model calls aren't. Redaction carries that risk, and the direct Anthropic API is plan B.
 
+## A structured decision, not keywords
+
+- **Decision:** the model fills in one Pydantic class through a forced tool call, `record_decision`: rationale first, then cause, path, steps, tool and its input, queue, summary and priority. The tools and queues it may name are listed in the schema. Anything unreadable, or a tool or queue that doesn't exist, becomes an escalation to `DESK-SUPPORT`.
+- **Reason:** scoring needs a clean path, tool, queue and cause on every ticket, and reading the path from keywords in free text failed quietly. Putting the rationale first makes the model reason before it commits.
+- **Trade-off:** the fix tools are no longer bound as tools. The model names one in the decision, and code checks it. A forced tool call also rules out extended thinking with some models, which commit 8 tests.
+
+## Two yardsticks
+
+- **Decision:** every score sits beside always giving the most common answer and a TF-IDF and logistic-regression classifier trained on the knowledge base split. Both are free and run with the evaluation.
+- **Reason:** "better than nothing" isn't a baseline. A model call has to beat a free model to earn its cost.
+- **Trade-off:** the imported tickets are templated, so the classifier is a flattering bar on the development set (92% on path) and a weak one on short, real requests (36%). It can't name a team for a family it never saw. The rules set and unseen families keep it honest.
+
+## Margins, kappa and costs in francs
+
+- **Decision:** each share shows a 95% Wilson margin, and path agreement shows Cohen's kappa. Model cost is converted at an assumed USD 1 = CHF 0.80, kept in `evals/scoring.py`.
+- **Reason:** 25 tickets give a margin near ±17%, so a small gap between two runs is noise. Kappa gives a constant answer no credit.
+- **Trade-off:** the exchange rate is a fixed assumption, not a live one.
+
 ## Known limitations
 
 - **Synthetic knowledge base.** A real deployment needs real client documentation.
@@ -188,3 +206,5 @@ Each design decision so far, with its reason and its trade-off.
 - **English only.** CorpLabs is Swiss, so production needs multilingual embeddings and German instructions.
 - **Partial ITSM alignment.** The ticket maps to ServiceNow's incident schema but omits `impact`, `urgency`, `cmdb_ci` and `work_notes`.
 - **Paths vary on underspecified tickets.** "My VPN keeps disconnecting" has three documented causes, so it can land on different paths from run to run. Retrieval is deterministic.
+- **The baseline rests on draft labels.** Causes are drafted by rules and not all read by the owner yet, so some of the agent's "mistakes" may be wrong labels. The baseline runs again once they are confirmed.
+- **Mistake costs count every mistake.** They ignore the review that would catch many of them, so they are a worst case.

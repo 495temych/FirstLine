@@ -24,7 +24,7 @@ The pre-commit hook and GitHub Actions run the same command.
 Other commands:
 
 - `npm run format` formats the Python and TypeScript.
-- `uv run -m evals` evaluates the rules set, with 25 model calls. `--tiny` makes 5, and `--set rules_held_out` runs its held-out half.
+- `uv run -m evals` evaluates the rules set, with 25 model calls, and scores the two yardsticks beside it. `--set dev` (129 calls) and `--set unseen_dev` (52) run the imported practice sets, and `--tiny` makes 5 calls on the rules set. The three practice sets cost about CHF 1 together. The held-out sets (`rules_held_out`, `held_out`, `unseen_held_out`) run once, at sprint review.
 - `uv run -m evals.label_tickets` gives every imported ticket its named cause again, from `data/evals/causes.json`.
 - `uv run -m evals --retrieval` scores retrieval on the development sets, with no model calls. `--split` picks another set, and `--save` keeps the result for the Scoreboard.
 - `uv run -m evals.import_tickets` imports the tickets again, as `data/tickets/SOURCE.md` explains.

@@ -36,7 +36,7 @@ export const draft = {
 
 export const declined = {
   source: "decline" as const,
-  queue: "DESKTOP-SUPPORT",
+  queue: "DESK-SUPPORT",
   priority: "P3-Normal",
   summary: "Declined",
   declined_tool: "reset_vpn_profile",
@@ -58,6 +58,39 @@ const summary = {
   mistake_cost_chf: 2120,
   cost_per_ticket_usd: 0.0047,
   time_per_ticket_sec: 1.5,
+  path_margin: 0.1,
+  action_margin: 0.1,
+  team_accuracy: 0.75,
+  team_margin: 0.2,
+  cause_accuracy: null,
+  cost_per_ticket_chf: 0.0032,
+  kappa: 0.71,
+};
+
+const yardstick = {
+  n: 25,
+  path_accuracy: 0.5,
+  path_margin: 0.2,
+  action_accuracy: 0.4,
+  action_margin: 0.2,
+  team_accuracy: null,
+  team_margin: null,
+  mistake_cost_chf: 900,
+  kappa: null,
+};
+
+const paths = ["SELF_SERVE", "AUTO_FIX", "ESCALATE", "OUT_OF_SCOPE"];
+
+const pathDetail = {
+  yardsticks: { most_common: yardstick, classifier: yardstick },
+  confusion: Object.fromEntries(
+    paths.map((path) => [path, Object.fromEntries(paths.map((p) => [p, 1]))]),
+  ),
+  per_path: Object.fromEntries(
+    paths.map((path) => [path, { precision: 0.5, recall: null, n: 4 }]),
+  ),
+  by_family: { "VPN access": summary },
+  kb_version: "916db54c",
 };
 
 const scored = {
@@ -140,6 +173,7 @@ export const evaluations: Evaluations = {
       model: "claude-haiku",
       version: "abc12345",
       summary,
+      ...pathDetail,
       by_difficulty: { hard: summary },
       tickets: [scored],
     },
@@ -150,7 +184,12 @@ export const evaluations: Evaluations = {
       tiny: false,
       model: "claude-sonnet",
       version: "def67890",
-      summary: { ...summary, cost_per_ticket_usd: null },
+      summary: {
+        ...summary,
+        cost_per_ticket_usd: null,
+        cost_per_ticket_chf: null,
+      },
+      ...pathDetail,
       by_difficulty: {},
       tickets: [],
     },

@@ -53,15 +53,31 @@ export interface Run {
   pending: Pending | null;
 }
 
-export interface Summary {
+export interface Decisions {
   n: number;
   path_accuracy: number;
+  path_margin: number;
   action_accuracy: number;
+  action_margin: number;
+  team_accuracy: number | null;
+  team_margin: number | null;
+  mistake_cost_chf: number;
+  kappa: number | null;
+}
+
+export interface Summary extends Decisions {
+  cause_accuracy: number | null;
   retrieval_accuracy: number;
   automation_rate: number;
-  mistake_cost_chf: number;
   cost_per_ticket_usd: number | null;
+  cost_per_ticket_chf: number | null;
   time_per_ticket_sec: number;
+}
+
+export interface PathMeasures {
+  precision: number | null;
+  recall: number | null;
+  n: number;
 }
 
 export interface ScoredTicket {
@@ -86,8 +102,13 @@ export interface Evaluation {
   tiny: boolean;
   model: string;
   version: string;
+  kb_version: string;
   summary: Summary;
+  yardsticks: { most_common: Decisions; classifier: Decisions };
+  confusion: Record<string, Record<string, number>>;
+  per_path: Record<string, PathMeasures>;
   by_difficulty: Record<string, Summary>;
+  by_family: Record<string, Summary>;
   tickets: ScoredTicket[];
 }
 

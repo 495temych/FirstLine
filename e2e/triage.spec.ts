@@ -1,5 +1,12 @@
 import { expect, test, type Page } from "@playwright/test";
 
+// The web fonts are slow to load, and a test has no need of them.
+test.beforeEach(async ({ page }) => {
+  await page.route(/fonts\.(googleapis|gstatic)\.com/, (route) =>
+    route.abort(),
+  );
+});
+
 async function triage(page: Page, ticket: string) {
   await page.goto("/");
   await page.getByLabel("Describe the issue").fill(ticket);

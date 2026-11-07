@@ -11,23 +11,17 @@ from pathlib import Path
 import uvicorn
 
 from agent import config, graph, retrieval
-from agent.tests.fakes import UNIT, FakeLLM, text, tool
+from agent.tests.fakes import UNIT, FakeLLM, escalate, fix, out_of_scope, steps
 from backend import main, stats
 from evals import retrieval_score, runner
 
 ANSWERS = {
-    "fix": [text("Reset the profile."), tool("reset_vpn_profile", username="a.b")],
-    "lockout": [
-        text("Repeat lockout, a possible compromise."),
-        tool(
-            "create_escalation_ticket",
-            queue="SEC-INCIDENT",
-            summary="Repeat lockout",
-            priority="P2-High",
-        ),
-    ],
-    "steps": [text("1. Reseat the cable.\n\nPath chosen: SELF_SERVE")],
-    "weather": [text("OUT_OF_SCOPE: not an IT question.")],
+    "fix": fix("reset_vpn_profile", "Reset the profile.", username="a.b"),
+    "lockout": escalate(
+        "SEC-INCIDENT", "Repeat lockout, a possible compromise.", "Repeat lockout"
+    ),
+    "steps": steps("Reseat the cable."),
+    "weather": out_of_scope(),
 }
 
 

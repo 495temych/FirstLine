@@ -77,11 +77,14 @@ def _view(run_id: str, snapshot: StateSnapshot) -> dict:
     return {"id": run_id, **fields, "pending": _pending(snapshot)}
 
 
+READABLE_SETS = {"rules", *runner.REVIEW_SPLITS}
+
+
 def latest_results(runs: list[dict]) -> dict[str, dict]:
-    """Each rules set ticket's newest result. `runs` is newest first."""
+    """Each reviewable ticket's newest result. `runs` is newest first."""
     latest: dict[str, dict] = {}
     for run in runs:
-        if run["set"] == "rules":
+        if run["set"] in READABLE_SETS:
             for ticket in run["tickets"]:
                 latest.setdefault(ticket["id"], ticket)
     return latest
@@ -125,11 +128,16 @@ def answer_gate(run_id: str, answer: GateAnswer) -> dict:
     return _view(run_id, _snapshot(run_id))
 
 
+def readable(run: dict) -> dict:
+    """A saved run as the API may show it: a held-out run keeps its scores only."""
+    return run if run["set"] in READABLE_SETS else {**run, "tickets": []}
+
+
 @app.get("/api/evaluations", operation_id="list_evaluations")
 def list_evaluations() -> dict:
     """List saved evaluations and retrieval scores, with the assumed mistake costs."""
     return {
-        "runs": runner.load_runs(),
+        "runs": [readable(run) for run in runner.load_runs()],
         "retrieval": retrieval_score.load_runs(),
         "costs": {
             "security": scoring.COST_SECURITY,

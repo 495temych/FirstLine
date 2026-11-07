@@ -121,3 +121,29 @@ Checks, with no API key needed: `uv run poe check`.
 - [Design decisions and known limitations](docs/DECISIONS.md)
 
 ## Results
+
+The first baseline, from 7 November 2026: one model call per ticket with `claude-haiku-4-5`, version `93b8e4f5`. The ± is the 95% margin of error. Mistake costs are assumptions, and they count every mistake as if nobody caught it at review.
+
+| Set | Tickets | Path | Action | Right team | Kappa | Mistakes (CHF) |
+|---|---|---|---|---|---|---|
+| Rules set | 25 | 80% ±15% | 72% ±17% | 75% ±26% | 0.71 | 600 |
+| Development | 129 | 70% ±8% | 68% ±8% | 75% ±9% | 0.44 | 10,020 |
+| Unseen families | 52 | 60% ±13% | 31% ±12% | 31% ±12% | 0.00 | 3,420 |
+
+Beside the two yardsticks, on path:
+
+| Set | FirstLine | Simple classifier | Most common answer |
+|---|---|---|---|
+| Rules set | **80%** | 36% | 28% |
+| Development | 70% | **92%** | 16% |
+| Unseen families | 60% | **92%**, but always the wrong team | 0% |
+
+What it says:
+
+- **The agent doesn't beat both yardsticks yet.** It wins clearly on short, real requests (the rules set) and finds the right team on unseen families, where the classifier never can. But on the development set a free classifier routes better, because those tickets are templated and look like the ones it trained on.
+- **Three security mistakes cost CHF 6,000 of the 10,020.** The agent proposed a routine fix on a possible compromise. That's the SEC-04 rule, which moves into code in commit 6.
+- **Two causes cause 17 of the 39 wrong paths.** Slow laptops from a scan backlog are labelled self-serve and never get it, and disks with an uninitialised TPM are labelled escalate but get a fix. Some of this may be the labels, which the owner is still reading.
+- **On unseen families it says "out of scope" too often** (21 of 52), when those are IT problems for another team.
+- **It's cheap:** about CHF 0.005 and 5 seconds a ticket. All 206 practice tickets cost CHF 0.98, so a full run with the held-out sets stays near CHF 2, under the CHF 3 estimate.
+
+Nothing was tuned on the held-out sets, which run once at sprint review.

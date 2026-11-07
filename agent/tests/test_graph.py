@@ -1,4 +1,4 @@
-"""Offline tests: parse_path, routers, and full graph flows with a fake model.
+"""Offline tests: routers and full graph flows with a fake model.
 
 No API calls and no embeddings — `graph.retrieve` and `graph._get_llm` are patched.
 """
@@ -12,90 +12,20 @@ from langgraph.checkpoint.memory import InMemorySaver
 from langgraph.types import Command
 
 from agent import graph as g
-from agent.tests.fakes import UNIT, FakeLLM, text, tool
+from agent.tests.fakes import (
+    UNIT,
+    FakeLLM,
+    escalate,
+    fix,
+    out_of_scope,
+    steps,
+    text,
+)
 
 
 def state(fields: dict) -> g.GraphState:
     """A partial state: routers read only one or two fields."""
     return cast(g.GraphState, fields)
-
-
-# ── parse_path ──────────────────────────────────────────────────────────────────
-def test_text_only_escalate_gets_safety_net_ticket():
-    out = g.parse_path(
-        [
-            text(
-                "Lockout frequency is unknown, so this needs review.\nPath chosen: "
-                "ESCALATE"
-            )
-        ]
-    )
-    assert out["path"] == "ESCALATE"
-    assert out["tool_name"] == "create_escalation_ticket"
-    assert out["tool_input"] == {
-        "queue": "DESKTOP-SUPPORT",
-        "summary": "Lockout frequency is unknown, so this needs review.",
-        "priority": "P3-Normal",
-    }
-
-
-def test_tool_use_overrides_text_keyword():
-    out = g.parse_path(
-        [
-            text("Looks like SELF_SERVE territory, but a tool is better."),
-            tool("reset_vpn_profile", username="current.user"),
-        ]
-    )
-    assert out["path"] == "AUTO_FIX"
-    assert out["tool_name"] == "reset_vpn_profile"
-    assert out["tool_input"] == {"username": "current.user"}
-
-
-def test_last_keyword_in_text_wins():
-    out = g.parse_path(
-        [text("Not ESCALATE material. Path chosen: SELF_SERVE because it is simple.")]
-    )
-    assert out["path"] == "SELF_SERVE"
-    assert out["tool_name"] is None
-
-
-def test_text_after_tool_use_does_not_change_path():
-    out = g.parse_path(
-        [
-            tool("clear_teams_cache", username="current.user"),
-            text("Path chosen: SELF_SERVE"),
-        ]
-    )
-    assert out["path"] == "AUTO_FIX"
-    assert out["reasoning"] == "Path chosen: SELF_SERVE"
-
-
-def test_escalation_ticket_tool_keeps_model_ticket():
-    ticket = {
-        "queue": "SEC-INCIDENT",
-        "summary": "Repeated lockouts",
-        "priority": "P2-High",
-    }
-    out = g.parse_path(
-        [text("Escalating per SEC-04."), tool("create_escalation_ticket", **ticket)]
-    )
-    assert out["path"] == "ESCALATE"
-    assert out["tool_input"] == ticket
-
-
-def test_out_of_scope_has_no_tool():
-    out = g.parse_path([text("OUT_OF_SCOPE: That is not an IT question.")])
-    assert out["path"] == "OUT_OF_SCOPE"
-    assert out["tool_name"] is None
-    assert out["tool_input"] is None
-
-
-def test_no_keyword_defaults_to_escalate_with_fallback_summary():
-    out = g.parse_path([text("hmm")])
-    assert out["path"] == "ESCALATE"
-    assert (
-        out["tool_input"]["summary"] == "Issue escalated — technician review required."
-    )
 
 
 # ── routers ─────────────────────────────────────────────────────────────────────
@@ -165,12 +95,7 @@ def env(tmp_path, monkeypatch):
 
 
 def test_auto_fix_confirm(env):
-    env.use(
-        [
-            text("Stale cert. Path chosen: AUTO_FIX"),
-            tool("reset_vpn_profile", username="current.user"),
-        ]
-    )
+    env.use(fix("reset_vpn_profile", "Stale cert.", username="current.user"))
     out = env.start()
     assert out["__interrupt__"][0].value["kind"] == "confirm_fix"
     assert env.rows() == []  # nothing logged and nothing executed before the decision
@@ -188,10 +113,7 @@ def test_auto_fix_confirm(env):
 
 def test_auto_fix_decline_then_send_ticket(env):
     env.use(
-        [
-            text("Stale cert on the laptop.\nPath chosen: AUTO_FIX"),
-            tool("reset_vpn_profile", username="current.user"),
-        ]
+        fix("reset_vpn_profile", "Stale cert on the laptop.", username="current.user")
     )
     env.start()
     out = env.resume(False)
@@ -211,17 +133,7 @@ def test_auto_fix_decline_then_send_ticket(env):
 
 
 def test_escalate_cancel_creates_no_ticket(env):
-    env.use(
-        [
-            text("Escalating."),
-            tool(
-                "create_escalation_ticket",
-                queue="SEC-INCIDENT",
-                summary="Lockout",
-                priority="P2-High",
-            ),
-        ]
-    )
+    env.use(escalate("SEC-INCIDENT", "Escalating.", "Lockout"))
     out = env.start()
     assert out["__interrupt__"][0].value["ticket"]["queue"] == "SEC-INCIDENT"
     out = env.resume(False)
@@ -241,7 +153,7 @@ def test_escalate_cancel_creates_no_ticket(env):
 
 
 def test_self_serve_not_resolved_becomes_ticket(env):
-    env.use([text("1. Reseat the cable.\nPath chosen: SELF_SERVE")])
+    env.use(steps("Reseat the cable."))
     out = env.start("monitor dead")
     assert out["__interrupt__"][0].value == {"kind": "self_serve"}
     out = env.resume(False)
@@ -249,13 +161,13 @@ def test_self_serve_not_resolved_becomes_ticket(env):
     assert ticket["source"] == "self_serve"
     assert "monitor dead" in ticket["summary"]
     out = env.resume(True)
-    assert out["tool_result"]["queue"] == "DESKTOP-SUPPORT"
+    assert out["tool_result"]["queue"] == "DESK-SUPPORT"
     (row,) = env.rows()
     assert (row["decision_path"], row["tool_called"]) == ("SELF_SERVE", "")
 
 
 def test_self_serve_resolved_logs_without_ticket(env):
-    env.use([text("Path chosen: SELF_SERVE")])
+    env.use(steps("Reseat the cable."))
     env.start()
     out = env.resume(True)
     assert out.get("tool_result") is None
@@ -263,7 +175,7 @@ def test_self_serve_resolved_logs_without_ticket(env):
 
 
 def test_out_of_scope_logs_immediately(env):
-    env.use([text("OUT_OF_SCOPE: Not an IT question.")])
+    env.use(out_of_scope())
     out = env.start("weather?")
     assert "__interrupt__" not in out
     (row,) = env.rows()
@@ -280,7 +192,7 @@ def test_rag_off_has_no_tools_and_is_not_logged(env):
 
 
 def test_new_run_on_same_thread_does_not_inherit_old_decisions(env):
-    env.use([text("x"), tool("reset_vpn_profile", username="current.user")])
+    env.use(fix("reset_vpn_profile", username="current.user"))
     env.start()
     env.resume(False)  # leaves human_decision={"fix": False} and a ticket draft behind
     env.resume(False)
@@ -291,7 +203,7 @@ def test_new_run_on_same_thread_does_not_inherit_old_decisions(env):
 
 
 def test_new_query_while_interrupt_pending_starts_fresh_run(env):
-    env.use([text("Path chosen: SELF_SERVE")])
+    env.use(steps("Reseat the cable."))
     first = env.start("first")
     assert first["__interrupt__"][0].value == {"kind": "self_serve"}
     env.start("second")  # previous run was still paused; abandoned, not resumed
@@ -302,7 +214,7 @@ def test_new_query_while_interrupt_pending_starts_fresh_run(env):
 
 
 def test_log_runs_false_skips_logging(env):
-    env.use([text("OUT_OF_SCOPE: nope")])
+    env.use(out_of_scope())
     cfg = {"configurable": {"thread_id": "t2", "log_runs": False}}
     env.graph.invoke(g.initial_state("weather?", True), cfg)
     assert env.rows() == []

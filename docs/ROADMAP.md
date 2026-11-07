@@ -51,12 +51,12 @@ Everything runs locally, with no new services. Done so far: the FastAPI and Reac
 | 2 | ✅ **CorpLabs.** Company, policies, queues, tools and staff records replace the old client | The Assistant answers as CorpLabs, with no old names left |
 | 3 | ✅ **Playbooks.** 12 playbooks on one template, with section-level retrieval | The same score beside the "before", on tickets the playbooks never saw |
 | 4 | **Labels.** Named causes with paths, reviewed by you, and the rules set relabelled | The Tickets page shows each ticket's cause and expected path |
-| 5 | **Baseline.** Structured decisions, scored against the most common answer and a simple classifier | The first real numbers, including whether Claude beats the yardsticks |
+| 5 | ✅ **Baseline.** Structured decisions, scored against the most common answer and a simple classifier | The first real numbers, including whether Claude beats the yardsticks |
 | 6 | **Rules in code.** Requester records, tool risk tiers and the SEC-04 guard | Pick a user: the same lockout gets a different answer |
 | 7 | **Investigate.** Three designs on the same tickets: one call, code runs the family's checks before one call, and one agent loop with read-only tools. Each writes a full handover | What investigating adds over one call, and whether a loop beats a fixed workflow, for what extra cost |
 | 8 | **Choices.** Test models and reasoning effort, rank the families by RICE, and record plans B and C | A written choice of model and design, backed by numbers |
 
-Commit 4 needs you: the path labels are your judgement, and everything after it depends on them. After commit 5, `docs/EVALS.md`, `docs/PLAN_EVALS.md` and `briefs/LABEL_REVIEW.md` are deleted.
+Commit 4 needs you: the path labels are your judgement, and everything after it depends on them. `docs/EVALS.md` and `docs/PLAN_EVALS.md` were deleted after commit 5. `briefs/LABEL_REVIEW.md` stays until you have read every cause, and then the baseline is run again on the confirmed labels.
 
 ### Success criteria
 
@@ -89,7 +89,7 @@ The number after each one is the commit that meets it.
 **Agent: LangGraph and Claude (`agent/`)**
 
 - [x] (2) `agent/prompt.md` and the tools describe CorpLabs. Each tool has a risk tier and an owner in `agent/tool_schemas.py`, and there's a tool for each fix L1 may run in the 12 families.
-- [ ] (5) The decision is a Pydantic class, with the rationale first, so the model reasons before it decides.
+- [x] (5) The decision is a Pydantic class, with the rationale first, so the model reasons before it decides.
 - [ ] (6) `run_triage` takes a requester, and the model sees that user's record. With no requester it behaves as it does today.
 - [ ] (6) `agent/rules.py` holds pure functions that both modes call. A user with 2+ lockouts on a lockout ticket ends at `SEC-INCIDENT`, and a sensitive tool in the Assistant becomes a ticket.
 - [ ] (6) Stub-model tests try to break each rule. The fix can't run, and a user with 2 lockouts and a printer ticket is not overridden.
@@ -101,10 +101,10 @@ The number after each one is the commit that meets it.
 
 **Evaluations (`evals/`)**
 
-- [ ] (5) The runner scores the development set, unseen families and the rules set. It reports path, action, team, named cause, mistake cost in CHF and cost per ticket, each by family.
-- [ ] (5) Each score sits beside two yardsticks: always giving the most common answer, and a simple classifier trained on the knowledge base split. The report includes a confusion matrix, precision and recall per path, and Cohen's kappa.
-- [ ] (5) Scores show a margin of error, and each run records the versions of the instructions, tools and knowledge base.
-- [ ] (5) The development set is run and committed. A full one-call run should cost under CHF 3, which is an estimate to confirm.
+- [x] (5) The runner scores the development set, unseen families and the rules set. It reports path, action, team, named cause, mistake cost in CHF and cost per ticket, each by family.
+- [x] (5) Each score sits beside two yardsticks: always giving the most common answer, and a simple classifier trained on the knowledge base split. The report includes a confusion matrix, precision and recall per path, and Cohen's kappa.
+- [x] (5) Scores show a margin of error, and each run records the versions of the instructions, tools and knowledge base.
+- [x] (5) The development set is run and committed. A full one-call run should cost under CHF 3, which is an estimate to confirm.
 - [ ] (6) Safety scores are zero failures, and SEC-04 scores come from the rules set.
 - [ ] (7) The same sets run through the fixed workflow and the loop, scored the same way, plus required checks run and steps per ticket. Evidence cited must come from a tool result. The loop stays only if it beats the fixed workflow by more than the noise, for its extra cost.
 - [ ] (8) At least two models, and reasoning effort where it applies, are run on the development set, more than once. A chart shows accuracy against the cost of the whole task, and the choice is in `docs/DECISIONS.md`.
@@ -115,8 +115,8 @@ The number after each one is the commit that meets it.
 
 - [x] (1) The Scoreboard shows retrieval scores.
 - [x] (4) Tickets shows family, named cause and expected path, with a filter for each.
-- [ ] (5) Tickets and evaluations return the new labels and measures. Held-out tickets stay out of every route, checked by a test.
-- [ ] (5) Triage is renamed Assistant, and the Scoreboard shows measures by family, the yardsticks, and CHF for mistakes.
+- [x] (5) Tickets and evaluations return the new labels and measures. Held-out tickets stay out of every route, checked by a test.
+- [x] (5) Triage is renamed Assistant, and the Scoreboard shows measures by family, the yardsticks, and CHF for mistakes.
 - [ ] (6) Starting a triage takes a requester, and a picker sits on the Assistant. The page shows when a rule changed the agent's decision. The gate rules are unchanged.
 - [ ] (7) The Scoreboard shows the fixed workflow and the loop beside the one-call run.
 

@@ -3,12 +3,12 @@
 from langchain_core.messages import AIMessage
 
 from agent import graph, run_triage
-from agent.tests.fakes import UNIT, FakeLLM, text, tool
+from agent.tests.fakes import UNIT, FakeLLM, fix
 
 
 def test_run_triage_stops_at_the_first_gate_and_logs_nothing(tmp_path, monkeypatch):
     log = tmp_path / "logs.csv"
-    llm = FakeLLM([text("Reset it."), tool("reset_vpn_profile", username="a.b")])
+    llm = FakeLLM(fix("reset_vpn_profile", "Reset it.", username="a.b"))
     monkeypatch.setattr(graph, "LOG_FILE", log)
     monkeypatch.setattr(graph, "retrieve", lambda q: [UNIT])
     monkeypatch.setattr(graph, "_get_llm", lambda: llm)

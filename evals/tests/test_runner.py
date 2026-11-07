@@ -14,6 +14,7 @@ def result(path, tool=None, tool_input=None):
         "retrieved": [{"doc": "vpn", "section": None}],
         "tool_name": tool,
         "tool_input": tool_input,
+        "cause": "Stale VPN profile",
         "usage": {"input_tokens": 1000, "output_tokens": 200},
         "response_time_sec": 1.5,
     }
@@ -70,8 +71,10 @@ def test_an_unknown_model_has_an_unknown_cost(monkeypatch):
 
 
 def test_runs_load_newest_first(stubbed):
-    stubbed.joinpath("20260101T000000-dev.json").write_text(json.dumps({"id": "old"}))
-    runner.save_run({"id": "20270101T000000-dev"})
+    stubbed.joinpath("20260101T000000-dev.json").write_text(
+        json.dumps({"id": "old", "yardsticks": {}})
+    )
+    runner.save_run({"id": "20270101T000000-dev", "yardsticks": {}})
     assert [r["id"] for r in runner.load_runs()] == ["20270101T000000-dev", "old"]
 
 
@@ -80,6 +83,46 @@ def test_the_command_saves_and_reports(stubbed, monkeypatch, capsys):
     runpy.run_module("evals", run_name="__main__")
     out = capsys.readouterr().out
     assert "-rules_held_out-tiny" in out
-    assert "cost per ticket $0.0020" in out
+    assert "cost per ticket CHF 0.0016" in out
     assert "CHF" in out
     assert len(list(stubbed.glob("*.json"))) == 1
+
+
+def test_a_run_records_its_versions_and_measures(stubbed):
+    run = runner.evaluate("rules", tiny=True)
+    assert len(run["instructions_version"]) == 8
+    assert len(run["tools_version"]) == 8
+    assert len(run["kb_version"]) == 8
+    assert run["yardsticks"].keys() == {"most_common", "classifier"}
+    assert run["confusion"]["ESCALATE"]
+    assert run["per_path"]["ESCALATE"]["n"] > 0
+    assert run["by_family"]["Rules set"]["n"] == 5
+
+
+def test_a_run_from_before_the_yardsticks_is_left_out(stubbed, tmp_path):
+    (tmp_path / "old.json").write_text(json.dumps({"id": "old"}))
+    assert runner.load_runs() == []
+
+
+def test_imported_sets_score_family_and_cause(stubbed):
+    run = runner.evaluate("unseen_dev")
+    assert run["summary"]["n"] == 52
+    assert run["by_family"].keys() == {"API timeouts", "Certificate expiry"}
+    assert run["summary"]["cause_accuracy"] == 0
+
+
+def test_tiny_only_applies_to_the_rules_sets(stubbed, monkeypatch, capsys):
+    monkeypatch.setattr("sys.argv", ["evals", "--set", "dev", "--tiny"])
+    with pytest.raises(SystemExit):
+        runner.main()
+    assert "--tiny only applies" in capsys.readouterr().err
+
+
+def test_a_failed_ticket_has_no_cause(stubbed, monkeypatch):
+    def fail(text, use_retrieval):
+        raise RuntimeError("down")
+
+    monkeypatch.setattr(runner, "run_triage", fail)
+    row = runner.evaluate("rules", tiny=True)["tickets"][0]
+    assert row["cause"] is None
+    assert row["error"] == "RuntimeError: down"
