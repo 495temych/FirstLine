@@ -9,7 +9,7 @@
     ],
     "queues": [],
     "units": [
-      "vpn"
+      "vpn-access"
     ],
     "difficulty": "routine",
     "tiny": false,
@@ -26,7 +26,7 @@
     ],
     "queues": [],
     "units": [
-      "vpn"
+      "vpn-access"
     ],
     "difficulty": "hard",
     "tiny": false,
@@ -42,7 +42,7 @@
       "NET-VPN"
     ],
     "units": [
-      "vpn"
+      "vpn-access"
     ],
     "difficulty": "routine",
     "tiny": false,
@@ -56,7 +56,7 @@
     "tools": [],
     "queues": [],
     "units": [
-      "vpn"
+      "vpn-access"
     ],
     "difficulty": "hard",
     "tiny": false,
@@ -72,7 +72,7 @@
     ],
     "queues": [],
     "units": [
-      "printer"
+      "printing"
     ],
     "difficulty": "routine",
     "tiny": true,
@@ -88,7 +88,7 @@
       "SD-PRINT"
     ],
     "units": [
-      "printer"
+      "printing"
     ],
     "difficulty": "routine",
     "tiny": true,
@@ -102,7 +102,7 @@
     "tools": [],
     "queues": [],
     "units": [
-      "printer"
+      "printing"
     ],
     "difficulty": "routine",
     "tiny": true,
@@ -303,7 +303,7 @@
       "SEC-INCIDENT"
     ],
     "units": [
-      "account-access"
+      "account-lockout"
     ],
     "difficulty": "records",
     "tiny": true,
@@ -320,7 +320,7 @@
     ],
     "queues": [],
     "units": [
-      "account-access"
+      "account-lockout"
     ],
     "difficulty": "records",
     "tiny": false,

@@ -59,7 +59,7 @@ Everything runs locally, with no new services. Done so far: the FastAPI and Reac
 |---|---|---|
 | 1 | ✅ **Tickets.** Import the 745 incidents, split them, and score retrieval for free | A "before" retrieval score on the Scoreboard |
 | 2 | ✅ **CorpLabs.** Company, policies, queues, tools and staff records replace the old client | The Assistant answers as CorpLabs, with no old names left |
-| 3 | **Playbooks.** 12 playbooks on one template, with section-level retrieval | The same score beside the "before", on tickets the playbooks never saw |
+| 3 | ✅ **Playbooks.** 12 playbooks on one template, with section-level retrieval | The same score beside the "before", on tickets the playbooks never saw |
 | 4 | **Labels.** Named causes with paths, reviewed by you, and the rules set relabelled | The Tickets page shows each ticket's cause and expected path |
 | 5 | **Baseline.** Structured decisions, scored against the most common answer and a simple classifier | The first real numbers, including whether Claude beats the yardsticks |
 | 6 | **Rules in code.** Requester records, tool risk tiers and the SEC-04 guard | Pick a user: the same lockout gets a different answer |
@@ -85,16 +85,16 @@ The number after each one is the commit that meets it.
 **Knowledge base (`data/kb/`)**
 
 - [x] (2) `company-profile.md`, `policies/` and the escalation queues describe CorpLabs, taken from the tickets' systems and teams. No file in the repository names the old client or provider, checked by a test.
-- [ ] (3) 12 playbooks plus `onedrive`, `teams` and `hardware-peripherals` follow one template, and a test fails on a missing section or field.
-- [ ] (3) A test proves `CES` and `AIT` have no playbook, and that no held-out or development ticket id appears in `data/kb/`.
-- [ ] (3) Each error code in a playbook comes from a knowledge base split ticket.
+- [x] (3) 12 playbooks plus `onedrive`, `teams` and `hardware-peripherals` follow one template, and a test fails on a missing section or field.
+- [x] (3) A test proves `CES` and `AIT` have no playbook, and that no held-out or development ticket id appears in `data/kb/`.
+- [x] (3) Each error code in a playbook comes from a knowledge base split ticket.
 
 **Retrieval: sentence-transformers (`agent/retrieval.py`)**
 
 - [x] (1) `uv run -m evals --retrieval` scores hit rate and false match rate on any split, with no model calls and in `poe check`.
-- [ ] (3) Retrieval matches sections, then returns the best playbook's useful sections and any policy that matched. `agent/retrieval.py` keeps a small interface, so Qdrant can replace its insides in Sprint 2.
-- [ ] (3) Hit rate reaches 95% on the development set, with a floor in `poe check`, and the false match rate on `unseen_dev` falls well below today's 96%. If the threshold alone can't do it, try a score margin. Keyword matching waits for Qdrant. Each attempt is recorded in `docs/DECISIONS.md`, including those that fail.
-- [ ] (3) The score adds mean reciprocal rank and recall, as well as the hit rate.
+- [x] (3) Retrieval matches sections, then returns the best playbook's useful sections and any policy that matched. `agent/retrieval.py` keeps a small interface, so Qdrant can replace its insides in Sprint 2.
+- [x] (3) Hit rate reaches 95% on the development set, with a floor in `poe check`, and the false match rate on `unseen_dev` falls well below today's 96%. If the threshold alone can't do it, try a score margin. Keyword matching waits for Qdrant. Each attempt is recorded in `docs/DECISIONS.md`, including those that fail.
+- [x] (3) The score adds mean reciprocal rank and recall, as well as the hit rate.
 
 **Agent: LangGraph and Claude (`agent/`)**
 

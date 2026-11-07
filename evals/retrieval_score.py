@@ -13,6 +13,8 @@ from evals.import_tickets import family_of
 RUNS_DIR = config.EVALS_DIR / "retrieval"
 DEFAULT_SPLITS = ("dev", "unseen_dev")
 SPLITS = ("kb", "dev", "held_out", "unseen_dev", "unseen_held_out")
+RECALL_AT = 2
+HIT_RATE_FLOOR = 0.95
 
 
 def load_split(name: str) -> list[dict]:
@@ -27,9 +29,16 @@ def load_families() -> dict[str, dict]:
     return json.loads((config.EVALS_DIR / "families.json").read_text())
 
 
-def score_ticket(ticket: dict, expected_doc: str | None, retrieved: list[dict]) -> dict:
-    """Score the top match against the document the family should find."""
-    top = retrieved[0] if retrieved else None
+def _rank_of(expected_doc: str | None, ranked: list[dict]) -> int | None:
+    docs = [r["doc"] for r in ranked]
+    return docs.index(expected_doc) + 1 if expected_doc in docs else None
+
+
+def score_ticket(
+    ticket: dict, expected_doc: str | None, retrieved: list[dict], ranked: list[dict]
+) -> dict:
+    """Score the playbook returned against the one the family should find."""
+    top = next((r for r in retrieved if r["kind"] == "playbook"), None)
     doc = top["doc"] if top else None
     return {
         "id": ticket["id"],
@@ -39,11 +48,26 @@ def score_ticket(ticket: dict, expected_doc: str | None, retrieved: list[dict]) 
         "score": top["score"] if top else None,
         "hit": expected_doc is not None and doc == expected_doc,
         "false_match": expected_doc is None and doc is not None,
+        "rank": _rank_of(expected_doc, ranked),
     }
 
 
 def _rate(matched: list[dict], key: str) -> float | None:
     return sum(r[key] for r in matched) / len(matched) if matched else None
+
+
+def _reciprocal_rank(rows: list[dict]) -> float | None:
+    """How high the right playbook ranks: 1 is first, 0.5 is second, and so on."""
+    if not rows:
+        return None
+    return sum(1 / r["rank"] for r in rows if r["rank"]) / len(rows)
+
+
+def _recall(rows: list[dict]) -> float | None:
+    """How often the right playbook is in the first RECALL_AT."""
+    if not rows:
+        return None
+    return sum(bool(r["rank"]) and r["rank"] <= RECALL_AT for r in rows) / len(rows)
 
 
 def summarize(rows: list[dict]) -> dict:
@@ -55,6 +79,8 @@ def summarize(rows: list[dict]) -> dict:
         "covered": len(covered),
         "uncovered": len(uncovered),
         "hit_rate": _rate(covered, "hit"),
+        "mean_reciprocal_rank": _reciprocal_rank(covered),
+        "recall": _recall(covered),
         "false_match_rate": _rate(uncovered, "false_match"),
     }
 
@@ -82,21 +108,27 @@ def kb_version() -> str:
 def evaluate(name: str) -> dict:
     """Score one set."""
     families = load_families()
-    rows = [
-        score_ticket(
-            ticket,
-            families[family_of(ticket["id"])]["doc"],
-            retrieval.retrieve(f"{ticket['title']}\n\n{ticket['description']}"),
+    rows = []
+    for ticket in load_split(name):
+        query = f"{ticket['title']}\n\n{ticket['description']}"
+        expected = families[family_of(ticket["id"])]["doc"]
+        rows.append(
+            score_ticket(
+                ticket,
+                expected,
+                retrieval.retrieve(query),
+                retrieval.rank_playbooks(query),
+            )
         )
-        for ticket in load_split(name)
-    ]
     now = datetime.now(UTC)
     return {
         "id": f"{now:%Y%m%dT%H%M%S}-retrieval-{name}",
         "date": now.isoformat(timespec="seconds"),
         "set": name,
         "kb_version": kb_version(),
-        "threshold": retrieval.SIMILARITY_THRESHOLD,
+        "sure": retrieval.PLAYBOOK_SURE,
+        "threshold": retrieval.PLAYBOOK_THRESHOLD,
+        "margin": retrieval.PLAYBOOK_MARGIN,
         "top_k": retrieval.TOP_K,
         "summary": summarize(rows),
         "by_family": by_family(rows, families),
@@ -124,6 +156,7 @@ def print_report(run: dict) -> None:
     print(
         f"{run['set']}: {s['n']} tickets, knowledge base {run['kb_version']}, "
         f"hit rate {_percent(s['hit_rate'])} of {s['covered']}, "
+        f"MRR {_percent(s['mean_reciprocal_rank'])}, recall {_percent(s['recall'])}, "
         f"false matches {_percent(s['false_match_rate'])} of {s['uncovered']}"
     )
     for family, f in run["by_family"].items():
@@ -135,9 +168,18 @@ def print_report(run: dict) -> None:
 
 
 def main(names: list[str] | None, save: bool) -> None:
-    """Score each set and print it, saving the runs if asked."""
+    """Score each set and print it, saving the runs if asked.
+
+    It fails if a set's hit rate is under the floor, so `poe check` catches a drop.
+    """
+    too_low = []
     for name in names or DEFAULT_SPLITS:
         run = evaluate(name)
         print_report(run)
         if save:
             save_run(run)
+        hit_rate = run["summary"]["hit_rate"]
+        if hit_rate is not None and hit_rate < HIT_RATE_FLOOR:
+            too_low.append(name)
+    if too_low:
+        raise SystemExit(f"Hit rate is under {HIT_RATE_FLOOR:.0%} on {too_low}")

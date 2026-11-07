@@ -96,6 +96,8 @@ export interface RetrievalSummary {
   covered: number;
   uncovered: number;
   hit_rate: number | null;
+  mean_reciprocal_rank?: number | null;
+  recall?: number | null;
   false_match_rate: number | null;
 }
 

@@ -7,16 +7,34 @@ from agent import retrieval
 from agent.config import ROOT
 
 
-def test_kb_has_a_unit_for_each_document_and_profile_section():
+def test_kb_has_a_unit_for_each_section_and_document():
     units = retrieval._get_units()
-    assert len(units) == 20
-    assert len({u["doc"] for u in units}) == 17
+    assert sum(u["kind"] == "playbook" for u in units) == 90
+    assert sum(u["kind"] == "policy" for u in units) == 4
+    assert len({u["doc"] for u in units}) == 21
 
 
 def test_policies_are_retrievable_on_their_own():
     docs = {u["doc"] for u in retrieval._get_units()}
     assert "sec-04-account-lockout" in docs
     assert "escalation-queues" in docs
+
+
+def test_a_playbook_keeps_its_fields_out_of_its_text():
+    meta, body = retrieval.read_playbook(
+        "---\ntitle: VPN\nfamily: null\n---\n\n## Symptoms\nDrops"
+    )
+    assert meta == {"title": "VPN", "family": "null"}
+    assert body == "## Symptoms\nDrops"
+
+
+def test_a_returned_playbook_leaves_out_its_symptoms():
+    units = retrieval._playbook_units(
+        "---\ntitle: VPN\n---\n\n## Symptoms\nDrops\n\n## Fix\nReset", "vpn"
+    )
+    assert len(units) == 2
+    assert units[0]["text"].startswith("VPN\n## Symptoms")
+    assert units[0]["full"] == "# VPN\n\n## Fix\nReset"
 
 
 def test_no_unit_comes_from_a_project_document():
@@ -41,11 +59,32 @@ class FakeEncoder:
         return np.array(vectors)
 
 
+def playbook(doc: str, section: str, text: str) -> dict:
+    return {
+        "doc": doc,
+        "kind": "playbook",
+        "section": section,
+        "text": text,
+        "full": f"whole {doc} playbook",
+    }
+
+
 CORPUS = [
-    {"doc": "vpn", "section": None, "text": "vpn gateway troubleshooting steps here"},
-    {"doc": "printer", "section": None, "text": "printer queue steps\nshort\n"},
-    {"doc": "mix", "section": None, "text": "vpn printer notes for the service desk"},
-    {"doc": "other", "section": None, "text": "nothing relevant in this document"},
+    playbook("vpn", "Symptoms", "vpn gateway troubleshooting steps here"),
+    playbook("vpn", "Fix", "nothing relevant in this section"),
+    playbook("printer", "Symptoms", "printer queue steps"),
+    {
+        "doc": "policy",
+        "kind": "policy",
+        "section": None,
+        "text": "vpn printer rules for the service desk",
+    },
+    {
+        "doc": "other",
+        "kind": "reference",
+        "section": "Quirks",
+        "text": "nothing relevant in this document",
+    },
 ]
 
 
@@ -59,15 +98,43 @@ def corpus(monkeypatch):
 
 
 @pytest.mark.usefixtures("corpus")
-def test_retrieve_returns_top_two_ranked():
+def test_the_best_playbook_comes_back_whole_with_a_policy():
     results = retrieval.retrieve("vpn gateway")
-    assert [r["doc"] for r in results] == ["vpn", "mix"]
-    assert results[0]["score"] >= results[1]["score"]
+    assert [r["doc"] for r in results] == ["vpn", "policy"]
+    assert results[0]["text"] == "whole vpn playbook"
+    assert results[0]["section"] is None
+    assert results[1]["kind"] == "policy"
+
+
+@pytest.mark.usefixtures("corpus")
+def test_playbooks_rank_by_their_best_section():
+    ranked = retrieval.rank_playbooks("vpn gateway")
+    assert [r["doc"] for r in ranked] == ["vpn", "printer"]
+    assert ranked[0]["section"] == "Symptoms"
 
 
 @pytest.mark.usefixtures("corpus")
 def test_retrieve_is_empty_below_the_threshold():
     assert retrieval.retrieve("what is the weather") == []
+
+
+def test_a_sure_score_needs_no_margin():
+    scores = np.array([0.6, 0.0, 0.55])
+    ranked = [("a", 0), ("b", 2)]
+    assert retrieval._confident(ranked, scores) == 0
+
+
+def test_a_lower_score_needs_a_clear_margin():
+    assert retrieval._confident([("a", 0), ("b", 1)], np.array([0.45, 0.2])) == 0
+    assert retrieval._confident([("a", 0), ("b", 1)], np.array([0.45, 0.4])) is None
+
+
+def test_a_score_below_the_threshold_never_matches():
+    assert retrieval._confident([("a", 0), ("b", 1)], np.array([0.3, 0.0])) is None
+
+
+def test_no_playbooks_means_no_match():
+    assert retrieval._confident([], np.array([])) is None
 
 
 @pytest.mark.usefixtures("corpus")

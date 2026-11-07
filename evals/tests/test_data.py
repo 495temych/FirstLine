@@ -17,10 +17,9 @@ TEXT_FILES = {".css", ".json", ".md", ".py", ".ts", ".tsx"}
 
 
 def known_units() -> set[str]:
-    return {
-        u["doc"] if u["section"] is None else f"{u['doc']}::{u['section']}"
-        for u in retrieval._get_units()
-    }
+    units = retrieval._get_units()
+    sections = {f"{u['doc']}::{u['section']}" for u in units if u["kind"] != "playbook"}
+    return sections | {u["doc"] for u in units}
 
 
 def known_queues() -> set[str]:

@@ -9,7 +9,7 @@
     ],
     "queues": [],
     "units": [
-      "vpn"
+      "vpn-access"
     ],
     "difficulty": "hard",
     "tiny": false,
@@ -42,7 +42,7 @@
     ],
     "queues": [],
     "units": [
-      "printer"
+      "printing"
     ],
     "difficulty": "routine",
     "tiny": true,
@@ -58,7 +58,7 @@
     ],
     "queues": [],
     "units": [
-      "vpn"
+      "vpn-access"
     ],
     "difficulty": "routine",
     "tiny": false,
@@ -90,7 +90,7 @@
       "SEC-INCIDENT"
     ],
     "units": [
-      "account-access"
+      "account-lockout"
     ],
     "difficulty": "records",
     "tiny": false,
@@ -107,7 +107,7 @@
       "SEC-INCIDENT"
     ],
     "units": [
-      "account-access",
+      "account-lockout",
       "sec-04-account-lockout",
       "sec-07-software-and-admin-rights"
     ],
@@ -308,7 +308,7 @@
       "SEC-INCIDENT"
     ],
     "units": [
-      "account-access"
+      "account-lockout"
     ],
     "difficulty": "records",
     "tiny": true,
@@ -325,7 +325,7 @@
     ],
     "queues": [],
     "units": [
-      "account-access"
+      "account-lockout"
     ],
     "difficulty": "records",
     "tiny": false,

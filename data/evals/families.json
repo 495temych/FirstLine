@@ -1,16 +1,16 @@
 {
   "AIT": { "name": "API timeouts", "doc": null },
-  "ALP": { "name": "Account lockout and password", "doc": "account-access" },
+  "ALP": { "name": "Account lockout and password", "doc": "account-lockout" },
   "CES": { "name": "Certificate expiry", "doc": null },
-  "DCP": { "name": "Device compliance", "doc": null },
-  "DRF": { "name": "DNS", "doc": null },
-  "EDE": { "name": "Disk encryption", "doc": null },
+  "DCP": { "name": "Device compliance", "doc": "device-compliance" },
+  "DRF": { "name": "DNS", "doc": "dns" },
+  "EDE": { "name": "Disk encryption", "doc": "disk-encryption" },
   "LPD": { "name": "Laptop performance", "doc": "laptop-performance" },
   "OES": { "name": "Outlook sync", "doc": "outlook" },
-  "PDQ": { "name": "Printing", "doc": "printer" },
+  "PDQ": { "name": "Printing", "doc": "printing" },
   "SDA": { "name": "Shared drive access", "doc": "shared-drive" },
   "SIB": { "name": "Software install", "doc": "software-install" },
-  "SML": { "name": "SSO and MFA", "doc": null },
-  "VDA": { "name": "VPN access", "doc": "vpn" },
+  "SML": { "name": "SSO and MFA", "doc": "sso-mfa" },
+  "VDA": { "name": "VPN access", "doc": "vpn-access" },
   "WCI": { "name": "Wi-Fi", "doc": "wifi" }
 }

@@ -20,17 +20,33 @@ Each design decision so far, with its reason and its trade-off.
 - **Reason:** no API cost per query, and ticket text isn't sent to an embedding service.
 - **Trade-off:** a ~90 MB model download and a heavy `torch` dependency, and the model is built for English.
 
-## Mixed-granularity retrieval
+## Section-level retrieval
 
-- **Decision:** embed each single-issue playbook whole, and split `company-profile.md` into one unit per `##` section.
-- **Reason:** a mixed-topic file embedded whole dilutes its topics, and would bury the one paragraph, such as SEC-04, that decides the path.
-- **Trade-off:** two kinds of unit in one index, and any new reference document has to be added to `REFERENCE_DOCS`.
+- **Decision:** embed each playbook section, score a playbook by its best section, and return that playbook without its Symptoms section, plus the best policy or reference units up to 2. `company-profile.md` and the escalation queues still split by `##` section, and policies stay whole.
+- **Reason:** a ticket describes symptoms, while the agent needs checks, fixes and escalation rules. Matching sections finds the playbook, and returning it whole gives the agent the rest. Scoring playbooks apart from policies also stops a policy from pushing out the playbook, which took the hit rate to 84% after commit 2.
+- **Trade-off:** one ticket returns more text, so each model call costs more. Any new reference document still has to be added to `REFERENCE_DOCS`.
 
-## The 0.35 threshold with top 2
+## Matching a playbook: score or clear margin
 
-- **Decision:** return up to 2 units, ranked across all sources, each scoring at least 0.35.
-- **Reason:** the threshold makes "no confident match" explicit, so the model isn't handed irrelevant grounding. Two units let one query pull a playbook and a policy section together.
-- **Trade-off:** both numbers were set by inspection on a corpus of 17 units, and need revalidating at scale.
+- **Decision:** a playbook matches if its best section scores at least 0.52, or scores at least 0.40 and beats the next playbook by 0.15.
+- **Reason:** long tickets score high, and short requests score low but often favour one playbook clearly. One number can't serve both. Each attempt is below, on `dev`, the short requests in the rules set, and `unseen_dev`:
+
+| Attempt | `dev` hit rate | Rules set hit rate | `unseen_dev` false matches | Outcome |
+|---|---|---|---|---|
+| Threshold 0.35, as before | 100% | 91% | 100% | Failed: it rejects nothing |
+| Threshold 0.50 | 100% | 74% | 13.5% | Failed: it loses a quarter of short requests |
+| Threshold 0.55 | 99.2% | 52% | 0% | Failed: it loses half of short requests |
+| Margin 0.10 alone | 95.3% | 83% | 5.8% | Failed: `dev` barely clears the floor |
+| Margin 0.15 alone | 80.6% | 78% | 0% | Failed: under the floor |
+| Score 0.52, or 0.40 with margin 0.15 | 100% | 87% | 3.8% | Chosen |
+
+- **Trade-off:** the two numbers were tuned on `unseen_dev`, so 3.8% is a tuned score. `unseen_held_out` stays unopened as the exam. The imported tickets are templated, which flatters every number here. A bare title from an unknown family still false-matches 36.5% of the time, and the rules set misses three requests.
+
+## Top 2 units
+
+- **Decision:** return up to 2 units: the best playbook if one matches, then the best policy or reference units scoring at least 0.35.
+- **Reason:** the threshold keeps irrelevant grounding from the model. Two units let one query pull a playbook and a policy together.
+- **Trade-off:** set by inspection, on 21 documents and 99 units.
 
 ## No tools with retrieval off
 
@@ -132,11 +148,12 @@ Each design decision so far, with its reason and its trade-off.
 
 - **Synthetic knowledge base.** A real deployment needs real client documentation.
 - **Simulated tools.** Production needs least-privilege service accounts for AD, Intune, PaperCut and ServiceNow.
-- **Small corpus.** With 12 documents and 17 units, the threshold and top 2 need revalidating at scale, and hundreds of units would need re-ranking.
+- **Small corpus.** With 21 documents and 99 units, the thresholds and top 2 need revalidating at scale, and hundreds of units would need re-ranking.
+- **Search by meaning only.** Error codes and bare titles match poorly. `T-012`, a short Outlook sign-in request, ranks `sso-mfa` first. Keyword matching arrives with Qdrant in Sprint 2.
 - **Single turn only.** Some real L1 issues need back-and-forth, which this design can't handle.
-- **No feedback loop.** The threshold is set by inspection, not tuned from confirmed outcomes.
+- **No feedback loop.** The thresholds are set by inspection, not tuned from confirmed outcomes.
 - **Retrieval's cost and latency aren't measured.** The on/off switch shows the difference but doesn't quantify it.
-- **Fixed top 2.** A weak second unit still comes back if it clears the threshold, and an ambiguous ticket can't pull a third.
+- **Fixed top 2.** A weak policy still comes back if it clears the threshold, and an ambiguous ticket can't pull a second playbook.
 - **Hardcoded tool schemas.** They live in `agent/tool_schemas.py`. MCP would make them discoverable and keep credentials out of the agent.
 - **English only.** CorpLabs is Swiss, so production needs multilingual embeddings and German instructions.
 - **Partial ITSM alignment.** The ticket maps to ServiceNow's incident schema but omits `impact`, `urgency`, `cmdb_ci` and `work_notes`.

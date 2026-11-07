@@ -57,6 +57,7 @@ def prepare(folder: Path) -> None:
     main.os.environ["ANTHROPIC_API_KEY"] = "stub"
     runner.save_run(runner.evaluate("dev", tiny=True))
     retrieval.retrieve = lambda q: []
+    retrieval.rank_playbooks = lambda q: []
     retrieval_score.save_run(retrieval_score.evaluate("unseen_dev"))
 
 

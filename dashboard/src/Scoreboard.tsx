@@ -34,6 +34,8 @@ function RetrievalRuns({ runs }: Readonly<{ runs: RetrievalRun[] }>) {
               "Knowledge base",
               "Tickets",
               "Hit rate",
+              "Reciprocal rank",
+              "Recall",
               "False matches",
             ].map((name) => (
               <th key={name} scope="col">
@@ -52,6 +54,8 @@ function RetrievalRuns({ runs }: Readonly<{ runs: RetrievalRun[] }>) {
               </td>
               <td>{run.summary.n}</td>
               <td>{rate(run.summary.hit_rate)}</td>
+              <td>{rate(run.summary.mean_reciprocal_rank)}</td>
+              <td>{rate(run.summary.recall)}</td>
               <td>{rate(run.summary.false_match_rate)}</td>
             </tr>
           ))}
@@ -104,7 +108,9 @@ function Retrieval({ runs }: Readonly<{ runs: RetrievalRun[] }>) {
       <p className="caption">
         The hit rate is the share of tickets whose top match is their family's
         playbook. False matches are tickets from a family with no playbook that
-        still matched something. These scores need no model calls.
+        still matched a playbook. Reciprocal rank shows how high the right
+        playbook ranks, and recall how often it's in the first two. These scores
+        need no model calls.
       </p>
       <label htmlFor="retrieval">Open a retrieval score</label>
       <select

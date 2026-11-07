@@ -80,6 +80,8 @@ const retrievalSummary = {
   covered: 90,
   uncovered: 39,
   hit_rate: 0.94,
+  mean_reciprocal_rank: 0.97,
+  recall: 0.99,
   false_match_rate: 0.85,
 };
 
