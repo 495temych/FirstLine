@@ -1,0 +1,153 @@
+{
+  "id": "20261107T185319-retrieval-dev",
+  "date": "2026-11-07T18:53:19+00:00",
+  "set": "dev",
+  "kb_version": "916db54c",
+  "sure": 0.52,
+  "threshold": 0.4,
+  "margin": 0.15,
+  "top_k": 2,
+  "summary": {
+    "n": 129,
+    "covered": 129,
+    "uncovered": 0,
+    "hit_rate": 1.0,
+    "mean_reciprocal_rank": 1.0,
+    "recall": 1.0,
+    "false_match_rate": null
+  },
+  "by_family": {
+    "ALP": {
+      "n": 12,
+      "covered": 12,
+      "uncovered": 0,
+      "hit_rate": 1.0,
+      "mean_reciprocal_rank": 1.0,
+      "recall": 1.0,
+      "false_match_rate": null,
+      "name": "Account lockout and password",
+      "doc": "account-lockout"
+    },
+    "DCP": {
+      "n": 9,
+      "covered": 9,
+      "uncovered": 0,
+      "hit_rate": 1.0,
+      "mean_reciprocal_rank": 1.0,
+      "recall": 1.0,
+      "false_match_rate": null,
+      "name": "Device compliance",
+      "doc": "device-compliance"
+    },
+    "DRF": {
+      "n": 11,
+      "covered": 11,
+      "uncovered": 0,
+      "hit_rate": 1.0,
+      "mean_reciprocal_rank": 1.0,
+      "recall": 1.0,
+      "false_match_rate": null,
+      "name": "DNS",
+      "doc": "dns"
+    },
+    "EDE": {
+      "n": 10,
+      "covered": 10,
+      "uncovered": 0,
+      "hit_rate": 1.0,
+      "mean_reciprocal_rank": 1.0,
+      "recall": 1.0,
+      "false_match_rate": null,
+      "name": "Disk encryption",
+      "doc": "disk-encryption"
+    },
+    "LPD": {
+      "n": 12,
+      "covered": 12,
+      "uncovered": 0,
+      "hit_rate": 1.0,
+      "mean_reciprocal_rank": 1.0,
+      "recall": 1.0,
+      "false_match_rate": null,
+      "name": "Laptop performance",
+      "doc": "laptop-performance"
+    },
+    "OES": {
+      "n": 10,
+      "covered": 10,
+      "uncovered": 0,
+      "hit_rate": 1.0,
+      "mean_reciprocal_rank": 1.0,
+      "recall": 1.0,
+      "false_match_rate": null,
+      "name": "Outlook sync",
+      "doc": "outlook"
+    },
+    "PDQ": {
+      "n": 11,
+      "covered": 11,
+      "uncovered": 0,
+      "hit_rate": 1.0,
+      "mean_reciprocal_rank": 1.0,
+      "recall": 1.0,
+      "false_match_rate": null,
+      "name": "Printing",
+      "doc": "printing"
+    },
+    "SDA": {
+      "n": 10,
+      "covered": 10,
+      "uncovered": 0,
+      "hit_rate": 1.0,
+      "mean_reciprocal_rank": 1.0,
+      "recall": 1.0,
+      "false_match_rate": null,
+      "name": "Shared drive access",
+      "doc": "shared-drive"
+    },
+    "SIB": {
+      "n": 12,
+      "covered": 12,
+      "uncovered": 0,
+      "hit_rate": 1.0,
+      "mean_reciprocal_rank": 1.0,
+      "recall": 1.0,
+      "false_match_rate": null,
+      "name": "Software install",
+      "doc": "software-install"
+    },
+    "SML": {
+      "n": 9,
+      "covered": 9,
+      "uncovered": 0,
+      "hit_rate": 1.0,
+      "mean_reciprocal_rank": 1.0,
+      "recall": 1.0,
+      "false_match_rate": null,
+      "name": "SSO and MFA",
+      "doc": "sso-mfa"
+    },
+    "VDA": {
+      "n": 12,
+      "covered": 12,
+      "uncovered": 0,
+      "hit_rate": 1.0,
+      "mean_reciprocal_rank": 1.0,
+      "recall": 1.0,
+      "false_match_rate": null,
+      "name": "VPN access",
+      "doc": "vpn-access"
+    },
+    "WCI": {
+      "n": 11,
+      "covered": 11,
+      "uncovered": 0,
+      "hit_rate": 1.0,
+      "mean_reciprocal_rank": 1.0,
+      "recall": 1.0,
+      "false_match_rate": null,
+      "name": "Wi-Fi",
+      "doc": "wifi"
+    }
+  }
+}

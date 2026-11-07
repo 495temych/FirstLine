@@ -55,7 +55,7 @@ def prepare(folder: Path) -> None:
     graph._get_llm = lambda: llm
     graph.retrieve = lambda q: [UNIT]
     main.os.environ["ANTHROPIC_API_KEY"] = "stub"
-    runner.save_run(runner.evaluate("dev", tiny=True))
+    runner.save_run(runner.evaluate("rules", tiny=True))
     retrieval.retrieve = lambda q: []
     retrieval.rank_playbooks = lambda q: []
     retrieval_score.save_run(retrieval_score.evaluate("unseen_dev"))

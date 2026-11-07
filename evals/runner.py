@@ -1,6 +1,6 @@
 """Runs the agent over a labelled set, scores it and saves the result.
 
-`uv run -m evals` runs the development set. `--set held_out` runs the held-out set,
+`uv run -m evals` runs the rules set. `--set rules_held_out` runs its held-out half,
 and `--tiny` runs only its five trial tickets. Results go to data/evals/runs/.
 `--retrieval` scores retrieval instead, with no model calls.
 """
@@ -16,7 +16,8 @@ from evals import retrieval_score, scoring
 
 EVALS_DIR = config.ROOT / "data" / "evals"
 RUNS_DIR = EVALS_DIR / "runs"
-PREFIXES = {"dev": "", "held_out": "held_out_"}
+PREFIXES = {"rules": "rules_", "rules_held_out": "rules_held_out_"}
+REVIEW_SPLITS = ("dev", "unseen_dev")  # the imported tickets a person may read
 
 
 def load_set(name: str, tiny: bool = False) -> list[tuple[dict, dict]]:
@@ -27,6 +28,46 @@ def load_set(name: str, tiny: bool = False) -> list[tuple[dict, dict]]:
     by_id = {a["id"]: a for a in answers}
     pairs = [(t, by_id[t["id"]]) for t in tickets]
     return [(t, a) for t, a in pairs if a["tiny"]] if tiny else pairs
+
+
+def load_imported(split: str) -> list[tuple[dict, dict]]:
+    """Return (ticket, answer) pairs for a split of the imported tickets."""
+    tickets = {t["id"]: t for t in retrieval_score.load_split(split)}
+    families = retrieval_score.load_families()
+    causes = {c["id"]: c for c in json.loads((EVALS_DIR / "causes.json").read_text())}
+    labels = json.loads((EVALS_DIR / "cause_labels.json").read_text())
+    incidents = json.loads((EVALS_DIR / "incidents.json").read_text())
+    root_causes = {i["id"]: i["root_cause"] for i in incidents}
+    pairs = []
+    for label in labels:
+        ticket = tickets.get(label["id"])
+        if ticket is None:
+            continue
+        family = families[retrieval_score.family_of(ticket["id"])]
+        answer = {
+            **label,
+            "family": family["name"],
+            "cause": causes[label["cause"]]["name"],
+            "root_cause": root_causes[ticket["id"]],
+            "units": [family["doc"]] if family["doc"] else [],
+            "difficulty": "routine",
+            "tiny": False,
+            "note": "Repeat lockouts in the records, so SEC-04 applies."
+            if label.get("sec_04")
+            else "",
+        }
+        text = f"{ticket['title']}\n\n{ticket['description']}"
+        pairs.append(({**ticket, "text": text}, answer))
+    return pairs
+
+
+def load_review_tickets() -> list[tuple[dict, dict]]:
+    """The tickets a person reviews. Held-out tickets stay out."""
+    rules = [
+        (ticket, {**answer, "family": "Rules set", "cause": None, "checks": []})
+        for ticket, answer in load_set("rules")
+    ]
+    return rules + [p for split in REVIEW_SPLITS for p in load_imported(split)]
 
 
 def version() -> str:
@@ -145,7 +186,7 @@ def print_report(run: dict) -> None:
 def main() -> None:
     """Run the evaluation, save it and print the report."""
     parser = argparse.ArgumentParser(prog="evals", description=__doc__)
-    parser.add_argument("--set", choices=sorted(PREFIXES), default="dev", dest="name")
+    parser.add_argument("--set", choices=sorted(PREFIXES), default="rules", dest="name")
     parser.add_argument("--tiny", action="store_true", help="five trial tickets")
     parser.add_argument(
         "--retrieval", action="store_true", help="score retrieval, with no model calls"

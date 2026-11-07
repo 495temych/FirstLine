@@ -27,6 +27,7 @@ Until the baseline is done, also read `docs/EVALS.md` and `docs/PLAN_EVALS.md`.
 - `dashboard/`: the React app
 - `e2e/`: browser tests, and the stub server they run against
 - `evals/`: the evaluation runner and scoring
+- `data/`: start with `data/README.md`, which explains how we use the dataset
 - `data/kb/`: the knowledge base
 - `data/tickets/`: the imported tickets and their fixed splits
 - `data/records/`: staff records, with invented devices, groups and lockouts

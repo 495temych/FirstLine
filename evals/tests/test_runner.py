@@ -34,8 +34,8 @@ def stubbed(tmp_path, monkeypatch):
 
 @pytest.mark.usefixtures("stubbed")
 def test_a_run_records_what_was_measured():
-    run = runner.evaluate("dev", tiny=True)
-    assert run["set"] == "dev"
+    run = runner.evaluate("rules", tiny=True)
+    assert run["set"] == "rules"
     assert run["tiny"] is True
     assert run["version"] == runner.version()
     assert len(run["version"]) == 8
@@ -53,7 +53,7 @@ def test_a_failed_ticket_counts_as_an_escalation_and_the_run_goes_on(monkeypatch
         raise TimeoutError("no answer")
 
     monkeypatch.setattr(runner, "run_triage", fail_once)
-    run = runner.evaluate("dev", tiny=True)
+    run = runner.evaluate("rules", tiny=True)
     assert run["summary"]["n"] == 5
     assert run["summary"]["failed"] == 1
     first = run["tickets"][0]
@@ -65,7 +65,7 @@ def test_a_failed_ticket_counts_as_an_escalation_and_the_run_goes_on(monkeypatch
 @pytest.mark.usefixtures("stubbed")
 def test_an_unknown_model_has_an_unknown_cost(monkeypatch):
     monkeypatch.setenv("MODEL_NAME", "a-model-with-no-price")
-    run = runner.evaluate("dev", tiny=True)
+    run = runner.evaluate("rules", tiny=True)
     assert run["summary"]["cost_per_ticket_usd"] is None
 
 
@@ -76,10 +76,10 @@ def test_runs_load_newest_first(stubbed):
 
 
 def test_the_command_saves_and_reports(stubbed, monkeypatch, capsys):
-    monkeypatch.setattr("sys.argv", ["evals", "--set", "held_out", "--tiny"])
+    monkeypatch.setattr("sys.argv", ["evals", "--set", "rules_held_out", "--tiny"])
     runpy.run_module("evals", run_name="__main__")
     out = capsys.readouterr().out
-    assert "-held_out-tiny" in out
+    assert "-rules_held_out-tiny" in out
     assert "cost per ticket $0.0020" in out
     assert "CHF" in out
     assert len(list(stubbed.glob("*.json"))) == 1

@@ -1,6 +1,7 @@
 """API tests, with a stub model and temporary files."""
 
 import csv
+import json
 from unittest.mock import patch
 
 import anthropic
@@ -224,7 +225,7 @@ def test_evaluations_start_empty_and_name_the_costs(client):
 
 def test_evaluations_show_a_saved_run(client, monkeypatch):
     monkeypatch.setattr(runner, "run_triage", stub_triage)
-    runner.save_run(runner.evaluate("dev", tiny=True))
+    runner.save_run(runner.evaluate("rules", tiny=True))
     runs = client.get("/api/evaluations").json()["runs"]
     assert len(runs) == 1
     assert runs[0]["summary"]["n"] == 5
@@ -237,10 +238,12 @@ def test_evaluations_show_saved_retrieval_scores(client):
     assert client.get("/api/evaluations").json()["retrieval"] == [run]
 
 
-def test_tickets_are_the_development_set_with_requesters(client):
+def test_tickets_to_review_have_requesters_and_labels(client):
     tickets = client.get("/api/tickets").json()
-    assert len(tickets) == 25
-    assert all(t["id"].startswith("T-") for t in tickets)
+    assert len(tickets) == 206
+    imported = next(t for t in tickets if t["id"].startswith("INC-"))
+    assert imported["answer"]["cause"]
+    assert imported["answer"]["checks"]
     first = tickets[0]
     assert first["text"] == "My VPN keeps disconnecting"
     assert first["answer"]["tools"] == ["reset_vpn_profile"]
@@ -250,17 +253,25 @@ def test_tickets_are_the_development_set_with_requesters(client):
 
 def test_tickets_show_the_latest_result(client, monkeypatch):
     monkeypatch.setattr(runner, "run_triage", stub_triage)
-    runner.save_run(runner.evaluate("dev", tiny=True))
+    runner.save_run(runner.evaluate("rules", tiny=True))
     tickets = {t["id"]: t for t in client.get("/api/tickets").json()}
     assert tickets["T-003"]["latest"]["action_correct"] is False
     assert tickets["T-001"]["latest"] is None
 
 
+def test_held_out_tickets_stay_out_of_the_review(client):
+    splits = json.loads((config.TICKETS_DIR / "splits.json").read_text())
+    closed = set(splits["held_out"]) | set(splits["unseen_held_out"])
+    ids = {t["id"] for t in client.get("/api/tickets").json()}
+    assert not ids & closed
+    assert not any(i.startswith("H-") for i in ids)
+
+
 def test_latest_results_keeps_the_newest_and_skips_the_held_out_set():
     runs = [
-        {"set": "held_out", "tickets": [{"id": "H-001"}]},
-        {"set": "dev", "tickets": [{"id": "T-001", "action_correct": True}]},
-        {"set": "dev", "tickets": [{"id": "T-001", "action_correct": False}]},
+        {"set": "rules_held_out", "tickets": [{"id": "H-001"}]},
+        {"set": "rules", "tickets": [{"id": "T-001", "action_correct": True}]},
+        {"set": "rules", "tickets": [{"id": "T-001", "action_correct": False}]},
     ]
     assert main.latest_results(runs) == {
         "T-001": {"id": "T-001", "action_correct": True}

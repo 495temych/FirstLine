@@ -13,6 +13,8 @@ const setNames: Record<string, string> = {
   kb: "knowledge base",
   dev: "development",
   held_out: "held-out",
+  rules: "rules set",
+  rules_held_out: "rules set, held-out",
   unseen_dev: "unseen, development",
   unseen_held_out: "unseen, held-out",
 };

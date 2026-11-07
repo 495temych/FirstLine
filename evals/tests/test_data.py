@@ -10,7 +10,7 @@ from agent import config, retrieval
 from agent.tool_schemas import TOOLS
 from evals import runner
 
-SETS = ["dev", "held_out"]
+SETS = ["rules", "rules_held_out"]
 USERS = json.loads(config.USERS_FILE.read_text())
 PATHS = {"SELF_SERVE", "AUTO_FIX", "ESCALATE", "OUT_OF_SCOPE"}
 TEXT_FILES = {".css", ".json", ".md", ".py", ".ts", ".tsx"}
@@ -54,9 +54,14 @@ def test_every_label_exists(name):
         assert answer["difficulty"] in {"routine", "hard", "records"}
 
 
+@pytest.mark.parametrize("name", SETS)
+def test_no_label_is_waiting_for_review(name):
+    assert not [a["id"] for _, a in runner.load_set(name) if "review" in a]
+
+
 def test_the_sets_share_no_ticket():
-    dev = {t["text"] for t, _ in runner.load_set("dev")}
-    held_out = {t["text"] for t, _ in runner.load_set("held_out")}
+    dev = {t["text"] for t, _ in runner.load_set("rules")}
+    held_out = {t["text"] for t, _ in runner.load_set("rules_held_out")}
     assert not dev & held_out
 
 
@@ -103,5 +108,6 @@ def test_only_the_evals_open_the_answers(package):
 
 def _names_answers(path: Path) -> bool:
     text = path.read_text()
-    named = "answers.json" in text or "incidents.json" in text
+    names = ("answers.json", "incidents.json", "causes.json", "cause_labels.json")
+    named = any(name in text for name in names)
     return named and "tests" not in path.parts

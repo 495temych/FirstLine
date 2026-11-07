@@ -1,12 +1,62 @@
 # Label review
 
-Review the development labels in the app's Tickets tab. Turn on **Only labels to check** to see the four that need a decision first.
+The seven open decisions are settled and recorded in the labels. What's left is a read through the causes and the held-out rows. Change anything you disagree with in `data/evals/`, then delete this file.
 
-Check the held-out rows below against the knowledge base. Change anything you disagree with in `data/evals/`, then delete this file.
+## Named causes
 
-**Look at this first:** `H-002` (two accepted paths).
+The counts cover the knowledge base, development and unseen development tickets. Open any development ticket in the Tickets tab to compare its cause with the root cause on record. Tickets take the cause their root cause names first, by rules in `data/evals/causes.json`. Rules are approximate, so a few tickets with mixed causes will sit under the wrong one. A count of 0 means the playbook lists the cause, but no ticket here has it.
 
-## Held-out
+| Family | Cause | Tickets | Accepted path | Tool or queue |
+|---|---|---|---|---|
+| Any | No confirmed cause | 4 | Escalate | any |
+| Account lockout and password | Stale phone credentials | 47 | Escalate | `SEC-INCIDENT` |
+| Account lockout and password | Expired reset token | 0 | Self-serve or Auto-fix | `unlock_ad_account` |
+| Account lockout and password | Standard lockout | 0 | Auto-fix or Self-serve | `unlock_ad_account` |
+| SSO and MFA | Clock drift | 2 | Self-serve | any |
+| SSO and MFA | Policy or group mismatch | 10 | Escalate | `IAM-ACCESS` |
+| SSO and MFA | Stale MFA enrollment | 25 | Escalate | `IAM-ACCESS` |
+| VPN access | Stale VPN profile | 2 | Auto-fix | `reset_vpn_profile` |
+| VPN access | Expired device certificate | 45 | Auto-fix | `reset_vpn_profile` |
+| VPN access | Okta Verify clock drift | 0 | Self-serve | any |
+| VPN access | Legacy gateway entry | 0 | Self-serve or Auto-fix | `reset_vpn_profile` |
+| Wi-Fi | Expired server certificate | 33 | Escalate | `NET-WIFI` |
+| Wi-Fi | Network access policy mismatch | 6 | Escalate | `NET-WIFI` |
+| Wi-Fi | Stale profile on one device | 3 | Auto-fix | `push_wifi_profile` |
+| Wi-Fi | Old Intel driver | 0 | Auto-fix | `push_wifi_driver_update` |
+| Wi-Fi | Access point or controller fault | 1 | Escalate | `NET-WIFI` |
+| DNS | Broken conditional forwarder | 10 | Escalate | `NET-DNS` |
+| DNS | Stale zone record | 16 | Escalate | `NET-DNS` |
+| DNS | Stale resolver cache | 16 | Escalate | `NET-DNS` |
+| Shared drive access | Folder permissions | 4 | Escalate | `SD-FILES` |
+| Shared drive access | Missing group membership | 31 | Escalate | `SD-FILES` |
+| Shared drive access | Stale credentials or token | 1 | Auto-fix | `clear_credential_manager` |
+| Shared drive access | Old drive mapping | 1 | Auto-fix | `remap_drives` |
+| Printing | Corrupt driver package | 43 | Auto-fix | `reinstall_print_driver` |
+| Printing | Hung spooler | 0 | Auto-fix | `restart_print_spooler` |
+| Printing | One stuck job | 2 | Self-serve | any |
+| Outlook sync | Noncompliant phone | 4 | Self-serve | any |
+| Outlook sync | Stale mobile partnership | 14 | Auto-fix | `reset_mobile_mail_profile` |
+| Outlook sync | Stale desktop profile | 21 | Self-serve or Escalate | `APP-M365` |
+| Outlook sync | Expired Okta session | 0 | Self-serve | any |
+| Outlook sync | Stale saved credentials | 0 | Auto-fix | `clear_credential_manager` |
+| Software install | Endpoint protection block | 21 | Escalate | `SEC-POLICY` |
+| Software install | Missing entitlement | 21 | Escalate | `IAM-ACCESS` |
+| Software install | Stale device inventory | 5 | Auto-fix | `force_intune_sync` |
+| Device compliance | Encryption isn't on | 3 | Self-serve or Escalate | `DESK-SUPPORT` |
+| Device compliance | Mismatch after a policy change | 3 | Auto-fix or Escalate | `force_intune_sync`, `SD-DEVICE` |
+| Device compliance | Stale check-in | 31 | Auto-fix | `force_intune_sync` |
+| Laptop performance | Low disk space | 1 | Auto-fix | `clean_temp_files` |
+| Laptop performance | Startup policy or items | 14 | Self-serve or Escalate | `DESK-SUPPORT` |
+| Laptop performance | Scan backlog | 32 | Self-serve | any |
+| Disk encryption | Recovery key escrow failed | 8 | Auto-fix | `escrow_bitlocker_key` |
+| Disk encryption | TPM protector not initialized | 27 | Escalate | `DESK-SUPPORT` |
+| Disk encryption | Encryption policy not delivered | 6 | Auto-fix | `force_intune_sync` |
+| API timeouts | Expired API token | 7 | Escalate | `APP-SUPPORT` |
+| API timeouts | Downstream rate limit | 2 | Escalate | `APP-SUPPORT` |
+| API timeouts | Downstream latency | 15 | Escalate | `APP-SUPPORT` |
+| Certificate expiry | Expired TLS certificate | 28 | Escalate | `APP-SUPPORT` |
+
+## Held-out rules set
 
 | Id | Requester | Ticket | Answer | Tool or queue | Difficulty | Note |
 |---|---|---|---|---|---|---|

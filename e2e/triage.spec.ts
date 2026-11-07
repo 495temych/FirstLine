@@ -63,7 +63,7 @@ test("a gate survives a reload", async ({ page }) => {
 test("the scoreboard shows a saved evaluation", async ({ page }) => {
   await page.goto("/");
   await page.getByRole("button", { name: "Scoreboard" }).click();
-  await expect(page.getByText("development (tiny)")).toBeVisible();
+  await expect(page.getByText("rules set (tiny)")).toBeVisible();
   await expect(page.getByLabel("Open an evaluation")).toBeVisible();
   await expect(page.getByText("unseen, development")).toBeVisible();
   await expect(page.getByLabel("Open a retrieval score")).toBeVisible();
@@ -72,9 +72,14 @@ test("the scoreboard shows a saved evaluation", async ({ page }) => {
 test("the tickets tab can be filtered", async ({ page }) => {
   await page.goto("/");
   await page.getByRole("button", { name: "Tickets" }).click();
-  await expect(page.getByText("25 of 25 development tickets")).toBeVisible();
+  await expect(page.getByText("206 of 206 tickets")).toBeVisible();
   await page.getByRole("button", { name: "records" }).click();
-  await expect(page.getByText("5 of 25 development tickets")).toBeVisible();
+  await expect(page.getByText("5 of 206 tickets")).toBeVisible();
+  await page.getByRole("button", { name: "records" }).click();
+  await page.getByLabel("Family").selectOption("VPN access");
+  await expect(page.getByText("12 of 206 tickets")).toBeVisible();
+  await page.getByLabel("Cause").selectOption("Stale VPN profile");
+  await expect(page.getByText("1 of 206 tickets")).toBeVisible();
 });
 
 test("the page fits a phone", async ({ page }) => {

@@ -69,7 +69,7 @@ The number after each one is the commit that meets it.
 - [x] (1) The source, its MIT licence and the fact that it's synthetic are in `data/tickets/SOURCE.md`. The import can be re-run.
 - [x] (2) `data/records/users.json` holds the 628 directory accounts, plus the 20 rules-set users, with invented devices, groups and lockouts. All 745 tickets link to a requester's record.
 - [ ] (4) Each ticket has one named cause, and each cause has accepted paths, tools, queues and required checks. You have reviewed every cause.
-- [ ] (4) Our 50 tickets are moved to CorpLabs queues and renamed the rules set, with no `review` flag left.
+- [x] (4) Our 50 tickets are moved to CorpLabs queues and renamed the rules set, with no `review` flag left.
 - [ ] (7) `data/tickets/checks.json` holds each check's recorded result and nothing that gives away the answer. A test proves no `diagnostics` summary, `root_cause`, `resolution` or `correspondence` text is in it.
 
 **Knowledge base (`data/kb/`)**
@@ -114,7 +114,7 @@ The number after each one is the commit that meets it.
 **API and dashboard (`backend/`, `dashboard/`)**
 
 - [x] (1) The Scoreboard shows retrieval scores.
-- [ ] (4) Tickets shows family, named cause and expected path, with a filter for each.
+- [x] (4) Tickets shows family, named cause and expected path, with a filter for each.
 - [ ] (5) Tickets and evaluations return the new labels and measures. Held-out tickets stay out of every route, checked by a test.
 - [ ] (5) Triage is renamed Assistant, and the Scoreboard shows measures by family, the yardsticks, and CHF for mistakes.
 - [ ] (6) Starting a triage takes a requester, and a picker sits on the Assistant. The page shows when a rule changed the agent's decision. The gate rules are unchanged.

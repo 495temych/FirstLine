@@ -41,6 +41,39 @@ const target = ({ answer }: LabelledTicket) =>
 const expectedPaths = ({ answer }: LabelledTicket) =>
   answer.paths.map((path) => pathLabels[path]).join(" or ");
 
+const headline = (ticket: LabelledTicket) => ticket.text.split("\n")[0];
+
+const unique = (values: string[]) =>
+  [...new Set(values)].sort((a, b) => a.localeCompare(b));
+
+function Choice(
+  props: Readonly<{
+    id: string;
+    legend: string;
+    options: string[];
+    value: string;
+    onChange: (value: string) => void;
+  }>,
+) {
+  return (
+    <div>
+      <label htmlFor={props.id}>{props.legend}</label>
+      <select
+        id={props.id}
+        value={props.value}
+        onChange={(event) => {
+          props.onChange(event.target.value);
+        }}
+      >
+        <option value="">All</option>
+        {props.options.map((option) => (
+          <option key={option}>{option}</option>
+        ))}
+      </select>
+    </div>
+  );
+}
+
 function Mark({ result }: Readonly<{ result: ScoredTicket | null }>) {
   if (!result) return <>not run</>;
   return result.action_correct ? (
@@ -74,20 +107,25 @@ function Detail({ ticket }: Readonly<{ ticket: LabelledTicket }>) {
   const lockouts = requester.lockouts_24h;
   return (
     <article className="detail">
-      <h2>{ticket.text}</h2>
+      <h2>{headline(ticket)}</h2>
       <p className="caption">
-        {ticket.id}, {answer.difficulty}
+        {ticket.id}, {answer.family}, {answer.difficulty}
       </p>
-      {answer.review && (
-        <p className="notice alert">
-          <strong>Check this label.</strong> {answer.review}
-        </p>
+      {ticket.text !== headline(ticket) && (
+        <p>{ticket.text.slice(headline(ticket).length).trim()}</p>
       )}
       <h3>Expected</h3>
       <dl className="facts">
+        {answer.cause && <Fact name="Cause" value={answer.cause} />}
         <Fact name="Path" value={expectedPaths(ticket)} />
         <Fact name="Tool or queue" value={target(ticket)} />
         <Fact name="Knowledge base" value={answer.units.join(", ") || "none"} />
+        {answer.checks.length > 0 && (
+          <Fact name="Required checks" value={answer.checks.join(", ")} />
+        )}
+        {answer.root_cause && (
+          <Fact name="Root cause on record" value={answer.root_cause} />
+        )}
         {answer.note && <Fact name="Note" value={answer.note} />}
       </dl>
       <h3>Requester</h3>
@@ -122,20 +160,44 @@ function Detail({ ticket }: Readonly<{ ticket: LabelledTicket }>) {
 function Browser({ tickets }: Readonly<{ tickets: LabelledTicket[] }>) {
   const [path, setPath] = useState<string | null>(null);
   const [difficulty, setDifficulty] = useState<string | null>(null);
-  const [toCheck, setToCheck] = useState(false);
+  const [family, setFamily] = useState("");
+  const [cause, setCause] = useState("");
   const [selected, setSelected] = useState<string>();
 
-  const shown = tickets.filter(
+  const inFamily = tickets.filter(
+    ({ answer }) => family === "" || answer.family === family,
+  );
+  const causes = unique(
+    inFamily.flatMap(({ answer }) => (answer.cause ? [answer.cause] : [])),
+  );
+  const shown = inFamily.filter(
     ({ answer }) =>
+      (cause === "" || answer.cause === cause) &&
       (path === null || answer.paths.includes(path)) &&
-      (difficulty === null || answer.difficulty === difficulty) &&
-      (!toCheck || Boolean(answer.review)),
+      (difficulty === null || answer.difficulty === difficulty),
   );
   const current = shown.find((t) => t.id === selected) ?? shown.at(0);
 
   return (
     <>
       <div className="filters">
+        <Choice
+          id="family"
+          legend="Family"
+          options={unique(tickets.map(({ answer }) => answer.family))}
+          value={family}
+          onChange={(value) => {
+            setFamily(value);
+            setCause("");
+          }}
+        />
+        <Choice
+          id="cause"
+          legend="Cause"
+          options={causes}
+          value={cause}
+          onChange={setCause}
+        />
         <Pills
           legend="Path"
           options={PATHS}
@@ -149,20 +211,9 @@ function Browser({ tickets }: Readonly<{ tickets: LabelledTicket[] }>) {
           value={difficulty}
           onChange={setDifficulty}
         />
-        <label className="switch">
-          <input
-            type="checkbox"
-            role="switch"
-            checked={toCheck}
-            onChange={(event) => {
-              setToCheck(event.target.checked);
-            }}
-          />
-          Only labels to check
-        </label>
       </div>
       <p className="caption" role="status">
-        {shown.length} of {tickets.length} development tickets
+        {shown.length} of {tickets.length} tickets
       </p>
       {current ? (
         <div className="tickets">
@@ -171,9 +222,10 @@ function Browser({ tickets }: Readonly<{ tickets: LabelledTicket[] }>) {
               <thead>
                 <tr>
                   <th scope="col">Ticket</th>
-                  <th scope="col">Label</th>
                   <th scope="col">Latest run</th>
                   <th scope="col">Text</th>
+                  <th scope="col">Family</th>
+                  <th scope="col">Cause</th>
                   <th scope="col">Expected</th>
                   <th scope="col">Tool or queue</th>
                   <th scope="col">Difficulty</th>
@@ -194,11 +246,12 @@ function Browser({ tickets }: Readonly<{ tickets: LabelledTicket[] }>) {
                         {ticket.id}
                       </button>
                     </td>
-                    <td>{ticket.answer.review ? "To check" : ""}</td>
                     <td>
                       <Mark result={ticket.latest} />
                     </td>
-                    <td className="wide">{ticket.text}</td>
+                    <td className="wide">{headline(ticket)}</td>
+                    <td>{ticket.answer.family}</td>
+                    <td>{ticket.answer.cause ?? "None"}</td>
                     <td>{expectedPaths(ticket)}</td>
                     <td>
                       <code>{target(ticket)}</code>

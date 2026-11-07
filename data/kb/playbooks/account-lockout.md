@@ -38,6 +38,6 @@ An unlock with no fix for the source just locks the account again.
 
 ## When to escalate
 
-- Two or more lockouts in 24 hours are a possible compromise under SEC-04 §4.2. Don't unlock. Send it to `SEC-INCIDENT`, even if earlier tickets were simply unlocked.
+- Two or more lockouts in 24 hours are a possible compromise under SEC-04 §4.2. Count lockouts the ticket describes as well as those in the records. Don't unlock. Send it to `SEC-INCIDENT`, even if earlier tickets were simply unlocked.
 - If the number of lockouts isn't known, escalate and say so, because it decides the path.
 - If the source device can't be found, send it to `IAM-ACCESS`.

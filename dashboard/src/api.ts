@@ -130,7 +130,10 @@ export interface Answer {
   units: string[];
   difficulty: string;
   note: string;
-  review?: string;
+  family: string;
+  cause: string | null;
+  checks: string[];
+  root_cause?: string;
 }
 
 export interface Requester {

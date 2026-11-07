@@ -4,7 +4,7 @@ FirstLine triages one ticket at a time for CorpLabs AG in a React dashboard on a
 
 The 745 closed incidents are imported to `data/tickets/` with fixed splits, and their answers are in `data/evals/incidents.json`. The knowledge base has 15 playbooks on one template, written only from the knowledge base split, plus the policies and queues. Retrieval matches sections, and the Scoreboard shows its score for free. The hit rate rose from 94% to 100% on the development set, and false matches on unseen families fell from 96% to 4%. These tickets are templated, so short requests are the harder test: the rules set hits 87%. The agent doesn't use the new tickets or staff records yet.
 
-The EVALS code is built. The baseline is waiting for the label review, in the Tickets tab for the development set and `briefs/LABEL_REVIEW.md` for the held-out set. The held-out set stays out of the app.
+The EVALS code is built, and it runs the 50 hand-written tickets, now called the rules set. All 745 imported tickets have a named cause, drafted by rules, and each cause has accepted paths, tools, queues and required checks. The Tickets tab shows the rules set and 181 imported tickets, with filters. The owner has settled the open label decisions. The full cause table is still in `briefs/LABEL_REVIEW.md`, for the owner to confirm. Held-out tickets stay out of the app.
 
 ## Who enforces each rule
 
@@ -18,7 +18,7 @@ From the rules in `docs/SPEC.md`. Later sprints close the gaps.
 | Failed self-serve goes to the same ticket confirmation | Code | `route_after_self_serve` |
 | The agent never asks the user a question | Instructions only | `agent/prompt.md`, line 52 |
 | Access requests are escalated, never out of scope | Instructions only | `agent/prompt.md`, line 25 |
-| SEC-04: 2+ lockouts go to `SEC-INCIDENT` | Instructions only | Knowledge base and `agent/prompt.md`. Nothing in code knows a user's lockout count |
+| SEC-04: 2+ lockouts, in the records or the ticket, go to `SEC-INCIDENT` | Instructions only | Knowledge base and `agent/prompt.md`. Nothing in code knows a user's lockout count |
 | Tool parameters are concrete values | Instructions only | `agent/prompt.md`, line 56 |
 | With retrieval off, no tools and no path | Code | `_call_model` binds tools only with retrieval on, and `no_tools` ends the run |
 | Every finished run is logged, and evaluation runs are not | Code, with one gap | The `log` node and `log_runs=False`. Retrieval-off runs are not logged either, which the rule doesn't say |

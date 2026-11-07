@@ -281,8 +281,8 @@ it("shows retrieval scores with no evaluations, and opens another one", async ()
 it("shows saved evaluations and opens another one", async () => {
   render(<App />);
   click("Scoreboard");
-  expect(await screen.findByText("development (tiny)")).toBeDefined();
-  expect(screen.getByText("held-out")).toBeDefined();
+  expect(await screen.findByText("rules set (tiny)")).toBeDefined();
+  expect(screen.getByText("rules set, held-out")).toBeDefined();
   expect(screen.getByText(/CHF 120 for a wrong fix/)).toBeDefined();
   expect(screen.getByText("My VPN keeps disconnecting")).toBeDefined();
   fireEvent.change(screen.getByLabelText("Open an evaluation"), {
@@ -301,11 +301,10 @@ it("shows a scoreboard failure", async () => {
 it("shows tickets, their first detail and the lockout count", async () => {
   render(<App />);
   click("Tickets");
-  expect(await screen.findByText("2 of 2 development tickets")).toBeDefined();
+  expect(await screen.findByText("2 of 2 tickets")).toBeDefined();
   expect(screen.getByRole("heading", { level: 2 }).textContent).toBe(
     "My VPN keeps disconnecting",
   );
-  expect(screen.getByText("Check this label.")).toBeDefined();
   expect(screen.getByText(/Wrong in the latest run/)).toBeDefined();
   expect(screen.getByText("2").className).toBe("wrong");
 });
@@ -323,13 +322,29 @@ it("selects a ticket", async () => {
 it("filters tickets", async () => {
   render(<App />);
   click("Tickets");
-  await screen.findByText("2 of 2 development tickets");
+  await screen.findByText("2 of 2 tickets");
   click("records");
-  expect(screen.getByText("1 of 2 development tickets")).toBeDefined();
+  expect(screen.getByText("1 of 2 tickets")).toBeDefined();
   click("Out of scope");
   expect(screen.getByText("No tickets match these filters.")).toBeDefined();
   click("Out of scope");
   click("records");
-  fireEvent.click(screen.getByRole("switch", { name: "Only labels to check" }));
-  expect(screen.getByText("1 of 2 development tickets")).toBeDefined();
+});
+
+it("filters tickets by family and cause, and shows the cause", async () => {
+  render(<App />);
+  click("Tickets");
+  await screen.findByText("2 of 2 tickets");
+  fireEvent.change(screen.getByLabelText("Family"), {
+    target: { value: "Account lockout" },
+  });
+  expect(screen.getByText("1 of 2 tickets")).toBeDefined();
+  fireEvent.change(screen.getByLabelText("Cause"), {
+    target: { value: "Stale phone credentials" },
+  });
+  expect(screen.getByText("1 of 2 tickets")).toBeDefined();
+  expect(screen.getByText("Root cause on record")).toBeDefined();
+  expect(screen.getByText("account-lockout-source-check")).toBeDefined();
+  fireEvent.change(screen.getByLabelText("Family"), { target: { value: "" } });
+  expect(screen.getByText("2 of 2 tickets")).toBeDefined();
 });

@@ -78,10 +78,10 @@ def _view(run_id: str, snapshot: StateSnapshot) -> dict:
 
 
 def latest_results(runs: list[dict]) -> dict[str, dict]:
-    """Each development ticket's newest result. `runs` is newest first."""
+    """Each rules set ticket's newest result. `runs` is newest first."""
     latest: dict[str, dict] = {}
     for run in runs:
-        if run["set"] == "dev":
+        if run["set"] == "rules":
             for ticket in run["tickets"]:
                 latest.setdefault(ticket["id"], ticket)
     return latest
@@ -141,7 +141,7 @@ def list_evaluations() -> dict:
 
 @app.get("/api/tickets", operation_id="list_tickets")
 def list_tickets() -> list[dict]:
-    """List the development tickets. The held-out set stays out, as it's the exam."""
+    """List the tickets to review. Held-out tickets stay out, as they're the exam."""
     latest = latest_results(runner.load_runs())
     users = {u["id"]: u for u in json.loads(config.USERS_FILE.read_text())}
     return [
@@ -151,7 +151,7 @@ def list_tickets() -> list[dict]:
             "requester": users[ticket["requester"]],
             "latest": latest.get(ticket["id"]),
         }
-        for ticket, answer in runner.load_set("dev")
+        for ticket, answer in runner.load_review_tickets()
     ]
 
 

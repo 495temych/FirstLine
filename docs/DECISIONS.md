@@ -114,6 +114,18 @@ Each design decision so far, with its reason and its trade-off.
 - **Reason:** 745 templated synthetic tickets would teach a model the generator's pattern. A free classifier shows whether Claude earns its cost on routing.
 - **Trade-off:** the classifier may score very well on tickets this alike, which says as much about the data as about Claude. Its value then rests on investigation and write-ups.
 
+## SEC-04 counts lockouts the ticket describes
+
+- **Decision:** two or more lockouts count under SEC-04 §4.2 whether they're in the records or stated in the ticket. So a stale phone that keeps locking an account goes to `SEC-INCIDENT`, not to a routine unlock.
+- **Reason:** a needless escalation costs CHF 120, and a wrong unlock costs CHF 2,000. The policy says what to do, whatever past tickets did.
+- **Trade-off:** most lockout tickets go to security, though a real desk would call many of them a harmless phone. No imported ticket now expects `unlock_ad_account`, so only the rules set tests it. Code can guard the records, but a count in the ticket text has to be read by the model.
+
+## Named causes by rule
+
+- **Decision:** a ticket takes the cause its `root_cause` names first, using rules written on the knowledge base split. Vaguer wording counts only if nothing precise matches. Held-out tickets were labelled by the same rules, and nobody read them.
+- **Reason:** the labels can be reproduced and reviewed cause by cause, with no model cost and no reading of held-out text.
+- **Trade-off:** many records name several causes, and rules are approximate, so some tickets sit under the wrong cause. Costs and paths are set per cause, so a person reviews 47 causes rather than 745 tickets.
+
 ## Checks in code before a loop
 
 - **Decision:** commit 7 tests a fixed workflow beside one call and the loop. Code runs the family's checks, then one model call decides. The loop stays only if it beats that by more than the noise, for its extra cost.
