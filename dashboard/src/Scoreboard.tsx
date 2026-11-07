@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type CSSProperties } from "react";
 import {
   api,
   type Evaluation,
@@ -240,35 +240,98 @@ function Yardsticks({ run }: Readonly<{ run: Evaluation }>) {
   );
 }
 
+function MatrixCell({
+  expected,
+  chosen,
+  count,
+  total,
+}: Readonly<{
+  expected: string;
+  chosen: string;
+  count: number;
+  total: number;
+}>) {
+  const share = total ? count / total : 0;
+  const label = `Expected ${pathLabels[expected]}, chose ${pathLabels[chosen]}: ${count.toString()} of ${total.toString()}`;
+  return (
+    <td
+      className={expected === chosen ? "cell hit" : "cell miss"}
+      style={
+        { "--share": `${Math.round(share * 85).toString()}%` } as CSSProperties
+      }
+      data-strong={share >= 0.5}
+      aria-label={label}
+      title={label}
+    >
+      {total ? count : "–"}
+      {count > 0 && <small>{percent(share)}</small>}
+    </td>
+  );
+}
+
 function Confusion({ run }: Readonly<{ run: Evaluation }>) {
   const paths = Object.keys(run.confusion);
   return (
-    <div className="table-scroll">
-      <table>
-        <Head
-          names={[
-            "Expected",
-            ...paths.map((path) => `Chose ${pathLabels[path]}`),
-            "Tickets",
-            "Precision",
-            "Recall",
-          ]}
-        />
-        <tbody>
-          {paths.map((expected) => (
-            <tr key={expected}>
-              <td>{pathLabels[expected]}</td>
-              {paths.map((chosen) => (
-                <td key={chosen}>{run.confusion[expected][chosen]}</td>
-              ))}
-              <td>{run.per_path[expected].n}</td>
-              <td>{rate(run.per_path[expected].precision)}</td>
-              <td>{rate(run.per_path[expected].recall)}</td>
+    <>
+      <div className="table-scroll">
+        <table className="matrix">
+          <thead>
+            <tr>
+              <th rowSpan={2}>Expected</th>
+              <th colSpan={paths.length} className="axis">
+                Agent chose
+              </th>
+              <th rowSpan={2}>Tickets</th>
+              <th rowSpan={2}>Recall</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+            <tr>
+              {paths.map((path) => (
+                <th key={path}>{pathLabels[path]}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {paths.map((expected) => {
+              const row = run.confusion[expected];
+              const total = Object.values(row).reduce((a, b) => a + b, 0);
+              return (
+                <tr key={expected}>
+                  <th scope="row">{pathLabels[expected]}</th>
+                  {paths.map((chosen) => (
+                    <MatrixCell
+                      key={chosen}
+                      expected={expected}
+                      chosen={chosen}
+                      count={row[chosen]}
+                      total={total}
+                    />
+                  ))}
+                  <td>{total}</td>
+                  <td>{rate(run.per_path[expected].recall)}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+          <tfoot>
+            <tr>
+              <th scope="row">Precision</th>
+              {paths.map((path) => (
+                <td key={path}>{rate(run.per_path[path].precision)}</td>
+              ))}
+              <td />
+              <td />
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+      <p className="caption">
+        Each row is the path the label expected, and each column the path the
+        agent chose. Green cells on the diagonal are right and orange ones are
+        mistakes. The darker the cell, the larger its share of the row. Recall
+        is the share of a row the agent got right, and precision the share of a
+        column that was right.
+      </p>
+    </>
   );
 }
 

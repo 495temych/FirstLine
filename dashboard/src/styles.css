@@ -556,6 +556,61 @@ tr[data-selected="true"] td {
   background: var(--wash);
 }
 
+.matrix th.axis {
+  text-align: center;
+  color: var(--ink-soft);
+  font-weight: 500;
+}
+
+.matrix tbody th,
+.matrix tfoot th {
+  font-weight: 600;
+  text-align: left;
+}
+
+.matrix tfoot td,
+.matrix tfoot th {
+  border-top: 2px solid var(--rule);
+}
+
+.matrix td.cell {
+  --hue: var(--escalate);
+  min-width: 6.5rem;
+  text-align: center;
+  font-size: 1.0625rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  background: color-mix(
+    in srgb,
+    var(--hue) calc(var(--share) * var(--depth, 1)),
+    var(--panel)
+  );
+  border: 2px solid var(--panel);
+}
+
+.matrix td.cell.hit {
+  --hue: var(--self-serve);
+}
+
+@media (prefers-color-scheme: light) {
+  .matrix td.cell[data-strong="true"] {
+    color: var(--panel);
+  }
+}
+
+/* Dark mode keeps light text, so the shading stops short of it. */
+@media (prefers-color-scheme: dark) {
+  .matrix td.cell {
+    --depth: 0.6;
+  }
+}
+
+.matrix td.cell small {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 400;
+}
+
 .right {
   color: var(--self-serve);
   font-weight: 600;

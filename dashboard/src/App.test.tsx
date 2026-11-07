@@ -286,7 +286,10 @@ it("shows saved evaluations and opens another one", async () => {
   expect(screen.getByText(/CHF 120 for a wrong fix/)).toBeDefined();
   expect(screen.getByText("My VPN keeps disconnecting")).toBeDefined();
   expect(screen.getByText("Simple classifier")).toBeDefined();
-  expect(screen.getByText("Chose Auto-fix")).toBeDefined();
+  expect(screen.getByText("Agent chose")).toBeDefined();
+  expect(
+    screen.getByLabelText("Expected Auto-fix, chose Escalate: 1 of 4"),
+  ).toBeDefined();
   expect(screen.getByText("VPN access")).toBeDefined();
   expect(screen.getAllByText("80% ±10%").length).toBeGreaterThan(0);
   fireEvent.change(screen.getByLabelText("Open an evaluation"), {
