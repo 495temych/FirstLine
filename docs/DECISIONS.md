@@ -98,11 +98,35 @@ Each design decision so far, with its reason and its trade-off.
 - **Reason:** 745 templated synthetic tickets would teach a model the generator's pattern. A free classifier shows whether Claude earns its cost on routing.
 - **Trade-off:** the classifier may score very well on tickets this alike, which says as much about the data as about Claude. Its value then rests on investigation and write-ups.
 
-## A thin Queue before a hardened one
+## Three sprints, one per course week
 
-- **Decision:** Sprint 2 ends with one agent working a batch through to review. Concurrency, crash recovery, spending limits and the hold on hidden instructions wait for Sprint 3.
-- **Reason:** the workflow is what proves the product's value, so it should exist before we harden it.
-- **Trade-off:** until Sprint 3 the Queue is a demo, and it doesn't yet meet the production rules in `docs/SPEC.md`.
+- **Decision:** Sprint 1 proves the agent locally, Sprint 2 makes it a system with Qdrant, Supabase and Langfuse, and Sprint 3 delivers it on Azure.
+- **Reason:** each sprint answers one question, and the order follows the risk: first whether it works, then whether it runs, then whether a client can trust it.
+- **Trade-off:** there's no batch screen until Sprint 2, so the workflow that proves the value comes later than it would if we built it on SQLite first. In exchange, nothing gets built twice.
+
+## One home for each kind of data
+
+- **Decision:** git holds the knowledge base and labels, Qdrant holds a search index, Supabase holds operational records, and Langfuse holds traces.
+- **Reason:** with several services, two copies of the truth is the likeliest failure. An index that can be rebuilt can never disagree with its source for long.
+- **Trade-off:** three services and three sets of keys for a project that could run on one Postgres database with `pgvector`.
+
+## Qdrant over pgvector
+
+- **Decision:** use Qdrant for search, even though Supabase includes `pgvector`.
+- **Reason:** hybrid search suits tickets full of error codes, which embeddings match poorly. It's also a skill employers ask for.
+- **Trade-off:** one more service. If hybrid search doesn't beat dense search on our scores, `pgvector` would be the simpler answer, and we'd say so.
+
+## Langfuse Cloud, not self-hosted
+
+- **Decision:** use Langfuse's hosted service, in its EU region.
+- **Reason:** self-hosting needs Postgres, ClickHouse, Redis and blob storage, which is too much to run for a demo.
+- **Trade-off:** traces leave our infrastructure, so redaction must come first. The hosted region needs confirming before we send anything.
+
+## Azure instead of AWS
+
+- **Decision:** deploy on Azure, with Container Apps, Key Vault, managed identity and API Management, and use Claude through Microsoft Foundry.
+- **Reason:** Swiss enterprises often run on Microsoft, and doing it on a different cloud from the course shows the ideas are understood, not copied.
+- **Trade-off:** Claude in Foundry has no Swiss or EU data zone that we could confirm, and a global deployment can route requests to the US. So the app can be Swiss-hosted while model calls aren't. Redaction carries that risk, and the direct Anthropic API is plan B.
 
 ## Known limitations
 

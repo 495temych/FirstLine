@@ -32,7 +32,7 @@ Other commands:
 
 ## Sprints
 
-We work in sprints, and `docs/ROADMAP.md` holds the current one. Each commit ships one focused MVP, fully working and tested. When a sprint ends, we run the held-out set, review the work, and plan the next sprint by rewriting the roadmap.
+We work in three sprints, and `docs/ROADMAP.md` holds them, with success criteria for the current one. Each commit ships one focused MVP, fully working and tested. When a sprint ends, we run the held-out set, review the work, and plan the next sprint by rewriting the roadmap.
 
 ## Planning
 

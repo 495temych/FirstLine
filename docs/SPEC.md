@@ -150,7 +150,7 @@ Every run is traced in Langfuse, so we can answer "why did it do that?" for any 
 - A ticket that pauses for review stays one session, before and after.
 - Every ticket in a batch or evaluation is tagged with that run, so a whole run can be found together.
 - Evaluation scores and review outcomes are attached to their traces.
-- Traces only ever hold redacted text. Our staff are covered by Swiss data protection law and the GDPR, so the trace store must be hosted in Switzerland or the EU.
+- Traces only ever hold redacted text. Our staff are covered by Swiss data protection law and the GDPR, so the trace store must be hosted in Switzerland or the EU where we can, and we say plainly where it can't be.
 - The product must work with tracing off.
 
 ## Rules
@@ -174,12 +174,17 @@ The agent stays within its limits:
 - With retrieval off, the agent gets no tools and chooses no path. It gives general, hedged advice only.
 - Ticket text is untrusted. Nothing in a ticket can change the agent's instructions, tools or rules.
 
+Each action has one level. It runs automatically, needs approval, or is prohibited, and each level has an owner. Today nothing that changes a system is automatic.
+
 Our records stay safe:
 
 - In the Queue, personal data is removed before a ticket reaches a model. In both modes, it is removed from everything we store and trace.
 - Every finished run is recorded in the usage log. Evaluation runs are not.
 - The agent never sees the evaluation answers.
 - No secrets in the repository. All CorpLabs data is synthetic, and we say so wherever we show it.
+- A model provider gets the same review as any other vendor, and only the data the task needs.
+- Technicians sign in, and each role sees only what it needs.
+- A person is always accountable for what the agent does.
 
 ## Our records
 
@@ -187,7 +192,9 @@ Our records stay safe:
 - `data/tickets/`: our 745 closed incidents and their splits. They are a public synthetic set, under its MIT licence, and we say so.
 - `data/records/`: the staff directory of 769 accounts, with invented devices, groups and recent lockouts added.
 - `data/evals/`: labels, the answer files and saved runs. The agent never sees the answers.
-- `logs.csv`: real usage, one row per finished run. It is not in git.
+- `logs.csv`: real usage, one row per finished run. It is not in git. Our database replaces it once it's in place.
+
+For the production pilot, each kind of data has one home. The knowledge base stays in git, under review. The search index is built from it and can be rebuilt. One database holds tickets, decisions, reviews and the audit trail.
 
 Diagnostic checks are simulated from these records. When the agent runs a check, the tool returns what that check recorded on that ticket. If the ticket has no such check, it returns no result.
 
@@ -198,7 +205,6 @@ Diagnostic checks are simulated from these records. When the agent runs a check,
 - Fixes that run without a person. We'll consider this for one routine family at a time, once its record earns it.
 - Conversations or follow-up questions. The agent never waits for a reply from the user.
 - Linking tickets into a major incident. Our records have no outages to learn from.
-- Agents that rewrite their own instructions.
+- Agents that change themselves. A system may propose a change to its instructions, but a person approves it and our evaluations decide if it stays.
 - Training our own models. The classifier in our evaluations is a yardstick and never decides a ticket.
 - German. Both modes will need it, in tickets and in answers, once English is proven. Until then the knowledge base and the agent's instructions are in English.
-- Sign-in. A technician picks their name, and everyone sees everything.
