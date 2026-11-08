@@ -10,6 +10,7 @@ import tempfile
 from pathlib import Path
 
 os.environ["LANGFUSE_TRACING"] = "false"  # before .env is read, so nothing is traced
+os.environ["SUPABASE_DB_URL"] = ""  # and the Queue keeps its record in memory
 
 import uvicorn
 

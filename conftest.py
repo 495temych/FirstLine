@@ -1,5 +1,6 @@
 """Keeps tests offline: the model and the encoder raise unless a test stubs them,
-nothing is traced, and search uses an in-memory index."""
+nothing is traced, search uses an in-memory index, and the Queue's record is kept in
+memory unless a test starts its own Postgres."""
 
 from typing import NoReturn
 
@@ -22,6 +23,12 @@ def no_tracing(monkeypatch: pytest.MonkeyPatch) -> None:
 def no_qdrant_cloud(monkeypatch: pytest.MonkeyPatch) -> None:
     """Search an in-memory index, whatever Qdrant address .env holds."""
     monkeypatch.delenv("QDRANT_URL", raising=False)
+
+
+@pytest.fixture(autouse=True)
+def no_supabase(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Keep the Queue's record in memory, whatever database .env names."""
+    monkeypatch.delenv("SUPABASE_DB_URL", raising=False)
 
 
 @pytest.fixture(autouse=True)

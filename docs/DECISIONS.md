@@ -240,11 +240,17 @@ Each design decision so far, with its reason and its trade-off.
 - **Reason:** Supabase serves every `public` table over a REST API, and its publishable key is meant to be public. Without row-level security, anyone with that key could read and write tickets.
 - **Trade-off:** the dashboard can't read Supabase on its own. Everything goes through the backend, which is where the rules live anyway.
 
-## The Queue's board lives in memory first
+## The board writes through to Supabase, and reads it back on start
 
-- **Decision:** the first Queue keeps its batches, decisions and reviews in the backend's memory, with two worker threads. It reads tickets from the development split, so held-out tickets never appear.
-- **Reason:** the MVP rule. The flow and its value had to be seen before they are made durable, and the Supabase tables already match the board's shape.
-- **Trade-off:** a restart clears the board, and a ticket a worker had started is lost. Supabase fixes both.
+- **Decision:** the board keeps its view in memory for the dashboard's polling, and saves each step to the store before showing it. It reads Supabase only when the backend starts. Tickets left queued or working then go back to the agent, and a ticket with a decision never does.
+- **Reason:** the board polls every second, and a round trip to the pooler takes far longer here than reading memory. Saving first means the board never shows what isn't recorded.
+- **Trade-off:** only one backend can run the Queue, because a second wouldn't see the first's changes until it restarted. A worker stopped mid-call costs that call again on restart.
+
+## One store, two versions, one set of tests
+
+- **Decision:** `backend/store.py` has a Postgres and a memory version, and each test of the store runs against both. The Postgres tests use a throwaway Postgres 17 in Docker, with the real migrations.
+- **Reason:** the fast tests and the browser tests use memory, so it must behave as Postgres does, or they prove nothing. Running the same tests on both catches any drift.
+- **Trade-off:** `poe check` now needs Docker, and its first run downloads the Postgres image.
 
 ## A technician's verdict is a Langfuse score
 

@@ -19,6 +19,8 @@ Put your key in `.env` as `ANTHROPIC_API_KEY`. `MODEL_NAME` is optional. `npm ru
 - Prettier, ESLint, `tsc` and vitest with 80% coverage of `dashboard/`
 - Playwright, against the real API and graph with a stub model, on ports 8010 and 5183
 
+The store's tests start a throwaway Postgres 17 in Docker, so Docker must be running. They never touch Supabase.
+
 The pre-commit hook and GitHub Actions run the same command.
 
 Other commands:
@@ -29,11 +31,11 @@ Other commands:
 - `uv run -m evals --rescore` marks the newest full run of each set against the current labels, with no model calls. Name runs to re-score particular ones, such as `--rescore 20261107T195842-dev`.
 - `uv run -m evals.langfuse_upload` copies the practice sets to Langfuse as datasets, the newest full run of each as an experiment, and `logs.csv` as traces. It makes no model calls, skips what's already there, and never sends a held-out ticket. New runs are traced as they happen when the Langfuse keys are in `.env`, and `LANGFUSE_TRACING=false` turns that off.
 - `uv run -m agent.index` rebuilds the knowledge base index in Qdrant Cloud. Run it after any change in `data/kb/`, because search refuses a stale index. It's free: embeddings are made on this machine.
-- The Supabase schema lives in `supabase/migrations/`, one timestamped SQL file per change, never edited after it's applied. A change is a new file. The first was applied by hand through `SUPABASE_DB_URL`, and commit 3 adds the command that applies new ones.
+- The Supabase schema lives in `supabase/migrations/`, one timestamped SQL file per change, never edited after it's applied. A change is a new file. `uv run -m backend.migrate` applies the files not yet applied, each in its own transaction, and records them in `schema_migrations`. `--record FILE` marks a file applied without running it, as was done once for the first, which was applied by hand.
 - `uv run -m evals.label_tickets` gives every imported ticket its named cause again, from `data/evals/causes.json`.
 - `uv run -m evals --retrieval` scores retrieval on the development sets, with no model calls. `--split` picks another set, and `--save` keeps the result for the Scoreboard.
 - `uv run -m evals.import_tickets` imports the tickets again, as `data/tickets/SOURCE.md` explains.
-- The Queue tab loads 8 development tickets at a time and triages them with real model calls, about CHF 0.03 a batch. The board lives in the backend's memory, so restarting `npm run dev` clears it.
+- The Queue tab loads 8 development tickets at a time and triages them with real model calls, about CHF 0.03 a batch. The board is saved in Supabase, so restarting `npm run dev` brings it back and finishes what was left. Without `SUPABASE_DB_URL` it lives in memory, and a restart clears it.
 - `uv run -m backend.stats` prints the usage statistics.
 - `uv run uvicorn backend.main:app` runs the backend alone, with its API at http://127.0.0.1:8000/docs.
 

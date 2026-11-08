@@ -280,3 +280,78 @@ def test_a_trace_waits_for_langfuse_then_shows_its_steps(client, monkeypatch):
     assert model_call["duration_ms"] == 2500
     assert model_call["input_tokens"] == 3564
     assert model_call["cost_usd"] == 0.0045
+
+
+def restarted(store) -> queue_board.Board:
+    """A new backend's board, reading the record the last one left."""
+    fresh = queue_board.Board(submit=lambda work: work())
+    fresh.restore(store)
+    return fresh
+
+
+def without_times(view):
+    return [
+        {**t, "review": t["review"] and {**t["review"], "at": None}}
+        for t in view["tickets"]
+    ]
+
+
+def test_a_restart_brings_the_board_back(client, board):
+    tickets = loaded(client)["tickets"]
+    review(client, tickets[0]["id"], verdict="approved")
+    review(client, tickets[1]["id"], verdict="rejected", note="Wrong user")
+    again = restarted(board.store).view()
+    assert without_times(again) == without_times(board.view())
+    assert again["value"] == board.view()["value"]
+    assert again["tickets"][0]["review"]["at"]
+
+
+def test_unfinished_tickets_go_back_to_the_agent_once(monkeypatch):
+    stopped = queue_board.Board(submit=lambda work: None)  # the backend stops at once
+    stopped.load(queue_board.staff())
+    first, second, *_ = stopped.tickets
+    monkeypatch.setattr(queue_board, "run_triage", lambda text, use_retrieval: FIX)
+    stopped.work(first)
+    stopped.store.started(second)  # it stopped while the agent was on this one
+    worked = []
+
+    def counted(text, use_retrieval):
+        worked.append(text)
+        return FIX
+
+    monkeypatch.setattr(queue_board, "run_triage", counted)
+    again = restarted(stopped.store)
+    assert len(worked) == queue_board.BATCH_SIZE - 1
+    assert again.view()["counts"]["review"] == queue_board.BATCH_SIZE
+    assert again.get(first)["decision"] == stopped.get(first)["decision"]
+
+
+def test_the_desk_never_hands_out_a_ticket_twice(client, board):
+    first = {t["id"] for t in loaded(client)["tickets"]}
+    again = restarted(board.store)
+    assert first.isdisjoint(t["id"] for t in again.waiting_at_desk())
+    again.load(queue_board.staff())
+    assert len(again.tickets) == 2 * queue_board.BATCH_SIZE
+
+
+def test_a_restart_reads_the_board_back_from_postgres(postgres_store, monkeypatch):
+    monkeypatch.setattr(
+        queue_board, "run_triage", lambda text, use_retrieval: ESCALATION
+    )
+    before = queue_board.Board(submit=lambda work: work(), store=postgres_store)
+    before.load(queue_board.staff())
+    first, second, *_ = before.tickets
+    before.review(first, queue_board.Review(verdict="approved", seconds=40))
+    before.review(
+        second, queue_board.Review(verdict="corrected", seconds=55, queue="NET-VPN")
+    )
+    again = restarted(postgres_store)
+    assert without_times(again.view()) == without_times(before.view())
+    assert again.view()["value"] == before.view()["value"]
+
+
+def test_the_backend_opens_its_record_when_it_starts(board):
+    board.store.add_batch("earlier", [])
+    with TestClient(main.app) as started:
+        assert started.get("/api/queue").json()["tickets"] == []
+    assert isinstance(board.store, queue_board.MemoryStore)

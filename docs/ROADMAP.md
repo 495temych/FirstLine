@@ -151,15 +151,69 @@ The number after each one is the commit that meets it.
 |---|---|---|---|
 | 1 | ✅ **Langfuse.** One trace per ticket, tagged runs and scores on traces, with personal data redacted before anything leaves the Mac | Click a decision and follow it, with no names in the trace | Traces, experiments, sending only what the task needs |
 | 2 | **Qdrant.** Sections and past incidents move to Qdrant, with hybrid search for error codes | Retrieval scores before and after, beside each other | Search by meaning and keywords, retrieval evals |
-| 3 | **Supabase.** Postgres replaces SQLite and `logs.csv`, including LangGraph's checkpoints | A paused ticket survives a restart | A system of record, durable checkpoints |
+| 3a | ✅ **Supabase: the Queue.** The board's batches, decisions, reviews and events live in Postgres | Restart the backend mid-batch: the board comes back, and unfinished tickets carry on | A system of record, states computed from data |
+| 3b | **Supabase: the Assistant.** Postgres replaces SQLite checkpoints and `logs.csv` | A paused Assistant ticket survives a restart, and usage statistics read Postgres | Durable checkpoints |
 | 4 | 🟡 **The Queue.** Load a batch, order it in code, and approve, correct or reject each decision with its evidence | A technician clears a morning batch, and technician time per ticket is measured | The human's step |
 | 5 | **Durable and gated.** Retries, no repeated actions, spending limits per batch, and a release gate: a change ships only if its Langfuse experiment passes | Kill a batch mid-run and it carries on without doing anything twice. A worse change is refused | Idempotency, `RetryPolicy`, evals as a release gate |
 
-The Queue's first version is in: batches, live states, review with measured time, traces in the UI and the value in CHF. It keeps the board in memory until Supabase is wired in, and the agent doesn't investigate yet.
+The Queue's first version is in: batches, live states, review with measured time, traces in the UI and the value in CHF. Since commit 3a it keeps its record in Supabase and survives a restart. The agent doesn't investigate yet.
 
 Sprint 2 started before Sprint 1's commits 6 to 8, at the owner's call, so the tools are in place when those experiments run.
 
 Tests stay free and offline: Qdrant has a local mode with no server, and Postgres runs in a container in CI. Commit 1 needs your Langfuse keys, commit 2 a Qdrant key, and commit 3 a Supabase project.
+
+### Success criteria
+
+The number after each one is the commit that meets it. The Queue's investigation and rules come from Sprint 1's commits 6 and 7, so Sprint 2 builds the system they run in.
+
+**Observability: Langfuse (`agent/tracing.py`)**
+
+- [x] (1) Every Assistant, Queue and evaluation run is one trace in Langfuse Cloud's EU region, tagged by mode, with emails, employee ids and IP addresses masked before it leaves the Mac. A test proves the masking.
+- [x] (1) The practice sets are Langfuse datasets, and saved runs are experiments scored by our own code, replayed with no model calls. Held-out tickets are never sent, checked by a test.
+- [x] (4) A technician's verdict is a score on the ticket's trace, and the dashboard shows the trace's steps with time, tokens and cost.
+- [ ] (5) The release gate reads its two experiments from Langfuse, so a refused change can be opened and compared there.
+
+**Search: Qdrant (`agent/retrieval.py`)**
+
+- [x] (2) Knowledge base sections are searched in Qdrant Cloud, with the same results as the NumPy search on all 206 practice tickets, so the retrieval scores are unchanged.
+- [x] (2) Search refuses an index built from another knowledge base or embedding model, and `uv run -m agent.index` rebuilds it for free. Tests use an in-memory index with no server.
+- [ ] (2) Keyword search runs beside search by meaning in the same query. An error code or a bare title such as `T-012` finds its playbook first, checked by a test.
+- [ ] (2) The retrieval score shows the meaning-only and hybrid results beside each other. Hit rate on development stays at its floor or above, and false matches on unseen families don't rise.
+- [ ] (2) Past incidents from the knowledge base split are a second collection, `incidents`, with their resolutions. A test proves no development or held-out ticket is in it.
+
+**System of record: Supabase (`backend/`, `supabase/`)**
+
+- [x] (3a) Five tables, batches, tickets, decisions, reviews and an append-only audit trail, are in `supabase/migrations/` and applied. Check constraints refuse an unknown path, an Assistant ticket in a batch, and a correction on a review that isn't "corrected".
+- [x] (3a) Row-level security is on with no policies, so the publishable key reads no rows and can't insert.
+- [x] (3a) `backend/store.py` is the board's only way to save and read, with a Postgres version through `SUPABASE_DB_URL` and a memory version that behaves the same. One set of tests runs against both, and without the URL the backend, tests and e2e use memory.
+- [x] (3a) A ticket's state is computed from its events, decision and review, never stored. Each step is one event with its actor, and one step's writes are one transaction.
+- [x] (3a) What isn't in Supabase, such as the title, SLA and requester's profile, is joined from `data/` by id, so no copy can drift. A decision records the runner's version hash, so it says which instructions, tools and knowledge base made it.
+- [x] (3a) `uv run -m backend.migrate` applies new migrations, records each in `schema_migrations`, and does nothing on a second run. A second migration keeps each retrieved section's score.
+- [x] (3a) After a restart the board comes back as it was. Tickets that were queued or working go back to the agent once, a ticket with a decision is never triaged again, and the desk never hands out a ticket already in Supabase.
+- [ ] (3b) LangGraph's checkpoints are in Postgres, so a paused Assistant ticket survives a restart. `checkpoints.sqlite` is no longer written.
+- [ ] (3b) An Assistant run is a ticket, a decision and its events in Supabase instead of a row in `logs.csv`, and the usage statistics read Postgres. The old rows stay in Langfuse.
+
+**The Queue (`backend/queue_board.py`, `dashboard/`)**
+
+- [x] (4) "Load 8 tickets" takes development tickets only, mixing kinds of request, and code orders them by priority, then age. Two workers triage them, and the board shows each state as it changes.
+- [x] (4) A ticket opens with its decision, reasoning, knowledge used, proposed action and trace. Nothing runs until a technician approves, sends it to another team or rejects it with a reason.
+- [x] (4) Review time per ticket is measured, and the board shows the time saved and the net saving in CHF, with its assumptions on the page.
+- [ ] (4) The Queue uses the investigation and rules from Sprint 1's commits 6 and 7 once they exist, and a ticket shows the checks the agent ran and any rule that changed its decision.
+- [ ] (4) A technician can clear a batch from the keyboard: next ticket, approve, reroute and reject.
+
+**Durable and gated (`agent/`, `backend/`, `evals/`)**
+
+- [ ] (5) Model calls and searches retry on connection errors, with limits, and a model call isn't retried after the model has answered. *(Searches retry since commit 4.)*
+- [ ] (5) Every action carries a key made from its ticket and decision, and a second attempt with the same key returns the first result without running again, checked by a test.
+- [ ] (5) Killing the backend mid-batch and starting it again finishes the batch, with no ticket triaged twice and no action run twice. A test kills it between steps.
+- [ ] (5) A batch states its estimated cost before it starts and refuses to start above its cap, CHF 0.25 by default.
+- [ ] (5) `uv run -m evals.gate` runs a change on the samples and refuses it if path accuracy falls by more than the margin of error or the mistake bill rises, against the saved baseline. A deliberately worse instruction is refused, with no model calls in the test.
+
+**Checks and CI**
+
+- [ ] (all) `uv run poe check` passes on every commit, with the coverage thresholds unchanged and no API key. From commit 3a it also needs Docker, for a throwaway Postgres 17 through `testcontainers`. It never touches Supabase, Qdrant Cloud or Langfuse.
+- [ ] (all) Each live check is made by hand and says what it cost, such as a batch, a restart and the same board coming back for about CHF 0.03.
+- [ ] (all) New services and dependencies are in `docs/TECH_STACK.md`, and what moved where is in `docs/STATUS.md` and `docs/DECISIONS.md`, in the commit that does it.
 
 ## Sprint 3: deliver it
 
