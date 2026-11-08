@@ -12,10 +12,11 @@ Services arrive in Sprint 2 and hosting in Sprint 3. Each is added here in full 
 
 - **Langfuse** (`langfuse` 5.0, kept below 5.1 until that settles): Langfuse Cloud in the EU region traces every Assistant and evaluation run through LangChain's callback, in `agent/tracing.py`. It exports only its own spans, and masks emails, employee ids and IP addresses first. Practice sets are Langfuse datasets, and saved runs are experiments. Tracing is off without `LANGFUSE_PUBLIC_KEY` and `LANGFUSE_SECRET_KEY`, and tests switch it off.
 
+- **Supabase** (Postgres 17, EU Central): the system of record. The schema is in `supabase/migrations/`: batches, tickets, decisions, reviews and an append-only audit trail. Row-level security is on with no policies, so the publishable key reads nothing, and the backend connects directly through `SUPABASE_DB_URL`, the session pooler. LangGraph's checkpoint tables come with commit 3, and sign-in later.
+
 Still to come:
 
 - **Qdrant:** search over knowledge base sections and past incidents.
-- **Supabase:** Postgres for tickets, decisions, reviews, the audit trail and checkpoints, then sign-in.
 - **Microsoft Azure:** Container Apps, Key Vault, managed identity, API Management and Claude in Foundry.
 
 Python 3.12 with uv, all in `pyproject.toml`. Node 26 with npm, in the root `package.json`. The Anthropic key is `ANTHROPIC_API_KEY` in `.env`. Paths and settings are in `agent/config.py`.

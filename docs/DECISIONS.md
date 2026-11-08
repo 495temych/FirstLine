@@ -216,6 +216,18 @@ Each design decision so far, with its reason and its trade-off.
 - **Reason:** 25 tickets give a margin near ±17%, so a small gap between two runs is noise. Kappa gives a constant answer no credit.
 - **Trade-off:** the exchange rate is a fixed assumption, not a live one.
 
+## Five tables, and states computed from them
+
+- **Decision:** Supabase holds batches, tickets, decisions, reviews and events. A decision is apart from its ticket, a review apart from its decision, and the audit trail is one append-only table with a `kind` and a JSON `detail`. Whether a ticket waits for review isn't stored: it's a decision with no review. Allowed values are `check` constraints on text, not Postgres enums.
+- **Reason:** what the agent said and what a person said must never overwrite each other, because comparing them is the measure. A stored status would be a second source of truth that drifts. Text checks are easier to change than enums.
+- **Trade-off:** no table per event kind, so an event's detail isn't checked by the database. Reviewers are plain names until sign-in.
+
+## Row-level security with no policies
+
+- **Decision:** every table has row-level security on and no policies. The backend uses the direct database connection, and the browser never talks to Supabase.
+- **Reason:** Supabase serves every `public` table over a REST API, and its publishable key is meant to be public. Without row-level security, anyone with that key could read and write tickets.
+- **Trade-off:** the dashboard can't read Supabase on its own. Everything goes through the backend, which is where the rules live anyway.
+
 ## Known limitations
 
 - **Synthetic knowledge base.** A real deployment needs real client documentation.

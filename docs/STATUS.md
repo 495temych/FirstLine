@@ -10,6 +10,8 @@ The baseline is run and committed for the rules, development and unseen sets, wi
 
 Every Assistant and evaluation run is traced in Langfuse Cloud's EU region, with emails, employee ids and IP addresses masked. The three practice sets are Langfuse datasets, and the latest baseline runs are experiments scored by our own code, replayed from saved decisions with no model calls. The 27 runs in `logs.csv` are there too. Langfuse exports only its own spans, because the Anthropic SDK's own spans counted each call twice.
 
+Supabase has the schema and nothing writes to it yet: five tables in `supabase/migrations/`, applied to the project and tested on a local Postgres 17. The database rejects an unknown path, an Assistant ticket in a batch, and a correction on a review that isn't "corrected". The publishable key reads no rows and can't insert. `logs.csv` and SQLite checkpoints are still what the app uses.
+
 Spending is guarded in code. A run states its estimated cost first, stops above CHF 1 unless allowed more, and refuses to repeat a saved run. `--rescore` marks saved decisions against new labels with no model calls, and `--sample` runs 3 tickets per family. The Batch API and prompt caching aren't used yet.
 
 ## Who enforces each rule

@@ -28,6 +28,7 @@ Other commands:
 - Every run prints its estimated cost first and stops above CHF 1 unless `--max-chf` allows more. It also refuses to repeat a saved run with the same model, instructions, tools and knowledge base unless `--again` is passed.
 - `uv run -m evals --rescore` marks the newest full run of each set against the current labels, with no model calls. Name runs to re-score particular ones, such as `--rescore 20261107T195842-dev`.
 - `uv run -m evals.langfuse_upload` copies the practice sets to Langfuse as datasets, the newest full run of each as an experiment, and `logs.csv` as traces. It makes no model calls, skips what's already there, and never sends a held-out ticket. New runs are traced as they happen when the Langfuse keys are in `.env`, and `LANGFUSE_TRACING=false` turns that off.
+- The Supabase schema lives in `supabase/migrations/`, one timestamped SQL file per change, never edited after it's applied. A change is a new file. The first was applied by hand through `SUPABASE_DB_URL`, and commit 3 adds the command that applies new ones.
 - `uv run -m evals.label_tickets` gives every imported ticket its named cause again, from `data/evals/causes.json`.
 - `uv run -m evals --retrieval` scores retrieval on the development sets, with no model calls. `--split` picks another set, and `--save` keeps the result for the Scoreboard.
 - `uv run -m evals.import_tickets` imports the tickets again, as `data/tickets/SOURCE.md` explains.
