@@ -100,6 +100,10 @@ export interface Evaluation {
   date: string;
   set: string;
   tiny: boolean;
+  /** Absent on runs saved before samples existed. */
+  sample?: boolean;
+  /** The run whose decisions were marked again, with no model calls. */
+  rescored_from?: string;
   model: string;
   version: string;
   kb_version: string;

@@ -24,7 +24,9 @@ The pre-commit hook and GitHub Actions run the same command.
 Other commands:
 
 - `npm run format` formats the Python and TypeScript.
-- `uv run -m evals` evaluates the rules set, with 25 model calls, and scores the two yardsticks beside it. `--set dev` (129 calls) and `--set unseen_dev` (52) run the imported practice sets, and `--tiny` makes 5 calls on the rules set. The three practice sets cost about CHF 1 together. The held-out sets (`rules_held_out`, `held_out`, `unseen_held_out`) run once, at sprint review.
+- `uv run -m evals` evaluates the rules set, with 25 model calls, and scores the two yardsticks beside it. `--set dev` (129 calls) and `--set unseen_dev` (52) run the imported practice sets, and the three cost about CHF 1 together. `--tiny` makes 5 calls on the rules set, and `--sample` takes 3 tickets per family of `dev` (36) or `unseen_dev` (6). The held-out sets (`rules_held_out`, `held_out`, `unseen_held_out`) run once, at sprint review.
+- Every run prints its estimated cost first and stops above CHF 1 unless `--max-chf` allows more. It also refuses to repeat a saved run with the same model, instructions, tools and knowledge base unless `--again` is passed.
+- `uv run -m evals --rescore` marks the newest full run of each set against the current labels, with no model calls. Name runs to re-score particular ones, such as `--rescore 20261107T195842-dev`.
 - `uv run -m evals.label_tickets` gives every imported ticket its named cause again, from `data/evals/causes.json`.
 - `uv run -m evals --retrieval` scores retrieval on the development sets, with no model calls. `--split` picks another set, and `--save` keeps the result for the Scoreboard.
 - `uv run -m evals.import_tickets` imports the tickets again, as `data/tickets/SOURCE.md` explains.
@@ -65,19 +67,18 @@ When asked to implement, as in "Please implement commit 3", build that one commi
 The owner pays for every model call, so we spend as little as gets a trustworthy number. A full practice run of 206 tickets costs about CHF 1 today.
 
 - **Ask before any run over CHF 1**, and say what it costs and why it's needed. Smaller runs still get a line saying what they cost.
-- **Never re-run the model when only the labels change.** Re-score the saved decisions instead, which is free.
-- **Practise on a sample** of a few tickets per family, and run a full set once per commit, to record its result.
+- **Never re-run the model when only the labels change.** Use `--rescore`, which is free.
+- **Practise on a sample**: `--tiny` on the rules set and `--sample` on `dev` and `unseen_dev`, 47 tickets for about CHF 0.25. Run a full set once per commit, to record its result.
 - **Try new designs and models on the sample first.** Run them in full only if they clearly win on it.
 - **Run the held-out sets once**, at sprint review.
-- **Never run the same thing twice.** If the instructions, tools, knowledge base and model are unchanged, reuse the saved run.
+- **Never run the same thing twice.** If the instructions, tools, knowledge base and model are unchanged, reuse the saved run. The runner refuses a repeat unless `--again` is passed.
 - **Prefer the cheapest model that passes**, and justify any bigger one with numbers.
 
-The tools that make this cheap by default are planned and not built yet:
-
-| Tool | What it saves |
-|---|---|
-| `--rescore` | Marks saved decisions against new labels, with no model calls |
-| `--sample` | Runs about 70 tickets, a few per family, for about CHF 0.30 |
-| Batch API | Half price on every evaluation run |
-| Prompt caching | Roughly 30–50% off the input that repeats on every call, to confirm on one small run |
-| A spending cap | The runner estimates the cost first and stops above a limit unless the owner confirms |
+| Tool | What it saves | Built |
+|---|---|---|
+| `--rescore` | Marks saved decisions against new labels, with no model calls | Yes |
+| `--sample` | Runs 3 tickets per family instead of the whole set | Yes |
+| A spending cap | Estimates the cost first and stops above CHF 1 unless `--max-chf` allows more | Yes |
+| A repeat guard | Refuses a run that's already saved, unless `--again` is passed | Yes |
+| Batch API | Half price on every evaluation run | Not yet |
+| Prompt caching | Roughly 30–50% off the input that repeats on every call, to confirm on one small run | Not yet |

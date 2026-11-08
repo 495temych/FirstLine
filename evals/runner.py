@@ -1,9 +1,14 @@
 """Runs the agent over a labelled set, scores it and saves the result.
 
 `uv run -m evals` runs the rules set. `--set` picks another set, such as `dev` or
-`unseen_dev`, and `--tiny` runs only the rules set's five trial tickets. Each run also
-scores the two yardsticks, for free. Results go to data/evals/runs/.
-`--retrieval` scores retrieval instead, with no model calls.
+`unseen_dev`. `--tiny` runs only the rules set's five trial tickets, and `--sample` a
+few tickets from each family of an imported practice set. Each run also scores the two
+yardsticks, for free. Results go to data/evals/runs/.
+
+A run states its estimated cost first. It stops above the spending cap unless
+`--max-chf` allows more, and it won't repeat a saved run unless `--again` is passed.
+`--rescore` marks saved runs against the current labels, and `--retrieval` scores
+retrieval. Neither calls a model.
 """
 
 import argparse
@@ -21,6 +26,27 @@ RUNS_DIR = EVALS_DIR / "runs"
 PREFIXES = {"rules": "rules_", "rules_held_out": "rules_held_out_"}
 IMPORTED_SETS = ("dev", "held_out", "unseen_dev", "unseen_held_out")
 REVIEW_SPLITS = ("dev", "unseen_dev")  # the imported tickets a person may read
+SAMPLE_PER_FAMILY = 3
+SPENDING_CAP_CHF = 1.00  # the most a run may cost without --max-chf
+TYPICAL_TOKENS = (6000, 600)  # input and output, when no saved run gives a cost
+VERSION_KEYS = ("version", "instructions_version", "tools_version", "kb_version")
+DECISION_KEYS = (
+    "path",
+    "tool",
+    "queue",
+    "cause",
+    "retrieved",
+    "input_tokens",
+    "output_tokens",
+    "time_sec",
+    "error",
+)
+LABEL_FILES = (
+    "rules_answers.json",
+    "rules_held_out_answers.json",
+    "causes.json",
+    "cause_labels.json",
+)
 
 
 def load_set(name: str, tiny: bool = False) -> list[tuple[dict, dict]]:
@@ -74,6 +100,27 @@ def load_any(name: str, tiny: bool = False) -> list[tuple[dict, dict]]:
     ]
 
 
+def sample(pairs: list[tuple[dict, dict]]) -> list[tuple[dict, dict]]:
+    """A few tickets from each family, spread evenly by id and the same every time."""
+    families: dict[str, list[tuple[dict, dict]]] = {}
+    for pair in sorted(pairs, key=lambda p: p[0]["id"]):
+        families.setdefault(pair[1]["family"], []).append(pair)
+    picked = []
+    for group in families.values():
+        if len(group) <= SAMPLE_PER_FAMILY:
+            picked += group
+            continue
+        step = len(group) / SAMPLE_PER_FAMILY
+        picked += [group[int(i * step)] for i in range(SAMPLE_PER_FAMILY)]
+    return picked
+
+
+def select(name: str, tiny: bool = False, sampled: bool = False) -> list[tuple]:
+    """The (ticket, answer) pairs a run would cover."""
+    pairs = load_any(name, tiny)
+    return sample(pairs) if sampled else pairs
+
+
 def load_review_tickets() -> list[tuple[dict, dict]]:
     """The tickets a person reviews. Held-out tickets stay out."""
     rules = [(ticket, {**answer, "checks": []}) for ticket, answer in load_any("rules")]
@@ -98,6 +145,20 @@ def version() -> str:
     return _hash(f"{instructions_version()}{tools_version()}".encode())
 
 
+def labels_version() -> str:
+    """One short hash of every answer file, so a re-scored run shows what it used."""
+    return _hash(b"".join((EVALS_DIR / name).read_bytes() for name in LABEL_FILES))
+
+
+def current_versions() -> dict:
+    return {
+        "version": version(),
+        "instructions_version": instructions_version(),
+        "tools_version": tools_version(),
+        "kb_version": retrieval_score.kb_version(),
+    }
+
+
 def _unit_id(u: dict) -> str:
     return u["doc"] if u["section"] is None else f"{u['doc']}::{u['section']}"
 
@@ -119,18 +180,32 @@ def _attempt(text: str) -> dict:
         }
 
 
-def score_ticket(ticket: dict, answer: dict, result: dict, model: str) -> dict:
-    """Combine a ticket, its answer and the agent's result into one row."""
-    path, tool = result["path"], result["tool_name"]
-    queue = (result["tool_input"] or {}).get("queue")
+def decision(result: dict) -> dict:
+    """What a run of the agent decided and used, which is all a score needs."""
     usage = result["usage"] or {"input_tokens": 0, "output_tokens": 0}
-    retrieved = [_unit_id(u) for u in result["retrieved"]]
+    return {
+        "path": result["path"],
+        "tool": result["tool_name"],
+        "queue": (result["tool_input"] or {}).get("queue"),
+        "cause": result["cause"],
+        "retrieved": [_unit_id(u) for u in result["retrieved"]],
+        "input_tokens": usage["input_tokens"],
+        "output_tokens": usage["output_tokens"],
+        "time_sec": result["response_time_sec"],
+        "error": result["error"],
+    }
+
+
+def score_ticket(ticket: dict, answer: dict, made: dict, model: str) -> dict:
+    """Combine a ticket, its answer and the agent's decision into one row."""
+    path, tool, queue = made["path"], made["tool"], made["queue"]
+    retrieved = made["retrieved"]
     return {
         "id": ticket["id"],
         "text": ticket["text"],
         "requester": ticket["requester"],
         "difficulty": answer["difficulty"],
-        "cause": result["cause"],
+        "cause": made["cause"],
         "expected_cause": answer["cause"],
         "expected_paths": answer["paths"],
         "expected_tools": answer["tools"],
@@ -140,36 +215,31 @@ def score_ticket(ticket: dict, answer: dict, result: dict, model: str) -> dict:
         "tool": tool,
         "queue": queue,
         "retrieved": retrieved,
-        "cause_correct": scoring.cause_correct(answer, result["cause"]),
+        "cause_correct": scoring.cause_correct(answer, made["cause"]),
         "retrieval_correct": scoring.retrieval_correct(answer, retrieved),
-        **usage,
-        "cost_usd": config.cost_usd(
-            model, usage["input_tokens"], usage["output_tokens"]
-        ),
-        "time_sec": result["response_time_sec"],
-        "error": result["error"],
+        "input_tokens": made["input_tokens"],
+        "output_tokens": made["output_tokens"],
+        "cost_usd": config.cost_usd(model, made["input_tokens"], made["output_tokens"]),
+        "time_sec": made["time_sec"],
+        "error": made["error"],
     }
 
 
-def evaluate(name: str, tiny: bool = False) -> dict:
-    """Run a set through the agent and return the evaluation."""
-    model = config.model_name()
-    pairs = load_any(name, tiny)
-    rows = [
-        score_ticket(ticket, answer, _attempt(ticket["text"]), model)
-        for ticket, answer in pairs
-    ]
+def _assemble(
+    name: str, pairs: list[tuple], rows: list[dict], model: str, versions: dict, **kind
+) -> dict:
+    """A saved run. `kind` says whether it was tiny, a sample or re-scored."""
     now = datetime.now(UTC)
+    suffix = "".join(f"-{label}" for label, on in kind.items() if on)
     return {
-        "id": f"{now:%Y%m%dT%H%M%S}-{name}{'-tiny' if tiny else ''}",
+        "id": f"{now:%Y%m%dT%H%M%S}-{name}{suffix}",
         "date": now.isoformat(timespec="seconds"),
         "set": name,
-        "tiny": tiny,
+        "tiny": kind.get("tiny", False),
+        "sample": kind.get("sample", False),
         "model": model,
-        "version": version(),
-        "instructions_version": instructions_version(),
-        "tools_version": tools_version(),
-        "kb_version": retrieval_score.kb_version(),
+        **versions,
+        "labels_version": labels_version(),
         "summary": scoring.summarize(rows),
         "yardsticks": yardsticks.score(pairs, load_imported(yardsticks.TRAINING_SPLIT)),
         "confusion": scoring.confusion(rows),
@@ -178,6 +248,78 @@ def evaluate(name: str, tiny: bool = False) -> dict:
         "by_family": scoring.by_family(rows),
         "tickets": rows,
     }
+
+
+def evaluate(name: str, tiny: bool = False, sampled: bool = False) -> dict:
+    """Run a set through the agent and return the evaluation."""
+    model = config.model_name()
+    pairs = select(name, tiny, sampled)
+    rows = [
+        score_ticket(ticket, answer, decision(_attempt(ticket["text"])), model)
+        for ticket, answer in pairs
+    ]
+    return _assemble(
+        name, pairs, rows, model, current_versions(), tiny=tiny, sample=sampled
+    )
+
+
+def rescore(run: dict) -> dict:
+    """Mark a saved run's decisions against the current labels, with no model calls."""
+    saved = {row["id"]: row for row in run["tickets"]}
+    pairs = [(t, a) for t, a in load_any(run["set"]) if t["id"] in saved]
+    rows = [
+        score_ticket(t, a, {k: saved[t["id"]][k] for k in DECISION_KEYS}, run["model"])
+        for t, a in pairs
+    ]
+    versions = {key: run[key] for key in VERSION_KEYS}
+    kind = {"tiny": run["tiny"], "sample": run.get("sample", False), "rescored": True}
+    new = _assemble(run["set"], pairs, rows, run["model"], versions, **kind)
+    return {**new, "rescored_from": run.get("rescored_from", run["id"])}
+
+
+def to_rescore(ids: list[str], runs: list[dict]) -> list[dict]:
+    """The saved runs named, or with none named, the newest full run of each set."""
+    if ids:
+        by_id = {run["id"]: run for run in runs}
+        missing = [i for i in ids if i not in by_id]
+        if missing:
+            raise KeyError(f"no saved run {', '.join(missing)}")
+        return [by_id[i] for i in ids]
+    newest: dict[str, dict] = {}
+    for run in runs:
+        if not run["tiny"] and not run.get("sample"):
+            newest.setdefault(run["set"], run)
+    return list(newest.values())
+
+
+def estimate_chf(model: str, tickets: int, runs: list[dict]) -> float | None:
+    """What a run should cost: the dearest saved run's rate, or a typical call."""
+    rates = [
+        run["summary"]["cost_per_ticket_chf"]
+        for run in runs
+        if run["model"] == model and run["summary"].get("cost_per_ticket_chf")
+    ]
+    if rates:
+        return max(rates) * tickets
+    usd = config.cost_usd(model, *TYPICAL_TOKENS)
+    return None if usd is None else usd * scoring.USD_TO_CHF * tickets
+
+
+def repeat_of(name: str, kind: dict, model: str, runs: list[dict]) -> dict | None:
+    """A saved run of the same tickets with the same model, instructions and tools."""
+    versions = current_versions()
+    for run in runs:
+        same_kind = (
+            run["tiny"] == kind["tiny"] and run.get("sample", False) == kind["sample"]
+        )
+        if (
+            run["set"] == name
+            and same_kind
+            and run["model"] == model
+            and all(run[key] == versions[key] for key in VERSION_KEYS)
+        ):
+            return run
+    return None
 
 
 def save_run(run: dict) -> None:
@@ -207,7 +349,10 @@ def _with_margin(summary: dict, measure: str) -> str:
 def print_report(run: dict) -> None:
     s = run["summary"]
     cost = s["cost_per_ticket_chf"]
-    print(f"{run['id']}  {run['model']}  version {run['version']}\n")
+    print(f"{run['id']}  {run['model']}  version {run['version']}")
+    if run.get("rescored_from"):
+        print(f"re-scored from {run['rescored_from']}, with no model calls")
+    print()
     print(
         f"path {_with_margin(s, 'path')}  action {_with_margin(s, 'action')}  "
         f"team {_with_margin(s, 'team')}  cause {_percent(s['cause_accuracy'])}  "
@@ -233,12 +378,59 @@ def print_report(run: dict) -> None:
             print(f"           expected {expected}, got {t['path']}")
 
 
+def _check_spend(parser: argparse.ArgumentParser, args: argparse.Namespace) -> None:
+    """Stop a run that repeats a saved one or costs more than allowed."""
+    model, runs = config.model_name(), load_runs()
+    tickets = len(select(args.name, args.tiny, args.sample))
+    kind = {"tiny": args.tiny, "sample": args.sample}
+    same = repeat_of(args.name, kind, model, runs)
+    if same and not args.again:
+        parser.error(
+            f"{same['id']} already ran these tickets with the same model, instructions,"
+            f" tools and knowledge base. Re-score it with --rescore {same['id']},"
+            " or pass --again to run it anyway."
+        )
+    cost = estimate_chf(model, tickets, runs)
+    cap = SPENDING_CAP_CHF if args.max_chf is None else args.max_chf
+    if cost is None:
+        if args.max_chf is None:
+            parser.error(f"{model} has no price. Pass --max-chf to run it anyway.")
+        print(f"{tickets} tickets, at an unknown cost.\n")
+        return
+    if cost > cap:
+        parser.error(
+            f"This run is about CHF {cost:.2f} for {tickets} tickets, over the"
+            f" CHF {cap:.2f} cap. Pass --max-chf {cost * 1.5:.2f} to go ahead."
+        )
+    print(f"About CHF {cost:.2f} for {tickets} tickets.\n")
+
+
 def main() -> None:
     """Run the evaluation, save it and print the report."""
     parser = argparse.ArgumentParser(prog="evals", description=__doc__)
     sets = sorted([*PREFIXES, *IMPORTED_SETS])
     parser.add_argument("--set", choices=sets, default="rules", dest="name")
     parser.add_argument("--tiny", action="store_true", help="five trial tickets")
+    parser.add_argument(
+        "--sample",
+        action="store_true",
+        help=f"{SAMPLE_PER_FAMILY} tickets from each family of dev or unseen_dev",
+    )
+    parser.add_argument(
+        "--max-chf",
+        type=float,
+        help=f"the most this run may cost, instead of CHF {SPENDING_CAP_CHF:.2f}",
+    )
+    parser.add_argument(
+        "--again", action="store_true", help="repeat a run that's already saved"
+    )
+    parser.add_argument(
+        "--rescore",
+        nargs="*",
+        metavar="RUN",
+        help="mark saved runs against the current labels, with no model calls."
+        " With no run named, the newest full run of each set",
+    )
     parser.add_argument(
         "--retrieval", action="store_true", help="score retrieval, with no model calls"
     )
@@ -253,8 +445,21 @@ def main() -> None:
     if args.retrieval:
         retrieval_score.main(args.split, args.save)
         return
+    if args.rescore is not None:
+        try:
+            chosen = to_rescore(args.rescore, load_runs())
+        except KeyError as exc:
+            parser.error(str(exc.args[0]))
+        for old in chosen:
+            new = rescore(old)
+            save_run(new)
+            print_report(new)
+        return
     if args.tiny and args.name in IMPORTED_SETS:
         parser.error("--tiny only applies to the rules sets")
-    run = evaluate(args.name, args.tiny)
+    if args.sample and args.name not in REVIEW_SPLITS:
+        parser.error("--sample only applies to dev and unseen_dev")
+    _check_spend(parser, args)
+    run = evaluate(args.name, args.tiny, args.sample)
     save_run(run)
     print_report(run)

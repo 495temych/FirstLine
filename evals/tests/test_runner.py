@@ -126,3 +126,134 @@ def test_a_failed_ticket_has_no_cause(stubbed, monkeypatch):
     row = runner.evaluate("rules", tiny=True)["tickets"][0]
     assert row["cause"] is None
     assert row["error"] == "RuntimeError: down"
+
+
+def no_model(text, use_retrieval):
+    raise AssertionError("re-scoring must not call the model")
+
+
+def command(monkeypatch, *args):
+    monkeypatch.setattr("sys.argv", ["evals", *args])
+    runner.main()
+
+
+def test_a_sample_takes_a_few_tickets_from_each_family_the_same_every_time():
+    picked = runner.sample(runner.load_any("dev"))
+    families = [answer["family"] for _, answer in picked]
+    assert len(picked) == 12 * runner.SAMPLE_PER_FAMILY
+    assert all(families.count(f) == runner.SAMPLE_PER_FAMILY for f in families)
+    assert picked == runner.sample(runner.load_any("dev"))
+
+
+def test_a_small_family_is_sampled_whole():
+    pairs = [({"id": "A-1"}, {"family": "A"}), ({"id": "A-2"}, {"family": "A"})]
+    assert runner.sample(pairs) == pairs
+
+
+@pytest.mark.usefixtures("stubbed")
+def test_a_sample_run_is_named_and_marked():
+    run = runner.evaluate("unseen_dev", sampled=True)
+    assert run["summary"]["n"] == 2 * runner.SAMPLE_PER_FAMILY
+    assert run["sample"] is True
+    assert run["id"].endswith("-unseen_dev-sample")
+
+
+@pytest.mark.parametrize("name", ["rules", "held_out", "unseen_held_out"])
+def test_only_the_practice_sets_can_be_sampled(stubbed, monkeypatch, capsys, name):
+    with pytest.raises(SystemExit):
+        command(monkeypatch, "--set", name, "--sample")
+    assert "--sample only applies" in capsys.readouterr().err
+
+
+@pytest.mark.usefixtures("stubbed")
+def test_rescoring_marks_saved_decisions_against_new_labels(monkeypatch):
+    run = runner.evaluate("rules", tiny=True)
+    first = run["tickets"][0]["id"]
+    monkeypatch.setattr(runner, "run_triage", no_model)
+    relabelled = [
+        (t, {**a, "paths": ["ESCALATE"], "tools": [], "queues": ["SEC-INCIDENT"]})
+        for t, a in runner.load_any("rules")
+    ]
+    monkeypatch.setattr(runner, "load_any", lambda name, tiny=False: relabelled)
+    new = runner.rescore(run)
+    assert new["summary"]["path_accuracy"] == 1
+    assert new["rescored_from"] == run["id"]
+    assert new["id"].endswith("-rules-tiny-rescored")
+    assert new["tickets"][0]["id"] == first
+    assert new["tickets"][0]["input_tokens"] == 1000
+    assert {k: new[k] for k in runner.VERSION_KEYS} == {
+        k: run[k] for k in runner.VERSION_KEYS
+    }
+    assert runner.rescore(new)["rescored_from"] == run["id"]
+
+
+def test_the_rescore_command_picks_the_newest_full_run_of_each_set(
+    stubbed, monkeypatch, capsys
+):
+    for run in [runner.evaluate("rules", tiny=True), runner.evaluate("unseen_dev")]:
+        runner.save_run(run)
+    monkeypatch.setattr(runner, "run_triage", no_model)
+    command(monkeypatch, "--rescore")
+    assert "re-scored from" in capsys.readouterr().out
+    saved = sorted(p.name for p in stubbed.glob("*.json"))
+    assert [n for n in saved if n.endswith("-rescored.json")] == [
+        n for n in saved if n.endswith("-unseen_dev-rescored.json")
+    ]
+    assert len(saved) == 3
+
+
+def test_rescoring_a_missing_run_says_so(stubbed, monkeypatch, capsys):
+    with pytest.raises(SystemExit):
+        command(monkeypatch, "--rescore", "no-such-run")
+    assert "no saved run no-such-run" in capsys.readouterr().err
+
+
+def test_a_run_over_the_cap_stops_before_any_call(stubbed, monkeypatch, capsys):
+    monkeypatch.setattr(runner, "SPENDING_CAP_CHF", 0.001)
+    monkeypatch.setattr(runner, "run_triage", no_model)
+    with pytest.raises(SystemExit):
+        command(monkeypatch, "--set", "unseen_dev")
+    err = capsys.readouterr().err
+    assert "over the CHF 0.00 cap" in err
+    assert "--max-chf" in err
+    assert not list(stubbed.glob("*.json"))
+
+
+def test_a_higher_limit_lets_the_run_go_ahead(stubbed, monkeypatch, capsys):
+    monkeypatch.setattr(runner, "SPENDING_CAP_CHF", 0.001)
+    command(monkeypatch, "--tiny", "--max-chf", "0.5")
+    assert "About CHF 0.04 for 5 tickets" in capsys.readouterr().out
+    assert len(list(stubbed.glob("*.json"))) == 1
+
+
+def test_the_estimate_uses_the_dearest_saved_run_of_the_model():
+    runs = [
+        {"model": "m", "summary": {"cost_per_ticket_chf": 0.01}},
+        {"model": "m", "summary": {"cost_per_ticket_chf": 0.02}},
+        {"model": "other", "summary": {"cost_per_ticket_chf": 9.0}},
+    ]
+    assert runner.estimate_chf("m", 10, runs) == pytest.approx(0.2)
+    assert runner.estimate_chf("unpriced", 10, []) is None
+
+
+def test_a_model_with_no_price_needs_a_limit(stubbed, monkeypatch, capsys):
+    monkeypatch.setenv("MODEL_NAME", "a-model-with-no-price")
+    with pytest.raises(SystemExit):
+        command(monkeypatch, "--tiny")
+    assert "has no price" in capsys.readouterr().err
+    command(monkeypatch, "--tiny", "--max-chf", "1")
+    assert "unknown cost" in capsys.readouterr().out
+
+
+def test_the_same_run_is_not_repeated(stubbed, monkeypatch, capsys):
+    command(monkeypatch, "--tiny")
+    capsys.readouterr()
+    with pytest.raises(SystemExit):
+        command(monkeypatch, "--tiny")
+    assert "already ran these tickets" in capsys.readouterr().err
+    command(monkeypatch, "--tiny", "--again")
+    assert "About CHF" in capsys.readouterr().out
+
+
+def test_every_run_records_its_labels_version(stubbed):
+    assert len(runner.evaluate("rules", tiny=True)["labels_version"]) == 8

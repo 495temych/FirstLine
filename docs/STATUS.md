@@ -8,6 +8,8 @@ All 745 imported tickets have a named cause, drafted by rules, and each cause ha
 
 The baseline is run and committed for the rules, development and unseen sets, with the two yardsticks beside each. The README's "Results" holds the numbers. In short: path 80% on the rules set, 70% on development and 60% on unseen families, against 36%, 92% and 92% for the simple classifier. The agent doesn't yet beat both yardsticks, and three SEC-04 mistakes make up CHF 6,000 of the CHF 10,020 mistake bill on development. The run's retrieval score counts any matched policy on an unseen ticket as wrong, so it reads 63% there, while the retrieval score, which counts playbooks only, reads 96%.
 
+Spending is guarded in code. A run states its estimated cost first, stops above CHF 1 unless allowed more, and refuses to repeat a saved run. `--rescore` marks saved decisions against new labels with no model calls, and `--sample` runs 3 tickets per family. The Batch API and prompt caching aren't used yet.
+
 ## Who enforces each rule
 
 From the rules in `docs/SPEC.md`. Later sprints close the gaps.

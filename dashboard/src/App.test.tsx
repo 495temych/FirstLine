@@ -282,7 +282,9 @@ it("shows saved evaluations and opens another one", async () => {
   render(<App />);
   click("Scoreboard");
   expect(await screen.findByText("rules set (tiny)")).toBeDefined();
-  expect(screen.getByText("rules set, held-out")).toBeDefined();
+  expect(
+    screen.getByText("rules set, held-out (sample, re-scored)"),
+  ).toBeDefined();
   expect(screen.getByText(/CHF 120 for a wrong fix/)).toBeDefined();
   expect(screen.getByText("My VPN keeps disconnecting")).toBeDefined();
   expect(screen.getByText("Simple classifier")).toBeDefined();

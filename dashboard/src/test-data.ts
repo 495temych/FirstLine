@@ -182,6 +182,8 @@ export const evaluations: Evaluations = {
       date: "2026-11-03T22:17:52+00:00",
       set: "rules_held_out",
       tiny: false,
+      sample: true,
+      rescored_from: "20261102-held_out",
       model: "claude-sonnet",
       version: "def67890",
       summary: {

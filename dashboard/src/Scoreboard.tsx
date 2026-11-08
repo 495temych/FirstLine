@@ -26,8 +26,13 @@ function withMargin(share: number | null, margin: number | null) {
 }
 
 function setName(run: Evaluation) {
+  const kinds = [
+    run.tiny && "tiny",
+    run.sample && "sample",
+    run.rescored_from && "re-scored",
+  ].filter(Boolean);
   const name = setNames[run.set];
-  return run.tiny ? `${name} (tiny)` : name;
+  return kinds.length ? `${name} (${kinds.join(", ")})` : name;
 }
 
 function RetrievalRuns({ runs }: Readonly<{ runs: RetrievalRun[] }>) {
