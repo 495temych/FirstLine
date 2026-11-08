@@ -56,6 +56,28 @@ When asked to implement, as in "Please implement commit 3", build that one commi
 - Never push without asking.
 - Ask before anything irreversible.
 - Keep `docs/STATUS.md` up to date.
-- Live runs cost money. Use them only when a check needs them.
+- Live runs cost money. Follow "Spending" below.
 - Never open the held-out set when changing the instructions, and never give the agent an answer file.
 - `logs.csv` and `checkpoints.sqlite` are real usage data. Keep them out of tests.
+
+## Spending
+
+The owner pays for every model call, so we spend as little as gets a trustworthy number. A full practice run of 206 tickets costs about CHF 1 today.
+
+- **Ask before any run over CHF 1**, and say what it costs and why it's needed. Smaller runs still get a line saying what they cost.
+- **Never re-run the model when only the labels change.** Re-score the saved decisions instead, which is free.
+- **Practise on a sample** of a few tickets per family, and run a full set once per commit, to record its result.
+- **Try new designs and models on the sample first.** Run them in full only if they clearly win on it.
+- **Run the held-out sets once**, at sprint review.
+- **Never run the same thing twice.** If the instructions, tools, knowledge base and model are unchanged, reuse the saved run.
+- **Prefer the cheapest model that passes**, and justify any bigger one with numbers.
+
+The tools that make this cheap by default are planned and not built yet:
+
+| Tool | What it saves |
+|---|---|
+| `--rescore` | Marks saved decisions against new labels, with no model calls |
+| `--sample` | Runs about 70 tickets, a few per family, for about CHF 0.30 |
+| Batch API | Half price on every evaluation run |
+| Prompt caching | Roughly 30–50% off the input that repeats on every call, to confirm on one small run |
+| A spending cap | The runner estimates the cost first and stops above a limit unless the owner confirms |
