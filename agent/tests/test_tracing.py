@@ -1,6 +1,7 @@
 """Tracing to Langfuse, with stand-ins so no test reaches the service."""
 
-from contextlib import contextmanager
+from contextlib import contextmanager, nullcontext
+from types import SimpleNamespace
 
 import pytest
 
@@ -100,3 +101,73 @@ def test_on_gives_a_handler_and_names_the_trace(on, monkeypatch):
     }
     tracing.flush()
     assert on.flushed
+
+
+def test_off_means_no_trace_id_url_or_verdict():
+    assert tracing.new_trace_id("seed") is None
+    assert tracing.trace_url("t1") is None
+    tracing.verdict("t1", "approved")
+
+
+def test_a_trace_id_from_the_same_seed_is_the_same(on):
+    assert tracing.new_trace_id("queue b T-1") == tracing.new_trace_id("queue b T-1")
+    assert tracing.new_trace_id("queue b T-1") != tracing.new_trace_id("queue b T-2")
+
+
+class RecordingClient(FakeClient):
+    def __init__(self):
+        super().__init__()
+        self.observations, self.scores = [], []
+        observations = SimpleNamespace(get_many=self._get_many)
+        self.api = SimpleNamespace(observations=observations)
+
+    @contextmanager
+    def start_as_current_observation(self, **observation):
+        self.observations.append(observation)
+        yield
+
+    def _get_many(self, **query):
+        self.query = query
+        return SimpleNamespace(data=[SimpleNamespace(model_dump=lambda: {"name": "x"})])
+
+    def get_trace_url(self, *, trace_id):
+        return f"https://lf/{trace_id}"
+
+    def create_score(self, **score):
+        self.scores.append(score)
+
+
+@pytest.fixture
+def recording(on, monkeypatch):
+    fake = RecordingClient()
+    monkeypatch.setattr(tracing, "client", lambda: fake)
+    monkeypatch.setattr(tracing, "propagate_attributes", lambda **_: nullcontext())
+    return fake
+
+
+def test_a_given_trace_id_holds_everything_inside(recording):
+    with tracing.trace("queue", trace_id="t1"):
+        pass
+    assert recording.observations == [
+        {"trace_context": {"trace_id": "t1"}, "name": "queue"}
+    ]
+
+
+def test_a_trace_is_read_back_with_usage_and_cost(recording):
+    assert tracing.trace_steps("t1") == [{"name": "x"}]
+    assert recording.query["trace_id"] == "t1"
+    assert "usage" in recording.query["fields"]
+    assert tracing.trace_url("t1") == "https://lf/t1"
+
+
+def test_a_verdict_lands_on_its_trace(recording):
+    tracing.verdict("t1", "rejected", "Wrong user")
+    assert recording.scores == [
+        {
+            "trace_id": "t1",
+            "name": "technician_verdict",
+            "value": "rejected",
+            "data_type": "CATEGORICAL",
+            "comment": "Wrong user",
+        }
+    ]

@@ -240,12 +240,31 @@ Each design decision so far, with its reason and its trade-off.
 - **Reason:** Supabase serves every `public` table over a REST API, and its publishable key is meant to be public. Without row-level security, anyone with that key could read and write tickets.
 - **Trade-off:** the dashboard can't read Supabase on its own. Everything goes through the backend, which is where the rules live anyway.
 
+## The Queue's board lives in memory first
+
+- **Decision:** the first Queue keeps its batches, decisions and reviews in the backend's memory, with two worker threads. It reads tickets from the development split, so held-out tickets never appear.
+- **Reason:** the MVP rule. The flow and its value had to be seen before they are made durable, and the Supabase tables already match the board's shape.
+- **Trade-off:** a restart clears the board, and a ticket a worker had started is lost. Supabase fixes both.
+
+## A technician's verdict is a Langfuse score
+
+- **Decision:** every review sends `technician_verdict` (approved, corrected or rejected) to the ticket's trace, and the dashboard shows the trace's own steps from Langfuse.
+- **Reason:** the trace then answers both questions in one place: why the agent decided, and whether a person agreed. Langfuse can filter and chart the verdicts with no code of ours.
+- **Trade-off:** Langfuse needs a few seconds to show a new trace, so the dashboard asks again for up to 30 seconds. With tracing off, the panel says so.
+
+## Parallel searches share one opening
+
+- **Decision:** the embedding model and the Qdrant client open once under a lock, the client waits up to 30 seconds, and the search step retries a failed connection up to 3 times.
+- **Reason:** two Queue workers opening Qdrant at once timed out on a slow network. A retried search costs nothing, unlike a retried model call.
+- **Trade-off:** a dead network now takes longer to fail.
+
 ## Known limitations
 
 - **Synthetic knowledge base.** A real deployment needs real client documentation.
 - **Simulated tools.** Production needs least-privilege service accounts for AD, Intune, PaperCut and ServiceNow.
 - **Small corpus.** With 21 documents and 99 units, the thresholds and top 2 need revalidating at scale, and hundreds of units would need re-ranking.
 - **Search by meaning only.** Error codes and bare titles match poorly. `T-012`, a short Outlook sign-in request, ranks `sso-mfa` first. Keyword matching arrives with Qdrant in Sprint 2.
+- **The agent can invent parameters.** In a live Queue run it proposed a device id that isn't the requester's. The technician's review catches it, and the requester lookup in the investigation loop should prevent it.
 - **Single turn only.** Some real L1 issues need back-and-forth, which this design can't handle.
 - **No feedback loop.** The thresholds are set by inspection, not tuned from confirmed outcomes.
 - **Retrieval's cost and latency aren't measured.** The on/off switch shows the difference but doesn't quantify it.

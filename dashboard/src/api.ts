@@ -196,6 +196,102 @@ export interface Stats {
   low_sample: boolean;
 }
 
+export type QueueState = "queued" | "working" | "review" | "closed" | "failed";
+
+export type Verdict = "approved" | "corrected" | "rejected";
+
+export interface QueueDecision {
+  path: Path;
+  cause: string;
+  reasoning: string;
+  tool: string | null;
+  tool_input: Record<string, string> | null;
+  queue: string | null;
+  priority: string | null;
+  summary: string | null;
+  retrieved: { doc: string; section: string | null; score: number }[];
+}
+
+export interface QueueReview {
+  verdict: Verdict;
+  seconds: number;
+  queue: string | null;
+  note: string;
+  outcome: { detail: string; ticket_number?: string; queue?: string };
+  at: string;
+}
+
+export interface QueueTicket {
+  id: string;
+  batch: string;
+  title: string;
+  description: string;
+  priority: string;
+  sla_plan: string;
+  submitted_at: string;
+  applications: string[];
+  requester: {
+    id: string;
+    name: string;
+    department: string | null;
+    office: string | null;
+    device: string | null;
+  };
+  state: QueueState;
+  decision: QueueDecision | null;
+  agent_seconds: number | null;
+  cost_chf: number | null;
+  trace_id: string | null;
+  trace_url: string | null;
+  review: QueueReview | null;
+  error: string | null;
+}
+
+export interface QueueValue {
+  model_cost_chf: number;
+  agent_seconds: number | null;
+  reviewed: number;
+  approved: number;
+  review_seconds: number | null;
+  minutes_saved: number;
+  net_chf: number;
+  minutes_by_hand: number;
+  chf_per_hour: number;
+}
+
+export interface QueueView {
+  tickets: QueueTicket[];
+  counts: Record<QueueState, number>;
+  at_desk: number;
+  batch_size: number;
+  queues: string[];
+  value: QueueValue;
+}
+
+export interface ReviewBody {
+  verdict: Verdict;
+  seconds: number;
+  queue?: string;
+  note?: string;
+}
+
+export interface TraceStep {
+  name: string;
+  type: string;
+  start_ms: number;
+  duration_ms: number;
+  model: string | null;
+  input_tokens: number | null;
+  output_tokens: number | null;
+  cost_usd: number | null;
+}
+
+export interface Trace {
+  status: "off" | "pending" | "ready";
+  url: string | null;
+  steps: TraceStep[];
+}
+
 async function request<T>(url: string, init?: RequestInit): Promise<T> {
   const response = await fetch(url, init);
   if (response.ok) return (await response.json()) as T;
@@ -227,4 +323,9 @@ export const api = {
   evaluations: () => request<Evaluations>("/api/evaluations"),
   tickets: () => request<LabelledTicket[]>("/api/tickets"),
   stats: () => request<Stats>("/api/stats"),
+  queue: () => request<QueueView>("/api/queue"),
+  loadBatch: () => post<QueueView>("/api/queue/load", {}),
+  review: (id: string, body: ReviewBody) =>
+    post<QueueTicket>(`/api/queue/tickets/${id}/review`, body),
+  trace: (id: string) => request<Trace>(`/api/queue/tickets/${id}/trace`),
 };

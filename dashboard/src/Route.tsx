@@ -4,7 +4,7 @@ import type { Gate, Run, Unit } from "./api";
 import { Action } from "./Action";
 import { pathLabels, plainText } from "./format";
 
-function Station(
+export function Station(
   props: Readonly<{
     n: number;
     title: string;

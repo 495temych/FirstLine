@@ -14,6 +14,7 @@ import {
   baseRun,
   declined,
   draft,
+  emptyQueue,
   evaluations,
   result,
   stats,
@@ -44,6 +45,7 @@ beforeEach(() => {
     "/api/evaluations": evaluations,
     "/api/tickets": tickets,
     "/api/stats": stats,
+    "/api/queue": emptyQueue,
   };
   window.history.replaceState(null, "", "/");
   vi.stubGlobal("fetch", vi.fn(reply));
@@ -58,10 +60,15 @@ const click = (name: string | RegExp) => {
   fireEvent.click(screen.getByRole("button", { name }));
 };
 
+/** The Queue opens first, so the Assistant needs its tab. */
+function showAssistant() {
+  render(<App />);
+  click("Assistant");
+}
+
 async function triage(run: Partial<Run> = {}) {
   replies["/api/triage"] = { ...baseRun, ...run };
-  render(<App />);
-  await screen.findByRole("button", { name: "Assistant" });
+  showAssistant();
   fireEvent.change(screen.getByLabelText("Describe the issue"), {
     target: { value: "My VPN fails" },
   });
@@ -69,17 +76,27 @@ async function triage(run: Partial<Run> = {}) {
   await screen.findByText("My VPN fails", { selector: ".query" });
 }
 
-it("shows the three tabs and the example tickets", () => {
+it("opens on the Queue, with three more tabs", async () => {
   render(<App />);
   expect(screen.getByRole("heading", { name: "FirstLine" })).toBeDefined();
-  for (const tab of ["Assistant", "Scoreboard", "Tickets"]) {
+  for (const tab of ["Queue", "Assistant", "Scoreboard", "Tickets"]) {
     expect(screen.getByRole("button", { name: tab })).toBeDefined();
   }
+  expect(
+    (await screen.findByRole("button", { name: "Queue" })).getAttribute(
+      "aria-current",
+    ),
+  ).toBe("page");
+  expect(await screen.findByText(/The board is empty/)).toBeDefined();
+});
+
+it("shows the example tickets on the Assistant", () => {
+  showAssistant();
   expect(screen.getAllByRole("listitem")).toHaveLength(presets.length);
 });
 
 it("fills the ticket from an example without running it", () => {
-  render(<App />);
+  showAssistant();
   click(presets[1] ?? "");
   const box: HTMLTextAreaElement = screen.getByLabelText("Describe the issue");
   expect(box.value).toBe(presets[1]);
@@ -87,8 +104,7 @@ it("fills the ticket from an example without running it", () => {
 });
 
 it("sends the retrieval switch with the ticket", async () => {
-  render(<App />);
-  await screen.findByRole("button", { name: "Assistant" });
+  showAssistant();
   fireEvent.click(screen.getByRole("switch"));
   fireEvent.change(screen.getByLabelText("Describe the issue"), {
     target: { value: "Help" },
@@ -104,7 +120,7 @@ it("sends the retrieval switch with the ticket", async () => {
 
 it("blocks triage and explains when the key is missing", async () => {
   replies["/api/health"] = { status: "ok", api_key: false };
-  render(<App />);
+  showAssistant();
   expect((await screen.findByRole("alert")).textContent).toContain(
     "ANTHROPIC_API_KEY",
   );
@@ -209,8 +225,7 @@ it("explains a run with retrieval off", async () => {
 
 it("shows a failed triage", async () => {
   replies["/api/triage"] = 502;
-  render(<App />);
-  await screen.findByRole("button", { name: "Assistant" });
+  showAssistant();
   fireEvent.change(screen.getByLabelText("Describe the issue"), {
     target: { value: "Help" },
   });

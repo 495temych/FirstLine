@@ -152,8 +152,10 @@ The number after each one is the commit that meets it.
 | 1 | ✅ **Langfuse.** One trace per ticket, tagged runs and scores on traces, with personal data redacted before anything leaves the Mac | Click a decision and follow it, with no names in the trace | Traces, experiments, sending only what the task needs |
 | 2 | **Qdrant.** Sections and past incidents move to Qdrant, with hybrid search for error codes | Retrieval scores before and after, beside each other | Search by meaning and keywords, retrieval evals |
 | 3 | **Supabase.** Postgres replaces SQLite and `logs.csv`, including LangGraph's checkpoints | A paused ticket survives a restart | A system of record, durable checkpoints |
-| 4 | **The Queue.** Load a batch, order it in code, and approve, correct or reject each decision with its evidence | A technician clears a morning batch, and technician time per ticket is measured | The human's step |
+| 4 | 🟡 **The Queue.** Load a batch, order it in code, and approve, correct or reject each decision with its evidence | A technician clears a morning batch, and technician time per ticket is measured | The human's step |
 | 5 | **Durable and gated.** Retries, no repeated actions, spending limits per batch, and a release gate: a change ships only if its Langfuse experiment passes | Kill a batch mid-run and it carries on without doing anything twice. A worse change is refused | Idempotency, `RetryPolicy`, evals as a release gate |
+
+The Queue's first version is in: batches, live states, review with measured time, traces in the UI and the value in CHF. It keeps the board in memory until Supabase is wired in, and the agent doesn't investigate yet.
 
 Sprint 2 started before Sprint 1's commits 6 to 8, at the owner's call, so the tools are in place when those experiments run.
 

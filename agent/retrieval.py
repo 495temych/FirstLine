@@ -11,6 +11,7 @@ import hashlib
 import os
 import re
 from functools import cache
+from threading import RLock
 
 import numpy as np
 from qdrant_client import QdrantClient, models
@@ -34,6 +35,7 @@ MATCH_ONLY_SECTIONS = {"Symptoms"}
 
 EMBEDDING_MODEL = "all-MiniLM-L6-v2"
 COLLECTION = "kb_sections"
+QDRANT_TIMEOUT_SEC = 30  # a free cluster can take a while to wake up
 
 MIN_LINE_CHARS = 25  # shorter lines are headers or blank rows
 MIN_LINE_SCORE = 0.25  # weaker lines are not worth highlighting
@@ -165,7 +167,9 @@ def index_problem(client: QdrantClient) -> str | None:
 
 def cloud_client() -> QdrantClient:
     return QdrantClient(
-        url=os.environ["QDRANT_URL"], api_key=os.getenv("QDRANT_API_KEY")
+        url=os.environ["QDRANT_URL"],
+        api_key=os.getenv("QDRANT_API_KEY"),
+        timeout=QDRANT_TIMEOUT_SEC,
     )
 
 
@@ -205,10 +209,21 @@ def _top_lines(doc_text: str, query_vec: np.ndarray, n: int = 3) -> list[dict]:
     ]
 
 
+# Searches can run in parallel, as the Queue's do. One loads the model and opens the
+# index, and the others wait for it instead of doing the same.
+_opening = RLock()
+
+
+def _ready() -> tuple[SentenceTransformer, QdrantClient]:
+    with _opening:
+        return _get_model(), _get_index()
+
+
 def _score(query: str) -> tuple[np.ndarray, np.ndarray]:
     """The query's vector, and its score against every unit, by position."""
-    query_vec = _get_model().encode([query], normalize_embeddings=True)[0]
-    hits = _get_index().query_points(
+    model, index = _ready()
+    query_vec = model.encode([query], normalize_embeddings=True)[0]
+    hits = index.query_points(
         COLLECTION, query=query_vec.tolist(), limit=len(_get_units())
     )
     scores = np.zeros(len(_get_units()))

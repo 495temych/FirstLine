@@ -10,6 +10,7 @@ import pytest
 from langchain_core.runnables import RunnableConfig
 from langgraph.checkpoint.memory import InMemorySaver
 from langgraph.types import Command
+from qdrant_client.http.exceptions import ResponseHandlingException
 
 from agent import graph as g
 from agent.tests.fakes import (
@@ -218,3 +219,8 @@ def test_log_runs_false_skips_logging(env):
     cfg = {"configurable": {"thread_id": "t2", "log_runs": False}}
     env.graph.invoke(g.initial_state("weather?", True), cfg)
     assert env.rows() == []
+
+
+def test_a_search_that_cannot_reach_the_index_is_retried():
+    assert g._is_search_error(ResponseHandlingException(OSError("timed out")))
+    assert not g._is_search_error(ValueError("bad input"))

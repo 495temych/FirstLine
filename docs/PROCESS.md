@@ -33,6 +33,7 @@ Other commands:
 - `uv run -m evals.label_tickets` gives every imported ticket its named cause again, from `data/evals/causes.json`.
 - `uv run -m evals --retrieval` scores retrieval on the development sets, with no model calls. `--split` picks another set, and `--save` keeps the result for the Scoreboard.
 - `uv run -m evals.import_tickets` imports the tickets again, as `data/tickets/SOURCE.md` explains.
+- The Queue tab loads 8 development tickets at a time and triages them with real model calls, about CHF 0.03 a batch. The board lives in the backend's memory, so restarting `npm run dev` clears it.
 - `uv run -m backend.stats` prints the usage statistics.
 - `uv run uvicorn backend.main:app` runs the backend alone, with its API at http://127.0.0.1:8000/docs.
 

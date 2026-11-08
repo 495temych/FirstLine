@@ -67,6 +67,11 @@ def callbacks() -> list[BaseCallbackHandler]:
     return [CallbackHandler()]
 
 
+def new_trace_id(seed: str) -> str | None:
+    """A trace id fixed in advance, so a record can link to its trace. None if off."""
+    return Langfuse.create_trace_id(seed=seed) if enabled() else None
+
+
 @contextmanager
 def trace(
     name: str,
@@ -74,16 +79,54 @@ def trace(
     session_id: str | None = None,
     tags: tuple[str, ...] = (),
     metadata: dict[str, str] | None = None,
+    trace_id: str | None = None,
 ) -> Iterator[None]:
-    """Name the trace of every graph call inside, and group them by session."""
+    """Name the trace of every graph call inside, and group them by session.
+
+    With a `trace_id`, everything inside lands in that one trace.
+    """
     if not enabled():
         yield
         return
-    client()
+    lf = client()
     with propagate_attributes(
         trace_name=name, session_id=session_id, tags=list(tags), metadata=metadata
     ):
-        yield
+        if trace_id is None:
+            yield
+            return
+        with lf.start_as_current_observation(
+            trace_context={"trace_id": trace_id}, name=name
+        ):
+            yield
+
+
+def trace_url(trace_id: str) -> str | None:
+    """Where a trace opens in Langfuse."""
+    return client().get_trace_url(trace_id=trace_id) if enabled() else None
+
+
+def trace_steps(trace_id: str) -> list[dict]:
+    """A trace's observations with their timing, model, tokens and cost.
+
+    Empty until Langfuse has ingested the trace, which takes a few seconds.
+    """
+    found = client().api.observations.get_many(
+        trace_id=trace_id, fields="core,basic,time,usage,model", limit=100
+    )
+    return [observation.model_dump() for observation in found.data]
+
+
+def verdict(trace_id: str, value: str, comment: str | None = None) -> None:
+    """Record a person's verdict on the trace it judges."""
+    if enabled():
+        client().create_score(
+            trace_id=trace_id,
+            name="technician_verdict",
+            value=value,
+            data_type="CATEGORICAL",
+            comment=comment,
+        )
 
 
 def flush() -> None:

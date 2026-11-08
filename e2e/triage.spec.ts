@@ -9,6 +9,7 @@ test.beforeEach(async ({ page }) => {
 
 async function triage(page: Page, ticket: string) {
   await page.goto("/");
+  await page.getByRole("button", { name: "Assistant" }).click();
   await page.getByLabel("Describe the issue").fill(ticket);
   await page.getByRole("button", { name: "Triage this ticket" }).click();
 }
@@ -78,7 +79,7 @@ test("the scoreboard shows a saved evaluation", async ({ page }) => {
 
 test("the tickets tab can be filtered", async ({ page }) => {
   await page.goto("/");
-  await page.getByRole("button", { name: "Tickets" }).click();
+  await page.getByRole("button", { name: "Tickets", exact: true }).click();
   await expect(page.getByText("206 of 206 tickets")).toBeVisible();
   await page.getByRole("button", { name: "records" }).click();
   await expect(page.getByText("5 of 206 tickets")).toBeVisible();
@@ -93,6 +94,35 @@ test("the page fits a phone", async ({ page }) => {
   await page.setViewportSize({ width: 375, height: 812 });
   await triage(page, "fix my VPN");
   await expect(page.getByRole("button", { name: "Run fix" })).toBeVisible();
+  const overflow = await page.evaluate(
+    () => document.documentElement.scrollWidth - window.innerWidth,
+  );
+  expect(overflow).toBeLessThanOrEqual(0);
+});
+
+test("the queue works a batch and waits for a technician", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.getByText(/The board is empty/)).toBeVisible();
+  await page
+    .getByRole("button", { name: /Load 8 tickets from the service desk/ })
+    .click();
+  const states = page.getByRole("list", { name: "Tickets by state" });
+  await expect(states.getByText("Waiting for a technician")).toBeVisible();
+  await expect(page.locator(".chip-review")).toHaveCount(8);
+  await page.locator("td.wide button.link").first().click();
+  await expect(page.getByText(/Tracing is off/)).toBeVisible();
+  await page.getByRole("button", { name: /^Approve and/ }).click();
+  await expect(page.locator(".chip-review")).toHaveCount(7);
+  await expect(page.locator(".chip-approved")).toHaveCount(1);
+  await expect(
+    page.getByRole("region", { name: "What the work is worth" }),
+  ).toContainText("1 of 1");
+});
+
+test("the queue fits a phone", async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 812 });
+  await page.goto("/");
+  await expect(page.getByText(/waiting at the desk/)).toBeVisible();
   const overflow = await page.evaluate(
     () => document.documentElement.scrollWidth - window.innerWidth,
   );

@@ -1,4 +1,13 @@
-import type { Evaluations, LabelledTicket, Run, Stats } from "./api";
+import type {
+  Evaluations,
+  LabelledTicket,
+  QueueDecision,
+  QueueTicket,
+  QueueView,
+  Run,
+  Stats,
+  Trace,
+} from "./api";
 
 export const unit = {
   doc: "vpn",
@@ -261,4 +270,167 @@ export const stats: Stats = {
   automation_rate: 100,
   avg_response_time_sec: { SELF_SERVE: null, AUTO_FIX: 1.5 },
   low_sample: true,
+};
+
+const fixDecision: QueueDecision = {
+  path: "AUTO_FIX",
+  cause: "Stale VPN profile",
+  reasoning: "The profile predates the **migration**.",
+  tool: "reset_vpn_profile",
+  tool_input: { username: "a.b" },
+  queue: null,
+  priority: null,
+  summary: null,
+  retrieved: [{ doc: "vpn-access", section: "Fix", score: 0.61 }],
+};
+
+export const queueTicket: QueueTicket = {
+  id: "INC-VPN-0001",
+  batch: "20261108T090000",
+  title: "VPN drops every few minutes",
+  description: "Since the migration my VPN disconnects.",
+  priority: "high",
+  sla_plan: "Business-hours SLA",
+  submitted_at: "2026-11-08T08:00:00Z",
+  applications: ["GlobalProtect"],
+  requester: {
+    id: "a.b",
+    name: "Anna Berg",
+    department: "Finance",
+    office: "Zurich",
+    device: "LT-ABERG",
+  },
+  state: "review",
+  decision: fixDecision,
+  agent_seconds: 3.2,
+  cost_chf: 0.0036,
+  trace_id: "t1",
+  trace_url: "https://cloud.langfuse.com/project/p/traces/t1",
+  review: null,
+  error: null,
+};
+
+export const escalationTicket: QueueTicket = {
+  ...queueTicket,
+  id: "INC-SEC-0002",
+  title: "Locked out again",
+  decision: {
+    ...fixDecision,
+    path: "ESCALATE",
+    tool: null,
+    tool_input: null,
+    queue: "SEC-INCIDENT",
+    priority: "P2-High",
+    summary: "Repeat lockout, a possible compromise.",
+  },
+};
+
+export const queuedTicket: QueueTicket = {
+  ...queueTicket,
+  id: "INC-PRT-0003",
+  title: "Printer on floor 3 is jammed",
+  state: "queued",
+  decision: null,
+  agent_seconds: null,
+  cost_chf: null,
+  trace_id: null,
+  trace_url: null,
+};
+
+export const failedTicket: QueueTicket = {
+  ...queuedTicket,
+  id: "INC-WIF-0004",
+  title: "Wi-Fi keeps dropping",
+  state: "failed",
+  error: "RuntimeError: model unavailable",
+};
+
+export const closedTicket: QueueTicket = {
+  ...queueTicket,
+  id: "INC-VPN-0005",
+  title: "VPN certificate expired",
+  state: "closed",
+  review: {
+    verdict: "corrected",
+    seconds: 75,
+    queue: "NET-VPN",
+    note: "",
+    outcome: {
+      detail: "Ticket #INC1234567 opened in NET-VPN (priority: P3-Normal).",
+    },
+    at: "2026-11-08T09:10:00Z",
+  },
+};
+
+const value = {
+  model_cost_chf: 0,
+  agent_seconds: null,
+  reviewed: 0,
+  approved: 0,
+  review_seconds: null,
+  minutes_saved: 0,
+  net_chf: 0,
+  minutes_by_hand: 15,
+  chf_per_hour: 60,
+};
+
+const noTickets = { queued: 0, working: 0, review: 0, closed: 0, failed: 0 };
+
+export const emptyQueue: QueueView = {
+  tickets: [],
+  counts: noTickets,
+  at_desk: 129,
+  batch_size: 8,
+  queues: ["NET-VPN", "SEC-INCIDENT"],
+  value,
+};
+
+export const busyQueue: QueueView = {
+  ...emptyQueue,
+  tickets: [
+    queueTicket,
+    escalationTicket,
+    queuedTicket,
+    failedTicket,
+    closedTicket,
+  ],
+  counts: { queued: 1, working: 0, review: 2, closed: 1, failed: 1 },
+  at_desk: 121,
+  value: {
+    ...value,
+    model_cost_chf: 0.0144,
+    agent_seconds: 3.2,
+    reviewed: 1,
+    approved: 0,
+    review_seconds: 75,
+    minutes_saved: -1.25,
+    net_chf: -1.2644,
+  },
+};
+
+export const readyTrace: Trace = {
+  status: "ready",
+  url: "https://cloud.langfuse.com/project/p/traces/t1",
+  steps: [
+    {
+      name: "retrieve",
+      type: "CHAIN",
+      start_ms: 0,
+      duration_ms: 400,
+      model: null,
+      input_tokens: null,
+      output_tokens: null,
+      cost_usd: null,
+    },
+    {
+      name: "ChatAnthropic",
+      type: "GENERATION",
+      start_ms: 400,
+      duration_ms: 2500,
+      model: "claude-haiku-4-5-20251001",
+      input_tokens: 3564,
+      output_tokens: 189,
+      cost_usd: 0.0045,
+    },
+  ],
 };

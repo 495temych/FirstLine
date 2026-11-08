@@ -2,12 +2,19 @@ import { useState } from "react";
 import { Scoreboard } from "./Scoreboard";
 import { Tickets } from "./Tickets";
 import { Assistant } from "./Assistant";
+import { Queue } from "./Queue";
 
-const tabs = ["Assistant", "Scoreboard", "Tickets"] as const;
+const tabs = ["Queue", "Assistant", "Scoreboard", "Tickets"] as const;
 type Tab = (typeof tabs)[number];
 
 export function App() {
-  const [tab, setTab] = useState<Tab>("Assistant");
+  // A link to a paused Assistant run opens the Assistant. Everything else opens
+  // the Queue, the core of the product.
+  const [tab, setTab] = useState<Tab>(() =>
+    new URLSearchParams(window.location.search).has("run")
+      ? "Assistant"
+      : "Queue",
+  );
 
   return (
     <>
@@ -32,6 +39,10 @@ export function App() {
         </nav>
       </header>
       <main>
+        {/* Both stay mounted, so a running batch or a paused run survives a tab switch. */}
+        <div hidden={tab !== "Queue"}>
+          <Queue />
+        </div>
         <div hidden={tab !== "Assistant"}>
           <Assistant />
         </div>

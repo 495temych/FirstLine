@@ -32,6 +32,7 @@ from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 from langchain_core.runnables import RunnableConfig
 from langgraph.graph import END, START, StateGraph
 from langgraph.types import RetryPolicy, interrupt
+from qdrant_client.http.exceptions import ResponseHandlingException
 from typing_extensions import TypedDict
 
 from agent import tools
@@ -248,6 +249,14 @@ def _is_api_error(exc: BaseException) -> bool:
 _API_RETRY = RetryPolicy(max_attempts=3, retry_on=_is_api_error)
 
 
+def _is_search_error(exc: BaseException) -> bool:
+    """Retry a search that couldn't reach the index. A retry costs nothing."""
+    return isinstance(exc, ResponseHandlingException)
+
+
+_SEARCH_RETRY = RetryPolicy(max_attempts=3, retry_on=_is_search_error)
+
+
 def _call_model(state: GraphState) -> tuple[AIMessage, float]:
     llm = _get_llm()
     instructions = _PROMPT_FILE.read_text()
@@ -434,7 +443,7 @@ def route_after_self_serve(state: GraphState) -> Literal["log", "draft_ticket"]:
 def build_graph(checkpointer):
     g = StateGraph(GraphState)
 
-    g.add_node("retrieve", retrieve_node)
+    g.add_node("retrieve", retrieve_node, retry_policy=_SEARCH_RETRY)
     g.add_node("triage", triage, retry_policy=_API_RETRY)
     g.add_node("no_tools", no_tools, retry_policy=_API_RETRY)
     g.add_node("confirm_fix", confirm_fix)
