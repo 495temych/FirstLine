@@ -12,6 +12,7 @@ from uuid import uuid4
 from langchain_core.runnables import RunnableConfig
 from langgraph.checkpoint.memory import InMemorySaver
 
+from agent import tracing
 from agent.graph import build_graph, initial_state
 
 
@@ -24,7 +25,8 @@ def run_triage(query: str, use_retrieval: bool) -> dict:
     """Run triage and return a structured result dict."""
     # log_runs=False: eval/library callers must not write to the app's usage log.
     config: RunnableConfig = {
-        "configurable": {"thread_id": uuid4().hex, "log_runs": False}
+        "configurable": {"thread_id": uuid4().hex, "log_runs": False},
+        "callbacks": tracing.callbacks(),
     }
     out = _graph().invoke(initial_state(query, use_retrieval), config)
     return {

@@ -126,11 +126,11 @@ Each design decision so far, with its reason and its trade-off.
 - **Reason:** the labels can be reproduced and reviewed cause by cause, with no model cost and no reading of held-out text.
 - **Trade-off:** many records name several causes, and rules are approximate, so some tickets sit under the wrong cause. Costs and paths are set per cause, so a person reviews 47 causes rather than 745 tickets.
 
-## Checks in code before a loop
+## One call against a loop, and nothing in between
 
-- **Decision:** commit 7 tests a fixed workflow beside one call and the loop. Code runs the family's checks, then one model call decides. The loop stays only if it beats that by more than the noise, for its extra cost.
-- **Reason:** in the knowledge base split, every family has the same three checks on every ticket, and a fixed workflow belongs in code.
-- **Trade-off:** one more design to build and score. The sameness may come from the synthetic data, so a real desk may need the loop more.
+- **Decision:** commit 7 compares two designs: today's one call, and an agent loop with read-only tools. It tries the loop on samples first and keeps it only if it beats one call by more than the noise, for its extra cost.
+- **Reason:** the comparison is what shows the method, and two designs show it as well as three. The loop is also what the Queue needs.
+- **Trade-off:** we dropped a fixed workflow, where code runs a family's checks before one call. In the knowledge base split every family has the same three checks, so that workflow might match the loop for less, and we won't know.
 
 ## Code writes the facts in a handover
 
@@ -146,7 +146,7 @@ Each design decision so far, with its reason and its trade-off.
 
 ## Three sprints, one per course week
 
-- **Decision:** Sprint 1 proves the agent locally, Sprint 2 makes it a system with Qdrant, Supabase and Langfuse, and Sprint 3 delivers it on Azure.
+- **Decision:** Sprint 1 proves the agent locally, Sprint 2 makes it a system with Langfuse, Qdrant and Supabase, and Sprint 3 delivers it on Azure with Microsoft Foundry. The plan was cut from 23 commits to 18, keeping every tool and dropping dataset work, self-improvement and a third design.
 - **Reason:** each sprint answers one question, and the order follows the risk: first whether it works, then whether it runs, then whether a client can trust it.
 - **Trade-off:** there's no batch screen until Sprint 2, so the workflow that proves the value comes later than it would if we built it on SQLite first. In exchange, nothing gets built twice.
 
@@ -167,6 +167,30 @@ Each design decision so far, with its reason and its trade-off.
 - **Decision:** use Langfuse's hosted service, in its EU region.
 - **Reason:** self-hosting needs Postgres, ClickHouse, Redis and blob storage, which is too much to run for a demo.
 - **Trade-off:** traces leave our infrastructure, so redaction must come first. The hosted region needs confirming before we send anything.
+
+## Langfuse traces through LangChain, and only its own spans
+
+- **Decision:** trace through LangChain's callback, so every graph step and model call is recorded with no change to the graph. The client exports only Langfuse's own spans, masks emails, employee ids and IP addresses, and is off in tests.
+- **Reason:** the Anthropic SDK traces each call itself, and Langfuse exports those spans by default, which counted every call's cost twice and bypassed the mask.
+- **Trade-off:** another tool's OpenTelemetry spans won't reach Langfuse unless we allow them. The mask is a few patterns, not a full redaction, which Sprint 3's guardrails take further.
+
+## Saved runs become Langfuse experiments by replay
+
+- **Decision:** `evals.langfuse_upload` mirrors the practice sets as datasets and replays each set's newest saved run as an experiment. Its task returns the saved decision, and its scores come from our scoring code.
+- **Reason:** history moves to Langfuse with no model calls, and the scores match the Scoreboard exactly.
+- **Trade-off:** replayed traces carry the upload time, not the run's, which goes in metadata. They show the decision, not the model call behind it.
+
+## Method over dataset
+
+- **Decision:** the project shows a method for automating a process with AI, and IT support is the example. The labels are frozen after the owner's review, and later work goes into evals, observability, integration and deployment instead of the dataset.
+- **Reason:** the tickets are synthetic, so their quirks teach little that transfers. Employers want to see how a problem is framed, measured, made safe and shipped.
+- **Trade-off:** the labels stay approximate, drafted by rules with two causes reviewed by hand, so some measured mistakes are probably label errors. The README says so.
+
+## Microsoft Foundry as a layer, not the platform
+
+- **Decision:** use Foundry for models and Content Safety, and keep the agent, its gates and rules in LangGraph and our own code. Langfuse stays the one place for traces and experiments.
+- **Reason:** Foundry is in demand in Zürich, and using its catalogue lets us compare vendors on the same exam. The human gates and resumable checkpoints are the core of the design, and Foundry Agent Service would replace them.
+- **Trade-off:** we don't show Foundry's agent and tracing features, and two consoles stay in play, Azure for the model and Langfuse for traces.
 
 ## Azure instead of AWS
 

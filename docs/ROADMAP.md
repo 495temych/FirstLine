@@ -1,62 +1,81 @@
 # Roadmap
 
-FirstLine is an L1 IT support agent for CorpLabs AG, a fictional company headquartered in Zürich, built as a portfolio project for Swiss employers. UnderCover is the model for the engineering practice, not the product.
+FirstLine gives every IT ticket a correct first pass before a technician touches it: **proven with evals, enforced in code, traced end to end, and running on Azure.** CorpLabs AG, a fictional company in Zürich, is the client.
 
-**The idea: the agent proposes, the system enforces, and a scoreboard proves it works.**
+It's a portfolio project for Swiss employers, and the story is the method, not the domain: someone who worked in L1 support shows how they now put AI into a business process. IT tickets are the example. The same steps would carry over to invoices, claims or HR requests.
 
-The project runs in three sprints, one for each week of the AI FDE course. This file holds all three, with success criteria for the current sprint and commit lists for the others. Each commit ships one working MVP. When a sprint ends we run the held-out set, review it, and write the next sprint's criteria.
+## The four promises
 
-## The business goal
+Every commit makes one of these visible in the demo. They're the questions a client asks before buying AI.
 
-**Every ticket gets a correct first pass before a technician touches it.** `docs/BUSINESS_GOAL.md` holds the outcomes, the money, the baselines and the success criteria.
+| Promise | The client's question | What the demo shows | Tools |
+|---|---|---|---|
+| **Proven** | Is it better than what we have, and what does it cost? | The Scoreboard: the agent against two free yardsticks, in CHF, with margins of error | Evals in code, Langfuse experiments |
+| **Safe** | Can it do something dangerous? | The agent proposes, code enforces, and a person approves. A risky unlock is blocked even when the model asks for it | LangGraph gates, rules in code, Content Safety |
+| **Observable** | Can we see why it decided? | Any decision opens as a trace: what it read, checked, proposed and what a person did | Langfuse |
+| **Shippable** | Can it run in our cloud, within budget? | A live URL on Azure, with no keys in the app and a token budget at the gateway | Container Apps, Key Vault, managed identity, API Management, Microsoft Foundry |
 
-The dataset does four jobs, and none of them is training a model:
+`docs/BUSINESS_GOAL.md` holds the money, the baselines and the success criteria.
 
-| Job | What it gives us | Part of the data |
-|---|---|---|
-| Knowledge | Playbooks and similar past incidents | Knowledge base split only |
-| Evaluation | Scores on tickets the agent has never seen | Development set, held-out set and two unseen families |
-| Simulator | Checks that return recorded results, so the agent can investigate with no live systems | `diagnostics` |
-| Privacy test | A real score for redaction | `pii.json` and `retention.json` |
+## Two modes
+
+- **The Assistant** is the front door. An employee describes a problem and gets an answer while they wait. Routine fixes need their confirmation, and anything touching access or security becomes a ticket.
+- **The Queue** is the core. A technician's morning batch, pre-triaged by an agent that investigates with read-only tools. The technician approves, corrects or rejects each decision, with its evidence beside it.
+
+## The method
+
+The demo walks through six steps, each with proof in this repository.
+
+1. **Frame the money.** Minutes saved, review time, mistake costs and break-even, in francs.
+2. **Define the exam.** Labelled tickets, a held-out set opened once, and two free yardsticks to beat.
+3. **Build the baseline.** One model call with a structured decision, before anything clever.
+4. **Enforce rules in code.** The model proposes. Code and people decide what runs.
+5. **Experiment.** Change one thing, measure it against cost and noise, and write down the decision.
+6. **Ship and watch.** Trace every decision, cap the spend, and hand it over.
+
+## The dataset is a means, not the subject
+
+The 745 synthetic incidents give us knowledge, an exam and recorded check results. The labels are frozen: drafted by rules from each incident's root cause, with the owner's seven decisions and the two causes the agent disputed most reviewed by hand. We don't dig further into the data's quirks. The README says plainly that the tickets are synthetic and the labels approximate.
 
 ## The three sprints
 
 | Sprint | Course week | Question it answers | Where it runs | Done when |
 |---|---|---|---|---|
-| 1. Prove it locally | Week 1: AI Engineer | Is this the right problem, and does the agent beat a simple baseline? | Your Mac, with Claude's API | A chosen model and design, with real numbers |
-| 2. Make it a system | Week 2: AI Architect | Can it run a whole queue, be observed, and improve safely? | Your Mac, with Qdrant, Supabase and Langfuse | A durable Queue, with every ticket traced and scored |
-| 3. Deliver it | Week 3: AI FDE | Could a client safely run it without you? | Microsoft Azure | A secured, hosted demo with a handover pack |
+| 1. Prove it | Week 1: AI Engineer | Does the agent beat a free baseline, safely and cheaply? | Your Mac, with Claude's API | A chosen design and model, with real numbers |
+| 2. Make it a system | Week 2: AI Architect | Can it run a whole queue, observed and durable? | Your Mac, with Langfuse, Qdrant and Supabase | The Queue works end to end, with every ticket traced |
+| 3. Deliver it | Week 3: AI FDE | Could a client run it safely in their own cloud? | Microsoft Azure | A hosted demo, a handover pack and a 3-minute video |
 
 ### What each service is for
 
-Week 3 asks where each kind of data belongs. Each store has one job, so nothing has two sources of truth.
+Each store has one job, so nothing has two sources of truth.
 
 | Place | Tool | What it holds | Source of truth? |
 |---|---|---|---|
 | Context layer | `data/kb/` in git | Playbooks and policies, with owner and review date | Yes |
 | Search index | Qdrant | Embedded knowledge base sections and past incidents | No, it can be rebuilt from git |
-| System of record | Supabase | Tickets, batches, decisions, reviews, the audit trail, checkpoints and sign-in | Yes |
+| System of record | Supabase | Tickets, batches, decisions, reviews, the audit trail and checkpoints | Yes |
 | Observability | Langfuse | Traces, datasets, experiments and scores | Yes for traces, no for labels, which stay in git |
+| Model and safety layer | Microsoft Foundry | Claude and other models, and Content Safety Prompt Shields | No, it holds no data of ours |
 | Gateway | Azure API Management | Keys, rate limits, token budgets and logs | No, it holds rules, not data |
 
-## Sprint 1: prove it locally
+### Spending
 
-**Week 1 in one line: start from a business problem you can measure, label the data, and test models on your own task against a simple baseline.**
+The owner pays for every call, so `docs/PROCESS.md` sets the rules: ask before any run over CHF 1, re-score instead of re-running, practise on samples, and run held-out sets once. The whole plan should cost about CHF 5 in model calls, plus Azure, which is torn down between demos.
 
-Everything runs locally, with no new services. Done so far: the FastAPI and React stack, the rename to FirstLine, and commits 1 and 2.
+## Sprint 1: prove it
 
-| # | Commit | What you can see afterwards |
+**Week 1 in one line: start from a business problem you can measure, and test the agent on your own task against a simple baseline.**
+
+| # | Commit | Demo moment |
 |---|---|---|
-| 1 | ✅ **Tickets.** Import the 745 incidents, split them, and score retrieval for free | A "before" retrieval score on the Scoreboard |
-| 2 | ✅ **CorpLabs.** Company, policies, queues, tools and staff records replace the old client | The Assistant answers as CorpLabs, with no old names left |
-| 3 | ✅ **Playbooks.** 12 playbooks on one template, with section-level retrieval | The same score beside the "before", on tickets the playbooks never saw |
-| 4 | **Labels.** Named causes with paths, reviewed by you, and the rules set relabelled | The Tickets page shows each ticket's cause and expected path |
-| 5 | ✅ **Baseline.** Structured decisions, scored against the most common answer and a simple classifier | The first real numbers, including whether Claude beats the yardsticks |
-| 6 | **Rules in code.** Requester records, tool risk tiers and the SEC-04 guard | Pick a user: the same lockout gets a different answer |
-| 7 | **Investigate.** Three designs on the same tickets: one call, code runs the family's checks before one call, and one agent loop with read-only tools. Each writes a full handover | What investigating adds over one call, and whether a loop beats a fixed workflow, for what extra cost |
-| 8 | **Choices.** Test models and reasoning effort, rank the families by RICE, and record plans B and C | A written choice of model and design, backed by numbers |
-
-Commit 4 needs you: the path labels are your judgement, and everything after it depends on them. `docs/EVALS.md` and `docs/PLAN_EVALS.md` were deleted after commit 5. `briefs/LABEL_REVIEW.md` stays until you have read every cause, and then the baseline is run again on the confirmed labels.
+| 1 | ✅ **Tickets.** Import the 745 incidents, split them, and score retrieval for free | A "before" retrieval score |
+| 2 | ✅ **CorpLabs.** Company, policies, queues, tools and staff records | The Assistant answers as CorpLabs |
+| 3 | ✅ **Playbooks.** 15 playbooks on one template, with section retrieval | Retrieval hit rate from 94% to 100%, false matches from 96% to 4% |
+| 4 | ✅ **Labels.** Named causes drafted by rules, then frozen after the owner's review | Each ticket's cause and expected path on the Tickets page |
+| 5 | ✅ **Baseline.** Structured decisions, scored against two yardsticks, with cost guards | The first real numbers, including where the agent loses |
+| 6 | **Rules in code.** Requester records, tool risk tiers and the SEC-04 guard | Pick a user: the same lockout gets a different answer, and the dangerous unlock can't run |
+| 7 | **Investigate.** An agent loop with read-only tools against today's one call, on samples first. The loop writes a full handover | What investigating adds, for what extra cost, on one chart |
+| 8 | **Choose.** Claude models compared on a sample, more than once, and the design and model chosen | A written choice, backed by a cost-against-accuracy chart |
 
 ### Success criteria
 
@@ -68,27 +87,27 @@ The number after each one is the commit that meets it.
 - [x] (1) `data/tickets/splits.json` is fixed and repeatable: `CES` and `AIT` are unseen families, halved so one half can be tuned against, and the other 12 are split 60/20/20 by family.
 - [x] (1) The source, its MIT licence and the fact that it's synthetic are in `data/tickets/SOURCE.md`. The import can be re-run.
 - [x] (2) `data/records/users.json` holds the 628 directory accounts, plus the 20 rules-set users, with invented devices, groups and lockouts. All 745 tickets link to a requester's record.
-- [ ] (4) Each ticket has one named cause, and each cause has accepted paths, tools, queues and required checks. You have reviewed every cause.
+- [x] (4) Each ticket has one named cause, and each cause has accepted paths, tools, queues and required checks. The labels are frozen after the owner's review of the open decisions and of the two causes the agent disputed most.
 - [x] (4) Our 50 tickets are moved to CorpLabs queues and renamed the rules set, with no `review` flag left.
 - [ ] (7) `data/tickets/checks.json` holds each check's recorded result and nothing that gives away the answer. A test proves no `diagnostics` summary, `root_cause`, `resolution` or `correspondence` text is in it.
 
 **Knowledge base (`data/kb/`)**
 
-- [x] (2) `company-profile.md`, `policies/` and the escalation queues describe CorpLabs, taken from the tickets' systems and teams. No file in the repository names the old client or provider, checked by a test.
-- [x] (3) 12 playbooks plus `onedrive`, `teams` and `hardware-peripherals` follow one template, and a test fails on a missing section or field.
+- [x] (2) `company-profile.md`, `policies/` and the escalation queues describe CorpLabs. No file in the repository names the old client or provider, checked by a test.
+- [x] (3) The playbooks follow one template, and a test fails on a missing section or field.
 - [x] (3) A test proves `CES` and `AIT` have no playbook, and that no held-out or development ticket id appears in `data/kb/`.
 - [x] (3) Each error code in a playbook comes from a knowledge base split ticket.
 
 **Retrieval: sentence-transformers (`agent/retrieval.py`)**
 
 - [x] (1) `uv run -m evals --retrieval` scores hit rate and false match rate on any split, with no model calls and in `poe check`.
-- [x] (3) Retrieval matches sections, then returns the best playbook's useful sections and any policy that matched. `agent/retrieval.py` keeps a small interface, so Qdrant can replace its insides in Sprint 2.
-- [x] (3) Hit rate reaches 95% on the development set, with a floor in `poe check`, and the false match rate on `unseen_dev` falls well below today's 96%. If the threshold alone can't do it, try a score margin. Keyword matching waits for Qdrant. Each attempt is recorded in `docs/DECISIONS.md`, including those that fail.
+- [x] (3) Retrieval matches sections, then returns the best playbook and any policy that matched. `agent/retrieval.py` keeps a small interface, so Qdrant can replace its insides in Sprint 2.
+- [x] (3) Hit rate reaches 95% on the development set, with a floor in `poe check`, and false matches on `unseen_dev` fall well below 96%. Each attempt is in `docs/DECISIONS.md`.
 - [x] (3) The score adds mean reciprocal rank and recall, as well as the hit rate.
 
 **Agent: LangGraph and Claude (`agent/`)**
 
-- [x] (2) `agent/prompt.md` and the tools describe CorpLabs. Each tool has a risk tier and an owner in `agent/tool_schemas.py`, and there's a tool for each fix L1 may run in the 12 families.
+- [x] (2) Each tool has a risk tier and an owner in `agent/tool_schemas.py`.
 - [x] (5) The decision is a Pydantic class, with the rationale first, so the model reasons before it decides.
 - [ ] (6) `run_triage` takes a requester, and the model sees that user's record. With no requester it behaves as it does today.
 - [ ] (6) `agent/rules.py` holds pure functions that both modes call. A user with 2+ lockouts on a lockout ticket ends at `SEC-INCIDENT`, and a sensitive tool in the Assistant becomes a ticket.
@@ -96,93 +115,87 @@ The number after each one is the commit that meets it.
 - [ ] (7) `agent/queue.py` investigates one ticket with four read-only tools: search the knowledge base, look up the requester, find similar incidents and run a check. It ends in the same decision format as the Assistant.
 - [ ] (7) The loop stops at its limits on steps and cost and escalates with what it found. A check the ticket doesn't have returns no result.
 - [ ] (7) A test proves the loop can't reach a tool that changes a system, and that similar-incident search reads knowledge base split tickets only.
-- [ ] (7) A fixed workflow runs a family's playbook checks in code, then makes one model call. With no matching playbook it runs no checks and escalates.
 - [ ] (7) An escalation carries a full handover. Code fills in the requester, device, priority, SLA deadline, applications, checks with their evidence, similar incidents and what's unknown. The model writes only the likely cause, what's ruled out and the next step, citing that evidence.
 
 **Evaluations (`evals/`)**
 
-- [x] (5) The runner scores the development set, unseen families and the rules set. It reports path, action, team, named cause, mistake cost in CHF and cost per ticket, each by family.
-- [x] (5) Each score sits beside two yardsticks: always giving the most common answer, and a simple classifier trained on the knowledge base split. The report includes a confusion matrix, precision and recall per path, and Cohen's kappa.
-- [x] (5) Scores show a margin of error, and each run records the versions of the instructions, tools and knowledge base.
-- [x] (5) The development set is run and committed. A full one-call run should cost under CHF 3, which is an estimate to confirm.
+- [x] (5) The runner scores the development set, unseen families and the rules set: path, action, team, named cause, mistake cost in CHF and cost per ticket, each by family.
+- [x] (5) Each score sits beside two yardsticks, the most common answer and a simple classifier trained on the knowledge base split, with a confusion matrix, precision and recall per path, and Cohen's kappa.
+- [x] (5) Scores show a margin of error, and each run records the versions of the instructions, tools, knowledge base and labels.
+- [x] (5) The development set is run and committed, for CHF 0.98 with the rules and unseen sets. Re-scoring, samples, a spending cap and a repeat guard keep later runs cheap.
 - [ ] (6) Safety scores are zero failures, and SEC-04 scores come from the rules set.
-- [ ] (7) The same sets run through the fixed workflow and the loop, scored the same way, plus required checks run and steps per ticket. Evidence cited must come from a tool result. The loop stays only if it beats the fixed workflow by more than the noise, for its extra cost.
-- [ ] (8) At least two models, and reasoning effort where it applies, are run on the development set, more than once. A chart shows accuracy against the cost of the whole task, and the choice is in `docs/DECISIONS.md`.
-- [ ] (8) Families are ranked by RICE from measured volume and scores, and the ranking says where to start.
-- [ ] (8) The held-out set runs once, at sprint review.
+- [ ] (7) The loop runs on the samples first, scored the same way as one call, plus checks run and steps per ticket. Evidence cited must come from a tool result. It runs in full only if it beats one call by more than the noise, for its extra cost.
+- [ ] (8) At least two Claude models run on the samples, more than once. A chart shows accuracy against cost per ticket, and the choice is in `docs/DECISIONS.md`.
+- [ ] (8) The held-out sets run once, at sprint review, with the chosen design and model.
 
 **API and dashboard (`backend/`, `dashboard/`)**
 
 - [x] (1) The Scoreboard shows retrieval scores.
 - [x] (4) Tickets shows family, named cause and expected path, with a filter for each.
 - [x] (5) Tickets and evaluations return the new labels and measures. Held-out tickets stay out of every route, checked by a test.
-- [x] (5) Triage is renamed Assistant, and the Scoreboard shows measures by family, the yardsticks, and CHF for mistakes.
-- [ ] (6) Starting a triage takes a requester, and a picker sits on the Assistant. The page shows when a rule changed the agent's decision. The gate rules are unchanged.
-- [ ] (7) The Scoreboard shows the fixed workflow and the loop beside the one-call run.
+- [x] (5) The Assistant, and a Scoreboard with measures by family, the yardsticks, CHF for mistakes and a confusion heatmap.
+- [ ] (6) Starting a triage takes a requester, and a picker sits on the Assistant. The page shows when a rule changed the agent's decision.
+- [ ] (7) The Scoreboard shows the loop beside the one-call run.
+- [ ] (8) The Scoreboard shows the cost-against-accuracy chart.
 
 **Checks and CI**
 
 - [ ] (all) `uv run poe check` passes on every commit, with the coverage thresholds unchanged and no API key.
 - [ ] (all) New dependencies are in `docs/TECH_STACK.md` in the commit that adds them.
 
-### Decisions to confirm at review
-
-- **Unseen families.** `CES` (certificates) and `AIT` (API timeouts) stay out of the knowledge base. Both are wrong for L1 to fix, and `CES` is a hard test, because 93% of those tickets match `vpn` today.
-- **Writing the playbooks.** A coding agent drafts them from knowledge base split tickets only, and you review them. The held-out set is never opened while writing.
-- **Technician time.** The starting assumption is 15 minutes for a first pass by hand and 2 minutes to review one, at CHF 60 an hour. These numbers are placeholders for you to change.
-- **Limits per ticket.** The loop starts at 8 steps and CHF 0.10, a guess to tune from the first run.
-
 ## Sprint 2: make it a system
 
-**Week 2 in one line: keep logic in code, measure everything, make long work durable, and let a system improve only when evals approve.**
+**Week 2 in one line: keep logic in code, measure everything, and make long work durable.**
 
-Redaction comes first, because tickets start leaving the Mac in this sprint. The batch and review screens are built straight on Supabase, so nothing gets built twice.
-
-| # | Commit | What you can see afterwards | Course idea |
+| # | Commit | Demo moment | Course idea |
 |---|---|---|---|
-| 1 | **Redaction.** Remove personal data before a ticket reaches any service, scored by `pii.json` and `retention.json` | A free redaction score | Send only the personal data the task needs |
-| 2 | **Langfuse.** One trace per ticket, tagged runs, and scores on traces | Open any decision and follow it | Traces, datasets, experiments and scores |
-| 3 | **Qdrant.** Sections and past incidents move to Qdrant, with hybrid search for error codes | Before and after retrieval scores, plus false matches | Search by meaning, and retrieval evals |
-| 4 | **Supabase.** Postgres replaces SQLite and `logs.csv`, including LangGraph's checkpoints | A paused ticket survives a restart, on Postgres | Checkpoints in Postgres, and a system of record |
-| 5 | **Queue and review.** Load a batch, order it in code, and approve, correct or reject in three lists. After a fix, the failed check runs again: the ticket closes if it passes, and escalates with both results if not | The full workflow, and technician time per ticket | The human's step |
-| 6 | **Durable at scale.** A dispatcher with no model, N agents, retries, no repeated actions, and spending limits | Kill a batch mid-run, and it carries on without doing anything twice | Dispatcher, `Send`, idempotency, `RetryPolicy` |
-| 7 | **Clean evals.** A Langfuse experiment for each change, repeated runs, a judge checked against your grades, and a release gate | A change either passes the gate or doesn't | Three kinds of evals, noise, and an LLM judge |
-| 8 | **Self-improvement, if time allows.** An improver proposes changes, you approve them, and evals keep or roll them back | A proposed change with its evidence | The improver, keep or roll back, held-out data |
+| 1 | ✅ **Langfuse.** One trace per ticket, tagged runs and scores on traces, with personal data redacted before anything leaves the Mac | Click a decision and follow it, with no names in the trace | Traces, experiments, sending only what the task needs |
+| 2 | **Qdrant.** Sections and past incidents move to Qdrant, with hybrid search for error codes | Retrieval scores before and after, beside each other | Search by meaning and keywords, retrieval evals |
+| 3 | **Supabase.** Postgres replaces SQLite and `logs.csv`, including LangGraph's checkpoints | A paused ticket survives a restart | A system of record, durable checkpoints |
+| 4 | **The Queue.** Load a batch, order it in code, and approve, correct or reject each decision with its evidence | A technician clears a morning batch, and technician time per ticket is measured | The human's step |
+| 5 | **Durable and gated.** Retries, no repeated actions, spending limits per batch, and a release gate: a change ships only if its Langfuse experiment passes | Kill a batch mid-run and it carries on without doing anything twice. A worse change is refused | Idempotency, `RetryPolicy`, evals as a release gate |
 
-The improver needs one safeguard. It sees mistakes from part of the development set, and decides on a separate part that it never sees. That keeps the held-out set for sprint review.
+Sprint 2 started before Sprint 1's commits 6 to 8, at the owner's call, so the tools are in place when those experiments run.
 
-The records hold no results from after a fix, so the re-check in commit 5 is simulated, and the demo says so.
-
-Tests stay free and offline: Qdrant has a local mode with no server, and Postgres can run in a container in CI. Commit 3 must confirm that local mode covers hybrid search. Commit 2 needs your Langfuse keys, commit 3 a Qdrant key, and commit 4 a Supabase project.
+Tests stay free and offline: Qdrant has a local mode with no server, and Postgres runs in a container in CI. Commit 1 needs your Langfuse keys, commit 2 a Qdrant key, and commit 3 a Supabase project.
 
 ## Sprint 3: deliver it
 
-**Week 3 in one line: decide what the agent may do, secure it in layers, run it where a client can trust it, and hand it over.**
+**Week 3 in one line: decide what the agent may do, secure it in layers, run it in the client's cloud, and hand it over.**
 
-| # | Commit | What you can see afterwards | Course idea |
+| # | Commit | Demo moment | Course idea |
 |---|---|---|---|
-| 1 | **Autonomy and responsibility.** Each action is automatic, approved or prohibited, with an owner for all six pillars | A one-page policy the code enforces | Risk per action, six pillars |
-| 2 | **Guardrails.** Coded checks for personal data and keys, a model check for hidden instructions, and golden attack tickets | A hidden-instruction ticket is held, and false alarms are counted | Lethal trifecta, guardrail layers |
-| 3 | **Sign-in and roles.** Technicians sign in, and Postgres row rules limit what each role sees | Signed out, you see nothing | Authentication and authorization |
-| 4 | **Containers.** The app builds into one image, with no secrets in it | The same image runs locally | Configuration and secrets |
-| 5 | **Azure.** Infrastructure as code, Container Apps, Key Vault, managed identity and budget alerts | A hosted demo, with one command to tear it down | Where it runs, cloud hygiene |
-| 6 | **Gateway.** API Management in front of the model, with rate limits and token budgets, logging first and enforcing after | A spending limit that blocks a call | Gateways, log-only then enforce |
-| 7 | **Handover.** Runbook, audit view, measures against the Sprint 1 baseline, and a two-minute walkthrough | A client could run it without you | Handover and adoption |
+| 1 | **Guardrails.** Coded checks for personal data and keys, Content Safety Prompt Shields for hidden instructions, and a set of attack tickets | A ticket with a hidden instruction is held, and false alarms are counted | Lethal trifecta, guardrail layers |
+| 2 | **Container.** The app builds into one image, with no secrets in it | The same image runs locally | Configuration and secrets |
+| 3 | **Azure and Foundry.** Infrastructure as code, Container Apps, Key Vault, managed identity and budget alerts. Claude through Microsoft Foundry, plus one cross-vendor comparison on a sample | A hosted demo with one command to tear it down, and Claude beside another vendor's model on the same chart | Where it runs, cloud hygiene, choosing models with evidence |
+| 4 | **Gateway.** API Management in front of every model call, with rate limits and token budgets, logging first and enforcing after | A spending limit that blocks a call | Gateways, log-only then enforce |
+| 5 | **Handover and demo.** A one-page autonomy policy, a runbook, measures against the Sprint 1 baseline, a password on the demo, a replay mode so visitors cost nothing, and a 3-minute video | A client could run it without you, and a recruiter can click through it for free | Handover and adoption |
 
-The demo all this builds towards: load 25 tickets, one with a hidden instruction. Agents work them at once. Code blocks a repeat lockout, even if the model proposes an unlock. A technician clears the lists in minutes. The Scoreboard shows accuracy, technician time saved and cost per ticket, in CHF.
+### The demo
+
+Three minutes, in this order:
+
+1. **Assistant (30 s).** An employee types a problem and gets an answer. A risky request is held for a technician.
+2. **Queue (60 s).** A technician's morning batch, pre-triaged. One ticket hides an instruction and is held. Code blocks a repeat lockout, even though the model proposed an unlock. The technician clears the lists in minutes.
+3. **Proof (60 s).** The Scoreboard against the yardsticks in CHF, one decision's trace in Langfuse, and the app running on Azure behind its gateway.
+4. **Where it fails (30 s).** What it still gets wrong, and what I'd test next.
+
+### Microsoft Foundry: a layer, not the architecture
+
+Foundry provides the models and Content Safety. The agent, its gates and its rules stay in our own tested code, so they're portable and auditable. Foundry Agent Service would replace LangGraph's human gates and resumable checkpoints, which are the core of the design, and Foundry's tracing would duplicate Langfuse.
 
 ### From AWS to Azure
 
 | Course, on AWS | FirstLine, on Azure | Why |
 |---|---|---|
 | AgentCore Runtime | Azure Container Apps | It runs any framework, so LangGraph stays as it is |
-| AgentCore Gateway and Policy | API Management | Its `llm-token-limit` policy covers the Anthropic Messages API on v2 tiers. We skip an MCP gateway, because these are our own tools |
+| AgentCore Gateway and Policy | API Management | Token limits in front of the model. We skip an MCP gateway, because these are our own tools |
 | AgentCore Identity, IAM user | Managed identity, Entra ID and Key Vault | The app holds no cloud passwords |
-| AgentCore Memory | Supabase, then Qdrant | Week 3 says to start with one kind of memory. Ours is past incidents |
 | Bedrock | Claude in Microsoft Foundry | One bill and one identity. The direct Anthropic API is plan B |
+| Bedrock Guardrails | Content Safety Prompt Shields | A managed check for hidden instructions, beside our coded checks |
 | Budget alerts, teardown | Azure budgets, teardown with infrastructure as code | Budgets alert, they don't stop spending, so teardown still matters |
 
-To check before Sprint 3 starts: whether Container Apps runs in Switzerland North, the current Foundry regions for Claude, and the monthly price of an API Management v2 tier.
+To check before Sprint 3 starts: whether Container Apps runs in Switzerland North, the current Foundry regions and data zones for Claude, and the monthly price of an API Management v2 tier.
 
 ## How the course maps to FirstLine
 
@@ -190,26 +203,28 @@ To check before Sprint 3 starts: whether Container Apps runs in Switzerland Nort
 |---|---|---|
 | 1 | Score against a simple baseline | Most common answer, and a classifier |
 | 1 | Weigh mistakes by business cost | Mistake costs in CHF |
-| 1 | Fixed workflow? One call can beat an agent | The Assistant is one call, and commit 7 tests a loop against checks run in code |
+| 1 | One call can beat an agent | Commit 7 tests the loop against one call, and keeps it only if it earns its cost |
 | 1 | Structured outputs, rationale first | The decision class |
-| 1 | Test models on the customer's task | Sprint 1, commit 8 |
+| 1 | Test models on the customer's task | Sprint 1 commit 8, and the cross-vendor comparison on Azure |
 | 1 | Agents need a harness | Instructions, tools, limits and a human handoff |
-| 2 | Business logic belongs in code | `agent/rules.py` and the dispatcher |
-| 2 | Start with one agent | One agent per ticket, and no sub-agents until evals justify them |
-| 2 | Three kinds of evals | Plain code, a judge, and technician reviews |
+| 2 | Business logic belongs in code | `agent/rules.py` |
+| 2 | Start with one agent | One agent per ticket, and no sub-agents |
+| 2 | Evals gate releases | The release gate in Sprint 2 commit 5 |
 | 2 | Side effects get their own node | Already how the gates work |
-| 2 | Decide on held-out data | The improver's safeguard |
 | 3 | Lethal trifecta | Ticket text is untrusted and records are private, so Queue tools only read, and a person approves anything that leaves |
 | 3 | Provenance | Owner and review date on every playbook |
-| 3 | Agree success criteria at the start | The criteria in `docs/BUSINESS_GOAL.md`, measured at handover |
+| 3 | Agree success criteria at the start | `docs/BUSINESS_GOAL.md`, measured at handover |
 
 We're leaving some things out on purpose, and each is a choice we can defend:
 
-- **Local and open-weight models.** Claude is enough here. A local model is plan C if a client won't send data to a provider.
-- **Fine-tuning.** It learns patterns rather than facts, and our tickets are too few and too alike.
-- **MCP.** The course says to skip it for your own tools on your own agent.
-- **Sub-agents, teams and A2A.** We have one agent per ticket. A judge and an improver are separate jobs, not agent teams.
-- **Self-hosted Langfuse.** It needs Postgres, ClickHouse, Redis and blob storage, which is too much to run for a demo.
+- **Further dataset work.** The labels are frozen. More review would improve the numbers, not the method.
+- **Self-improving agents and an LLM judge.** Evals in plain code are enough to gate a release here.
+- **Ranking the families by value.** The handover names the next family to automate, from the Sprint 1 numbers.
+- **Local and open-weight models.** Claude is enough. A local model is plan C if a client won't send data to a provider.
+- **Fine-tuning.** Our tickets are too few and too alike.
+- **MCP, sub-agents and A2A.** One agent with our own tools doesn't need them.
+- **Foundry Agent Service.** It would replace the gates and checkpoints we built on purpose.
+- **Self-hosted Langfuse.** Too much to run for a demo.
 
 ## How the knowledge base is structured
 
@@ -221,75 +236,38 @@ data/kb/
 └── playbooks/                one file per issue
 ```
 
-Each playbook starts with fields that code reads, then has the same six sections:
-
-```markdown
----
-id: vpn-access
-title: VPN access
-owner_team: network
-last_reviewed: 2026-11-06
-applications: [GlobalProtect]
-tools: [reset_vpn_profile]
----
-
-## Symptoms
-## Checks
-## Error codes
-## Known causes
-## Fix
-## When to escalate
-```
-
-| Family | Playbook | Team that owns escalations |
-|---|---|---|
-| `ALP` | `account-lockout` | Identity |
-| `SML` | `sso-mfa` | Identity |
-| `VDA` | `vpn-access` | Network |
-| `WCI` | `wifi` | Network |
-| `DRF` | `dns` | Network |
-| `SDA` | `shared-drive` | Service desk |
-| `PDQ` | `printing` | Service desk |
-| `OES` | `outlook` | Service desk |
-| `SIB` | `software-install` | Service desk, security for blocks |
-| `DCP` | `device-compliance` | Service desk |
-| `LPD` | `laptop-performance` | Desktop support |
-| `EDE` | `disk-encryption` | Desktop support |
-| `CES` | None, unseen | Applications and network |
-| `AIT` | None, unseen | Applications |
+Each playbook starts with fields that code reads (`id`, `title`, `owner_team`, `last_reviewed`, `applications`, `tools`), then has the same six sections: symptoms, checks, error codes, known causes, fix, and when to escalate. `CES` and `AIT` have no playbook, so they test how the agent handles the unknown.
 
 ## How the rest of the product changes
 
 | Part | Now | Target |
 |---|---|---|
-| `data/tickets/` | Imported tickets and splits | The same, loaded into Supabase for the Queue |
-| `data/evals/` | 50 tickets, incident answers and retrieval scores | Rules set, named causes and saved runs, mirrored as Langfuse datasets |
-| `agent/` | One graph | The Assistant's graph, plus `rules.py`, `queue.py`, `redact.py` and a dispatcher |
+| `agent/` | The Assistant's graph | Plus `rules.py`, `queue.py` and redaction |
 | `agent/retrieval.py` | Local NumPy search | The same interface, on Qdrant |
-| `agent/tool_schemas.py` | 10 tools | Tools with a risk tier and owner, plus four read-only tools |
-| `evals/` | One decision score | One score per level in `docs/SPEC.md`, yardsticks, a judge and a release gate |
-| `backend/` | Triage routes | Plus batch and review routes, sign-in and role checks |
-| `dashboard/` | Triage, Scoreboard, Tickets | Queue, Assistant, Scoreboard, Tickets, each ticket linked to its trace |
+| `evals/` | Decision scores, yardsticks and cost guards | Plus Langfuse experiments and a release gate |
+| `backend/` | Triage and evaluation routes | Plus batch and review routes |
+| `dashboard/` | Assistant, Scoreboard, Tickets | Queue, Assistant, Scoreboard, Tickets, each ticket linked to its trace |
 | Storage | SQLite and CSV | Supabase |
+| Models | Claude's API | Claude through Microsoft Foundry, with the direct API as plan B |
 | Hosting | Your Mac | Azure Container Apps, behind API Management |
 
 ## After Sprint 3
 
-German comes next: tickets and answers in both modes. It needs a multilingual embedding model, German versions of tickets in the evaluations, and answers in the language of the request.
+German comes next: tickets and answers in both modes. It needs a multilingual embedding model, German tickets in the evaluations, and answers in the language of the request.
 
 ## How to make this a solid project
 
 Employers will spend a few minutes on this, so each point should be something they can see.
 
-1. **Let numbers make the claim.** Replace the README's assumed 50% automation with measured approval and routing rates, next to mistake cost, technician time and cost per ticket.
-2. **Close rule gaps by how much harm they do.** Each safety rule needs code, plus a test where a stub model tries to break it.
-3. **Treat evaluations as regression tests.** Run the development set after every agent change. Run the held-out set only at sprint review.
-4. **Fail towards a technician.** A timeout, API error or unreadable answer should become an escalation, never a crash or a silent fix.
-5. **Make every decision traceable.** Each ticket should show what was retrieved, proposed, overridden and confirmed.
-6. **Take Swiss data protection seriously.** Say plainly what reaches a model hosted abroad, and keep personal data out of logs and traces.
-7. **Keep one of everything.** One decision format, one place for rules, one source of truth for each kind of data. Delete what gets replaced.
-8. **Stay honest.** The tickets are synthetic, the costs are assumptions, the test sets are small, and the Scoreboard shows every mistake.
+1. **Lead with the method.** The README opens with the four promises and the six steps, and IT detail stays in the background.
+2. **Let numbers make the claim.** Measured accuracy, mistake cost, technician time and cost per ticket, in CHF, beside the yardsticks.
+3. **Show where it fails.** The Scoreboard shows every mistake, and the demo ends on what it still gets wrong.
+4. **Close rule gaps by how much harm they do.** Each safety rule needs code, plus a test where a stub model tries to break it.
+5. **Fail towards a technician.** A timeout, API error or unreadable answer becomes an escalation, never a crash or a silent fix.
+6. **Make every decision traceable.** Each ticket shows what was retrieved, proposed, overridden and confirmed.
+7. **Take Swiss data protection seriously.** Say plainly what reaches a model hosted abroad, and keep personal data out of logs and traces.
+8. **Stay honest.** The tickets are synthetic, the labels approximate, the costs assumptions and the test sets small.
 
 ## Not for now
 
-Real integrations, more than one company, agents that change themselves without approval, and fixes that run without a person.
+Real integrations, more than one company, agents that change themselves, and fixes that run without a person.

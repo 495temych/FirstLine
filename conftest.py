@@ -1,4 +1,5 @@
-"""Keeps tests offline: the model and the encoder raise unless a test stubs them."""
+"""Keeps tests offline: the model and the encoder raise unless a test stubs them, and
+nothing is traced."""
 
 from typing import NoReturn
 
@@ -9,6 +10,12 @@ from agent import graph, retrieval
 
 def _no_model_in_tests() -> NoReturn:
     raise AssertionError("Tests never call a model. Stub it instead.")
+
+
+@pytest.fixture(autouse=True)
+def no_tracing(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Keep every test away from Langfuse, whatever keys .env holds."""
+    monkeypatch.setenv("LANGFUSE_TRACING", "false")
 
 
 @pytest.fixture(autouse=True)

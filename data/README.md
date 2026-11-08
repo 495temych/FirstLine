@@ -36,6 +36,7 @@ The Tickets tab shows `rules`, `dev` and `unseen_dev`, which makes 206 tickets. 
 | `evals/families.json` | Each issue family and its playbook | Never |
 | `evals/rules_*.json` | The hand-written tickets and their answers | The tickets only |
 | `evals/retrieval/` | Saved retrieval scores | Never |
+| Langfuse datasets `firstline-rules`, `firstline-dev`, `firstline-unseen_dev` | Copies of the practice sets, with personal details masked. Git stays the source of truth | No |
 | `evals/runs/` | Saved agent runs, each with its decisions, so `--rescore` can mark them again for free. The baseline runs of each practice set are committed, and trial runs stay out of git | Never |
 
 ## How a ticket gets its answer

@@ -89,7 +89,7 @@ We compare against something at each level, and "better than nothing" doesn't co
 | Today's process | Does it save technician time? | The 15-minute assumption, until a client's real numbers replace it |
 | Always the most common answer | Is the agent better than a constant? | Measured in commit 5. The agent beats it everywhere |
 | A simple classifier, trained on the knowledge base split | Is it better than a free, cheap model on routing? | Measured in commit 5. It beats the agent on the templated development tickets and loses on short requests and unseen teams. It's a yardstick and never decides a ticket |
-| One model call | Does investigating add more than it costs? | The Assistant today, compared with checks run in code and with the loop in commit 7 |
+| One model call | Does investigating add more than it costs? | The Assistant today, compared with the loop in commit 7 |
 | Retrieval before the playbooks | Did the knowledge base get better? | Measured: hit rate 94%, false matches 96%. Now 100% and 4% |
 
 The first agent baseline is in the README's "Results". It rests on labels the owner hasn't finished reading, so it's run again once they are confirmed.
@@ -155,7 +155,7 @@ The tools are where the money comes from, and each kind has a different risk. To
 
 **Read tools are safe to automate**, because they change nothing. They do need the same care with personal data, and ticket text can never choose what they read. Real versions would call Active Directory logs, Microsoft Graph for Intune, PaperCut and GlobalProtect.
 
-**A fixed workflow belongs in code.** Every family has three checks, always the same ones. So a loop may not be needed: code can run a family's checks and give the results to one model call. Commit 7 tests this beside one call and the loop. It's cheaper and easier to test, so the loop has to beat it to stay.
+**A loop has to earn its cost.** Every family has three checks, always the same ones, so investigating may add little. Commit 7 tries the loop against one call on samples first, and keeps it only if it wins by more than the noise.
 
 **The handover needs more than it has.** `create_escalation_ticket` takes a queue, a priority and one sentence today, which can't deliver the second outcome. From commit 7, code fills in everything it already knows, and the model writes only what needs judgement.
 
@@ -187,7 +187,7 @@ In production, each fix would be a narrow runbook under a managed identity that 
 | Approve in bulk | A technician approves a reviewed list | High approval, with no sign of rubber-stamping |
 | Automatic | One routine fix runs alone, with a report and spot checks | Long clean record, and a person can stop it at once |
 
-A fix can only go past bulk approval if it's routine, limited to one user or device, reversible, and checkable afterwards. Device compliance looks like the best first candidate: the service desk owns 24 of its 25 tickets with a failing check, and `force_intune_sync` changes very little. The RICE ranking in commit 8 decides. Unlocks, group changes, and anything under SEC-04 stay with a person.
+A fix can only go past bulk approval if it's routine, limited to one user or device, reversible, and checkable afterwards. Device compliance looks like the best first candidate: the service desk owns 24 of its 25 tickets with a failing check, and `force_intune_sync` changes very little. The Sprint 1 numbers decide, and the handover names it. Unlocks, group changes, and anything under SEC-04 stay with a person.
 
 ## Risks to the business case
 
@@ -206,8 +206,8 @@ A fix can only go past bulk approval if it's routine, limited to one user or dev
 
 | Moment | What's decided |
 |---|---|
-| Label review, commit 4 | The path labels, by the owner |
-| End of Sprint 1 | Does it beat the yardsticks? Which model and design? Which family goes first? |
+| Labels, commit 4 | Frozen after the owner's review of the open decisions and two disputed causes |
+| End of Sprint 1 | Does it beat the yardsticks? Which model and design? |
 | End of Sprint 2 | Do the review times confirm the saving? Does the Queue hold up? |
 | End of Sprint 3 | Could a client run it without us, and do the numbers beat the Sprint 1 baseline? |
 

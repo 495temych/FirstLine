@@ -4,9 +4,12 @@ The ticket text picks the stub's answer. Everything is written to a temporary fo
 so `logs.csv` and `checkpoints.sqlite` stay untouched.
 """
 
+import os
 import sys
 import tempfile
 from pathlib import Path
+
+os.environ["LANGFUSE_TRACING"] = "false"  # before .env is read, so nothing is traced
 
 import uvicorn
 

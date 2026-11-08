@@ -1,45 +1,33 @@
-# FirstLine — L1 IT Support Agent
+# FirstLine
 
-FirstLine does the first pass on L1 IT support tickets for a Swiss IT service provider: it looks up the client's knowledge base, picks one path, and proposes the next step for a technician to confirm.
+**An AI first pass for every IT ticket: proven with evals, enforced in code, traced end to end, and running on Azure.**
 
-### Problem
+I worked in L1 IT support. FirstLine is how I'd now put AI into a service desk, and the method carries over to any business process. The client is CorpLabs AG, a fictional company in Zürich, and the 745 tickets are synthetic.
 
-Most L1 tickets aren't hard — they're just troubleshooting simple, repetitive tasks. For an office worker, though, it doesn't feel small — work stops until someone shows up to fix it.
+## Four promises
 
-- **The work is repetitive, not complex.** Routine issues (software installs, OS config, workplace setup) sit in a queue until a technician is free, identifies the pattern, looks up the procedure, and acts. The fix is rarely novel — the dispatch delay is the struggle.
-- **In Swiss SMEs, dispatch means travel.** A single technician often supports multiple client locations, since a small office can't justify a full-time on-site IT presence. Travel time to and from site is frequently a larger cost than the fix itself.
-- **Skilled IT hours are expensive and scarce in this region.** Time spent traveling and pattern-matching a known issue is time not spent on the complex work only that technician can do.
-
-**FirstLine targets exactly that slice: high-frequency, well-documented, low-novelty tickets — resolved remotely, before a trip is even needed.**
-
-### Stakeholder Profiles Breakdown
-
-| Stakeholder | Job-to-be-Done | Pain | Gain — Basic | Gain — Surprising | Key metric |
-|---|---|---|---|---|---|
-| **Employees** | Get back to work with minimal disruption | Long wait for trivial issues; repeating context to technicians | Faster resolution for well-documented issues | Explainable, grounded self-serve guides for basic IT issues; generating a service ticket based on their issue automatically | Mostly qualitative, but IT issues influence productivity|
-| **L1 Technicians** (on-site dispatch, multi-client) | Triage & resolve routine tickets, escalate the rest with context | Repetitive pattern-matching across multiple unfamiliar client environments; unclear user requests | Fewer routine tickets to resolve manually or dispatch for | AUTO_FIX shifts burden from diagnosis to confirmation; escalation write-ups auto-generated | Time-to-first-action|
-| **L2/L3 Specialists** (remote, outsourced offshore)| Resolve complex issues without re-diagnosing from scratch; keep documentation up-to-date | Escalations under-documented; no live L1 to call back and clarify across timezones; quality varies by which L1 technician handled it | Escalations arrive with diagnostic summary + retrieval trace | Consistent documentation regardless of which technician escalated | Mean-time-to-resolution |
-| **CTO** (of the IT service provider) | Keep cost-per-ticket low, maintain SLA & audit compliance; price and justify contracts | Cost-per-ticket opaque; no per-category automation visibility; audit risk on unlogged fixes | Lower cost-per-ticket; automation-rate reporting by client account | Automation-rate data becomes a pricing/contract lever — accounts with low automation potential (highly custom environments) can be identified and priced or staffed differently  | Cost-per-ticket by category; SLA compliance rate |
-
-### Economic potential:
-
-**Assumption:** ~4 tickets/day/technician, ~2 h avg per ticket including travel to and from client site.
-
-| Automation rate | Time recovered/day | Value/technician/year |
+| Promise | The client's question | What you can see |
 |---|---|---|
-| 30% (conservative) | ~2.4 h | ~CHF 32k |
-| 50% (target) | ~4.0 h | ~CHF 53k |
-| 70% (optimistic) | ~5.6 h | ~CHF 74k |
+| **Proven** | Is it better than what we have, and what does it cost? | The Scoreboard: the agent against two free yardsticks, in CHF, with margins of error |
+| **Safe** | Can it do something dangerous? | The agent proposes, code enforces, and a person approves every fix |
+| **Observable** | Can we see why it decided? | Every decision traced, from what it read to what a person did *(Sprint 2)* |
+| **Shippable** | Can it run in our cloud, within budget? | Azure Container Apps, Key Vault, API Management, and Claude through Microsoft Foundry *(Sprint 3)* |
 
-*(CHF 60/h fully-loaded technician cost, 220 working days/year, 2h/ticket including travel, 4 tickets/day.)*
+## Two modes
 
-For SME customers specifically, remote resolution via SELF_SERVE/AUTO_FIX removes the travel leg entirely for automatable tickets — this is not just faster resolution, it's a dispatch trip that never has to happen. Not netted against this figure: knowledge-base curation/maintenance effort, LLM inference cost per ticket, and technician review overhead during AUTO_FIX confirmation.
+- **The Assistant:** an employee describes a problem and gets an answer while they wait. Routine fixes need their confirmation, and anything touching access or security becomes a ticket.
+- **The Queue:** a technician's morning batch, pre-triaged by an agent that investigates with read-only tools. The technician approves, corrects or rejects each decision *(Sprint 2)*.
 
-### Data potential
-Every completed triage run (one that reaches a final state; RAG-off runs, which have no decision path, are not logged) appends a row to `logs.csv` — query, retrieved units, decision path, diagnostic summary, tool called, operator confirmation, escalation queue/priority, response time — and the dashboard's "Live usage statistics" panel turns that into a running summary (path distribution, automation rate, avg response time). Over time, the same log supports:
-- Retrieval threshold tuning, per category
-- Cost-per-resolution-path analysis (AUTO_FIX cost vs. ESCALATE technician-hour cost)
-- A natural link to quantitative/pricing-style analysis of automation vs. human dispatch
+## The method
+
+1. **Frame the money.** Minutes saved, review time, mistake costs and break-even, in francs. See [the business goal](docs/BUSINESS_GOAL.md).
+2. **Define the exam.** Labelled tickets, a held-out set opened once, and two free yardsticks to beat.
+3. **Build the baseline.** One model call with a structured decision, before anything clever. See [Results](#results).
+4. **Enforce rules in code.** The model proposes. Code and people decide what runs.
+5. **Experiment.** Change one thing, measure it against cost and noise, and write the decision down. See [the decisions](docs/DECISIONS.md).
+6. **Ship and watch.** Trace every decision, cap the spend, and hand it over.
+
+[The roadmap](docs/ROADMAP.md) shows where each step stands.
 
 ---
 

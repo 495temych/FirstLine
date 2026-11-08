@@ -15,7 +15,7 @@ from langgraph.checkpoint.sqlite import SqliteSaver
 from langgraph.types import Command, StateSnapshot
 from pydantic import BaseModel, StringConstraints
 
-from agent import config
+from agent import config, tracing
 from agent.graph import build_graph, initial_state
 from backend import stats
 from evals import retrieval_score, runner, scoring
@@ -58,7 +58,12 @@ def _graph():
 
 
 def _thread(run_id: str) -> RunnableConfig:
-    return {"configurable": {"thread_id": run_id}}
+    return {"configurable": {"thread_id": run_id}, "callbacks": tracing.callbacks()}
+
+
+def _traced(run_id: str):
+    """Each step of one Assistant run, grouped in Langfuse as one session."""
+    return tracing.trace("assistant", session_id=run_id, tags=("assistant",))
 
 
 def _snapshot(run_id: str) -> StateSnapshot:
@@ -103,9 +108,10 @@ def start_triage(ticket: NewTicket) -> dict:
         raise HTTPException(503, "ANTHROPIC_API_KEY isn't set. Add it to .env.")
     run_id = uuid4().hex
     try:
-        _graph().invoke(
-            initial_state(ticket.text, ticket.use_retrieval), _thread(run_id)
-        )
+        with _traced(run_id):
+            _graph().invoke(
+                initial_state(ticket.text, ticket.use_retrieval), _thread(run_id)
+            )
     except anthropic.APIError as exc:
         raise HTTPException(502, f"The model call failed: {exc}") from exc
     return _view(run_id, _snapshot(run_id))
@@ -124,7 +130,8 @@ def answer_gate(run_id: str, answer: GateAnswer) -> dict:
         pending = _pending(_snapshot(run_id))
         if pending is None or pending["kind"] != answer.gate:
             raise HTTPException(409, "This run isn't waiting at that gate.")
-        _graph().invoke(Command(resume=answer.approved), _thread(run_id))
+        with _traced(run_id):
+            _graph().invoke(Command(resume=answer.approved), _thread(run_id))
     return _view(run_id, _snapshot(run_id))
 
 

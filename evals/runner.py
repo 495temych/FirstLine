@@ -16,7 +16,7 @@ import hashlib
 import json
 from datetime import UTC, datetime
 
-from agent import config, run_triage
+from agent import config, run_triage, tracing
 from agent.decision import DECISION_TOOL
 from agent.tool_schemas import TOOL_POLICY, TOOLS
 from evals import retrieval_score, scoring, yardsticks
@@ -250,14 +250,30 @@ def _assemble(
     }
 
 
+def _traced_attempt(ticket: dict, name: str, session: str) -> dict:
+    """One ticket's run, traced in Langfuse under the evaluation's session."""
+    tags = ("evaluation", name)
+    with tracing.trace(
+        "evaluation",
+        session_id=session,
+        tags=tags,
+        metadata={"ticket": ticket["id"], "version": version()},
+    ):
+        return _attempt(ticket["text"])
+
+
 def evaluate(name: str, tiny: bool = False, sampled: bool = False) -> dict:
     """Run a set through the agent and return the evaluation."""
     model = config.model_name()
     pairs = select(name, tiny, sampled)
+    session = f"{datetime.now(UTC):%Y%m%dT%H%M%S}-{name}"
     rows = [
-        score_ticket(ticket, answer, decision(_attempt(ticket["text"])), model)
+        score_ticket(
+            ticket, answer, decision(_traced_attempt(ticket, name, session)), model
+        )
         for ticket, answer in pairs
     ]
+    tracing.flush()
     return _assemble(
         name, pairs, rows, model, current_versions(), tiny=tiny, sample=sampled
     )
