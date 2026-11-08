@@ -3,7 +3,6 @@
 A family with a playbook should find it. A family without one should find nothing.
 """
 
-import hashlib
 import json
 from datetime import UTC, datetime
 
@@ -99,10 +98,7 @@ def by_family(rows: list[dict], families: dict[str, dict]) -> dict[str, dict]:
 
 def kb_version() -> str:
     """A short hash of the knowledge base, so runs can be compared."""
-    digest = hashlib.sha256()
-    for path in sorted(config.KB_DIR.rglob("*.md")):
-        digest.update(path.read_bytes())
-    return digest.hexdigest()[:8]
+    return retrieval.kb_version()
 
 
 def evaluate(name: str) -> dict:

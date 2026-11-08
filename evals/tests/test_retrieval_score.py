@@ -116,7 +116,7 @@ def test_the_query_is_the_title_and_description(monkeypatch):
 
 
 def test_the_knowledge_base_version_follows_its_files(tmp_path, monkeypatch):
-    monkeypatch.setattr(retrieval_score.config, "KB_DIR", tmp_path)
+    monkeypatch.setattr(retrieval_score.retrieval, "KB_DIR", tmp_path)
     (tmp_path / "a.md").write_text("one")
     first = retrieval_score.kb_version()
     (tmp_path / "a.md").write_text("two")

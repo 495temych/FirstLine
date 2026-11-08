@@ -2,12 +2,18 @@
 
 Tickets are matched against playbook sections, so one precise section can win. The
 winning playbook comes back whole, with any policy or reference that also matches.
+
+Sections are searched in Qdrant: Qdrant Cloud when `QDRANT_URL` is set, built there
+with `uv run -m agent.index`, or an in-memory index built on first use otherwise.
 """
 
+import hashlib
+import os
 import re
 from functools import cache
 
 import numpy as np
+from qdrant_client import QdrantClient, models
 from sentence_transformers import SentenceTransformer
 
 from agent.config import KB_DIR
@@ -26,13 +32,24 @@ REFERENCE_DOCS = {"company-profile"}
 # Written to match tickets, not to help answer them.
 MATCH_ONLY_SECTIONS = {"Symptoms"}
 
+EMBEDDING_MODEL = "all-MiniLM-L6-v2"
+COLLECTION = "kb_sections"
+
 MIN_LINE_CHARS = 25  # shorter lines are headers or blank rows
 MIN_LINE_SCORE = 0.25  # weaker lines are not worth highlighting
 
 
 @cache
 def _get_model() -> SentenceTransformer:
-    return SentenceTransformer("all-MiniLM-L6-v2")
+    return SentenceTransformer(EMBEDDING_MODEL)
+
+
+def kb_version() -> str:
+    """A short hash of the knowledge base, so runs and the index can be compared."""
+    digest = hashlib.sha256()
+    for path in sorted(KB_DIR.rglob("*.md")):
+        digest.update(path.read_bytes())
+    return digest.hexdigest()[:8]
 
 
 def _chunk_by_heading(text: str) -> list[dict]:
@@ -100,6 +117,74 @@ def _get_embeddings() -> np.ndarray:
     return _get_model().encode(texts, normalize_embeddings=True)
 
 
+def build_index(client: QdrantClient) -> int:
+    """Embed every unit into a fresh collection. A unit's point id is its position.
+
+    Vectors are normalized, so the dot product is the cosine similarity the thresholds
+    were set on.
+    """
+    vectors = _get_embeddings()
+    if client.collection_exists(COLLECTION):
+        client.delete_collection(COLLECTION)
+    client.create_collection(
+        COLLECTION,
+        vectors_config=models.VectorParams(
+            size=vectors.shape[1], distance=models.Distance.DOT
+        ),
+    )
+    stamp = {"kb_version": kb_version(), "model": EMBEDDING_MODEL}
+    client.upsert(
+        COLLECTION,
+        points=[
+            models.PointStruct(
+                id=i,
+                vector=vectors[i].tolist(),
+                payload={"doc": u["doc"], "kind": u["kind"], "section": u["section"]}
+                | stamp,
+            )
+            for i, u in enumerate(_get_units())
+        ],
+    )
+    return len(vectors)
+
+
+def index_problem(client: QdrantClient) -> str | None:
+    """Why the index doesn't match the knowledge base, or None if it does."""
+    if not client.collection_exists(COLLECTION):
+        return "it has no knowledge base yet"
+    if client.count(COLLECTION, exact=True).count != len(_get_units()):
+        return "it holds a different number of sections"
+    [first] = client.retrieve(COLLECTION, ids=[0])
+    payload = first.payload or {}
+    if payload.get("kb_version") != kb_version():
+        return "the knowledge base has changed since it was built"
+    if payload.get("model") != EMBEDDING_MODEL:
+        return "it was built with another embedding model"
+    return None
+
+
+def cloud_client() -> QdrantClient:
+    return QdrantClient(
+        url=os.environ["QDRANT_URL"], api_key=os.getenv("QDRANT_API_KEY")
+    )
+
+
+@cache
+def _get_index() -> QdrantClient:
+    """Qdrant Cloud if `QDRANT_URL` is set and the index is current, else in memory."""
+    if not os.getenv("QDRANT_URL"):
+        client = QdrantClient(":memory:")
+        build_index(client)
+        return client
+    client = cloud_client()
+    problem = index_problem(client)
+    if problem:
+        raise RuntimeError(
+            f"The Qdrant index is out of date: {problem}. Run `uv run -m agent.index`."
+        )
+    return client
+
+
 def _top_lines(doc_text: str, query_vec: np.ndarray, n: int = 3) -> list[dict]:
     """Return up to n lines from doc_text most similar to query_vec."""
     lines = [
@@ -121,8 +206,15 @@ def _top_lines(doc_text: str, query_vec: np.ndarray, n: int = 3) -> list[dict]:
 
 
 def _score(query: str) -> tuple[np.ndarray, np.ndarray]:
+    """The query's vector, and its score against every unit, by position."""
     query_vec = _get_model().encode([query], normalize_embeddings=True)[0]
-    return query_vec, np.dot(_get_embeddings(), query_vec)
+    hits = _get_index().query_points(
+        COLLECTION, query=query_vec.tolist(), limit=len(_get_units())
+    )
+    scores = np.zeros(len(_get_units()))
+    for hit in hits.points:
+        scores[int(hit.id)] = hit.score
+    return query_vec, scores
 
 
 def _rank(scores: np.ndarray) -> list[tuple[str, int]]:

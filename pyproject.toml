@@ -14,6 +14,7 @@ dependencies = [
     "numpy>=2.5.4",
     "pydantic>=2.0.0",
     "python-dotenv>=1.2.4",
+    "qdrant-client>=1.20.0",
     "scikit-learn>=1.9.0",
     "sentence-transformers>=6.2.0",
     "uvicorn>=0.54.0",
@@ -42,7 +43,7 @@ format = "ruff format --check"
 lint = "ruff check"
 types = "pyright"
 test = "pytest"
-retrieval = "python -m evals --retrieval"
+retrieval = { cmd = "python -m evals --retrieval", env = { QDRANT_URL = "" } }
 ts = "npm run check:ts"
 e2e = "npm run e2e"
 check = ["format", "lint", "types", "test", "retrieval", "ts", "e2e"]

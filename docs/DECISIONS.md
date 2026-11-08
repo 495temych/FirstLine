@@ -162,6 +162,18 @@ Each design decision so far, with its reason and its trade-off.
 - **Reason:** hybrid search suits tickets full of error codes, which embeddings match poorly. It's also a skill employers ask for.
 - **Trade-off:** one more service. If hybrid search doesn't beat dense search on our scores, `pgvector` would be the simpler answer, and we'd say so.
 
+## Move the search first, change it later
+
+- **Decision:** the knowledge base moved to Qdrant with the same units, model and scores, before anything about search changes. Vectors are normalized and compared by dot product, which is the cosine similarity the thresholds were set on. Each query scores every section, and `retrieval.py` keeps its interface.
+- **Reason:** if the scores move when only the engine changed, it's a bug. On all 206 practice tickets, in memory and in Qdrant Cloud, the results and playbook rankings are identical to the NumPy search, and no score differs by more than 0.0000002.
+- **Trade-off:** scoring all 99 sections per query doesn't scale to a large knowledge base, and each search is now a network call. Both are fine at this size, and a top-k query is a one-line change once thresholds don't need every score.
+
+## A stale index stops search
+
+- **Decision:** each point records the knowledge base version and embedding model it was built from. Search checks them once and stops with the fix, `uv run -m agent.index`, instead of rebuilding on its own. Tests and `poe check` search in memory, so they stay offline.
+- **Reason:** answers from an outdated index look right and are quietly wrong. Rebuilding from the app would make any running copy write to the shared index.
+- **Trade-off:** a knowledge base change needs one more command before the app or a live evaluation runs.
+
 ## Langfuse Cloud, not self-hosted
 
 - **Decision:** use Langfuse's hosted service, in its EU region.

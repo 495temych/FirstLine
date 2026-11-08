@@ -2,6 +2,7 @@
 
 import numpy as np
 import pytest
+from qdrant_client import QdrantClient
 
 from agent import retrieval
 from agent.config import ROOT
@@ -93,8 +94,10 @@ def corpus(monkeypatch):
     monkeypatch.setattr(retrieval, "_get_model", FakeEncoder)
     monkeypatch.setattr(retrieval, "_get_units", lambda: CORPUS)
     retrieval._get_embeddings.cache_clear()
+    retrieval._get_index.cache_clear()
     yield
     retrieval._get_embeddings.cache_clear()
+    retrieval._get_index.cache_clear()
 
 
 @pytest.mark.usefixtures("corpus")
@@ -158,3 +161,61 @@ def test_chunking_drops_the_preamble_and_keeps_each_section():
     )
     assert [s["section"] for s in sections] == ["One", "Two"]
     assert sections[0]["text"] == "## One\nfirst"
+
+
+@pytest.mark.usefixtures("corpus")
+def test_the_index_scores_every_unit_as_a_dot_product():
+    query_vec, scores = retrieval._score("vpn gateway")
+    expected = np.dot(retrieval._get_embeddings(), query_vec)
+    assert np.allclose(scores, expected)
+
+
+@pytest.mark.usefixtures("corpus")
+def test_a_fresh_index_matches_the_knowledge_base():
+    client = QdrantClient(":memory:")
+    assert retrieval.index_problem(client) == "it has no knowledge base yet"
+    assert retrieval.build_index(client) == len(CORPUS)
+    assert retrieval.index_problem(client) is None
+    assert retrieval.build_index(client) == len(CORPUS)
+    assert client.count(retrieval.COLLECTION).count == len(CORPUS)
+
+
+@pytest.mark.usefixtures("corpus")
+def test_a_changed_knowledge_base_makes_the_index_stale(monkeypatch):
+    client = QdrantClient(":memory:")
+    retrieval.build_index(client)
+    monkeypatch.setattr(retrieval, "kb_version", lambda: "changed")
+    assert retrieval.index_problem(client) == (
+        "the knowledge base has changed since it was built"
+    )
+    monkeypatch.setattr(retrieval, "_get_units", lambda: CORPUS[:2])
+    assert retrieval.index_problem(client) == (
+        "it holds a different number of sections"
+    )
+
+
+@pytest.mark.usefixtures("corpus")
+def test_another_embedding_model_makes_the_index_stale(monkeypatch):
+    client = QdrantClient(":memory:")
+    retrieval.build_index(client)
+    monkeypatch.setattr(retrieval, "EMBEDDING_MODEL", "another-model")
+    assert retrieval.index_problem(client) == (
+        "it was built with another embedding model"
+    )
+
+
+@pytest.mark.usefixtures("corpus")
+def test_a_stale_cloud_index_stops_search_with_the_fix(monkeypatch):
+    monkeypatch.setenv("QDRANT_URL", "https://example.test")
+    monkeypatch.setattr(retrieval, "cloud_client", lambda: QdrantClient(":memory:"))
+    with pytest.raises(RuntimeError, match="uv run -m agent.index"):
+        retrieval.retrieve("vpn")
+
+
+@pytest.mark.usefixtures("corpus")
+def test_a_current_cloud_index_is_used(monkeypatch):
+    cloud = QdrantClient(":memory:")
+    retrieval.build_index(cloud)
+    monkeypatch.setenv("QDRANT_URL", "https://example.test")
+    monkeypatch.setattr(retrieval, "cloud_client", lambda: cloud)
+    assert retrieval._get_index() is cloud
