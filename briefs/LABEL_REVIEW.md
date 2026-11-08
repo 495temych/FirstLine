@@ -4,6 +4,8 @@ The seven open decisions are settled and recorded in the labels. What's left is 
 
 ## Named causes
 
+Reviewed on 8 November 2026: scan backlog now escalates to `DESK-SUPPORT`, because the tickets say it keeps coming back and a technician cleared the scans each time. An uninitialised TPM stays an escalation, as the playbook says.
+
 The counts cover the knowledge base, development and unseen development tickets. Open any development ticket in the Tickets tab to compare its cause with the root cause on record. Tickets take the cause their root cause names first, by rules in `data/evals/causes.json`. Rules are approximate, so a few tickets with mixed causes will sit under the wrong one. A count of 0 means the playbook lists the cause, but no ticket here has it.
 
 | Family | Cause | Tickets | Accepted path | Tool or queue |
@@ -47,7 +49,7 @@ The counts cover the knowledge base, development and unseen development tickets.
 | Device compliance | Stale check-in | 31 | Auto-fix | `force_intune_sync` |
 | Laptop performance | Low disk space | 1 | Auto-fix | `clean_temp_files` |
 | Laptop performance | Startup policy or items | 14 | Self-serve or Escalate | `DESK-SUPPORT` |
-| Laptop performance | Scan backlog | 32 | Self-serve | any |
+| Laptop performance | Scan backlog | 32 | Escalate | `DESK-SUPPORT` |
 | Disk encryption | Recovery key escrow failed | 8 | Auto-fix | `escrow_bitlocker_key` |
 | Disk encryption | TPM protector not initialized | 27 | Escalate | `DESK-SUPPORT` |
 | Disk encryption | Encryption policy not delivered | 6 | Auto-fix | `force_intune_sync` |
