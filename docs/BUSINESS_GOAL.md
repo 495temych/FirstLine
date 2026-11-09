@@ -36,16 +36,18 @@ The headline is **net saving per ticket, in CHF**. It compares the same first pa
 
 ```text
 minutes saved  = (share approved × minutes by hand) − minutes to review
-net saving     = minutes saved × rate per minute − model cost − cost of mistakes
+net saving     = minutes saved × rate per minute − model cost − cost of mistakes missed
+mistakes missed = mistake bill × (1 − share of wrong decisions the technician catches)
 ```
 
-Every ticket costs a review. A ticket the technician rejects also costs the full first pass by hand, which is the cautious case, because a correction is often quicker than starting again.
+Every ticket costs a review. A ticket the technician rejects also costs the full first pass by hand, which is the cautious case, because a correction is often quicker than starting again. Every decision is reviewed, so a wrong one costs money only when the technician misses it. `backend/economics.py` is the one place these sums are done, and the Scoreboard shows them.
 
 | Input | Value | Status |
 |---|---|---|
 | First pass by hand | 15 minutes | Assumption. The records have no handling times. The first and last messages on a ticket are a median of 14 minutes apart, which is a rough check at best |
 | Review of one decision | 2 minutes | Assumption, to be replaced by real review times in Sprint 2 |
 | Technician rate | CHF 60 an hour | Assumption, for the owner to change |
+| Wrong decisions the technician catches | 90% | Assumption, chosen by the owner. With the baseline's mistakes, it pays above 89%, so this is the assumption the case turns on. The Queue's reviews measure it |
 | Share approved unchanged | 68% on the development set | Measured against the labels at the baseline, so it's a stand-in until real reviews replace it |
 | Model cost | About CHF 0.005 per ticket | Measured on 206 tickets with Haiku and one call. The loop's limit starts at CHF 0.10 |
 | Routine fix on a possible compromise | CHF 2,000 | Assumption, and it dominates the total |

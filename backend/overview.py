@@ -15,7 +15,7 @@ from langgraph.checkpoint.memory import InMemorySaver
 from agent import config
 from agent.graph import build_graph
 from agent.tool_schemas import ESCALATION_TOOL, QUEUES, TOOL_POLICY, TOOLS
-from backend import queue_board
+from backend import economics
 from evals import runner
 
 GOAL = "Every ticket gets a correct first pass before a technician touches it."
@@ -23,7 +23,6 @@ WORTH_IT = (
     "It's worth doing if the technician time it saves, in Swiss francs, is well "
     "above what it costs, and nothing unsafe happens."
 )
-REVIEW_MINUTES = 2  # docs/BUSINESS_GOAL.md's assumption for reviewing one decision
 EXAMPLE_SET = "dev"  # examples come from the development set, never the held-out one
 
 # What happens at each node of the graph, in plain words.
@@ -303,10 +302,10 @@ def read_overview() -> dict:
         "goal": {
             "sentence": GOAL,
             "worth_it": WORTH_IT,
-            "minutes_by_hand": queue_board.MINUTES_BY_HAND,
-            "review_minutes": REVIEW_MINUTES,
-            "chf_per_hour": queue_board.CHF_PER_HOUR,
-            "break_even": REVIEW_MINUTES / queue_board.MINUTES_BY_HAND,
+            "minutes_by_hand": economics.MINUTES_BY_HAND,
+            "review_minutes": economics.REVIEW_MINUTES,
+            "chf_per_hour": economics.CHF_PER_HOUR,
+            "break_even": economics.break_even(economics.REVIEW_MINUTES),
         },
         "result": _result(),
         "trunk": TRUNK,

@@ -215,6 +215,44 @@ export interface SearchResult {
   given: (RetrievedUnit & { highlights: { text: string; score: number }[] })[];
 }
 
+export interface Layer {
+  n: number;
+  share: number;
+  share_margin: number;
+  review_minutes: number;
+  model_chf: number;
+  bill_chf: number;
+  catch_rate: number;
+  mistakes_chf: number;
+  break_even: number;
+  catch_needed: number | null;
+  minutes_saved: number;
+  time_chf: number;
+  net_chf: number;
+  net_low: number;
+  net_high: number;
+  per_year_chf: number;
+  net_none_caught: number;
+  net_all_caught: number;
+}
+
+export interface Rates {
+  minutes_by_hand: number;
+  chf_per_hour: number;
+  catch_rate: number;
+}
+
+export interface BusinessCase {
+  assumptions: Rates & {
+    review_minutes: number;
+    tickets_per_year: number;
+    mistakes: { security: number; wrong: number; minor: number };
+  };
+  rates: Rates;
+  projected: (Layer & { source: string; model: string }) | null;
+  observed: (Layer & { wrong: number; slipped: number }) | null;
+}
+
 export interface Evaluations {
   runs: Evaluation[];
   costs: { security: number; wrong: number; minor: number };
@@ -325,10 +363,6 @@ export interface QueueValue {
   reviewed: number;
   approved: number;
   review_seconds: number | null;
-  minutes_saved: number;
-  net_chf: number;
-  minutes_by_hand: number;
-  chf_per_hour: number;
 }
 
 export interface QueueView {
@@ -479,6 +513,16 @@ export const api = {
   stats: () => request<Stats>("/api/stats"),
   overview: () => request<Overview>("/api/overview"),
   retrieval: () => request<RetrievalView>("/api/retrieval"),
+  business: (rates?: Rates) =>
+    request<BusinessCase>(
+      rates
+        ? `/api/business?${new URLSearchParams({
+            minutes_by_hand: rates.minutes_by_hand.toString(),
+            chf_per_hour: rates.chf_per_hour.toString(),
+            catch_rate: rates.catch_rate.toString(),
+          }).toString()}`
+        : "/api/business",
+    ),
   search: (text: string) =>
     post<SearchResult>("/api/retrieval/search", { text }),
   queue: () => request<QueueView>("/api/queue"),

@@ -211,15 +211,13 @@ def test_the_value_counts_approvals_against_review_time_and_cost(client):
     assert value["reviewed"] == 2
     assert value["approved"] == 1
     assert value["review_seconds"] == 90
-    assert value["minutes_saved"] == pytest.approx(15 - 3)
-    assert value["net_chf"] == pytest.approx(12 - value["model_cost_chf"])
 
 
 def test_an_empty_board_is_worth_nothing_yet(client):
     view = client.get("/api/queue").json()
     assert view["tickets"] == []
     assert view["value"]["agent_seconds"] is None
-    assert view["value"]["net_chf"] == 0
+    assert view["value"]["review_seconds"] is None
 
 
 def test_a_verdict_is_recorded_on_the_trace(client, monkeypatch):

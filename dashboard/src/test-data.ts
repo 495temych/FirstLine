@@ -314,10 +314,6 @@ const value = {
   reviewed: 0,
   approved: 0,
   review_seconds: null,
-  minutes_saved: 0,
-  net_chf: 0,
-  minutes_by_hand: 15,
-  chf_per_hour: 60,
 };
 
 const noTickets = { queued: 0, working: 0, review: 0, closed: 0, failed: 0 };
@@ -349,8 +345,6 @@ export const busyQueue: QueueView = {
     reviewed: 1,
     approved: 0,
     review_seconds: 75,
-    minutes_saved: -1.25,
-    net_chf: -1.2644,
   },
 };
 

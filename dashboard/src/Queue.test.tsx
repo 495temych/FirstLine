@@ -84,15 +84,15 @@ it("shows how many tickets are in each state", async () => {
   expect(count("Failed")).toBe("1");
 });
 
-it("shows what the work is worth, with its assumptions", async () => {
+it("shows how the batch went, and sends the money to the Scoreboard", async () => {
   render(<Queue />);
   const value = await screen.findByRole("region", {
-    name: "What the work is worth",
+    name: "How the batch went",
   });
   expect(within(value).getByText("0 of 1")).toBeDefined();
   expect(within(value).getByText("1:15")).toBeDefined();
   expect(within(value).getByText("CHF 0.0144")).toBeDefined();
-  expect(within(value).getByText(/assumed at 15 minutes/)).toBeDefined();
+  expect(within(value).getByText(/is on the Scoreboard/)).toBeDefined();
 });
 
 it("labels each ticket with its status and the agent's decision", async () => {

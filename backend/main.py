@@ -17,7 +17,7 @@ from pydantic import BaseModel, StringConstraints
 
 from agent import config, tracing
 from agent.graph import build_graph, initial_state
-from backend import overview, queue_board, retrieval_view, stats, store
+from backend import economics, overview, queue_board, retrieval_view, stats, store
 from evals import runner, scoring
 
 RUN_FIELDS = [
@@ -45,6 +45,7 @@ app = FastAPI(title="FirstLine", lifespan=lifespan)
 app.include_router(queue_board.router)
 app.include_router(overview.router)
 app.include_router(retrieval_view.router)
+app.include_router(economics.router)
 
 _gate_lock = Lock()  # two answers to one gate must not both pass its check
 

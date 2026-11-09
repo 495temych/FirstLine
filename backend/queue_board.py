@@ -37,8 +37,6 @@ WORKERS = 2
 PRIORITIES = ("critical", "high", "medium", "low")
 STATES = ("queued", "working", "review", "closed", "failed")
 # docs/BUSINESS_GOAL.md's assumptions, until a client's own numbers replace them.
-MINUTES_BY_HAND = 15
-CHF_PER_HOUR = 60
 HIDDEN_STEPS = ("__start__", "route_")  # LangGraph's plumbing, not the agent's work
 UNFINISHED = ("queued", "working")
 DECISION_FIELDS = (
@@ -392,15 +390,13 @@ class Board:
             return dict(self.tickets[ticket_id])
 
     def view(self) -> dict:
-        """Every ticket, the count in each state, and what the work is worth."""
+        """Every ticket, the count in each state, and how the batch went."""
         with self._lock:
             tickets = [dict(t) for t in self.tickets.values()]
         reviews = [t["review"] for t in tickets if t["review"]]
         timed = [t["agent_seconds"] for t in tickets if t["agent_seconds"] is not None]
         approved = sum(r["verdict"] == "approved" for r in reviews)
-        review_minutes = sum(r["seconds"] for r in reviews) / 60
         model_cost = sum(t["cost_chf"] or 0 for t in tickets)
-        minutes_saved = approved * MINUTES_BY_HAND - review_minutes
         return {
             "tickets": tickets,
             "counts": {s: sum(t["state"] == s for t in tickets) for s in STATES},
@@ -417,10 +413,6 @@ class Board:
                     if reviews
                     else None
                 ),
-                "minutes_saved": minutes_saved,
-                "net_chf": minutes_saved * CHF_PER_HOUR / 60 - model_cost,
-                "minutes_by_hand": MINUTES_BY_HAND,
-                "chf_per_hour": CHF_PER_HOUR,
             },
         }
 

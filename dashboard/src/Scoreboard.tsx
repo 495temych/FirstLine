@@ -8,6 +8,7 @@ import {
 } from "./api";
 import { chf, dateTime, pathLabels, percent, rappen, rate } from "./format";
 import { useLoad } from "./useLoad";
+import { BusinessCase } from "./BusinessCase";
 
 const setNames: Record<string, string> = {
   kb: "knowledge base",
@@ -376,17 +377,17 @@ export function Scoreboard() {
   const { data, error } = useLoad(api.evaluations);
   if (error) return <p className="notice alert">{error}</p>;
   if (!data) return null;
-  if (data.runs.length === 0) {
-    return (
-      <p className="notice">
-        No evaluations yet. Run <code>uv run -m evals --tiny</code> to create
-        one.
-      </p>
-    );
-  }
   return (
     <>
-      <Board runs={data.runs} costs={data.costs} />
+      <BusinessCase />
+      {data.runs.length === 0 ? (
+        <p className="notice">
+          No evaluations yet. Run <code>uv run -m evals --tiny</code> to create
+          one.
+        </p>
+      ) : (
+        <Board runs={data.runs} costs={data.costs} />
+      )}
       <p className="caption">
         Retrieval has its own tab, with every saved score.
       </p>

@@ -99,7 +99,7 @@ def test_the_overview_route_says_what_is_connected(monkeypatch):
     services = {s["name"]: s for s in body["services"]}
     assert services["Git"]["connected"] is True
     assert services["Qdrant"]["connected"] is False
-    assert body["goal"]["break_even"] == overview.REVIEW_MINUTES / 15
+    assert body["goal"]["break_even"] == 2 / 15
     assert body["result"]["n"] > 0
     assert set(body["stations"]) == set(overview.STATIONS)
     assert body["versions"]["version"]

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { api, type QueueState, type QueueTicket, type QueueView } from "./api";
 import { QueueDetail } from "./QueueDetail";
-import { francs, minutes, pathLabels, rappen, seconds } from "./format";
+import { pathLabels, rappen, seconds } from "./format";
 
 const POLL_MS = 1000;
 
@@ -49,16 +49,8 @@ function Pipeline({ view }: Readonly<{ view: QueueView }>) {
 function Value({ view }: Readonly<{ view: QueueView }>) {
   const value = view.value;
   return (
-    <section className="value" aria-label="What the work is worth">
+    <section className="value" aria-label="How the batch went">
       <dl className="figures">
-        <div>
-          <dt>Net saving so far</dt>
-          <dd>{francs(value.net_chf)}</dd>
-        </div>
-        <div>
-          <dt>Technician time saved</dt>
-          <dd>{minutes(value.minutes_saved)}</dd>
-        </div>
         <div>
           <dt>Approved unchanged</dt>
           <dd>
@@ -79,10 +71,8 @@ function Value({ view }: Readonly<{ view: QueueView }>) {
         </div>
       </dl>
       <p className="caption">
-        Each approved ticket saves a first pass by hand, assumed at{" "}
-        {value.minutes_by_hand} minutes. Review time is measured here. Time is
-        worth CHF {value.chf_per_hour} an hour, and the model cost comes off.
-        The assumptions are in BUSINESS_GOAL.md.
+        What this work is worth in francs, with any mistakes that slipped
+        through priced, is on the Scoreboard.
       </p>
     </section>
   );

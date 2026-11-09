@@ -282,6 +282,12 @@ Each design decision so far, with its reason and its trade-off.
 - **Reason:** a hit rate alone can't show why the thresholds sit where they do. The per-ticket scores show the gap between the weakest right match and the strongest unseen one, and a reader can test the rule on their own words for free.
 - **Trade-off:** a saved development score grows from 1 KB to about 140 KB. Each ticket keeps only its best five playbooks, enough to explain it.
 
+## A mistake costs money only when the technician misses it
+
+- **Decision:** the business case prices the mistake bill times the share of wrong decisions a technician misses, assumed at 90% caught. The Queue measures the real share, from the labels of the decisions technicians approved.
+- **Reason:** every decision is reviewed. Pricing every mistake as uncaught made each ticket lose CHF 68 on the development set, which contradicts the review the design depends on. Counting none would hide the risk.
+- **Trade-off:** the headline rests on one assumption. The page shows where it turns, at 89% with the baseline, and lets a reader move it. The three security mistakes are CHF 6,000 of the CHF 9,960 bill, so the rules in Sprint 1's commit 6 should move it most.
+
 ## Known limitations
 
 - **Synthetic knowledge base.** A real deployment needs real client documentation.
@@ -298,4 +304,4 @@ Each design decision so far, with its reason and its trade-off.
 - **Partial ITSM alignment.** The ticket maps to ServiceNow's incident schema but omits `impact`, `urgency`, `cmdb_ci` and `work_notes`.
 - **Paths vary on underspecified tickets.** "My VPN keeps disconnecting" has three documented causes, so it can land on different paths from run to run. Retrieval is deterministic.
 - **The baseline rests on draft labels.** Causes are drafted by rules and not all read by the owner yet, so some of the agent's "mistakes" may be wrong labels. The baseline runs again once they are confirmed.
-- **Mistake costs count every mistake.** They ignore the review that would catch many of them, so they are a worst case.
+- **The share of mistakes caught is assumed.** The business case rests on 90%, and the Queue's reviews so far are too few to measure it.

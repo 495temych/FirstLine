@@ -169,7 +169,7 @@ The number after each one is the commit that meets it.
 | 4 | 🟡 **The Queue.** Load a batch, order it in code, and approve, correct or reject each decision with its evidence | A technician clears a morning batch, and technician time per ticket is measured | The human's step |
 | 6 ✅ | **How it works.** An overview page of the goal, the route a ticket takes, the model, the tools and the services, built from the code | A recruiter understands the agent in two minutes without opening the repository | Explainability, a single source of truth |
 | 7 | **Retrieval.** A page of the core retrieval measures, how sure each match is, and a search anyone can try | Type a request and watch which playbook it finds, and how strongly | RAG evaluation |
-| 8 | **The business case.** The Scoreboard answers "is it worth it?" in CHF: projected from the evaluations, observed from the Queue's reviews, and how it moves if the assumptions are wrong | Change the minutes by hand and watch the saving and break-even move | Unit economics, measuring value, not only accuracy |
+| 8 ✅ | **The business case.** The Scoreboard answers "is it worth it?" in CHF: projected from the evaluations, observed from the Queue's reviews, and how it moves if the assumptions are wrong | Change the minutes by hand and watch the saving and break-even move | Unit economics, measuring value, not only accuracy |
 | 5 | **Durable and gated.** Retries, no repeated actions, spending limits per batch, and a release gate: a change ships only if its Langfuse experiment passes | Kill a batch mid-run and it carries on without doing anything twice. A worse change is refused | Idempotency, `RetryPolicy`, evals as a release gate |
 
 The Queue's first version is in: batches, live states, review with measured time, traces in the UI and the value in CHF. Since commit 3a it keeps its record in Supabase and survives a restart. The agent doesn't investigate yet.
@@ -234,10 +234,10 @@ The number after each one is the commit that meets it. The Queue's investigation
 
 **The business case (`backend/`, `dashboard/`)**
 
-- [ ] (8) The Queue keeps what a technician needs to trust the batch: states, approved unchanged, agent time per ticket and model cost. Net saving and time saved move to the Scoreboard.
-- [ ] (8) One module in `backend/` computes the economics from `docs/BUSINESS_GOAL.md`'s assumptions, and both the API and the tests use it. Nothing is computed twice.
-- [ ] (8) The Scoreboard opens with net saving per ticket in CHF, in three layers. Projected: from the latest evaluation, with accuracy, mistakes priced from the labels and model cost. Observed: from the Queue's reviews, where measured review time replaces the assumed 2 minutes and a rejected or corrected decision is priced as a mistake. Sensitivity: sliders for minutes by hand and the hourly rate move the saving and the 13% break-even.
-- [ ] (8) Each figure follows `docs/EXPLAINABILITY.md`: its question, n, margin and source, and the assumptions on the page. One line says the numbers come from practice tickets and the held-out sets run once at the end.
+- [x] (8) The Queue keeps what a technician needs to trust the batch: states, approved unchanged, agent time per ticket and model cost. Net saving and time saved move to the Scoreboard.
+- [x] (8) One module in `backend/` computes the economics from `docs/BUSINESS_GOAL.md`'s assumptions, and both the API and the tests use it. Nothing is computed twice.
+- [x] (8) The Scoreboard opens with net saving per ticket in CHF, in three layers. Projected: from the latest evaluation, with accuracy, mistakes priced from the labels, the share technicians catch, and model cost. Observed: from the Queue's reviews, where review time and the share caught are measured, and an approved decision the labels say is wrong is priced as a mistake. Sensitivity: sliders for minutes by hand, the hourly rate and the share caught move the saving, and a chart shows where it turns positive.
+- [x] (8) Each figure follows `docs/EXPLAINABILITY.md`: its question, n, margin and source, and the assumptions on the page. One line says the numbers come from practice tickets and the held-out sets run once at the end.
 - [ ] (8) Sprint 1's model comparison sits here once it exists, as cost and time against accuracy.
 
 **Durable and gated (`agent/`, `backend/`, `evals/`)**
