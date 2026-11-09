@@ -104,6 +104,28 @@ def test_a_set_is_scored_saved_and_reloaded(runs):
     assert run["summary"]["n"] == 129
     assert run["threshold"] == retrieval.PLAYBOOK_THRESHOLD
     assert len(run["kb_version"]) == 8
+    assert len(run["tickets"]) == 129
+
+
+def test_each_ticket_keeps_why_it_matched():
+    scored = [
+        {"doc": "vpn", "section": "Symptoms", "score": 0.5},
+        {"doc": "account-access", "section": "Fix", "score": 0.45},
+        *[{"doc": f"d{i}", "section": None, "score": 0.1} for i in range(9)],
+    ]
+    row = retrieval_score.score_ticket(ALP, "account-access", [WRONG, POLICY], scored)
+    assert (row["right_score"], row["best_wrong_score"]) == (0.45, 0.5)
+    assert len(row["ranked"]) == retrieval_score.RANKS_KEPT
+    assert row["ranked"][0] == scored[0]
+    assert row["also"] == [
+        {"doc": "sec-04", "kind": "policy", "section": None, "score": 0.7}
+    ]
+
+
+def test_a_family_without_a_playbook_has_no_right_score():
+    scored = [{"doc": "vpn", "section": None, "score": 0.3}]
+    row = retrieval_score.score_ticket(CES, None, [], scored)
+    assert (row["right_score"], row["best_wrong_score"]) == (None, 0.3)
 
 
 def test_the_query_is_the_title_and_description(monkeypatch):

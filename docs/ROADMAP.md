@@ -211,11 +211,11 @@ The number after each one is the commit that meets it. The Queue's investigation
 - [x] (6) A "How it works" tab opens with the goal in one sentence, then the route as a schematic. Clicking a station explains what happens there, with a real ticket's data, and amber marks the stations where a person decides.
 - [x] (6) The tools are grouped by risk tier, the model shows why it was chosen and what a ticket costs, and the services show which one is the source of truth for what. Each part names where it fails, from the known limitations.
 - [x] (6) A test fails when a graph node or tool has no explanation, so the page can't fall behind the code. The schematic has a text equivalent.
-- [ ] (7) Saved retrieval scores keep each ticket's ranked sections and scores. Saving them again is free, with no model calls.
-- [ ] (7) A "Retrieval" view shows hit rate, how high the right playbook ranks (MRR), recall and false matches on unseen families. Each comes with its question, n, the floor `poe check` enforces, and how it moved across saved runs.
-- [ ] (7) A chart shows the right playbook's score against the best wrong one for every ticket, with the thresholds drawn in, so a reader sees why the thresholds sit where they do. Clicking a ticket opens its ranked sections.
-- [ ] (7) "Try a search" ranks the knowledge base for any text the reader types, with the scores and the threshold, through `POST /api/retrieval/search`. It's free, because embeddings run on this machine and no model is called.
-- [ ] (7) The view shows how retrieval changes the decision: path accuracy with and without it, from saved runs.
+- [x] (7) Saved retrieval scores keep each ticket's ranked sections and scores. Saving them again is free, with no model calls.
+- [x] (7) A "Retrieval" view shows hit rate, how high the right playbook ranks (MRR), recall and false matches on unseen families. Each comes with its question, n, the floor `poe check` enforces, and how it moved across saved runs.
+- [x] (7) A chart shows the right playbook's score against the best wrong one for every ticket, with the thresholds drawn in, so a reader sees why the thresholds sit where they do. Clicking a ticket opens its ranked sections.
+- [x] (7) "Try a search" ranks the knowledge base for any text the reader types, with the scores and the threshold, through `POST /api/retrieval/search`. It's free, because embeddings run on this machine and no model is called.
+- [ ] (7) The view shows how retrieval changes the decision: path accuracy with and without it, from saved runs. The view reads both from saved runs and shows the one with search. None is saved without it, because with search off the agent answers in plain text with no path to score. Measuring it needs a run where the decision form gets no playbook, about CHF 0.65 on the development set, and waits for the owner's go-ahead.
 - [ ] (6, 7) Both pages pass the checklist in `docs/EXPLAINABILITY.md`: phone width, light and dark, keyboard, and screenshots reviewed.
 
 **Durable and gated (`agent/`, `backend/`, `evals/`)**

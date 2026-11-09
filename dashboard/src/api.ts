@@ -142,9 +142,81 @@ export interface RetrievalRun {
   by_family: Record<string, RetrievalFamily>;
 }
 
+export interface RankedPlaybook {
+  doc: string;
+  section: string | null;
+  score: number;
+}
+
+export interface RetrievedUnit {
+  doc: string;
+  kind: string;
+  section: string | null;
+  score: number;
+}
+
+export interface RetrievalTicket {
+  id: string;
+  title: string;
+  family: string;
+  expected: string | null;
+  top: string | null;
+  score: number | null;
+  hit: boolean;
+  false_match: boolean;
+  rank: number | null;
+  right_score: number | null;
+  best_wrong_score: number | null;
+  ranked: RankedPlaybook[];
+  also: RetrievedUnit[];
+}
+
+export interface ScoredSet extends RetrievalRun {
+  tickets: RetrievalTicket[];
+}
+
+export type Measure =
+  "hit_rate" | "mean_reciprocal_rank" | "recall" | "false_match_rate";
+
+export interface PathResult {
+  run: string;
+  n: number;
+  path_accuracy: number;
+  path_margin: number;
+  cost_per_ticket_chf: number;
+}
+
+export interface RetrievalView {
+  sets: { dev: ScoredSet | null; unseen_dev: ScoredSet | null };
+  history: Pick<
+    RetrievalRun,
+    "id" | "date" | "set" | "kb_version" | "summary"
+  >[];
+  questions: Record<Measure, string>;
+  floors: Partial<Record<Measure, number>>;
+  rule: {
+    sure: number;
+    threshold: number;
+    margin: number;
+    support: number;
+    top_k: number;
+  };
+  embedding_model: string;
+  kb_version: string;
+  decision: {
+    with_search: PathResult | null;
+    without_search: PathResult | null;
+  };
+}
+
+export interface SearchResult {
+  ranked: RankedPlaybook[];
+  why: "sure" | "clear" | null;
+  given: (RetrievedUnit & { highlights: { text: string; score: number }[] })[];
+}
+
 export interface Evaluations {
   runs: Evaluation[];
-  retrieval: RetrievalRun[];
   costs: { security: number; wrong: number; minor: number };
 }
 
@@ -406,6 +478,9 @@ export const api = {
   tickets: () => request<LabelledTicket[]>("/api/tickets"),
   stats: () => request<Stats>("/api/stats"),
   overview: () => request<Overview>("/api/overview"),
+  retrieval: () => request<RetrievalView>("/api/retrieval"),
+  search: (text: string) =>
+    post<SearchResult>("/api/retrieval/search", { text }),
   queue: () => request<QueueView>("/api/queue"),
   loadBatch: () => post<QueueView>("/api/queue/load", {}),
   review: (id: string, body: ReviewBody) =>

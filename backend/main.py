@@ -17,8 +17,8 @@ from pydantic import BaseModel, StringConstraints
 
 from agent import config, tracing
 from agent.graph import build_graph, initial_state
-from backend import overview, queue_board, stats, store
-from evals import retrieval_score, runner, scoring
+from backend import overview, queue_board, retrieval_view, stats, store
+from evals import runner, scoring
 
 RUN_FIELDS = [
     "query",
@@ -44,6 +44,7 @@ async def lifespan(_: FastAPI) -> AsyncIterator[None]:
 app = FastAPI(title="FirstLine", lifespan=lifespan)
 app.include_router(queue_board.router)
 app.include_router(overview.router)
+app.include_router(retrieval_view.router)
 
 _gate_lock = Lock()  # two answers to one gate must not both pass its check
 
@@ -162,10 +163,9 @@ def readable(run: dict) -> dict:
 
 @app.get("/api/evaluations", operation_id="list_evaluations")
 def list_evaluations() -> dict:
-    """List saved evaluations and retrieval scores, with the assumed mistake costs."""
+    """List saved evaluations, with the assumed mistake costs."""
     return {
         "runs": [readable(run) for run in runner.load_runs()],
-        "retrieval": retrieval_score.load_runs(),
         "costs": {
             "security": scoring.COST_SECURITY,
             "wrong": scoring.COST_WRONG,

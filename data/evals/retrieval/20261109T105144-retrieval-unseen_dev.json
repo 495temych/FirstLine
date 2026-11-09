@@ -1,0 +1,2274 @@
+{
+  "id": "20261109T105144-retrieval-unseen_dev",
+  "date": "2026-11-09T10:51:44+00:00",
+  "set": "unseen_dev",
+  "kb_version": "916db54c",
+  "sure": 0.52,
+  "threshold": 0.4,
+  "margin": 0.15,
+  "top_k": 2,
+  "summary": {
+    "n": 52,
+    "covered": 0,
+    "uncovered": 52,
+    "hit_rate": null,
+    "mean_reciprocal_rank": null,
+    "recall": null,
+    "false_match_rate": 0.038461538461538464
+  },
+  "by_family": {
+    "AIT": {
+      "n": 24,
+      "covered": 0,
+      "uncovered": 24,
+      "hit_rate": null,
+      "mean_reciprocal_rank": null,
+      "recall": null,
+      "false_match_rate": 0.0,
+      "name": "API timeouts",
+      "doc": null
+    },
+    "CES": {
+      "n": 28,
+      "covered": 0,
+      "uncovered": 28,
+      "hit_rate": null,
+      "mean_reciprocal_rank": null,
+      "recall": null,
+      "false_match_rate": 0.07142857142857142,
+      "name": "Certificate expiry",
+      "doc": null
+    }
+  },
+  "tickets": [
+    {
+      "id": "INC-AIT-0001",
+      "family": "AIT",
+      "expected": null,
+      "top": null,
+      "score": null,
+      "hit": false,
+      "false_match": false,
+      "rank": null,
+      "right_score": null,
+      "best_wrong_score": 0.4830376,
+      "ranked": [
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.4830376
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Checks",
+          "score": 0.45981863
+        },
+        {
+          "doc": "wifi",
+          "section": "Symptoms",
+          "score": 0.3574075
+        },
+        {
+          "doc": "sso-mfa",
+          "section": "Symptoms",
+          "score": 0.34997794
+        },
+        {
+          "doc": "laptop-performance",
+          "section": "Known causes",
+          "score": 0.3433963
+        }
+      ],
+      "also": [
+        {
+          "doc": "escalation-queues",
+          "kind": "reference",
+          "section": null,
+          "score": 0.37968612
+        },
+        {
+          "doc": "company-profile",
+          "kind": "reference",
+          "section": "Known organizational quirks",
+          "score": 0.37025303
+        }
+      ]
+    },
+    {
+      "id": "INC-AIT-0004",
+      "family": "AIT",
+      "expected": null,
+      "top": null,
+      "score": null,
+      "hit": false,
+      "false_match": false,
+      "rank": null,
+      "right_score": null,
+      "best_wrong_score": 0.36399537,
+      "ranked": [
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.36399537
+        },
+        {
+          "doc": "account-lockout",
+          "section": "When to escalate",
+          "score": 0.33645552
+        },
+        {
+          "doc": "wifi",
+          "section": "Symptoms",
+          "score": 0.3144736
+        },
+        {
+          "doc": "dns",
+          "section": "Known causes",
+          "score": 0.3084571
+        },
+        {
+          "doc": "software-install",
+          "section": "Known causes",
+          "score": 0.30717617
+        }
+      ],
+      "also": []
+    },
+    {
+      "id": "INC-AIT-0009",
+      "family": "AIT",
+      "expected": null,
+      "top": null,
+      "score": null,
+      "hit": false,
+      "false_match": false,
+      "rank": null,
+      "right_score": null,
+      "best_wrong_score": 0.4901005,
+      "ranked": [
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.4901005
+        },
+        {
+          "doc": "account-lockout",
+          "section": "When to escalate",
+          "score": 0.40609154
+        },
+        {
+          "doc": "wifi",
+          "section": "Known causes",
+          "score": 0.36025566
+        },
+        {
+          "doc": "sso-mfa",
+          "section": "Symptoms",
+          "score": 0.36003274
+        },
+        {
+          "doc": "disk-encryption",
+          "section": "Known causes",
+          "score": 0.30477446
+        }
+      ],
+      "also": [
+        {
+          "doc": "sec-04-account-lockout",
+          "kind": "policy",
+          "section": null,
+          "score": 0.3681035
+        }
+      ]
+    },
+    {
+      "id": "INC-AIT-0010",
+      "family": "AIT",
+      "expected": null,
+      "top": null,
+      "score": null,
+      "hit": false,
+      "false_match": false,
+      "rank": null,
+      "right_score": null,
+      "best_wrong_score": 0.3951375,
+      "ranked": [
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.3951375
+        },
+        {
+          "doc": "account-lockout",
+          "section": "When to escalate",
+          "score": 0.37292916
+        },
+        {
+          "doc": "printing",
+          "section": "Error codes",
+          "score": 0.33219084
+        },
+        {
+          "doc": "sso-mfa",
+          "section": "Fix",
+          "score": 0.30528164
+        },
+        {
+          "doc": "disk-encryption",
+          "section": "Known causes",
+          "score": 0.29280555
+        }
+      ],
+      "also": [
+        {
+          "doc": "escalation-queues",
+          "kind": "reference",
+          "section": null,
+          "score": 0.39028066
+        }
+      ]
+    },
+    {
+      "id": "INC-AIT-0011",
+      "family": "AIT",
+      "expected": null,
+      "top": null,
+      "score": null,
+      "hit": false,
+      "false_match": false,
+      "rank": null,
+      "right_score": null,
+      "best_wrong_score": 0.4505588,
+      "ranked": [
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.4505588
+        },
+        {
+          "doc": "wifi",
+          "section": "Known causes",
+          "score": 0.36285266
+        },
+        {
+          "doc": "laptop-performance",
+          "section": "Known causes",
+          "score": 0.33921197
+        },
+        {
+          "doc": "account-lockout",
+          "section": "When to escalate",
+          "score": 0.325275
+        },
+        {
+          "doc": "teams",
+          "section": "When to escalate",
+          "score": 0.31111932
+        }
+      ],
+      "also": [
+        {
+          "doc": "escalation-queues",
+          "kind": "reference",
+          "section": null,
+          "score": 0.367538
+        }
+      ]
+    },
+    {
+      "id": "INC-AIT-0014",
+      "family": "AIT",
+      "expected": null,
+      "top": null,
+      "score": null,
+      "hit": false,
+      "false_match": false,
+      "rank": null,
+      "right_score": null,
+      "best_wrong_score": 0.4246596,
+      "ranked": [
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.4246596
+        },
+        {
+          "doc": "laptop-performance",
+          "section": "Known causes",
+          "score": 0.37712193
+        },
+        {
+          "doc": "wifi",
+          "section": "Known causes",
+          "score": 0.37151676
+        },
+        {
+          "doc": "account-lockout",
+          "section": "When to escalate",
+          "score": 0.34527102
+        },
+        {
+          "doc": "printing",
+          "section": "Known causes",
+          "score": 0.33327034
+        }
+      ],
+      "also": []
+    },
+    {
+      "id": "INC-AIT-0016",
+      "family": "AIT",
+      "expected": null,
+      "top": null,
+      "score": null,
+      "hit": false,
+      "false_match": false,
+      "rank": null,
+      "right_score": null,
+      "best_wrong_score": 0.44333386,
+      "ranked": [
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.44333386
+        },
+        {
+          "doc": "account-lockout",
+          "section": "When to escalate",
+          "score": 0.425426
+        },
+        {
+          "doc": "laptop-performance",
+          "section": "Known causes",
+          "score": 0.41144553
+        },
+        {
+          "doc": "wifi",
+          "section": "Known causes",
+          "score": 0.34992033
+        },
+        {
+          "doc": "shared-drive",
+          "section": "Known causes",
+          "score": 0.34890217
+        }
+      ],
+      "also": [
+        {
+          "doc": "escalation-queues",
+          "kind": "reference",
+          "section": null,
+          "score": 0.38187334
+        },
+        {
+          "doc": "sec-04-account-lockout",
+          "kind": "policy",
+          "section": null,
+          "score": 0.35919192
+        }
+      ]
+    },
+    {
+      "id": "INC-AIT-0017",
+      "family": "AIT",
+      "expected": null,
+      "top": null,
+      "score": null,
+      "hit": false,
+      "false_match": false,
+      "rank": null,
+      "right_score": null,
+      "best_wrong_score": 0.4217524,
+      "ranked": [
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.4217524
+        },
+        {
+          "doc": "account-lockout",
+          "section": "When to escalate",
+          "score": 0.39451325
+        },
+        {
+          "doc": "sso-mfa",
+          "section": "Symptoms",
+          "score": 0.37042296
+        },
+        {
+          "doc": "laptop-performance",
+          "section": "Known causes",
+          "score": 0.36370653
+        },
+        {
+          "doc": "device-compliance",
+          "section": "Known causes",
+          "score": 0.35249075
+        }
+      ],
+      "also": [
+        {
+          "doc": "escalation-queues",
+          "kind": "reference",
+          "section": null,
+          "score": 0.35725132
+        }
+      ]
+    },
+    {
+      "id": "INC-AIT-0018",
+      "family": "AIT",
+      "expected": null,
+      "top": null,
+      "score": null,
+      "hit": false,
+      "false_match": false,
+      "rank": null,
+      "right_score": null,
+      "best_wrong_score": 0.45189232,
+      "ranked": [
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.45189232
+        },
+        {
+          "doc": "laptop-performance",
+          "section": "Known causes",
+          "score": 0.41087055
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Checks",
+          "score": 0.40592444
+        },
+        {
+          "doc": "sso-mfa",
+          "section": "Known causes",
+          "score": 0.33484522
+        },
+        {
+          "doc": "wifi",
+          "section": "Known causes",
+          "score": 0.33386406
+        }
+      ],
+      "also": []
+    },
+    {
+      "id": "INC-AIT-0023",
+      "family": "AIT",
+      "expected": null,
+      "top": null,
+      "score": null,
+      "hit": false,
+      "false_match": false,
+      "rank": null,
+      "right_score": null,
+      "best_wrong_score": 0.49869302,
+      "ranked": [
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.49869302
+        },
+        {
+          "doc": "laptop-performance",
+          "section": "Known causes",
+          "score": 0.4537773
+        },
+        {
+          "doc": "wifi",
+          "section": "Known causes",
+          "score": 0.4312195
+        },
+        {
+          "doc": "account-lockout",
+          "section": "When to escalate",
+          "score": 0.37984768
+        },
+        {
+          "doc": "dns",
+          "section": "Known causes",
+          "score": 0.34148613
+        }
+      ],
+      "also": []
+    },
+    {
+      "id": "INC-AIT-0024",
+      "family": "AIT",
+      "expected": null,
+      "top": null,
+      "score": null,
+      "hit": false,
+      "false_match": false,
+      "rank": null,
+      "right_score": null,
+      "best_wrong_score": 0.37994608,
+      "ranked": [
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.37994608
+        },
+        {
+          "doc": "laptop-performance",
+          "section": "Known causes",
+          "score": 0.36845177
+        },
+        {
+          "doc": "account-lockout",
+          "section": "When to escalate",
+          "score": 0.35618174
+        },
+        {
+          "doc": "wifi",
+          "section": "Known causes",
+          "score": 0.33841497
+        },
+        {
+          "doc": "printing",
+          "section": "Error codes",
+          "score": 0.33292058
+        }
+      ],
+      "also": [
+        {
+          "doc": "escalation-queues",
+          "kind": "reference",
+          "section": null,
+          "score": 0.41313362
+        }
+      ]
+    },
+    {
+      "id": "INC-AIT-0030",
+      "family": "AIT",
+      "expected": null,
+      "top": null,
+      "score": null,
+      "hit": false,
+      "false_match": false,
+      "rank": null,
+      "right_score": null,
+      "best_wrong_score": 0.45506907,
+      "ranked": [
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.45506907
+        },
+        {
+          "doc": "account-lockout",
+          "section": "When to escalate",
+          "score": 0.45156777
+        },
+        {
+          "doc": "sso-mfa",
+          "section": "Fix",
+          "score": 0.38283378
+        },
+        {
+          "doc": "wifi",
+          "section": "Known causes",
+          "score": 0.32871068
+        },
+        {
+          "doc": "device-compliance",
+          "section": "Known causes",
+          "score": 0.31234
+        }
+      ],
+      "also": [
+        {
+          "doc": "sec-04-account-lockout",
+          "kind": "policy",
+          "section": null,
+          "score": 0.4149431
+        }
+      ]
+    },
+    {
+      "id": "INC-AIT-0033",
+      "family": "AIT",
+      "expected": null,
+      "top": null,
+      "score": null,
+      "hit": false,
+      "false_match": false,
+      "rank": null,
+      "right_score": null,
+      "best_wrong_score": 0.4014781,
+      "ranked": [
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.4014781
+        },
+        {
+          "doc": "sso-mfa",
+          "section": "Symptoms",
+          "score": 0.3532732
+        },
+        {
+          "doc": "account-lockout",
+          "section": "When to escalate",
+          "score": 0.34064424
+        },
+        {
+          "doc": "laptop-performance",
+          "section": "Known causes",
+          "score": 0.31868398
+        },
+        {
+          "doc": "wifi",
+          "section": "Known causes",
+          "score": 0.31323853
+        }
+      ],
+      "also": []
+    },
+    {
+      "id": "INC-AIT-0034",
+      "family": "AIT",
+      "expected": null,
+      "top": null,
+      "score": null,
+      "hit": false,
+      "false_match": false,
+      "rank": null,
+      "right_score": null,
+      "best_wrong_score": 0.42672902,
+      "ranked": [
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.42672902
+        },
+        {
+          "doc": "account-lockout",
+          "section": "When to escalate",
+          "score": 0.42589638
+        },
+        {
+          "doc": "sso-mfa",
+          "section": "Symptoms",
+          "score": 0.37880647
+        },
+        {
+          "doc": "wifi",
+          "section": "Known causes",
+          "score": 0.33063465
+        },
+        {
+          "doc": "device-compliance",
+          "section": "Known causes",
+          "score": 0.30605978
+        }
+      ],
+      "also": [
+        {
+          "doc": "sec-04-account-lockout",
+          "kind": "policy",
+          "section": null,
+          "score": 0.4107954
+        },
+        {
+          "doc": "company-profile",
+          "kind": "reference",
+          "section": "Known organizational quirks",
+          "score": 0.38773447
+        }
+      ]
+    },
+    {
+      "id": "INC-AIT-0037",
+      "family": "AIT",
+      "expected": null,
+      "top": null,
+      "score": null,
+      "hit": false,
+      "false_match": false,
+      "rank": null,
+      "right_score": null,
+      "best_wrong_score": 0.4731308,
+      "ranked": [
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.4731308
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Checks",
+          "score": 0.46218404
+        },
+        {
+          "doc": "sso-mfa",
+          "section": "Symptoms",
+          "score": 0.37848252
+        },
+        {
+          "doc": "laptop-performance",
+          "section": "Known causes",
+          "score": 0.36038637
+        },
+        {
+          "doc": "shared-drive",
+          "section": "Known causes",
+          "score": 0.32482913
+        }
+      ],
+      "also": [
+        {
+          "doc": "company-profile",
+          "kind": "reference",
+          "section": "Core systems",
+          "score": 0.3632747
+        },
+        {
+          "doc": "sec-04-account-lockout",
+          "kind": "policy",
+          "section": null,
+          "score": 0.35261744
+        }
+      ]
+    },
+    {
+      "id": "INC-AIT-0042",
+      "family": "AIT",
+      "expected": null,
+      "top": null,
+      "score": null,
+      "hit": false,
+      "false_match": false,
+      "rank": null,
+      "right_score": null,
+      "best_wrong_score": 0.42403907,
+      "ranked": [
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.42403907
+        },
+        {
+          "doc": "account-lockout",
+          "section": "When to escalate",
+          "score": 0.3594256
+        },
+        {
+          "doc": "wifi",
+          "section": "Known causes",
+          "score": 0.34746787
+        },
+        {
+          "doc": "laptop-performance",
+          "section": "Known causes",
+          "score": 0.33268613
+        },
+        {
+          "doc": "sso-mfa",
+          "section": "Symptoms",
+          "score": 0.31979614
+        }
+      ],
+      "also": [
+        {
+          "doc": "escalation-queues",
+          "kind": "reference",
+          "section": null,
+          "score": 0.35116988
+        }
+      ]
+    },
+    {
+      "id": "INC-AIT-0046",
+      "family": "AIT",
+      "expected": null,
+      "top": null,
+      "score": null,
+      "hit": false,
+      "false_match": false,
+      "rank": null,
+      "right_score": null,
+      "best_wrong_score": 0.47097233,
+      "ranked": [
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.47097233
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Checks",
+          "score": 0.36005247
+        },
+        {
+          "doc": "disk-encryption",
+          "section": "Known causes",
+          "score": 0.34925437
+        },
+        {
+          "doc": "sso-mfa",
+          "section": "Known causes",
+          "score": 0.3468042
+        },
+        {
+          "doc": "laptop-performance",
+          "section": "Known causes",
+          "score": 0.3448287
+        }
+      ],
+      "also": []
+    },
+    {
+      "id": "INC-AIT-0056",
+      "family": "AIT",
+      "expected": null,
+      "top": null,
+      "score": null,
+      "hit": false,
+      "false_match": false,
+      "rank": null,
+      "right_score": null,
+      "best_wrong_score": 0.502284,
+      "ranked": [
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.502284
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Checks",
+          "score": 0.42641425
+        },
+        {
+          "doc": "laptop-performance",
+          "section": "Known causes",
+          "score": 0.42089373
+        },
+        {
+          "doc": "sso-mfa",
+          "section": "Known causes",
+          "score": 0.40033475
+        },
+        {
+          "doc": "shared-drive",
+          "section": "Known causes",
+          "score": 0.33557785
+        }
+      ],
+      "also": []
+    },
+    {
+      "id": "INC-AIT-0059",
+      "family": "AIT",
+      "expected": null,
+      "top": null,
+      "score": null,
+      "hit": false,
+      "false_match": false,
+      "rank": null,
+      "right_score": null,
+      "best_wrong_score": 0.40342927,
+      "ranked": [
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.40342927
+        },
+        {
+          "doc": "laptop-performance",
+          "section": "Known causes",
+          "score": 0.36888686
+        },
+        {
+          "doc": "account-lockout",
+          "section": "When to escalate",
+          "score": 0.32736582
+        },
+        {
+          "doc": "wifi",
+          "section": "Known causes",
+          "score": 0.3085688
+        },
+        {
+          "doc": "printing",
+          "section": "Error codes",
+          "score": 0.30676362
+        }
+      ],
+      "also": []
+    },
+    {
+      "id": "INC-AIT-0063",
+      "family": "AIT",
+      "expected": null,
+      "top": null,
+      "score": null,
+      "hit": false,
+      "false_match": false,
+      "rank": null,
+      "right_score": null,
+      "best_wrong_score": 0.3902198,
+      "ranked": [
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.3902198
+        },
+        {
+          "doc": "printing",
+          "section": "Error codes",
+          "score": 0.3689507
+        },
+        {
+          "doc": "outlook",
+          "section": "Error codes",
+          "score": 0.35294655
+        },
+        {
+          "doc": "account-lockout",
+          "section": "When to escalate",
+          "score": 0.35108757
+        },
+        {
+          "doc": "onedrive",
+          "section": "Error codes",
+          "score": 0.34334433
+        }
+      ],
+      "also": [
+        {
+          "doc": "escalation-queues",
+          "kind": "reference",
+          "section": null,
+          "score": 0.3743373
+        }
+      ]
+    },
+    {
+      "id": "INC-AIT-0065",
+      "family": "AIT",
+      "expected": null,
+      "top": null,
+      "score": null,
+      "hit": false,
+      "false_match": false,
+      "rank": null,
+      "right_score": null,
+      "best_wrong_score": 0.408683,
+      "ranked": [
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.408683
+        },
+        {
+          "doc": "account-lockout",
+          "section": "When to escalate",
+          "score": 0.3595424
+        },
+        {
+          "doc": "wifi",
+          "section": "Known causes",
+          "score": 0.33514738
+        },
+        {
+          "doc": "laptop-performance",
+          "section": "Known causes",
+          "score": 0.29333824
+        },
+        {
+          "doc": "sso-mfa",
+          "section": "Symptoms",
+          "score": 0.2899507
+        }
+      ],
+      "also": []
+    },
+    {
+      "id": "INC-CES-0002",
+      "family": "CES",
+      "expected": null,
+      "top": "vpn-access",
+      "score": 0.5301044,
+      "hit": false,
+      "false_match": true,
+      "rank": null,
+      "right_score": null,
+      "best_wrong_score": 0.5301044,
+      "ranked": [
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.5301044
+        },
+        {
+          "doc": "wifi",
+          "section": "Symptoms",
+          "score": 0.47639322
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Checks",
+          "score": 0.40852004
+        },
+        {
+          "doc": "software-install",
+          "section": "When to escalate",
+          "score": 0.36336178
+        },
+        {
+          "doc": "dns",
+          "section": "Known causes",
+          "score": 0.35382313
+        }
+      ],
+      "also": []
+    },
+    {
+      "id": "INC-CES-0003",
+      "family": "CES",
+      "expected": null,
+      "top": null,
+      "score": null,
+      "hit": false,
+      "false_match": false,
+      "rank": null,
+      "right_score": null,
+      "best_wrong_score": 0.48877883,
+      "ranked": [
+        {
+          "doc": "vpn-access",
+          "section": "Error codes",
+          "score": 0.48877883
+        },
+        {
+          "doc": "wifi",
+          "section": "Symptoms",
+          "score": 0.3926164
+        },
+        {
+          "doc": "dns",
+          "section": "Known causes",
+          "score": 0.34364623
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Checks",
+          "score": 0.29470286
+        },
+        {
+          "doc": "software-install",
+          "section": "When to escalate",
+          "score": 0.27234572
+        }
+      ],
+      "also": []
+    },
+    {
+      "id": "INC-CES-0006",
+      "family": "CES",
+      "expected": null,
+      "top": null,
+      "score": null,
+      "hit": false,
+      "false_match": false,
+      "rank": null,
+      "right_score": null,
+      "best_wrong_score": 0.45102847,
+      "ranked": [
+        {
+          "doc": "wifi",
+          "section": "Symptoms",
+          "score": 0.45102847
+        },
+        {
+          "doc": "vpn-access",
+          "section": "Symptoms",
+          "score": 0.44521648
+        },
+        {
+          "doc": "software-install",
+          "section": "When to escalate",
+          "score": 0.39129657
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Checks",
+          "score": 0.37537104
+        },
+        {
+          "doc": "dns",
+          "section": "Checks",
+          "score": 0.36919716
+        }
+      ],
+      "also": []
+    },
+    {
+      "id": "INC-CES-0008",
+      "family": "CES",
+      "expected": null,
+      "top": null,
+      "score": null,
+      "hit": false,
+      "false_match": false,
+      "rank": null,
+      "right_score": null,
+      "best_wrong_score": 0.5064165,
+      "ranked": [
+        {
+          "doc": "vpn-access",
+          "section": "Error codes",
+          "score": 0.5064165
+        },
+        {
+          "doc": "wifi",
+          "section": "Symptoms",
+          "score": 0.4475638
+        },
+        {
+          "doc": "dns",
+          "section": "Error codes",
+          "score": 0.36130288
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Checks",
+          "score": 0.33117732
+        },
+        {
+          "doc": "software-install",
+          "section": "Known causes",
+          "score": 0.29487318
+        }
+      ],
+      "also": []
+    },
+    {
+      "id": "INC-CES-0012",
+      "family": "CES",
+      "expected": null,
+      "top": null,
+      "score": null,
+      "hit": false,
+      "false_match": false,
+      "rank": null,
+      "right_score": null,
+      "best_wrong_score": 0.4874628,
+      "ranked": [
+        {
+          "doc": "vpn-access",
+          "section": "Error codes",
+          "score": 0.4874628
+        },
+        {
+          "doc": "wifi",
+          "section": "Error codes",
+          "score": 0.3699704
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Checks",
+          "score": 0.36829117
+        },
+        {
+          "doc": "disk-encryption",
+          "section": "Known causes",
+          "score": 0.34023255
+        },
+        {
+          "doc": "sso-mfa",
+          "section": "Known causes",
+          "score": 0.32688713
+        }
+      ],
+      "also": []
+    },
+    {
+      "id": "INC-CES-0016",
+      "family": "CES",
+      "expected": null,
+      "top": null,
+      "score": null,
+      "hit": false,
+      "false_match": false,
+      "rank": null,
+      "right_score": null,
+      "best_wrong_score": 0.4978401,
+      "ranked": [
+        {
+          "doc": "vpn-access",
+          "section": "Error codes",
+          "score": 0.4978401
+        },
+        {
+          "doc": "wifi",
+          "section": "Known causes",
+          "score": 0.41358712
+        },
+        {
+          "doc": "dns",
+          "section": "Known causes",
+          "score": 0.39279917
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Checks",
+          "score": 0.3569844
+        },
+        {
+          "doc": "software-install",
+          "section": "When to escalate",
+          "score": 0.3307827
+        }
+      ],
+      "also": []
+    },
+    {
+      "id": "INC-CES-0017",
+      "family": "CES",
+      "expected": null,
+      "top": null,
+      "score": null,
+      "hit": false,
+      "false_match": false,
+      "rank": null,
+      "right_score": null,
+      "best_wrong_score": 0.4795191,
+      "ranked": [
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.4795191
+        },
+        {
+          "doc": "wifi",
+          "section": "Symptoms",
+          "score": 0.45497692
+        },
+        {
+          "doc": "dns",
+          "section": "Known causes",
+          "score": 0.398722
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Checks",
+          "score": 0.3576774
+        },
+        {
+          "doc": "sso-mfa",
+          "section": "Known causes",
+          "score": 0.3268404
+        }
+      ],
+      "also": []
+    },
+    {
+      "id": "INC-CES-0018",
+      "family": "CES",
+      "expected": null,
+      "top": null,
+      "score": null,
+      "hit": false,
+      "false_match": false,
+      "rank": null,
+      "right_score": null,
+      "best_wrong_score": 0.47754022,
+      "ranked": [
+        {
+          "doc": "vpn-access",
+          "section": "Error codes",
+          "score": 0.47754022
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Checks",
+          "score": 0.3832492
+        },
+        {
+          "doc": "software-install",
+          "section": "When to escalate",
+          "score": 0.37801945
+        },
+        {
+          "doc": "wifi",
+          "section": "Symptoms",
+          "score": 0.3687921
+        },
+        {
+          "doc": "sso-mfa",
+          "section": "Symptoms",
+          "score": 0.33605403
+        }
+      ],
+      "also": []
+    },
+    {
+      "id": "INC-CES-0020",
+      "family": "CES",
+      "expected": null,
+      "top": null,
+      "score": null,
+      "hit": false,
+      "false_match": false,
+      "rank": null,
+      "right_score": null,
+      "best_wrong_score": 0.51143616,
+      "ranked": [
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.51143616
+        },
+        {
+          "doc": "wifi",
+          "section": "Known causes",
+          "score": 0.42969373
+        },
+        {
+          "doc": "dns",
+          "section": "Known causes",
+          "score": 0.3742407
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Symptoms",
+          "score": 0.3530815
+        },
+        {
+          "doc": "sso-mfa",
+          "section": "Known causes",
+          "score": 0.33328056
+        }
+      ],
+      "also": []
+    },
+    {
+      "id": "INC-CES-0023",
+      "family": "CES",
+      "expected": null,
+      "top": null,
+      "score": null,
+      "hit": false,
+      "false_match": false,
+      "rank": null,
+      "right_score": null,
+      "best_wrong_score": 0.5052954,
+      "ranked": [
+        {
+          "doc": "vpn-access",
+          "section": "Error codes",
+          "score": 0.5052954
+        },
+        {
+          "doc": "wifi",
+          "section": "Symptoms",
+          "score": 0.47511438
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Checks",
+          "score": 0.37023225
+        },
+        {
+          "doc": "software-install",
+          "section": "When to escalate",
+          "score": 0.35887855
+        },
+        {
+          "doc": "dns",
+          "section": "Error codes",
+          "score": 0.35852426
+        }
+      ],
+      "also": [
+        {
+          "doc": "company-profile",
+          "kind": "reference",
+          "section": "Naming conventions",
+          "score": 0.36254418
+        }
+      ]
+    },
+    {
+      "id": "INC-CES-0024",
+      "family": "CES",
+      "expected": null,
+      "top": null,
+      "score": null,
+      "hit": false,
+      "false_match": false,
+      "rank": null,
+      "right_score": null,
+      "best_wrong_score": 0.457346,
+      "ranked": [
+        {
+          "doc": "vpn-access",
+          "section": "Error codes",
+          "score": 0.457346
+        },
+        {
+          "doc": "wifi",
+          "section": "Symptoms",
+          "score": 0.40978014
+        },
+        {
+          "doc": "dns",
+          "section": "Known causes",
+          "score": 0.39686406
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Checks",
+          "score": 0.33773762
+        },
+        {
+          "doc": "software-install",
+          "section": "Known causes",
+          "score": 0.30535513
+        }
+      ],
+      "also": []
+    },
+    {
+      "id": "INC-CES-0028",
+      "family": "CES",
+      "expected": null,
+      "top": null,
+      "score": null,
+      "hit": false,
+      "false_match": false,
+      "rank": null,
+      "right_score": null,
+      "best_wrong_score": 0.47927836,
+      "ranked": [
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.47927836
+        },
+        {
+          "doc": "wifi",
+          "section": "Symptoms",
+          "score": 0.44837266
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Checks",
+          "score": 0.36353242
+        },
+        {
+          "doc": "dns",
+          "section": "Known causes",
+          "score": 0.3631046
+        },
+        {
+          "doc": "disk-encryption",
+          "section": "Known causes",
+          "score": 0.33504078
+        }
+      ],
+      "also": []
+    },
+    {
+      "id": "INC-CES-0029",
+      "family": "CES",
+      "expected": null,
+      "top": null,
+      "score": null,
+      "hit": false,
+      "false_match": false,
+      "rank": null,
+      "right_score": null,
+      "best_wrong_score": 0.47682965,
+      "ranked": [
+        {
+          "doc": "vpn-access",
+          "section": "Error codes",
+          "score": 0.47682965
+        },
+        {
+          "doc": "wifi",
+          "section": "Symptoms",
+          "score": 0.45508134
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Checks",
+          "score": 0.3774976
+        },
+        {
+          "doc": "software-install",
+          "section": "When to escalate",
+          "score": 0.3431593
+        },
+        {
+          "doc": "dns",
+          "section": "Known causes",
+          "score": 0.3430048
+        }
+      ],
+      "also": []
+    },
+    {
+      "id": "INC-CES-0032",
+      "family": "CES",
+      "expected": null,
+      "top": null,
+      "score": null,
+      "hit": false,
+      "false_match": false,
+      "rank": null,
+      "right_score": null,
+      "best_wrong_score": 0.4663168,
+      "ranked": [
+        {
+          "doc": "wifi",
+          "section": "Symptoms",
+          "score": 0.4663168
+        },
+        {
+          "doc": "vpn-access",
+          "section": "Symptoms",
+          "score": 0.43840697
+        },
+        {
+          "doc": "dns",
+          "section": "Symptoms",
+          "score": 0.35442394
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Checks",
+          "score": 0.34809715
+        },
+        {
+          "doc": "software-install",
+          "section": "When to escalate",
+          "score": 0.32076392
+        }
+      ],
+      "also": []
+    },
+    {
+      "id": "INC-CES-0033",
+      "family": "CES",
+      "expected": null,
+      "top": null,
+      "score": null,
+      "hit": false,
+      "false_match": false,
+      "rank": null,
+      "right_score": null,
+      "best_wrong_score": 0.49062827,
+      "ranked": [
+        {
+          "doc": "wifi",
+          "section": "Symptoms",
+          "score": 0.49062827
+        },
+        {
+          "doc": "vpn-access",
+          "section": "Error codes",
+          "score": 0.4883923
+        },
+        {
+          "doc": "dns",
+          "section": "Known causes",
+          "score": 0.37667966
+        },
+        {
+          "doc": "software-install",
+          "section": "When to escalate",
+          "score": 0.31842792
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Checks",
+          "score": 0.31539962
+        }
+      ],
+      "also": []
+    },
+    {
+      "id": "INC-CES-0034",
+      "family": "CES",
+      "expected": null,
+      "top": null,
+      "score": null,
+      "hit": false,
+      "false_match": false,
+      "rank": null,
+      "right_score": null,
+      "best_wrong_score": 0.4636593,
+      "ranked": [
+        {
+          "doc": "vpn-access",
+          "section": "Error codes",
+          "score": 0.4636593
+        },
+        {
+          "doc": "wifi",
+          "section": "Known causes",
+          "score": 0.41404337
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Checks",
+          "score": 0.32458508
+        },
+        {
+          "doc": "sso-mfa",
+          "section": "Symptoms",
+          "score": 0.3244585
+        },
+        {
+          "doc": "dns",
+          "section": "Known causes",
+          "score": 0.31937444
+        }
+      ],
+      "also": []
+    },
+    {
+      "id": "INC-CES-0037",
+      "family": "CES",
+      "expected": null,
+      "top": null,
+      "score": null,
+      "hit": false,
+      "false_match": false,
+      "rank": null,
+      "right_score": null,
+      "best_wrong_score": 0.4902627,
+      "ranked": [
+        {
+          "doc": "vpn-access",
+          "section": "Error codes",
+          "score": 0.4902627
+        },
+        {
+          "doc": "wifi",
+          "section": "Symptoms",
+          "score": 0.4559635
+        },
+        {
+          "doc": "dns",
+          "section": "Known causes",
+          "score": 0.34731412
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Checks",
+          "score": 0.33633152
+        },
+        {
+          "doc": "software-install",
+          "section": "When to escalate",
+          "score": 0.28439903
+        }
+      ],
+      "also": []
+    },
+    {
+      "id": "INC-CES-0039",
+      "family": "CES",
+      "expected": null,
+      "top": null,
+      "score": null,
+      "hit": false,
+      "false_match": false,
+      "rank": null,
+      "right_score": null,
+      "best_wrong_score": 0.48297295,
+      "ranked": [
+        {
+          "doc": "vpn-access",
+          "section": "Error codes",
+          "score": 0.48297295
+        },
+        {
+          "doc": "wifi",
+          "section": "Symptoms",
+          "score": 0.42247036
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Checks",
+          "score": 0.35827696
+        },
+        {
+          "doc": "dns",
+          "section": "Known causes",
+          "score": 0.31712654
+        },
+        {
+          "doc": "software-install",
+          "section": "When to escalate",
+          "score": 0.31236082
+        }
+      ],
+      "also": []
+    },
+    {
+      "id": "INC-CES-0043",
+      "family": "CES",
+      "expected": null,
+      "top": null,
+      "score": null,
+      "hit": false,
+      "false_match": false,
+      "rank": null,
+      "right_score": null,
+      "best_wrong_score": 0.4892102,
+      "ranked": [
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.4892102
+        },
+        {
+          "doc": "wifi",
+          "section": "Symptoms",
+          "score": 0.43458965
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Checks",
+          "score": 0.4169
+        },
+        {
+          "doc": "software-install",
+          "section": "When to escalate",
+          "score": 0.41447863
+        },
+        {
+          "doc": "dns",
+          "section": "Known causes",
+          "score": 0.33233374
+        }
+      ],
+      "also": [
+        {
+          "doc": "escalation-queues",
+          "kind": "reference",
+          "section": null,
+          "score": 0.35693628
+        }
+      ]
+    },
+    {
+      "id": "INC-CES-0045",
+      "family": "CES",
+      "expected": null,
+      "top": null,
+      "score": null,
+      "hit": false,
+      "false_match": false,
+      "rank": null,
+      "right_score": null,
+      "best_wrong_score": 0.46498108,
+      "ranked": [
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.46498108
+        },
+        {
+          "doc": "wifi",
+          "section": "Known causes",
+          "score": 0.3920368
+        },
+        {
+          "doc": "dns",
+          "section": "Known causes",
+          "score": 0.36976928
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Checks",
+          "score": 0.3520111
+        },
+        {
+          "doc": "sso-mfa",
+          "section": "Known causes",
+          "score": 0.3225463
+        }
+      ],
+      "also": []
+    },
+    {
+      "id": "INC-CES-0048",
+      "family": "CES",
+      "expected": null,
+      "top": null,
+      "score": null,
+      "hit": false,
+      "false_match": false,
+      "rank": null,
+      "right_score": null,
+      "best_wrong_score": 0.49798918,
+      "ranked": [
+        {
+          "doc": "vpn-access",
+          "section": "Error codes",
+          "score": 0.49798918
+        },
+        {
+          "doc": "software-install",
+          "section": "When to escalate",
+          "score": 0.43723112
+        },
+        {
+          "doc": "wifi",
+          "section": "Symptoms",
+          "score": 0.39724156
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Checks",
+          "score": 0.38455427
+        },
+        {
+          "doc": "dns",
+          "section": "Symptoms",
+          "score": 0.34450606
+        }
+      ],
+      "also": []
+    },
+    {
+      "id": "INC-CES-0050",
+      "family": "CES",
+      "expected": null,
+      "top": null,
+      "score": null,
+      "hit": false,
+      "false_match": false,
+      "rank": null,
+      "right_score": null,
+      "best_wrong_score": 0.44507998,
+      "ranked": [
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.44507998
+        },
+        {
+          "doc": "wifi",
+          "section": "Symptoms",
+          "score": 0.4160879
+        },
+        {
+          "doc": "dns",
+          "section": "Known causes",
+          "score": 0.39655375
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Checks",
+          "score": 0.38227868
+        },
+        {
+          "doc": "software-install",
+          "section": "When to escalate",
+          "score": 0.33148086
+        }
+      ],
+      "also": []
+    },
+    {
+      "id": "INC-CES-0051",
+      "family": "CES",
+      "expected": null,
+      "top": null,
+      "score": null,
+      "hit": false,
+      "false_match": false,
+      "rank": null,
+      "right_score": null,
+      "best_wrong_score": 0.47340542,
+      "ranked": [
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.47340542
+        },
+        {
+          "doc": "wifi",
+          "section": "Symptoms",
+          "score": 0.428361
+        },
+        {
+          "doc": "dns",
+          "section": "Known causes",
+          "score": 0.3589148
+        },
+        {
+          "doc": "software-install",
+          "section": "When to escalate",
+          "score": 0.352768
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Checks",
+          "score": 0.35043967
+        }
+      ],
+      "also": []
+    },
+    {
+      "id": "INC-CES-0052",
+      "family": "CES",
+      "expected": null,
+      "top": null,
+      "score": null,
+      "hit": false,
+      "false_match": false,
+      "rank": null,
+      "right_score": null,
+      "best_wrong_score": 0.49632514,
+      "ranked": [
+        {
+          "doc": "vpn-access",
+          "section": "Error codes",
+          "score": 0.49632514
+        },
+        {
+          "doc": "wifi",
+          "section": "Symptoms",
+          "score": 0.43803152
+        },
+        {
+          "doc": "software-install",
+          "section": "When to escalate",
+          "score": 0.364483
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Checks",
+          "score": 0.3612976
+        },
+        {
+          "doc": "dns",
+          "section": "Known causes",
+          "score": 0.33882296
+        }
+      ],
+      "also": []
+    },
+    {
+      "id": "INC-CES-0054",
+      "family": "CES",
+      "expected": null,
+      "top": null,
+      "score": null,
+      "hit": false,
+      "false_match": false,
+      "rank": null,
+      "right_score": null,
+      "best_wrong_score": 0.46007878,
+      "ranked": [
+        {
+          "doc": "vpn-access",
+          "section": "Error codes",
+          "score": 0.46007878
+        },
+        {
+          "doc": "wifi",
+          "section": "Symptoms",
+          "score": 0.393811
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Checks",
+          "score": 0.3633167
+        },
+        {
+          "doc": "dns",
+          "section": "Known causes",
+          "score": 0.34053993
+        },
+        {
+          "doc": "software-install",
+          "section": "When to escalate",
+          "score": 0.31673843
+        }
+      ],
+      "also": []
+    },
+    {
+      "id": "INC-CES-0062",
+      "family": "CES",
+      "expected": null,
+      "top": null,
+      "score": null,
+      "hit": false,
+      "false_match": false,
+      "rank": null,
+      "right_score": null,
+      "best_wrong_score": 0.5099201,
+      "ranked": [
+        {
+          "doc": "vpn-access",
+          "section": "Error codes",
+          "score": 0.5099201
+        },
+        {
+          "doc": "wifi",
+          "section": "Symptoms",
+          "score": 0.3868423
+        },
+        {
+          "doc": "dns",
+          "section": "Known causes",
+          "score": 0.3473283
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Checks",
+          "score": 0.3087799
+        },
+        {
+          "doc": "software-install",
+          "section": "When to escalate",
+          "score": 0.30782235
+        }
+      ],
+      "also": []
+    },
+    {
+      "id": "INC-CES-0063",
+      "family": "CES",
+      "expected": null,
+      "top": null,
+      "score": null,
+      "hit": false,
+      "false_match": false,
+      "rank": null,
+      "right_score": null,
+      "best_wrong_score": 0.44503498,
+      "ranked": [
+        {
+          "doc": "vpn-access",
+          "section": "Error codes",
+          "score": 0.44503498
+        },
+        {
+          "doc": "wifi",
+          "section": "Symptoms",
+          "score": 0.38132808
+        },
+        {
+          "doc": "dns",
+          "section": "Known causes",
+          "score": 0.33509424
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Checks",
+          "score": 0.32447505
+        },
+        {
+          "doc": "software-install",
+          "section": "When to escalate",
+          "score": 0.32225958
+        }
+      ],
+      "also": []
+    },
+    {
+      "id": "INC-CES-V0018",
+      "family": "CES",
+      "expected": null,
+      "top": "wifi",
+      "score": 0.5297913,
+      "hit": false,
+      "false_match": true,
+      "rank": null,
+      "right_score": null,
+      "best_wrong_score": 0.5297913,
+      "ranked": [
+        {
+          "doc": "wifi",
+          "section": "Symptoms",
+          "score": 0.5297913
+        },
+        {
+          "doc": "vpn-access",
+          "section": "When to escalate",
+          "score": 0.5089229
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Checks",
+          "score": 0.38560003
+        },
+        {
+          "doc": "software-install",
+          "section": "When to escalate",
+          "score": 0.37162712
+        },
+        {
+          "doc": "dns",
+          "section": "Symptoms",
+          "score": 0.36981064
+        }
+      ],
+      "also": []
+    },
+    {
+      "id": "INC-AIT-V0031",
+      "family": "AIT",
+      "expected": null,
+      "top": null,
+      "score": null,
+      "hit": false,
+      "false_match": false,
+      "rank": null,
+      "right_score": null,
+      "best_wrong_score": 0.41507465,
+      "ranked": [
+        {
+          "doc": "laptop-performance",
+          "section": "Known causes",
+          "score": 0.41507465
+        },
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.40514696
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Checks",
+          "score": 0.37132698
+        },
+        {
+          "doc": "teams",
+          "section": "Known causes",
+          "score": 0.36957157
+        },
+        {
+          "doc": "printing",
+          "section": "Known causes",
+          "score": 0.34785
+        }
+      ],
+      "also": [
+        {
+          "doc": "escalation-queues",
+          "kind": "reference",
+          "section": null,
+          "score": 0.40165907
+        },
+        {
+          "doc": "company-profile",
+          "kind": "reference",
+          "section": "Known organizational quirks",
+          "score": 0.35499203
+        }
+      ]
+    },
+    {
+      "id": "INC-AIT-V0032",
+      "family": "AIT",
+      "expected": null,
+      "top": null,
+      "score": null,
+      "hit": false,
+      "false_match": false,
+      "rank": null,
+      "right_score": null,
+      "best_wrong_score": 0.36935723,
+      "ranked": [
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.36935723
+        },
+        {
+          "doc": "printing",
+          "section": "Error codes",
+          "score": 0.36816788
+        },
+        {
+          "doc": "laptop-performance",
+          "section": "Known causes",
+          "score": 0.35269332
+        },
+        {
+          "doc": "account-lockout",
+          "section": "When to escalate",
+          "score": 0.31647748
+        },
+        {
+          "doc": "teams",
+          "section": "Known causes",
+          "score": 0.28773433
+        }
+      ],
+      "also": [
+        {
+          "doc": "escalation-queues",
+          "kind": "reference",
+          "section": null,
+          "score": 0.38388258
+        }
+      ]
+    },
+    {
+      "id": "INC-AIT-V0033",
+      "family": "AIT",
+      "expected": null,
+      "top": null,
+      "score": null,
+      "hit": false,
+      "false_match": false,
+      "rank": null,
+      "right_score": null,
+      "best_wrong_score": 0.4685236,
+      "ranked": [
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.4685236
+        },
+        {
+          "doc": "sso-mfa",
+          "section": "Known causes",
+          "score": 0.41476655
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Checks",
+          "score": 0.4089809
+        },
+        {
+          "doc": "laptop-performance",
+          "section": "Known causes",
+          "score": 0.406506
+        },
+        {
+          "doc": "outlook",
+          "section": "Known causes",
+          "score": 0.37627295
+        }
+      ],
+      "also": [
+        {
+          "doc": "company-profile",
+          "kind": "reference",
+          "section": "Known organizational quirks",
+          "score": 0.42772955
+        }
+      ]
+    }
+  ]
+}

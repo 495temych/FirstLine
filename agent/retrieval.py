@@ -12,6 +12,7 @@ import os
 import re
 from functools import cache
 from threading import RLock
+from typing import Literal
 
 import numpy as np
 from qdrant_client import QdrantClient, models
@@ -253,14 +254,24 @@ def rank_playbooks(query: str) -> list[dict]:
     ]
 
 
+def why_matched(best: float, runner_up: float) -> Literal["sure", "clear"] | None:
+    """Why the best playbook counts as a match: its score alone is high enough, or
+    it is above the threshold and well ahead of the next. None when it isn't one.
+    """
+    if best >= PLAYBOOK_SURE:
+        return "sure"
+    if best >= PLAYBOOK_THRESHOLD and best - runner_up >= PLAYBOOK_MARGIN:
+        return "clear"
+    return None
+
+
 def _confident(ranked: list[tuple[str, int]], scores: np.ndarray) -> int | None:
     """The best playbook's section index, if it's clearly a match."""
     if not ranked:
         return None
     best = scores[ranked[0][1]]
     runner_up = scores[ranked[1][1]] if len(ranked) > 1 else -1.0
-    clear = best >= PLAYBOOK_THRESHOLD and best - runner_up >= PLAYBOOK_MARGIN
-    return ranked[0][1] if best >= PLAYBOOK_SURE or clear else None
+    return ranked[0][1] if why_matched(float(best), float(runner_up)) else None
 
 
 def retrieve(query: str) -> list[dict]:

@@ -117,62 +117,8 @@ const scored = {
   error: null,
 };
 
-const retrievalSummary = {
-  n: 129,
-  covered: 90,
-  uncovered: 39,
-  hit_rate: 0.94,
-  mean_reciprocal_rank: 0.97,
-  recall: 0.99,
-  false_match_rate: 0.85,
-};
-
-const coveredFamily = {
-  n: 12,
-  covered: 12,
-  uncovered: 0,
-  hit_rate: 1,
-  false_match_rate: null,
-};
-
 export const evaluations: Evaluations = {
   costs: { security: 2000, wrong: 120, minor: 60 },
-  retrieval: [
-    {
-      id: "20261107-retrieval-dev",
-      date: "2026-11-07T11:41:10+00:00",
-      set: "dev",
-      kb_version: "5b52d0ab",
-      threshold: 0.35,
-      top_k: 2,
-      summary: retrievalSummary,
-      by_family: {
-        ALP: {
-          ...coveredFamily,
-          name: "Account lockout",
-          doc: "account-access",
-        },
-      },
-    },
-    {
-      id: "20261107-retrieval-unseen_dev",
-      date: "2026-11-07T11:41:12+00:00",
-      set: "unseen_dev",
-      kb_version: "5b52d0ab",
-      threshold: 0.35,
-      top_k: 2,
-      summary: { ...retrievalSummary, hit_rate: null, covered: 0 },
-      by_family: {
-        CES: {
-          ...coveredFamily,
-          name: "Certificate expiry",
-          doc: null,
-          hit_rate: null,
-          false_match_rate: 0.93,
-        },
-      },
-    },
-  ],
   runs: [
     {
       id: "20261104-dev-tiny",

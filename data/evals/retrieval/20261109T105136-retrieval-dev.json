@@ -1,0 +1,6071 @@
+{
+  "id": "20261109T105136-retrieval-dev",
+  "date": "2026-11-09T10:51:36+00:00",
+  "set": "dev",
+  "kb_version": "916db54c",
+  "sure": 0.52,
+  "threshold": 0.4,
+  "margin": 0.15,
+  "top_k": 2,
+  "summary": {
+    "n": 129,
+    "covered": 129,
+    "uncovered": 0,
+    "hit_rate": 1.0,
+    "mean_reciprocal_rank": 1.0,
+    "recall": 1.0,
+    "false_match_rate": null
+  },
+  "by_family": {
+    "ALP": {
+      "n": 12,
+      "covered": 12,
+      "uncovered": 0,
+      "hit_rate": 1.0,
+      "mean_reciprocal_rank": 1.0,
+      "recall": 1.0,
+      "false_match_rate": null,
+      "name": "Account lockout and password",
+      "doc": "account-lockout"
+    },
+    "DCP": {
+      "n": 9,
+      "covered": 9,
+      "uncovered": 0,
+      "hit_rate": 1.0,
+      "mean_reciprocal_rank": 1.0,
+      "recall": 1.0,
+      "false_match_rate": null,
+      "name": "Device compliance",
+      "doc": "device-compliance"
+    },
+    "DRF": {
+      "n": 11,
+      "covered": 11,
+      "uncovered": 0,
+      "hit_rate": 1.0,
+      "mean_reciprocal_rank": 1.0,
+      "recall": 1.0,
+      "false_match_rate": null,
+      "name": "DNS",
+      "doc": "dns"
+    },
+    "EDE": {
+      "n": 10,
+      "covered": 10,
+      "uncovered": 0,
+      "hit_rate": 1.0,
+      "mean_reciprocal_rank": 1.0,
+      "recall": 1.0,
+      "false_match_rate": null,
+      "name": "Disk encryption",
+      "doc": "disk-encryption"
+    },
+    "LPD": {
+      "n": 12,
+      "covered": 12,
+      "uncovered": 0,
+      "hit_rate": 1.0,
+      "mean_reciprocal_rank": 1.0,
+      "recall": 1.0,
+      "false_match_rate": null,
+      "name": "Laptop performance",
+      "doc": "laptop-performance"
+    },
+    "OES": {
+      "n": 10,
+      "covered": 10,
+      "uncovered": 0,
+      "hit_rate": 1.0,
+      "mean_reciprocal_rank": 1.0,
+      "recall": 1.0,
+      "false_match_rate": null,
+      "name": "Outlook sync",
+      "doc": "outlook"
+    },
+    "PDQ": {
+      "n": 11,
+      "covered": 11,
+      "uncovered": 0,
+      "hit_rate": 1.0,
+      "mean_reciprocal_rank": 1.0,
+      "recall": 1.0,
+      "false_match_rate": null,
+      "name": "Printing",
+      "doc": "printing"
+    },
+    "SDA": {
+      "n": 10,
+      "covered": 10,
+      "uncovered": 0,
+      "hit_rate": 1.0,
+      "mean_reciprocal_rank": 1.0,
+      "recall": 1.0,
+      "false_match_rate": null,
+      "name": "Shared drive access",
+      "doc": "shared-drive"
+    },
+    "SIB": {
+      "n": 12,
+      "covered": 12,
+      "uncovered": 0,
+      "hit_rate": 1.0,
+      "mean_reciprocal_rank": 1.0,
+      "recall": 1.0,
+      "false_match_rate": null,
+      "name": "Software install",
+      "doc": "software-install"
+    },
+    "SML": {
+      "n": 9,
+      "covered": 9,
+      "uncovered": 0,
+      "hit_rate": 1.0,
+      "mean_reciprocal_rank": 1.0,
+      "recall": 1.0,
+      "false_match_rate": null,
+      "name": "SSO and MFA",
+      "doc": "sso-mfa"
+    },
+    "VDA": {
+      "n": 12,
+      "covered": 12,
+      "uncovered": 0,
+      "hit_rate": 1.0,
+      "mean_reciprocal_rank": 1.0,
+      "recall": 1.0,
+      "false_match_rate": null,
+      "name": "VPN access",
+      "doc": "vpn-access"
+    },
+    "WCI": {
+      "n": 11,
+      "covered": 11,
+      "uncovered": 0,
+      "hit_rate": 1.0,
+      "mean_reciprocal_rank": 1.0,
+      "recall": 1.0,
+      "false_match_rate": null,
+      "name": "Wi-Fi",
+      "doc": "wifi"
+    }
+  },
+  "tickets": [
+    {
+      "id": "INC-ALP-0010",
+      "family": "ALP",
+      "expected": "account-lockout",
+      "top": "account-lockout",
+      "score": 0.6589174,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.6589174,
+      "best_wrong_score": 0.51661336,
+      "ranked": [
+        {
+          "doc": "account-lockout",
+          "section": "Checks",
+          "score": 0.6589174
+        },
+        {
+          "doc": "sso-mfa",
+          "section": "Symptoms",
+          "score": 0.51661336
+        },
+        {
+          "doc": "outlook",
+          "section": "Symptoms",
+          "score": 0.48354366
+        },
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.46590766
+        },
+        {
+          "doc": "wifi",
+          "section": "Error codes",
+          "score": 0.4455398
+        }
+      ],
+      "also": [
+        {
+          "doc": "sec-04-account-lockout",
+          "kind": "policy",
+          "section": null,
+          "score": 0.5114145
+        }
+      ]
+    },
+    {
+      "id": "INC-ALP-0012",
+      "family": "ALP",
+      "expected": "account-lockout",
+      "top": "account-lockout",
+      "score": 0.739642,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.739642,
+      "best_wrong_score": 0.5476141,
+      "ranked": [
+        {
+          "doc": "account-lockout",
+          "section": "Symptoms",
+          "score": 0.739642
+        },
+        {
+          "doc": "sso-mfa",
+          "section": "Known causes",
+          "score": 0.5476141
+        },
+        {
+          "doc": "wifi",
+          "section": "Symptoms",
+          "score": 0.416634
+        },
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.38500088
+        },
+        {
+          "doc": "shared-drive",
+          "section": "Known causes",
+          "score": 0.364792
+        }
+      ],
+      "also": [
+        {
+          "doc": "sec-04-account-lockout",
+          "kind": "policy",
+          "section": null,
+          "score": 0.5155883
+        }
+      ]
+    },
+    {
+      "id": "INC-ALP-0024",
+      "family": "ALP",
+      "expected": "account-lockout",
+      "top": "account-lockout",
+      "score": 0.66674066,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.66674066,
+      "best_wrong_score": 0.57128084,
+      "ranked": [
+        {
+          "doc": "account-lockout",
+          "section": "Symptoms",
+          "score": 0.66674066
+        },
+        {
+          "doc": "sso-mfa",
+          "section": "Symptoms",
+          "score": 0.57128084
+        },
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.40844986
+        },
+        {
+          "doc": "wifi",
+          "section": "Symptoms",
+          "score": 0.40605906
+        },
+        {
+          "doc": "outlook",
+          "section": "Fix",
+          "score": 0.3675792
+        }
+      ],
+      "also": [
+        {
+          "doc": "company-profile",
+          "kind": "reference",
+          "section": "Core systems",
+          "score": 0.5098046
+        }
+      ]
+    },
+    {
+      "id": "INC-ALP-0026",
+      "family": "ALP",
+      "expected": "account-lockout",
+      "top": "account-lockout",
+      "score": 0.73348975,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.73348975,
+      "best_wrong_score": 0.5518161,
+      "ranked": [
+        {
+          "doc": "account-lockout",
+          "section": "Symptoms",
+          "score": 0.73348975
+        },
+        {
+          "doc": "sso-mfa",
+          "section": "Symptoms",
+          "score": 0.5518161
+        },
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.40452474
+        },
+        {
+          "doc": "wifi",
+          "section": "Symptoms",
+          "score": 0.39367482
+        },
+        {
+          "doc": "outlook",
+          "section": "Known causes",
+          "score": 0.35553986
+        }
+      ],
+      "also": [
+        {
+          "doc": "sec-04-account-lockout",
+          "kind": "policy",
+          "section": null,
+          "score": 0.5568388
+        }
+      ]
+    },
+    {
+      "id": "INC-ALP-0036",
+      "family": "ALP",
+      "expected": "account-lockout",
+      "top": "account-lockout",
+      "score": 0.69703865,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.69703865,
+      "best_wrong_score": 0.53052723,
+      "ranked": [
+        {
+          "doc": "account-lockout",
+          "section": "Symptoms",
+          "score": 0.69703865
+        },
+        {
+          "doc": "sso-mfa",
+          "section": "Symptoms",
+          "score": 0.53052723
+        },
+        {
+          "doc": "outlook",
+          "section": "Known causes",
+          "score": 0.48788506
+        },
+        {
+          "doc": "wifi",
+          "section": "Symptoms",
+          "score": 0.4205648
+        },
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.39257562
+        }
+      ],
+      "also": [
+        {
+          "doc": "sec-04-account-lockout",
+          "kind": "policy",
+          "section": null,
+          "score": 0.5185699
+        }
+      ]
+    },
+    {
+      "id": "INC-ALP-0044",
+      "family": "ALP",
+      "expected": "account-lockout",
+      "top": "account-lockout",
+      "score": 0.7038447,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.7038447,
+      "best_wrong_score": 0.50297725,
+      "ranked": [
+        {
+          "doc": "account-lockout",
+          "section": "Symptoms",
+          "score": 0.7038447
+        },
+        {
+          "doc": "sso-mfa",
+          "section": "Symptoms",
+          "score": 0.50297725
+        },
+        {
+          "doc": "wifi",
+          "section": "Symptoms",
+          "score": 0.45068058
+        },
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.41005826
+        },
+        {
+          "doc": "outlook",
+          "section": "Symptoms",
+          "score": 0.3470165
+        }
+      ],
+      "also": [
+        {
+          "doc": "sec-04-account-lockout",
+          "kind": "policy",
+          "section": null,
+          "score": 0.51568526
+        }
+      ]
+    },
+    {
+      "id": "INC-ALP-0050",
+      "family": "ALP",
+      "expected": "account-lockout",
+      "top": "account-lockout",
+      "score": 0.65368664,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.65368664,
+      "best_wrong_score": 0.50576675,
+      "ranked": [
+        {
+          "doc": "account-lockout",
+          "section": "Checks",
+          "score": 0.65368664
+        },
+        {
+          "doc": "sso-mfa",
+          "section": "Symptoms",
+          "score": 0.50576675
+        },
+        {
+          "doc": "wifi",
+          "section": "Symptoms",
+          "score": 0.42870724
+        },
+        {
+          "doc": "outlook",
+          "section": "Symptoms",
+          "score": 0.41928917
+        },
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.39236274
+        }
+      ],
+      "also": [
+        {
+          "doc": "sec-04-account-lockout",
+          "kind": "policy",
+          "section": null,
+          "score": 0.5503815
+        }
+      ]
+    },
+    {
+      "id": "INC-ALP-0056",
+      "family": "ALP",
+      "expected": "account-lockout",
+      "top": "account-lockout",
+      "score": 0.79494345,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.79494345,
+      "best_wrong_score": 0.58750904,
+      "ranked": [
+        {
+          "doc": "account-lockout",
+          "section": "Symptoms",
+          "score": 0.79494345
+        },
+        {
+          "doc": "sso-mfa",
+          "section": "Symptoms",
+          "score": 0.58750904
+        },
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.4539797
+        },
+        {
+          "doc": "wifi",
+          "section": "Error codes",
+          "score": 0.42132202
+        },
+        {
+          "doc": "outlook",
+          "section": "Known causes",
+          "score": 0.36901164
+        }
+      ],
+      "also": [
+        {
+          "doc": "sec-04-account-lockout",
+          "kind": "policy",
+          "section": null,
+          "score": 0.5361784
+        }
+      ]
+    },
+    {
+      "id": "INC-ALP-0057",
+      "family": "ALP",
+      "expected": "account-lockout",
+      "top": "account-lockout",
+      "score": 0.6660496,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.6660496,
+      "best_wrong_score": 0.51053846,
+      "ranked": [
+        {
+          "doc": "account-lockout",
+          "section": "Symptoms",
+          "score": 0.6660496
+        },
+        {
+          "doc": "sso-mfa",
+          "section": "Fix",
+          "score": 0.51053846
+        },
+        {
+          "doc": "outlook",
+          "section": "Fix",
+          "score": 0.3701663
+        },
+        {
+          "doc": "device-compliance",
+          "section": "Known causes",
+          "score": 0.34480286
+        },
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.34367174
+        }
+      ],
+      "also": [
+        {
+          "doc": "sec-04-account-lockout",
+          "kind": "policy",
+          "section": null,
+          "score": 0.5367106
+        }
+      ]
+    },
+    {
+      "id": "INC-ALP-0061",
+      "family": "ALP",
+      "expected": "account-lockout",
+      "top": "account-lockout",
+      "score": 0.75436425,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.75436425,
+      "best_wrong_score": 0.61368656,
+      "ranked": [
+        {
+          "doc": "account-lockout",
+          "section": "Symptoms",
+          "score": 0.75436425
+        },
+        {
+          "doc": "sso-mfa",
+          "section": "Symptoms",
+          "score": 0.61368656
+        },
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.50884104
+        },
+        {
+          "doc": "wifi",
+          "section": "Symptoms",
+          "score": 0.47747517
+        },
+        {
+          "doc": "outlook",
+          "section": "Known causes",
+          "score": 0.42113274
+        }
+      ],
+      "also": [
+        {
+          "doc": "sec-04-account-lockout",
+          "kind": "policy",
+          "section": null,
+          "score": 0.5876189
+        }
+      ]
+    },
+    {
+      "id": "INC-ALP-0064",
+      "family": "ALP",
+      "expected": "account-lockout",
+      "top": "account-lockout",
+      "score": 0.69482315,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.69482315,
+      "best_wrong_score": 0.5521947,
+      "ranked": [
+        {
+          "doc": "account-lockout",
+          "section": "Symptoms",
+          "score": 0.69482315
+        },
+        {
+          "doc": "sso-mfa",
+          "section": "Symptoms",
+          "score": 0.5521947
+        },
+        {
+          "doc": "wifi",
+          "section": "Symptoms",
+          "score": 0.52655184
+        },
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.43533537
+        },
+        {
+          "doc": "outlook",
+          "section": "Symptoms",
+          "score": 0.34124425
+        }
+      ],
+      "also": [
+        {
+          "doc": "sec-04-account-lockout",
+          "kind": "policy",
+          "section": null,
+          "score": 0.57568735
+        }
+      ]
+    },
+    {
+      "id": "INC-ALP-0065",
+      "family": "ALP",
+      "expected": "account-lockout",
+      "top": "account-lockout",
+      "score": 0.7050992,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.7050992,
+      "best_wrong_score": 0.54964906,
+      "ranked": [
+        {
+          "doc": "account-lockout",
+          "section": "Checks",
+          "score": 0.7050992
+        },
+        {
+          "doc": "sso-mfa",
+          "section": "Known causes",
+          "score": 0.54964906
+        },
+        {
+          "doc": "wifi",
+          "section": "Symptoms",
+          "score": 0.4596522
+        },
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.44435874
+        },
+        {
+          "doc": "outlook",
+          "section": "Symptoms",
+          "score": 0.42544404
+        }
+      ],
+      "also": [
+        {
+          "doc": "sec-04-account-lockout",
+          "kind": "policy",
+          "section": null,
+          "score": 0.5123627
+        }
+      ]
+    },
+    {
+      "id": "INC-DCP-0004",
+      "family": "DCP",
+      "expected": "device-compliance",
+      "top": "device-compliance",
+      "score": 0.7766176,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.7766176,
+      "best_wrong_score": 0.5184304,
+      "ranked": [
+        {
+          "doc": "device-compliance",
+          "section": "Symptoms",
+          "score": 0.7766176
+        },
+        {
+          "doc": "disk-encryption",
+          "section": "Known causes",
+          "score": 0.5184304
+        },
+        {
+          "doc": "sso-mfa",
+          "section": "Known causes",
+          "score": 0.48509276
+        },
+        {
+          "doc": "outlook",
+          "section": "Known causes",
+          "score": 0.47567374
+        },
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.4556187
+        }
+      ],
+      "also": [
+        {
+          "doc": "sec-09-device-compliance",
+          "kind": "policy",
+          "section": null,
+          "score": 0.68952394
+        }
+      ]
+    },
+    {
+      "id": "INC-DCP-0013",
+      "family": "DCP",
+      "expected": "device-compliance",
+      "top": "device-compliance",
+      "score": 0.7685736,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.7685736,
+      "best_wrong_score": 0.55948377,
+      "ranked": [
+        {
+          "doc": "device-compliance",
+          "section": "Error codes",
+          "score": 0.7685736
+        },
+        {
+          "doc": "outlook",
+          "section": "Known causes",
+          "score": 0.55948377
+        },
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.48133197
+        },
+        {
+          "doc": "sso-mfa",
+          "section": "Known causes",
+          "score": 0.4771487
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Checks",
+          "score": 0.41965288
+        }
+      ],
+      "also": [
+        {
+          "doc": "sec-09-device-compliance",
+          "kind": "policy",
+          "section": null,
+          "score": 0.6229839
+        }
+      ]
+    },
+    {
+      "id": "INC-DCP-0018",
+      "family": "DCP",
+      "expected": "device-compliance",
+      "top": "device-compliance",
+      "score": 0.7461252,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.7461252,
+      "best_wrong_score": 0.5756333,
+      "ranked": [
+        {
+          "doc": "device-compliance",
+          "section": "Symptoms",
+          "score": 0.7461252
+        },
+        {
+          "doc": "disk-encryption",
+          "section": "Symptoms",
+          "score": 0.5756333
+        },
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.49077556
+        },
+        {
+          "doc": "outlook",
+          "section": "Known causes",
+          "score": 0.46789652
+        },
+        {
+          "doc": "wifi",
+          "section": "Symptoms",
+          "score": 0.4242564
+        }
+      ],
+      "also": [
+        {
+          "doc": "sec-09-device-compliance",
+          "kind": "policy",
+          "section": null,
+          "score": 0.71727407
+        }
+      ]
+    },
+    {
+      "id": "INC-DCP-0032",
+      "family": "DCP",
+      "expected": "device-compliance",
+      "top": "device-compliance",
+      "score": 0.6780065,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.6780065,
+      "best_wrong_score": 0.5545981,
+      "ranked": [
+        {
+          "doc": "device-compliance",
+          "section": "Symptoms",
+          "score": 0.6780065
+        },
+        {
+          "doc": "outlook",
+          "section": "Error codes",
+          "score": 0.5545981
+        },
+        {
+          "doc": "disk-encryption",
+          "section": "Fix",
+          "score": 0.39064065
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Fix",
+          "score": 0.38950026
+        },
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.3878496
+        }
+      ],
+      "also": [
+        {
+          "doc": "sec-09-device-compliance",
+          "kind": "policy",
+          "section": null,
+          "score": 0.51521504
+        }
+      ]
+    },
+    {
+      "id": "INC-DCP-0034",
+      "family": "DCP",
+      "expected": "device-compliance",
+      "top": "device-compliance",
+      "score": 0.80914253,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.80914253,
+      "best_wrong_score": 0.5370112,
+      "ranked": [
+        {
+          "doc": "device-compliance",
+          "section": "Symptoms",
+          "score": 0.80914253
+        },
+        {
+          "doc": "disk-encryption",
+          "section": "Known causes",
+          "score": 0.5370112
+        },
+        {
+          "doc": "outlook",
+          "section": "Known causes",
+          "score": 0.47591794
+        },
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.43843943
+        },
+        {
+          "doc": "sso-mfa",
+          "section": "Known causes",
+          "score": 0.40318558
+        }
+      ],
+      "also": [
+        {
+          "doc": "sec-09-device-compliance",
+          "kind": "policy",
+          "section": null,
+          "score": 0.7188816
+        }
+      ]
+    },
+    {
+      "id": "INC-DCP-0037",
+      "family": "DCP",
+      "expected": "device-compliance",
+      "top": "device-compliance",
+      "score": 0.71795285,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.71795285,
+      "best_wrong_score": 0.60699373,
+      "ranked": [
+        {
+          "doc": "device-compliance",
+          "section": "Symptoms",
+          "score": 0.71795285
+        },
+        {
+          "doc": "disk-encryption",
+          "section": "Known causes",
+          "score": 0.60699373
+        },
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.51834965
+        },
+        {
+          "doc": "outlook",
+          "section": "Known causes",
+          "score": 0.49638778
+        },
+        {
+          "doc": "sso-mfa",
+          "section": "Known causes",
+          "score": 0.45883816
+        }
+      ],
+      "also": [
+        {
+          "doc": "sec-09-device-compliance",
+          "kind": "policy",
+          "section": null,
+          "score": 0.7145394
+        }
+      ]
+    },
+    {
+      "id": "INC-DCP-0046",
+      "family": "DCP",
+      "expected": "device-compliance",
+      "top": "device-compliance",
+      "score": 0.61857784,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.61857784,
+      "best_wrong_score": 0.49920702,
+      "ranked": [
+        {
+          "doc": "device-compliance",
+          "section": "Symptoms",
+          "score": 0.61857784
+        },
+        {
+          "doc": "software-install",
+          "section": "Known causes",
+          "score": 0.49920702
+        },
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.48568082
+        },
+        {
+          "doc": "sso-mfa",
+          "section": "Known causes",
+          "score": 0.45078522
+        },
+        {
+          "doc": "wifi",
+          "section": "Symptoms",
+          "score": 0.42859393
+        }
+      ],
+      "also": [
+        {
+          "doc": "sec-09-device-compliance",
+          "kind": "policy",
+          "section": null,
+          "score": 0.5953672
+        }
+      ]
+    },
+    {
+      "id": "INC-DCP-0055",
+      "family": "DCP",
+      "expected": "device-compliance",
+      "top": "device-compliance",
+      "score": 0.7564817,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.7564817,
+      "best_wrong_score": 0.51603377,
+      "ranked": [
+        {
+          "doc": "device-compliance",
+          "section": "Symptoms",
+          "score": 0.7564817
+        },
+        {
+          "doc": "outlook",
+          "section": "Known causes",
+          "score": 0.51603377
+        },
+        {
+          "doc": "disk-encryption",
+          "section": "Known causes",
+          "score": 0.5020249
+        },
+        {
+          "doc": "sso-mfa",
+          "section": "Known causes",
+          "score": 0.4739894
+        },
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.38032266
+        }
+      ],
+      "also": [
+        {
+          "doc": "sec-09-device-compliance",
+          "kind": "policy",
+          "section": null,
+          "score": 0.72156346
+        }
+      ]
+    },
+    {
+      "id": "INC-DRF-0010",
+      "family": "DRF",
+      "expected": "dns",
+      "top": "dns",
+      "score": 0.6096734,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.6096734,
+      "best_wrong_score": 0.3720472,
+      "ranked": [
+        {
+          "doc": "dns",
+          "section": "Known causes",
+          "score": 0.6096734
+        },
+        {
+          "doc": "vpn-access",
+          "section": "Symptoms",
+          "score": 0.3720472
+        },
+        {
+          "doc": "wifi",
+          "section": "Symptoms",
+          "score": 0.3665524
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Checks",
+          "score": 0.30182308
+        },
+        {
+          "doc": "shared-drive",
+          "section": "Known causes",
+          "score": 0.27905
+        }
+      ],
+      "also": [
+        {
+          "doc": "company-profile",
+          "kind": "reference",
+          "section": "Naming conventions",
+          "score": 0.4187098
+        }
+      ]
+    },
+    {
+      "id": "INC-DRF-0014",
+      "family": "DRF",
+      "expected": "dns",
+      "top": "dns",
+      "score": 0.69306946,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.69306946,
+      "best_wrong_score": 0.3961203,
+      "ranked": [
+        {
+          "doc": "dns",
+          "section": "Symptoms",
+          "score": 0.69306946
+        },
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.3961203
+        },
+        {
+          "doc": "wifi",
+          "section": "Known causes",
+          "score": 0.35228842
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Checks",
+          "score": 0.30813196
+        },
+        {
+          "doc": "teams",
+          "section": "Known causes",
+          "score": 0.3028984
+        }
+      ],
+      "also": [
+        {
+          "doc": "company-profile",
+          "kind": "reference",
+          "section": "Naming conventions",
+          "score": 0.37243187
+        }
+      ]
+    },
+    {
+      "id": "INC-DRF-0020",
+      "family": "DRF",
+      "expected": "dns",
+      "top": "dns",
+      "score": 0.7284677,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.7284677,
+      "best_wrong_score": 0.4162006,
+      "ranked": [
+        {
+          "doc": "dns",
+          "section": "Symptoms",
+          "score": 0.7284677
+        },
+        {
+          "doc": "wifi",
+          "section": "Known causes",
+          "score": 0.4162006
+        },
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.3890968
+        },
+        {
+          "doc": "teams",
+          "section": "Known causes",
+          "score": 0.34130907
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Checks",
+          "score": 0.31323388
+        }
+      ],
+      "also": []
+    },
+    {
+      "id": "INC-DRF-0021",
+      "family": "DRF",
+      "expected": "dns",
+      "top": "dns",
+      "score": 0.715456,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.715456,
+      "best_wrong_score": 0.4109991,
+      "ranked": [
+        {
+          "doc": "dns",
+          "section": "Symptoms",
+          "score": 0.715456
+        },
+        {
+          "doc": "wifi",
+          "section": "Known causes",
+          "score": 0.4109991
+        },
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.37841606
+        },
+        {
+          "doc": "teams",
+          "section": "Known causes",
+          "score": 0.32591647
+        },
+        {
+          "doc": "laptop-performance",
+          "section": "Known causes",
+          "score": 0.3161517
+        }
+      ],
+      "also": [
+        {
+          "doc": "company-profile",
+          "kind": "reference",
+          "section": "Naming conventions",
+          "score": 0.3613584
+        }
+      ]
+    },
+    {
+      "id": "INC-DRF-0034",
+      "family": "DRF",
+      "expected": "dns",
+      "top": "dns",
+      "score": 0.7130638,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.7130638,
+      "best_wrong_score": 0.43435472,
+      "ranked": [
+        {
+          "doc": "dns",
+          "section": "Symptoms",
+          "score": 0.7130638
+        },
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.43435472
+        },
+        {
+          "doc": "wifi",
+          "section": "Known causes",
+          "score": 0.37991652
+        },
+        {
+          "doc": "teams",
+          "section": "Known causes",
+          "score": 0.29993773
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Checks",
+          "score": 0.28359708
+        }
+      ],
+      "also": [
+        {
+          "doc": "company-profile",
+          "kind": "reference",
+          "section": "Naming conventions",
+          "score": 0.38568422
+        }
+      ]
+    },
+    {
+      "id": "INC-DRF-0036",
+      "family": "DRF",
+      "expected": "dns",
+      "top": "dns",
+      "score": 0.7532998,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.7532998,
+      "best_wrong_score": 0.37766147,
+      "ranked": [
+        {
+          "doc": "dns",
+          "section": "Symptoms",
+          "score": 0.7532998
+        },
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.37766147
+        },
+        {
+          "doc": "wifi",
+          "section": "Known causes",
+          "score": 0.3661065
+        },
+        {
+          "doc": "teams",
+          "section": "Known causes",
+          "score": 0.30271083
+        },
+        {
+          "doc": "software-install",
+          "section": "Known causes",
+          "score": 0.25517398
+        }
+      ],
+      "also": [
+        {
+          "doc": "company-profile",
+          "kind": "reference",
+          "section": "Naming conventions",
+          "score": 0.35374343
+        }
+      ]
+    },
+    {
+      "id": "INC-DRF-0043",
+      "family": "DRF",
+      "expected": "dns",
+      "top": "dns",
+      "score": 0.625044,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.625044,
+      "best_wrong_score": 0.4069547,
+      "ranked": [
+        {
+          "doc": "dns",
+          "section": "Symptoms",
+          "score": 0.625044
+        },
+        {
+          "doc": "vpn-access",
+          "section": "Symptoms",
+          "score": 0.4069547
+        },
+        {
+          "doc": "wifi",
+          "section": "Symptoms",
+          "score": 0.32269806
+        },
+        {
+          "doc": "shared-drive",
+          "section": "Symptoms",
+          "score": 0.20584932
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Checks",
+          "score": 0.20435917
+        }
+      ],
+      "also": [
+        {
+          "doc": "company-profile",
+          "kind": "reference",
+          "section": "Naming conventions",
+          "score": 0.3784312
+        }
+      ]
+    },
+    {
+      "id": "INC-DRF-0052",
+      "family": "DRF",
+      "expected": "dns",
+      "top": "dns",
+      "score": 0.6489476,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.6489476,
+      "best_wrong_score": 0.33896214,
+      "ranked": [
+        {
+          "doc": "dns",
+          "section": "Symptoms",
+          "score": 0.6489476
+        },
+        {
+          "doc": "vpn-access",
+          "section": "Symptoms",
+          "score": 0.33896214
+        },
+        {
+          "doc": "wifi",
+          "section": "Symptoms",
+          "score": 0.29100287
+        },
+        {
+          "doc": "shared-drive",
+          "section": "Known causes",
+          "score": 0.2639531
+        },
+        {
+          "doc": "software-install",
+          "section": "Known causes",
+          "score": 0.25927508
+        }
+      ],
+      "also": [
+        {
+          "doc": "company-profile",
+          "kind": "reference",
+          "section": "Naming conventions",
+          "score": 0.4061291
+        }
+      ]
+    },
+    {
+      "id": "INC-DRF-0054",
+      "family": "DRF",
+      "expected": "dns",
+      "top": "dns",
+      "score": 0.73217547,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.73217547,
+      "best_wrong_score": 0.38153714,
+      "ranked": [
+        {
+          "doc": "dns",
+          "section": "Symptoms",
+          "score": 0.73217547
+        },
+        {
+          "doc": "wifi",
+          "section": "Known causes",
+          "score": 0.38153714
+        },
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.37803525
+        },
+        {
+          "doc": "teams",
+          "section": "Known causes",
+          "score": 0.34073418
+        },
+        {
+          "doc": "shared-drive",
+          "section": "Known causes",
+          "score": 0.29319084
+        }
+      ],
+      "also": []
+    },
+    {
+      "id": "INC-DRF-0057",
+      "family": "DRF",
+      "expected": "dns",
+      "top": "dns",
+      "score": 0.6603293,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.6603293,
+      "best_wrong_score": 0.36940774,
+      "ranked": [
+        {
+          "doc": "dns",
+          "section": "Symptoms",
+          "score": 0.6603293
+        },
+        {
+          "doc": "vpn-access",
+          "section": "Symptoms",
+          "score": 0.36940774
+        },
+        {
+          "doc": "wifi",
+          "section": "Known causes",
+          "score": 0.35729155
+        },
+        {
+          "doc": "teams",
+          "section": "Known causes",
+          "score": 0.29422218
+        },
+        {
+          "doc": "shared-drive",
+          "section": "Known causes",
+          "score": 0.27494177
+        }
+      ],
+      "also": [
+        {
+          "doc": "company-profile",
+          "kind": "reference",
+          "section": "Naming conventions",
+          "score": 0.37691092
+        }
+      ]
+    },
+    {
+      "id": "INC-DRF-0059",
+      "family": "DRF",
+      "expected": "dns",
+      "top": "dns",
+      "score": 0.6904265,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.6904265,
+      "best_wrong_score": 0.34889543,
+      "ranked": [
+        {
+          "doc": "dns",
+          "section": "Symptoms",
+          "score": 0.6904265
+        },
+        {
+          "doc": "wifi",
+          "section": "Symptoms",
+          "score": 0.34889543
+        },
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.3096689
+        },
+        {
+          "doc": "teams",
+          "section": "Known causes",
+          "score": 0.30377534
+        },
+        {
+          "doc": "shared-drive",
+          "section": "Known causes",
+          "score": 0.27470422
+        }
+      ],
+      "also": [
+        {
+          "doc": "company-profile",
+          "kind": "reference",
+          "section": "Naming conventions",
+          "score": 0.44621545
+        }
+      ]
+    },
+    {
+      "id": "INC-EDE-0021",
+      "family": "EDE",
+      "expected": "disk-encryption",
+      "top": "disk-encryption",
+      "score": 0.7312312,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.7312312,
+      "best_wrong_score": 0.6360558,
+      "ranked": [
+        {
+          "doc": "disk-encryption",
+          "section": "Symptoms",
+          "score": 0.7312312
+        },
+        {
+          "doc": "device-compliance",
+          "section": "Symptoms",
+          "score": 0.6360558
+        },
+        {
+          "doc": "account-lockout",
+          "section": "When to escalate",
+          "score": 0.42545173
+        },
+        {
+          "doc": "software-install",
+          "section": "When to escalate",
+          "score": 0.4101045
+        },
+        {
+          "doc": "vpn-access",
+          "section": "When to escalate",
+          "score": 0.37300563
+        }
+      ],
+      "also": [
+        {
+          "doc": "sec-09-device-compliance",
+          "kind": "policy",
+          "section": null,
+          "score": 0.7614238
+        }
+      ]
+    },
+    {
+      "id": "INC-EDE-0025",
+      "family": "EDE",
+      "expected": "disk-encryption",
+      "top": "disk-encryption",
+      "score": 0.7274804,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.7274804,
+      "best_wrong_score": 0.61122346,
+      "ranked": [
+        {
+          "doc": "disk-encryption",
+          "section": "Symptoms",
+          "score": 0.7274804
+        },
+        {
+          "doc": "device-compliance",
+          "section": "Symptoms",
+          "score": 0.61122346
+        },
+        {
+          "doc": "sso-mfa",
+          "section": "Known causes",
+          "score": 0.381227
+        },
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.35852414
+        },
+        {
+          "doc": "outlook",
+          "section": "Error codes",
+          "score": 0.34759468
+        }
+      ],
+      "also": [
+        {
+          "doc": "sec-09-device-compliance",
+          "kind": "policy",
+          "section": null,
+          "score": 0.6771233
+        }
+      ]
+    },
+    {
+      "id": "INC-EDE-0026",
+      "family": "EDE",
+      "expected": "disk-encryption",
+      "top": "disk-encryption",
+      "score": 0.66958296,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.66958296,
+      "best_wrong_score": 0.5827299,
+      "ranked": [
+        {
+          "doc": "disk-encryption",
+          "section": "Symptoms",
+          "score": 0.66958296
+        },
+        {
+          "doc": "device-compliance",
+          "section": "Fix",
+          "score": 0.5827299
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Fix",
+          "score": 0.40950987
+        },
+        {
+          "doc": "software-install",
+          "section": "Symptoms",
+          "score": 0.37666297
+        },
+        {
+          "doc": "sso-mfa",
+          "section": "Known causes",
+          "score": 0.3753243
+        }
+      ],
+      "also": [
+        {
+          "doc": "sec-09-device-compliance",
+          "kind": "policy",
+          "section": null,
+          "score": 0.6614654
+        }
+      ]
+    },
+    {
+      "id": "INC-EDE-0029",
+      "family": "EDE",
+      "expected": "disk-encryption",
+      "top": "disk-encryption",
+      "score": 0.71880627,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.71880627,
+      "best_wrong_score": 0.6540115,
+      "ranked": [
+        {
+          "doc": "disk-encryption",
+          "section": "Symptoms",
+          "score": 0.71880627
+        },
+        {
+          "doc": "device-compliance",
+          "section": "Fix",
+          "score": 0.6540115
+        },
+        {
+          "doc": "sso-mfa",
+          "section": "Known causes",
+          "score": 0.37025023
+        },
+        {
+          "doc": "outlook",
+          "section": "Known causes",
+          "score": 0.35487556
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Fix",
+          "score": 0.34515002
+        }
+      ],
+      "also": [
+        {
+          "doc": "sec-09-device-compliance",
+          "kind": "policy",
+          "section": null,
+          "score": 0.7205813
+        }
+      ]
+    },
+    {
+      "id": "INC-EDE-0037",
+      "family": "EDE",
+      "expected": "disk-encryption",
+      "top": "disk-encryption",
+      "score": 0.69017434,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.69017434,
+      "best_wrong_score": 0.549579,
+      "ranked": [
+        {
+          "doc": "disk-encryption",
+          "section": "Fix",
+          "score": 0.69017434
+        },
+        {
+          "doc": "device-compliance",
+          "section": "When to escalate",
+          "score": 0.549579
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Fix",
+          "score": 0.42233256
+        },
+        {
+          "doc": "sso-mfa",
+          "section": "Symptoms",
+          "score": 0.38920456
+        },
+        {
+          "doc": "software-install",
+          "section": "When to escalate",
+          "score": 0.3758222
+        }
+      ],
+      "also": [
+        {
+          "doc": "sec-09-device-compliance",
+          "kind": "policy",
+          "section": null,
+          "score": 0.6574105
+        }
+      ]
+    },
+    {
+      "id": "INC-EDE-0039",
+      "family": "EDE",
+      "expected": "disk-encryption",
+      "top": "disk-encryption",
+      "score": 0.81872034,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.81872034,
+      "best_wrong_score": 0.6252023,
+      "ranked": [
+        {
+          "doc": "disk-encryption",
+          "section": "Known causes",
+          "score": 0.81872034
+        },
+        {
+          "doc": "device-compliance",
+          "section": "When to escalate",
+          "score": 0.6252023
+        },
+        {
+          "doc": "vpn-access",
+          "section": "When to escalate",
+          "score": 0.3824516
+        },
+        {
+          "doc": "sso-mfa",
+          "section": "Known causes",
+          "score": 0.3737707
+        },
+        {
+          "doc": "account-lockout",
+          "section": "When to escalate",
+          "score": 0.33387694
+        }
+      ],
+      "also": [
+        {
+          "doc": "sec-09-device-compliance",
+          "kind": "policy",
+          "section": null,
+          "score": 0.6257453
+        }
+      ]
+    },
+    {
+      "id": "INC-EDE-0049",
+      "family": "EDE",
+      "expected": "disk-encryption",
+      "top": "disk-encryption",
+      "score": 0.7479619,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.7479619,
+      "best_wrong_score": 0.5711558,
+      "ranked": [
+        {
+          "doc": "disk-encryption",
+          "section": "Fix",
+          "score": 0.7479619
+        },
+        {
+          "doc": "device-compliance",
+          "section": "Fix",
+          "score": 0.5711558
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Fix",
+          "score": 0.40417308
+        },
+        {
+          "doc": "sso-mfa",
+          "section": "Known causes",
+          "score": 0.4024558
+        },
+        {
+          "doc": "vpn-access",
+          "section": "When to escalate",
+          "score": 0.36034936
+        }
+      ],
+      "also": [
+        {
+          "doc": "sec-09-device-compliance",
+          "kind": "policy",
+          "section": null,
+          "score": 0.6229684
+        }
+      ]
+    },
+    {
+      "id": "INC-EDE-0058",
+      "family": "EDE",
+      "expected": "disk-encryption",
+      "top": "disk-encryption",
+      "score": 0.7203351,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.7203351,
+      "best_wrong_score": 0.48603544,
+      "ranked": [
+        {
+          "doc": "disk-encryption",
+          "section": "Fix",
+          "score": 0.7203351
+        },
+        {
+          "doc": "device-compliance",
+          "section": "When to escalate",
+          "score": 0.48603544
+        },
+        {
+          "doc": "account-lockout",
+          "section": "When to escalate",
+          "score": 0.38167727
+        },
+        {
+          "doc": "software-install",
+          "section": "When to escalate",
+          "score": 0.37932125
+        },
+        {
+          "doc": "sso-mfa",
+          "section": "Symptoms",
+          "score": 0.37058973
+        }
+      ],
+      "also": [
+        {
+          "doc": "sec-09-device-compliance",
+          "kind": "policy",
+          "section": null,
+          "score": 0.6071624
+        }
+      ]
+    },
+    {
+      "id": "INC-EDE-0060",
+      "family": "EDE",
+      "expected": "disk-encryption",
+      "top": "disk-encryption",
+      "score": 0.8001169,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.8001169,
+      "best_wrong_score": 0.66979337,
+      "ranked": [
+        {
+          "doc": "disk-encryption",
+          "section": "Symptoms",
+          "score": 0.8001169
+        },
+        {
+          "doc": "device-compliance",
+          "section": "Known causes",
+          "score": 0.66979337
+        },
+        {
+          "doc": "software-install",
+          "section": "When to escalate",
+          "score": 0.3990293
+        },
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.38176543
+        },
+        {
+          "doc": "account-lockout",
+          "section": "When to escalate",
+          "score": 0.36728457
+        }
+      ],
+      "also": [
+        {
+          "doc": "sec-09-device-compliance",
+          "kind": "policy",
+          "section": null,
+          "score": 0.69438016
+        }
+      ]
+    },
+    {
+      "id": "INC-EDE-0063",
+      "family": "EDE",
+      "expected": "disk-encryption",
+      "top": "disk-encryption",
+      "score": 0.7801997,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.7801997,
+      "best_wrong_score": 0.6345105,
+      "ranked": [
+        {
+          "doc": "disk-encryption",
+          "section": "Fix",
+          "score": 0.7801997
+        },
+        {
+          "doc": "device-compliance",
+          "section": "When to escalate",
+          "score": 0.6345105
+        },
+        {
+          "doc": "software-install",
+          "section": "When to escalate",
+          "score": 0.4203847
+        },
+        {
+          "doc": "vpn-access",
+          "section": "When to escalate",
+          "score": 0.41594058
+        },
+        {
+          "doc": "account-lockout",
+          "section": "When to escalate",
+          "score": 0.38329622
+        }
+      ],
+      "also": [
+        {
+          "doc": "sec-09-device-compliance",
+          "kind": "policy",
+          "section": null,
+          "score": 0.68762755
+        }
+      ]
+    },
+    {
+      "id": "INC-LPD-0002",
+      "family": "LPD",
+      "expected": "laptop-performance",
+      "top": "laptop-performance",
+      "score": 0.73585033,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.73585033,
+      "best_wrong_score": 0.42821395,
+      "ranked": [
+        {
+          "doc": "laptop-performance",
+          "section": "Symptoms",
+          "score": 0.73585033
+        },
+        {
+          "doc": "teams",
+          "section": "Known causes",
+          "score": 0.42821395
+        },
+        {
+          "doc": "wifi",
+          "section": "Known causes",
+          "score": 0.37228376
+        },
+        {
+          "doc": "outlook",
+          "section": "Known causes",
+          "score": 0.33942938
+        },
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.32624757
+        }
+      ],
+      "also": []
+    },
+    {
+      "id": "INC-LPD-0004",
+      "family": "LPD",
+      "expected": "laptop-performance",
+      "top": "laptop-performance",
+      "score": 0.6450342,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.6450342,
+      "best_wrong_score": 0.3757915,
+      "ranked": [
+        {
+          "doc": "laptop-performance",
+          "section": "Symptoms",
+          "score": 0.6450342
+        },
+        {
+          "doc": "teams",
+          "section": "Known causes",
+          "score": 0.3757915
+        },
+        {
+          "doc": "disk-encryption",
+          "section": "Symptoms",
+          "score": 0.34257358
+        },
+        {
+          "doc": "device-compliance",
+          "section": "Known causes",
+          "score": 0.33920407
+        },
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.33182287
+        }
+      ],
+      "also": []
+    },
+    {
+      "id": "INC-LPD-0009",
+      "family": "LPD",
+      "expected": "laptop-performance",
+      "top": "laptop-performance",
+      "score": 0.7087543,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.7087543,
+      "best_wrong_score": 0.42671418,
+      "ranked": [
+        {
+          "doc": "laptop-performance",
+          "section": "Known causes",
+          "score": 0.7087543
+        },
+        {
+          "doc": "teams",
+          "section": "Known causes",
+          "score": 0.42671418
+        },
+        {
+          "doc": "wifi",
+          "section": "Known causes",
+          "score": 0.39391154
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Symptoms",
+          "score": 0.36136168
+        },
+        {
+          "doc": "shared-drive",
+          "section": "Known causes",
+          "score": 0.3426151
+        }
+      ],
+      "also": []
+    },
+    {
+      "id": "INC-LPD-0024",
+      "family": "LPD",
+      "expected": "laptop-performance",
+      "top": "laptop-performance",
+      "score": 0.6113497,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.6113497,
+      "best_wrong_score": 0.48415506,
+      "ranked": [
+        {
+          "doc": "laptop-performance",
+          "section": "Known causes",
+          "score": 0.6113497
+        },
+        {
+          "doc": "teams",
+          "section": "Known causes",
+          "score": 0.48415506
+        },
+        {
+          "doc": "wifi",
+          "section": "Known causes",
+          "score": 0.43103778
+        },
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.3946461
+        },
+        {
+          "doc": "dns",
+          "section": "Fix",
+          "score": 0.3411665
+        }
+      ],
+      "also": []
+    },
+    {
+      "id": "INC-LPD-0033",
+      "family": "LPD",
+      "expected": "laptop-performance",
+      "top": "laptop-performance",
+      "score": 0.5470626,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.5470626,
+      "best_wrong_score": 0.39931962,
+      "ranked": [
+        {
+          "doc": "laptop-performance",
+          "section": "Known causes",
+          "score": 0.5470626
+        },
+        {
+          "doc": "teams",
+          "section": "Known causes",
+          "score": 0.39931962
+        },
+        {
+          "doc": "shared-drive",
+          "section": "Symptoms",
+          "score": 0.3497101
+        },
+        {
+          "doc": "wifi",
+          "section": "Known causes",
+          "score": 0.3329599
+        },
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.31452876
+        }
+      ],
+      "also": []
+    },
+    {
+      "id": "INC-LPD-0037",
+      "family": "LPD",
+      "expected": "laptop-performance",
+      "top": "laptop-performance",
+      "score": 0.69125867,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.69125867,
+      "best_wrong_score": 0.49333754,
+      "ranked": [
+        {
+          "doc": "laptop-performance",
+          "section": "Symptoms",
+          "score": 0.69125867
+        },
+        {
+          "doc": "teams",
+          "section": "Known causes",
+          "score": 0.49333754
+        },
+        {
+          "doc": "wifi",
+          "section": "Known causes",
+          "score": 0.3981854
+        },
+        {
+          "doc": "outlook",
+          "section": "Known causes",
+          "score": 0.36308467
+        },
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.34699047
+        }
+      ],
+      "also": []
+    },
+    {
+      "id": "INC-LPD-0041",
+      "family": "LPD",
+      "expected": "laptop-performance",
+      "top": "laptop-performance",
+      "score": 0.66753036,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.66753036,
+      "best_wrong_score": 0.35194093,
+      "ranked": [
+        {
+          "doc": "laptop-performance",
+          "section": "Known causes",
+          "score": 0.66753036
+        },
+        {
+          "doc": "wifi",
+          "section": "Known causes",
+          "score": 0.35194093
+        },
+        {
+          "doc": "teams",
+          "section": "Known causes",
+          "score": 0.33517057
+        },
+        {
+          "doc": "shared-drive",
+          "section": "Error codes",
+          "score": 0.3043633
+        },
+        {
+          "doc": "disk-encryption",
+          "section": "Symptoms",
+          "score": 0.29810357
+        }
+      ],
+      "also": []
+    },
+    {
+      "id": "INC-LPD-0043",
+      "family": "LPD",
+      "expected": "laptop-performance",
+      "top": "laptop-performance",
+      "score": 0.67973065,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.67973065,
+      "best_wrong_score": 0.38765523,
+      "ranked": [
+        {
+          "doc": "laptop-performance",
+          "section": "Known causes",
+          "score": 0.67973065
+        },
+        {
+          "doc": "teams",
+          "section": "Known causes",
+          "score": 0.38765523
+        },
+        {
+          "doc": "wifi",
+          "section": "Known causes",
+          "score": 0.3829273
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Checks",
+          "score": 0.34430632
+        },
+        {
+          "doc": "outlook",
+          "section": "Known causes",
+          "score": 0.32278585
+        }
+      ],
+      "also": []
+    },
+    {
+      "id": "INC-LPD-0049",
+      "family": "LPD",
+      "expected": "laptop-performance",
+      "top": "laptop-performance",
+      "score": 0.6987912,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.6987912,
+      "best_wrong_score": 0.39730322,
+      "ranked": [
+        {
+          "doc": "laptop-performance",
+          "section": "Symptoms",
+          "score": 0.6987912
+        },
+        {
+          "doc": "teams",
+          "section": "Known causes",
+          "score": 0.39730322
+        },
+        {
+          "doc": "wifi",
+          "section": "Known causes",
+          "score": 0.32987404
+        },
+        {
+          "doc": "device-compliance",
+          "section": "Known causes",
+          "score": 0.32591993
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Symptoms",
+          "score": 0.3137434
+        }
+      ],
+      "also": []
+    },
+    {
+      "id": "INC-LPD-0057",
+      "family": "LPD",
+      "expected": "laptop-performance",
+      "top": "laptop-performance",
+      "score": 0.732392,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.732392,
+      "best_wrong_score": 0.31374633,
+      "ranked": [
+        {
+          "doc": "laptop-performance",
+          "section": "Known causes",
+          "score": 0.732392
+        },
+        {
+          "doc": "wifi",
+          "section": "Known causes",
+          "score": 0.31374633
+        },
+        {
+          "doc": "device-compliance",
+          "section": "Known causes",
+          "score": 0.30179515
+        },
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.2943951
+        },
+        {
+          "doc": "teams",
+          "section": "Known causes",
+          "score": 0.28672493
+        }
+      ],
+      "also": []
+    },
+    {
+      "id": "INC-LPD-0062",
+      "family": "LPD",
+      "expected": "laptop-performance",
+      "top": "laptop-performance",
+      "score": 0.6658468,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.6658468,
+      "best_wrong_score": 0.3491851,
+      "ranked": [
+        {
+          "doc": "laptop-performance",
+          "section": "Symptoms",
+          "score": 0.6658468
+        },
+        {
+          "doc": "teams",
+          "section": "Known causes",
+          "score": 0.3491851
+        },
+        {
+          "doc": "outlook",
+          "section": "Known causes",
+          "score": 0.3305569
+        },
+        {
+          "doc": "wifi",
+          "section": "Known causes",
+          "score": 0.31686506
+        },
+        {
+          "doc": "device-compliance",
+          "section": "Known causes",
+          "score": 0.30410582
+        }
+      ],
+      "also": []
+    },
+    {
+      "id": "INC-OES-0001",
+      "family": "OES",
+      "expected": "outlook",
+      "top": "outlook",
+      "score": 0.6937713,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.6937713,
+      "best_wrong_score": 0.442099,
+      "ranked": [
+        {
+          "doc": "outlook",
+          "section": "Error codes",
+          "score": 0.6937713
+        },
+        {
+          "doc": "onedrive",
+          "section": "Symptoms",
+          "score": 0.442099
+        },
+        {
+          "doc": "teams",
+          "section": "Symptoms",
+          "score": 0.34020337
+        },
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.33170223
+        },
+        {
+          "doc": "sso-mfa",
+          "section": "Known causes",
+          "score": 0.33155787
+        }
+      ],
+      "also": []
+    },
+    {
+      "id": "INC-OES-0005",
+      "family": "OES",
+      "expected": "outlook",
+      "top": "outlook",
+      "score": 0.7413496,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.7413496,
+      "best_wrong_score": 0.5044827,
+      "ranked": [
+        {
+          "doc": "outlook",
+          "section": "Known causes",
+          "score": 0.7413496
+        },
+        {
+          "doc": "sso-mfa",
+          "section": "Known causes",
+          "score": 0.5044827
+        },
+        {
+          "doc": "device-compliance",
+          "section": "Error codes",
+          "score": 0.49417156
+        },
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.43519068
+        },
+        {
+          "doc": "onedrive",
+          "section": "Checks",
+          "score": 0.42448592
+        }
+      ],
+      "also": [
+        {
+          "doc": "company-profile",
+          "kind": "reference",
+          "section": "Known organizational quirks",
+          "score": 0.4445784
+        }
+      ]
+    },
+    {
+      "id": "INC-OES-0024",
+      "family": "OES",
+      "expected": "outlook",
+      "top": "outlook",
+      "score": 0.71649384,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.71649384,
+      "best_wrong_score": 0.42192644,
+      "ranked": [
+        {
+          "doc": "outlook",
+          "section": "Symptoms",
+          "score": 0.71649384
+        },
+        {
+          "doc": "teams",
+          "section": "When to escalate",
+          "score": 0.42192644
+        },
+        {
+          "doc": "sso-mfa",
+          "section": "Known causes",
+          "score": 0.40905026
+        },
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.37648657
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Checks",
+          "score": 0.36852583
+        }
+      ],
+      "also": []
+    },
+    {
+      "id": "INC-OES-0026",
+      "family": "OES",
+      "expected": "outlook",
+      "top": "outlook",
+      "score": 0.7484439,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.7484439,
+      "best_wrong_score": 0.3863647,
+      "ranked": [
+        {
+          "doc": "outlook",
+          "section": "Symptoms",
+          "score": 0.7484439
+        },
+        {
+          "doc": "sso-mfa",
+          "section": "Known causes",
+          "score": 0.3863647
+        },
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.35328066
+        },
+        {
+          "doc": "onedrive",
+          "section": "When to escalate",
+          "score": 0.3424403
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Checks",
+          "score": 0.33987284
+        }
+      ],
+      "also": []
+    },
+    {
+      "id": "INC-OES-0029",
+      "family": "OES",
+      "expected": "outlook",
+      "top": "outlook",
+      "score": 0.73367596,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.73367596,
+      "best_wrong_score": 0.41199982,
+      "ranked": [
+        {
+          "doc": "outlook",
+          "section": "Symptoms",
+          "score": 0.73367596
+        },
+        {
+          "doc": "onedrive",
+          "section": "Symptoms",
+          "score": 0.41199982
+        },
+        {
+          "doc": "sso-mfa",
+          "section": "Known causes",
+          "score": 0.39652485
+        },
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.37644038
+        },
+        {
+          "doc": "teams",
+          "section": "Symptoms",
+          "score": 0.37048927
+        }
+      ],
+      "also": [
+        {
+          "doc": "company-profile",
+          "kind": "reference",
+          "section": "Known organizational quirks",
+          "score": 0.365471
+        }
+      ]
+    },
+    {
+      "id": "INC-OES-0034",
+      "family": "OES",
+      "expected": "outlook",
+      "top": "outlook",
+      "score": 0.70371044,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.70371044,
+      "best_wrong_score": 0.40052822,
+      "ranked": [
+        {
+          "doc": "outlook",
+          "section": "Symptoms",
+          "score": 0.70371044
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Fix",
+          "score": 0.40052822
+        },
+        {
+          "doc": "sso-mfa",
+          "section": "Known causes",
+          "score": 0.38679093
+        },
+        {
+          "doc": "wifi",
+          "section": "Symptoms",
+          "score": 0.3771082
+        },
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.3714561
+        }
+      ],
+      "also": []
+    },
+    {
+      "id": "INC-OES-0051",
+      "family": "OES",
+      "expected": "outlook",
+      "top": "outlook",
+      "score": 0.7626357,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.7626357,
+      "best_wrong_score": 0.4800449,
+      "ranked": [
+        {
+          "doc": "outlook",
+          "section": "Known causes",
+          "score": 0.7626357
+        },
+        {
+          "doc": "sso-mfa",
+          "section": "Known causes",
+          "score": 0.4800449
+        },
+        {
+          "doc": "teams",
+          "section": "When to escalate",
+          "score": 0.4548812
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Known causes",
+          "score": 0.4200462
+        },
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.40910393
+        }
+      ],
+      "also": [
+        {
+          "doc": "company-profile",
+          "kind": "reference",
+          "section": "Known organizational quirks",
+          "score": 0.38800788
+        }
+      ]
+    },
+    {
+      "id": "INC-OES-0058",
+      "family": "OES",
+      "expected": "outlook",
+      "top": "outlook",
+      "score": 0.8062737,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.8062737,
+      "best_wrong_score": 0.36993217,
+      "ranked": [
+        {
+          "doc": "outlook",
+          "section": "Symptoms",
+          "score": 0.8062737
+        },
+        {
+          "doc": "onedrive",
+          "section": "Symptoms",
+          "score": 0.36993217
+        },
+        {
+          "doc": "sso-mfa",
+          "section": "Known causes",
+          "score": 0.36495918
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Known causes",
+          "score": 0.34633493
+        },
+        {
+          "doc": "teams",
+          "section": "Symptoms",
+          "score": 0.33035773
+        }
+      ],
+      "also": []
+    },
+    {
+      "id": "INC-PDQ-0003",
+      "family": "PDQ",
+      "expected": "printing",
+      "top": "printing",
+      "score": 0.7801517,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.7801517,
+      "best_wrong_score": 0.2793529,
+      "ranked": [
+        {
+          "doc": "printing",
+          "section": "Symptoms",
+          "score": 0.7801517
+        },
+        {
+          "doc": "hardware-peripherals",
+          "section": "Error codes",
+          "score": 0.2793529
+        },
+        {
+          "doc": "shared-drive",
+          "section": "Symptoms",
+          "score": 0.26370716
+        },
+        {
+          "doc": "onedrive",
+          "section": "Known causes",
+          "score": 0.26224166
+        },
+        {
+          "doc": "sso-mfa",
+          "section": "Fix",
+          "score": 0.26006886
+        }
+      ],
+      "also": [
+        {
+          "doc": "escalation-queues",
+          "kind": "reference",
+          "section": null,
+          "score": 0.43299478
+        }
+      ]
+    },
+    {
+      "id": "INC-PDQ-0004",
+      "family": "PDQ",
+      "expected": "printing",
+      "top": "printing",
+      "score": 0.7994084,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.7994084,
+      "best_wrong_score": 0.32096437,
+      "ranked": [
+        {
+          "doc": "printing",
+          "section": "Symptoms",
+          "score": 0.7994084
+        },
+        {
+          "doc": "shared-drive",
+          "section": "Known causes",
+          "score": 0.32096437
+        },
+        {
+          "doc": "onedrive",
+          "section": "Symptoms",
+          "score": 0.3014464
+        },
+        {
+          "doc": "hardware-peripherals",
+          "section": "Error codes",
+          "score": 0.2991404
+        },
+        {
+          "doc": "sso-mfa",
+          "section": "Fix",
+          "score": 0.28298897
+        }
+      ],
+      "also": [
+        {
+          "doc": "escalation-queues",
+          "kind": "reference",
+          "section": null,
+          "score": 0.42886794
+        }
+      ]
+    },
+    {
+      "id": "INC-PDQ-0014",
+      "family": "PDQ",
+      "expected": "printing",
+      "top": "printing",
+      "score": 0.7794497,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.7794497,
+      "best_wrong_score": 0.34657195,
+      "ranked": [
+        {
+          "doc": "printing",
+          "section": "Symptoms",
+          "score": 0.7794497
+        },
+        {
+          "doc": "hardware-peripherals",
+          "section": "Error codes",
+          "score": 0.34657195
+        },
+        {
+          "doc": "onedrive",
+          "section": "Known causes",
+          "score": 0.3157165
+        },
+        {
+          "doc": "shared-drive",
+          "section": "Symptoms",
+          "score": 0.31093895
+        },
+        {
+          "doc": "software-install",
+          "section": "Known causes",
+          "score": 0.28303516
+        }
+      ],
+      "also": [
+        {
+          "doc": "escalation-queues",
+          "kind": "reference",
+          "section": null,
+          "score": 0.4187227
+        }
+      ]
+    },
+    {
+      "id": "INC-PDQ-0034",
+      "family": "PDQ",
+      "expected": "printing",
+      "top": "printing",
+      "score": 0.77740145,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.77740145,
+      "best_wrong_score": 0.32157198,
+      "ranked": [
+        {
+          "doc": "printing",
+          "section": "Symptoms",
+          "score": 0.77740145
+        },
+        {
+          "doc": "onedrive",
+          "section": "Known causes",
+          "score": 0.32157198
+        },
+        {
+          "doc": "hardware-peripherals",
+          "section": "Error codes",
+          "score": 0.3118937
+        },
+        {
+          "doc": "shared-drive",
+          "section": "Symptoms",
+          "score": 0.2890188
+        },
+        {
+          "doc": "teams",
+          "section": "When to escalate",
+          "score": 0.26874632
+        }
+      ],
+      "also": [
+        {
+          "doc": "escalation-queues",
+          "kind": "reference",
+          "section": null,
+          "score": 0.42459303
+        }
+      ]
+    },
+    {
+      "id": "INC-PDQ-0038",
+      "family": "PDQ",
+      "expected": "printing",
+      "top": "printing",
+      "score": 0.80281854,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.80281854,
+      "best_wrong_score": 0.28390637,
+      "ranked": [
+        {
+          "doc": "printing",
+          "section": "Symptoms",
+          "score": 0.80281854
+        },
+        {
+          "doc": "wifi",
+          "section": "Known causes",
+          "score": 0.28390637
+        },
+        {
+          "doc": "hardware-peripherals",
+          "section": "Error codes",
+          "score": 0.28153965
+        },
+        {
+          "doc": "teams",
+          "section": "Known causes",
+          "score": 0.27509743
+        },
+        {
+          "doc": "laptop-performance",
+          "section": "Known causes",
+          "score": 0.2725463
+        }
+      ],
+      "also": [
+        {
+          "doc": "escalation-queues",
+          "kind": "reference",
+          "section": null,
+          "score": 0.4500478
+        }
+      ]
+    },
+    {
+      "id": "INC-PDQ-0050",
+      "family": "PDQ",
+      "expected": "printing",
+      "top": "printing",
+      "score": 0.7431507,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.7431507,
+      "best_wrong_score": 0.33129752,
+      "ranked": [
+        {
+          "doc": "printing",
+          "section": "Symptoms",
+          "score": 0.7431507
+        },
+        {
+          "doc": "shared-drive",
+          "section": "Symptoms",
+          "score": 0.33129752
+        },
+        {
+          "doc": "hardware-peripherals",
+          "section": "Error codes",
+          "score": 0.32617354
+        },
+        {
+          "doc": "onedrive",
+          "section": "Known causes",
+          "score": 0.32032374
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Fix",
+          "score": 0.2995624
+        }
+      ],
+      "also": [
+        {
+          "doc": "escalation-queues",
+          "kind": "reference",
+          "section": null,
+          "score": 0.39821923
+        }
+      ]
+    },
+    {
+      "id": "INC-PDQ-0054",
+      "family": "PDQ",
+      "expected": "printing",
+      "top": "printing",
+      "score": 0.8006456,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.8006456,
+      "best_wrong_score": 0.29567546,
+      "ranked": [
+        {
+          "doc": "printing",
+          "section": "Symptoms",
+          "score": 0.8006456
+        },
+        {
+          "doc": "hardware-peripherals",
+          "section": "Error codes",
+          "score": 0.29567546
+        },
+        {
+          "doc": "laptop-performance",
+          "section": "Error codes",
+          "score": 0.27796888
+        },
+        {
+          "doc": "wifi",
+          "section": "Known causes",
+          "score": 0.25359017
+        },
+        {
+          "doc": "teams",
+          "section": "Symptoms",
+          "score": 0.24680546
+        }
+      ],
+      "also": [
+        {
+          "doc": "escalation-queues",
+          "kind": "reference",
+          "section": null,
+          "score": 0.43349
+        }
+      ]
+    },
+    {
+      "id": "INC-PDQ-0056",
+      "family": "PDQ",
+      "expected": "printing",
+      "top": "printing",
+      "score": 0.731772,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.731772,
+      "best_wrong_score": 0.33483452,
+      "ranked": [
+        {
+          "doc": "printing",
+          "section": "Symptoms",
+          "score": 0.731772
+        },
+        {
+          "doc": "hardware-peripherals",
+          "section": "Error codes",
+          "score": 0.33483452
+        },
+        {
+          "doc": "teams",
+          "section": "Known causes",
+          "score": 0.28294295
+        },
+        {
+          "doc": "shared-drive",
+          "section": "Known causes",
+          "score": 0.27743316
+        },
+        {
+          "doc": "onedrive",
+          "section": "Symptoms",
+          "score": 0.27436927
+        }
+      ],
+      "also": [
+        {
+          "doc": "escalation-queues",
+          "kind": "reference",
+          "section": null,
+          "score": 0.44714206
+        }
+      ]
+    },
+    {
+      "id": "INC-PDQ-0057",
+      "family": "PDQ",
+      "expected": "printing",
+      "top": "printing",
+      "score": 0.75359905,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.75359905,
+      "best_wrong_score": 0.34325442,
+      "ranked": [
+        {
+          "doc": "printing",
+          "section": "Symptoms",
+          "score": 0.75359905
+        },
+        {
+          "doc": "hardware-peripherals",
+          "section": "Error codes",
+          "score": 0.34325442
+        },
+        {
+          "doc": "wifi",
+          "section": "Known causes",
+          "score": 0.29977715
+        },
+        {
+          "doc": "laptop-performance",
+          "section": "Error codes",
+          "score": 0.2858768
+        },
+        {
+          "doc": "teams",
+          "section": "Error codes",
+          "score": 0.28209075
+        }
+      ],
+      "also": [
+        {
+          "doc": "escalation-queues",
+          "kind": "reference",
+          "section": null,
+          "score": 0.4230834
+        }
+      ]
+    },
+    {
+      "id": "INC-PDQ-0062",
+      "family": "PDQ",
+      "expected": "printing",
+      "top": "printing",
+      "score": 0.7683881,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.7683881,
+      "best_wrong_score": 0.33186966,
+      "ranked": [
+        {
+          "doc": "printing",
+          "section": "Symptoms",
+          "score": 0.7683881
+        },
+        {
+          "doc": "wifi",
+          "section": "Known causes",
+          "score": 0.33186966
+        },
+        {
+          "doc": "teams",
+          "section": "Symptoms",
+          "score": 0.33080065
+        },
+        {
+          "doc": "hardware-peripherals",
+          "section": "Error codes",
+          "score": 0.32638037
+        },
+        {
+          "doc": "shared-drive",
+          "section": "Known causes",
+          "score": 0.31985933
+        }
+      ],
+      "also": [
+        {
+          "doc": "escalation-queues",
+          "kind": "reference",
+          "section": null,
+          "score": 0.43089122
+        }
+      ]
+    },
+    {
+      "id": "INC-SDA-0001",
+      "family": "SDA",
+      "expected": "shared-drive",
+      "top": "shared-drive",
+      "score": 0.70097184,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.70097184,
+      "best_wrong_score": 0.37914407,
+      "ranked": [
+        {
+          "doc": "shared-drive",
+          "section": "Symptoms",
+          "score": 0.70097184
+        },
+        {
+          "doc": "onedrive",
+          "section": "Known causes",
+          "score": 0.37914407
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Fix",
+          "score": 0.35592252
+        },
+        {
+          "doc": "software-install",
+          "section": "When to escalate",
+          "score": 0.31931272
+        },
+        {
+          "doc": "disk-encryption",
+          "section": "Fix",
+          "score": 0.28663212
+        }
+      ],
+      "also": [
+        {
+          "doc": "sec-11-access-requests",
+          "kind": "policy",
+          "section": null,
+          "score": 0.47567427
+        }
+      ]
+    },
+    {
+      "id": "INC-SDA-0020",
+      "family": "SDA",
+      "expected": "shared-drive",
+      "top": "shared-drive",
+      "score": 0.6770986,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.6770986,
+      "best_wrong_score": 0.3868584,
+      "ranked": [
+        {
+          "doc": "shared-drive",
+          "section": "Symptoms",
+          "score": 0.6770986
+        },
+        {
+          "doc": "software-install",
+          "section": "When to escalate",
+          "score": 0.3868584
+        },
+        {
+          "doc": "wifi",
+          "section": "Symptoms",
+          "score": 0.36310247
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Checks",
+          "score": 0.35855117
+        },
+        {
+          "doc": "onedrive",
+          "section": "Fix",
+          "score": 0.2970211
+        }
+      ],
+      "also": [
+        {
+          "doc": "sec-11-access-requests",
+          "kind": "policy",
+          "section": null,
+          "score": 0.5407347
+        }
+      ]
+    },
+    {
+      "id": "INC-SDA-0024",
+      "family": "SDA",
+      "expected": "shared-drive",
+      "top": "shared-drive",
+      "score": 0.6635192,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.6635192,
+      "best_wrong_score": 0.35683697,
+      "ranked": [
+        {
+          "doc": "shared-drive",
+          "section": "Symptoms",
+          "score": 0.6635192
+        },
+        {
+          "doc": "software-install",
+          "section": "When to escalate",
+          "score": 0.35683697
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Checks",
+          "score": 0.3542694
+        },
+        {
+          "doc": "onedrive",
+          "section": "Known causes",
+          "score": 0.33297795
+        },
+        {
+          "doc": "sso-mfa",
+          "section": "Symptoms",
+          "score": 0.32679018
+        }
+      ],
+      "also": [
+        {
+          "doc": "sec-11-access-requests",
+          "kind": "policy",
+          "section": null,
+          "score": 0.55548245
+        }
+      ]
+    },
+    {
+      "id": "INC-SDA-0025",
+      "family": "SDA",
+      "expected": "shared-drive",
+      "top": "shared-drive",
+      "score": 0.7555303,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.7555303,
+      "best_wrong_score": 0.41307542,
+      "ranked": [
+        {
+          "doc": "shared-drive",
+          "section": "Symptoms",
+          "score": 0.7555303
+        },
+        {
+          "doc": "onedrive",
+          "section": "Known causes",
+          "score": 0.41307542
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Checks",
+          "score": 0.305478
+        },
+        {
+          "doc": "software-install",
+          "section": "When to escalate",
+          "score": 0.2891751
+        },
+        {
+          "doc": "sso-mfa",
+          "section": "Symptoms",
+          "score": 0.26697433
+        }
+      ],
+      "also": [
+        {
+          "doc": "sec-11-access-requests",
+          "kind": "policy",
+          "section": null,
+          "score": 0.46248624
+        }
+      ]
+    },
+    {
+      "id": "INC-SDA-0036",
+      "family": "SDA",
+      "expected": "shared-drive",
+      "top": "shared-drive",
+      "score": 0.7710377,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.7710377,
+      "best_wrong_score": 0.49029785,
+      "ranked": [
+        {
+          "doc": "shared-drive",
+          "section": "Symptoms",
+          "score": 0.7710377
+        },
+        {
+          "doc": "onedrive",
+          "section": "Known causes",
+          "score": 0.49029785
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Fix",
+          "score": 0.36156607
+        },
+        {
+          "doc": "sso-mfa",
+          "section": "Symptoms",
+          "score": 0.32927188
+        },
+        {
+          "doc": "software-install",
+          "section": "When to escalate",
+          "score": 0.3124684
+        }
+      ],
+      "also": [
+        {
+          "doc": "sec-11-access-requests",
+          "kind": "policy",
+          "section": null,
+          "score": 0.5291585
+        }
+      ]
+    },
+    {
+      "id": "INC-SDA-0039",
+      "family": "SDA",
+      "expected": "shared-drive",
+      "top": "shared-drive",
+      "score": 0.6992896,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.6992896,
+      "best_wrong_score": 0.3542397,
+      "ranked": [
+        {
+          "doc": "shared-drive",
+          "section": "Symptoms",
+          "score": 0.6992896
+        },
+        {
+          "doc": "onedrive",
+          "section": "Known causes",
+          "score": 0.3542397
+        },
+        {
+          "doc": "software-install",
+          "section": "When to escalate",
+          "score": 0.3469286
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Checks",
+          "score": 0.33384436
+        },
+        {
+          "doc": "wifi",
+          "section": "Symptoms",
+          "score": 0.27340525
+        }
+      ],
+      "also": [
+        {
+          "doc": "sec-11-access-requests",
+          "kind": "policy",
+          "section": null,
+          "score": 0.4486314
+        }
+      ]
+    },
+    {
+      "id": "INC-SDA-0050",
+      "family": "SDA",
+      "expected": "shared-drive",
+      "top": "shared-drive",
+      "score": 0.7407793,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.7407793,
+      "best_wrong_score": 0.37598214,
+      "ranked": [
+        {
+          "doc": "shared-drive",
+          "section": "Symptoms",
+          "score": 0.7407793
+        },
+        {
+          "doc": "onedrive",
+          "section": "Known causes",
+          "score": 0.37598214
+        },
+        {
+          "doc": "software-install",
+          "section": "When to escalate",
+          "score": 0.31823802
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Fix",
+          "score": 0.31209493
+        },
+        {
+          "doc": "wifi",
+          "section": "Symptoms",
+          "score": 0.27025163
+        }
+      ],
+      "also": [
+        {
+          "doc": "sec-11-access-requests",
+          "kind": "policy",
+          "section": null,
+          "score": 0.47000375
+        }
+      ]
+    },
+    {
+      "id": "INC-SDA-0052",
+      "family": "SDA",
+      "expected": "shared-drive",
+      "top": "shared-drive",
+      "score": 0.73122585,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.73122585,
+      "best_wrong_score": 0.41088367,
+      "ranked": [
+        {
+          "doc": "shared-drive",
+          "section": "Symptoms",
+          "score": 0.73122585
+        },
+        {
+          "doc": "onedrive",
+          "section": "Known causes",
+          "score": 0.41088367
+        },
+        {
+          "doc": "disk-encryption",
+          "section": "Fix",
+          "score": 0.3110711
+        },
+        {
+          "doc": "software-install",
+          "section": "When to escalate",
+          "score": 0.3051201
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Checks",
+          "score": 0.29888642
+        }
+      ],
+      "also": [
+        {
+          "doc": "sec-11-access-requests",
+          "kind": "policy",
+          "section": null,
+          "score": 0.45767155
+        }
+      ]
+    },
+    {
+      "id": "INC-SIB-0001",
+      "family": "SIB",
+      "expected": "software-install",
+      "top": "software-install",
+      "score": 0.66132706,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.66132706,
+      "best_wrong_score": 0.41270533,
+      "ranked": [
+        {
+          "doc": "software-install",
+          "section": "Symptoms",
+          "score": 0.66132706
+        },
+        {
+          "doc": "shared-drive",
+          "section": "Symptoms",
+          "score": 0.41270533
+        },
+        {
+          "doc": "teams",
+          "section": "When to escalate",
+          "score": 0.381834
+        },
+        {
+          "doc": "device-compliance",
+          "section": "Error codes",
+          "score": 0.37877572
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Checks",
+          "score": 0.3729832
+        }
+      ],
+      "also": [
+        {
+          "doc": "sec-07-software-and-admin-rights",
+          "kind": "policy",
+          "section": null,
+          "score": 0.5762447
+        }
+      ]
+    },
+    {
+      "id": "INC-SIB-0004",
+      "family": "SIB",
+      "expected": "software-install",
+      "top": "software-install",
+      "score": 0.74456954,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.74456954,
+      "best_wrong_score": 0.36417228,
+      "ranked": [
+        {
+          "doc": "software-install",
+          "section": "Error codes",
+          "score": 0.74456954
+        },
+        {
+          "doc": "shared-drive",
+          "section": "Symptoms",
+          "score": 0.36417228
+        },
+        {
+          "doc": "vpn-access",
+          "section": "When to escalate",
+          "score": 0.35579205
+        },
+        {
+          "doc": "device-compliance",
+          "section": "Error codes",
+          "score": 0.33850938
+        },
+        {
+          "doc": "disk-encryption",
+          "section": "Known causes",
+          "score": 0.332842
+        }
+      ],
+      "also": [
+        {
+          "doc": "sec-07-software-and-admin-rights",
+          "kind": "policy",
+          "section": null,
+          "score": 0.6532599
+        }
+      ]
+    },
+    {
+      "id": "INC-SIB-0012",
+      "family": "SIB",
+      "expected": "software-install",
+      "top": "software-install",
+      "score": 0.7167708,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.7167708,
+      "best_wrong_score": 0.3581977,
+      "ranked": [
+        {
+          "doc": "software-install",
+          "section": "Error codes",
+          "score": 0.7167708
+        },
+        {
+          "doc": "device-compliance",
+          "section": "Error codes",
+          "score": 0.3581977
+        },
+        {
+          "doc": "vpn-access",
+          "section": "When to escalate",
+          "score": 0.35050076
+        },
+        {
+          "doc": "wifi",
+          "section": "Fix",
+          "score": 0.29606375
+        },
+        {
+          "doc": "disk-encryption",
+          "section": "Known causes",
+          "score": 0.28899962
+        }
+      ],
+      "also": [
+        {
+          "doc": "sec-07-software-and-admin-rights",
+          "kind": "policy",
+          "section": null,
+          "score": 0.60948485
+        }
+      ]
+    },
+    {
+      "id": "INC-SIB-0013",
+      "family": "SIB",
+      "expected": "software-install",
+      "top": "software-install",
+      "score": 0.7180058,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.7180058,
+      "best_wrong_score": 0.4120381,
+      "ranked": [
+        {
+          "doc": "software-install",
+          "section": "Symptoms",
+          "score": 0.7180058
+        },
+        {
+          "doc": "device-compliance",
+          "section": "Error codes",
+          "score": 0.4120381
+        },
+        {
+          "doc": "shared-drive",
+          "section": "Symptoms",
+          "score": 0.3042457
+        },
+        {
+          "doc": "sso-mfa",
+          "section": "Symptoms",
+          "score": 0.28380173
+        },
+        {
+          "doc": "disk-encryption",
+          "section": "Known causes",
+          "score": 0.2805097
+        }
+      ],
+      "also": [
+        {
+          "doc": "sec-07-software-and-admin-rights",
+          "kind": "policy",
+          "section": null,
+          "score": 0.62459755
+        }
+      ]
+    },
+    {
+      "id": "INC-SIB-0021",
+      "family": "SIB",
+      "expected": "software-install",
+      "top": "software-install",
+      "score": 0.5509281,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.5509281,
+      "best_wrong_score": 0.54492897,
+      "ranked": [
+        {
+          "doc": "software-install",
+          "section": "Error codes",
+          "score": 0.5509281
+        },
+        {
+          "doc": "vpn-access",
+          "section": "Checks",
+          "score": 0.54492897
+        },
+        {
+          "doc": "shared-drive",
+          "section": "Symptoms",
+          "score": 0.38264963
+        },
+        {
+          "doc": "device-compliance",
+          "section": "Error codes",
+          "score": 0.30871636
+        },
+        {
+          "doc": "disk-encryption",
+          "section": "Error codes",
+          "score": 0.2970309
+        }
+      ],
+      "also": [
+        {
+          "doc": "sec-07-software-and-admin-rights",
+          "kind": "policy",
+          "section": null,
+          "score": 0.5362353
+        }
+      ]
+    },
+    {
+      "id": "INC-SIB-0038",
+      "family": "SIB",
+      "expected": "software-install",
+      "top": "software-install",
+      "score": 0.6868986,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.6868986,
+      "best_wrong_score": 0.4943573,
+      "ranked": [
+        {
+          "doc": "software-install",
+          "section": "Error codes",
+          "score": 0.6868986
+        },
+        {
+          "doc": "vpn-access",
+          "section": "When to escalate",
+          "score": 0.4943573
+        },
+        {
+          "doc": "device-compliance",
+          "section": "Error codes",
+          "score": 0.38330105
+        },
+        {
+          "doc": "disk-encryption",
+          "section": "Known causes",
+          "score": 0.3248533
+        },
+        {
+          "doc": "wifi",
+          "section": "Symptoms",
+          "score": 0.32243213
+        }
+      ],
+      "also": [
+        {
+          "doc": "sec-07-software-and-admin-rights",
+          "kind": "policy",
+          "section": null,
+          "score": 0.6370241
+        }
+      ]
+    },
+    {
+      "id": "INC-SIB-0040",
+      "family": "SIB",
+      "expected": "software-install",
+      "top": "software-install",
+      "score": 0.7006441,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.7006441,
+      "best_wrong_score": 0.43899122,
+      "ranked": [
+        {
+          "doc": "software-install",
+          "section": "Error codes",
+          "score": 0.7006441
+        },
+        {
+          "doc": "device-compliance",
+          "section": "Error codes",
+          "score": 0.43899122
+        },
+        {
+          "doc": "shared-drive",
+          "section": "Symptoms",
+          "score": 0.28572723
+        },
+        {
+          "doc": "disk-encryption",
+          "section": "Known causes",
+          "score": 0.2847537
+        },
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.28226838
+        }
+      ],
+      "also": [
+        {
+          "doc": "sec-07-software-and-admin-rights",
+          "kind": "policy",
+          "section": null,
+          "score": 0.6268475
+        }
+      ]
+    },
+    {
+      "id": "INC-SIB-0045",
+      "family": "SIB",
+      "expected": "software-install",
+      "top": "software-install",
+      "score": 0.6823293,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.6823293,
+      "best_wrong_score": 0.5096301,
+      "ranked": [
+        {
+          "doc": "software-install",
+          "section": "Error codes",
+          "score": 0.6823293
+        },
+        {
+          "doc": "vpn-access",
+          "section": "Checks",
+          "score": 0.5096301
+        },
+        {
+          "doc": "device-compliance",
+          "section": "Error codes",
+          "score": 0.38978803
+        },
+        {
+          "doc": "disk-encryption",
+          "section": "Known causes",
+          "score": 0.30841613
+        },
+        {
+          "doc": "wifi",
+          "section": "Symptoms",
+          "score": 0.30819023
+        }
+      ],
+      "also": [
+        {
+          "doc": "sec-07-software-and-admin-rights",
+          "kind": "policy",
+          "section": null,
+          "score": 0.5406395
+        }
+      ]
+    },
+    {
+      "id": "INC-SIB-0056",
+      "family": "SIB",
+      "expected": "software-install",
+      "top": "software-install",
+      "score": 0.6468497,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.6468497,
+      "best_wrong_score": 0.50605357,
+      "ranked": [
+        {
+          "doc": "software-install",
+          "section": "Known causes",
+          "score": 0.6468497
+        },
+        {
+          "doc": "device-compliance",
+          "section": "Symptoms",
+          "score": 0.50605357
+        },
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.3983315
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Checks",
+          "score": 0.3833778
+        },
+        {
+          "doc": "sso-mfa",
+          "section": "Symptoms",
+          "score": 0.3706245
+        }
+      ],
+      "also": [
+        {
+          "doc": "sec-07-software-and-admin-rights",
+          "kind": "policy",
+          "section": null,
+          "score": 0.5691751
+        }
+      ]
+    },
+    {
+      "id": "INC-SIB-0058",
+      "family": "SIB",
+      "expected": "software-install",
+      "top": "software-install",
+      "score": 0.6162542,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.6162542,
+      "best_wrong_score": 0.5057646,
+      "ranked": [
+        {
+          "doc": "software-install",
+          "section": "Symptoms",
+          "score": 0.6162542
+        },
+        {
+          "doc": "device-compliance",
+          "section": "Symptoms",
+          "score": 0.5057646
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Fix",
+          "score": 0.36278203
+        },
+        {
+          "doc": "shared-drive",
+          "section": "Symptoms",
+          "score": 0.35945976
+        },
+        {
+          "doc": "wifi",
+          "section": "Symptoms",
+          "score": 0.3527375
+        }
+      ],
+      "also": [
+        {
+          "doc": "sec-07-software-and-admin-rights",
+          "kind": "policy",
+          "section": null,
+          "score": 0.59340054
+        }
+      ]
+    },
+    {
+      "id": "INC-SIB-0062",
+      "family": "SIB",
+      "expected": "software-install",
+      "top": "software-install",
+      "score": 0.62536186,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.62536186,
+      "best_wrong_score": 0.45727772,
+      "ranked": [
+        {
+          "doc": "software-install",
+          "section": "Symptoms",
+          "score": 0.62536186
+        },
+        {
+          "doc": "device-compliance",
+          "section": "Symptoms",
+          "score": 0.45727772
+        },
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.3484044
+        },
+        {
+          "doc": "wifi",
+          "section": "Symptoms",
+          "score": 0.34253022
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Fix",
+          "score": 0.30122796
+        }
+      ],
+      "also": [
+        {
+          "doc": "sec-07-software-and-admin-rights",
+          "kind": "policy",
+          "section": null,
+          "score": 0.61649454
+        }
+      ]
+    },
+    {
+      "id": "INC-SML-0003",
+      "family": "SML",
+      "expected": "sso-mfa",
+      "top": "sso-mfa",
+      "score": 0.7289542,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.7289542,
+      "best_wrong_score": 0.5040745,
+      "ranked": [
+        {
+          "doc": "sso-mfa",
+          "section": "Symptoms",
+          "score": 0.7289542
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Fix",
+          "score": 0.5040745
+        },
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.47866938
+        },
+        {
+          "doc": "outlook",
+          "section": "Known causes",
+          "score": 0.43829846
+        },
+        {
+          "doc": "device-compliance",
+          "section": "Symptoms",
+          "score": 0.4038087
+        }
+      ],
+      "also": [
+        {
+          "doc": "company-profile",
+          "kind": "reference",
+          "section": "Core systems",
+          "score": 0.55249035
+        }
+      ]
+    },
+    {
+      "id": "INC-SML-0018",
+      "family": "SML",
+      "expected": "sso-mfa",
+      "top": "sso-mfa",
+      "score": 0.8283874,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.8283874,
+      "best_wrong_score": 0.5459866,
+      "ranked": [
+        {
+          "doc": "sso-mfa",
+          "section": "Symptoms",
+          "score": 0.8283874
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Fix",
+          "score": 0.5459866
+        },
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.5137463
+        },
+        {
+          "doc": "outlook",
+          "section": "Known causes",
+          "score": 0.4543385
+        },
+        {
+          "doc": "wifi",
+          "section": "Symptoms",
+          "score": 0.4417765
+        }
+      ],
+      "also": [
+        {
+          "doc": "company-profile",
+          "kind": "reference",
+          "section": "Core systems",
+          "score": 0.55139256
+        }
+      ]
+    },
+    {
+      "id": "INC-SML-0021",
+      "family": "SML",
+      "expected": "sso-mfa",
+      "top": "sso-mfa",
+      "score": 0.8021563,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.8021563,
+      "best_wrong_score": 0.5501732,
+      "ranked": [
+        {
+          "doc": "sso-mfa",
+          "section": "Symptoms",
+          "score": 0.8021563
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Symptoms",
+          "score": 0.5501732
+        },
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.49072155
+        },
+        {
+          "doc": "disk-encryption",
+          "section": "Known causes",
+          "score": 0.41961265
+        },
+        {
+          "doc": "device-compliance",
+          "section": "Error codes",
+          "score": 0.41903725
+        }
+      ],
+      "also": [
+        {
+          "doc": "company-profile",
+          "kind": "reference",
+          "section": "Core systems",
+          "score": 0.512412
+        }
+      ]
+    },
+    {
+      "id": "INC-SML-0038",
+      "family": "SML",
+      "expected": "sso-mfa",
+      "top": "sso-mfa",
+      "score": 0.8180016,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.8180016,
+      "best_wrong_score": 0.5525909,
+      "ranked": [
+        {
+          "doc": "sso-mfa",
+          "section": "Symptoms",
+          "score": 0.8180016
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Symptoms",
+          "score": 0.5525909
+        },
+        {
+          "doc": "vpn-access",
+          "section": "Checks",
+          "score": 0.49416572
+        },
+        {
+          "doc": "wifi",
+          "section": "Symptoms",
+          "score": 0.40941188
+        },
+        {
+          "doc": "device-compliance",
+          "section": "Error codes",
+          "score": 0.37291902
+        }
+      ],
+      "also": [
+        {
+          "doc": "company-profile",
+          "kind": "reference",
+          "section": "Core systems",
+          "score": 0.5317768
+        }
+      ]
+    },
+    {
+      "id": "INC-SML-0044",
+      "family": "SML",
+      "expected": "sso-mfa",
+      "top": "sso-mfa",
+      "score": 0.7472863,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.7472863,
+      "best_wrong_score": 0.56654495,
+      "ranked": [
+        {
+          "doc": "sso-mfa",
+          "section": "Symptoms",
+          "score": 0.7472863
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Fix",
+          "score": 0.56654495
+        },
+        {
+          "doc": "vpn-access",
+          "section": "Checks",
+          "score": 0.49086505
+        },
+        {
+          "doc": "wifi",
+          "section": "Error codes",
+          "score": 0.40021577
+        },
+        {
+          "doc": "outlook",
+          "section": "Fix",
+          "score": 0.38466606
+        }
+      ],
+      "also": [
+        {
+          "doc": "company-profile",
+          "kind": "reference",
+          "section": "Core systems",
+          "score": 0.534212
+        }
+      ]
+    },
+    {
+      "id": "INC-SML-0049",
+      "family": "SML",
+      "expected": "sso-mfa",
+      "top": "sso-mfa",
+      "score": 0.72005284,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.72005284,
+      "best_wrong_score": 0.6052214,
+      "ranked": [
+        {
+          "doc": "sso-mfa",
+          "section": "Symptoms",
+          "score": 0.72005284
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Symptoms",
+          "score": 0.6052214
+        },
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.4439208
+        },
+        {
+          "doc": "wifi",
+          "section": "Symptoms",
+          "score": 0.43872368
+        },
+        {
+          "doc": "disk-encryption",
+          "section": "Known causes",
+          "score": 0.4050989
+        }
+      ],
+      "also": [
+        {
+          "doc": "company-profile",
+          "kind": "reference",
+          "section": "Core systems",
+          "score": 0.57222676
+        }
+      ]
+    },
+    {
+      "id": "INC-SML-0053",
+      "family": "SML",
+      "expected": "sso-mfa",
+      "top": "sso-mfa",
+      "score": 0.70434535,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.70434535,
+      "best_wrong_score": 0.5218134,
+      "ranked": [
+        {
+          "doc": "sso-mfa",
+          "section": "Symptoms",
+          "score": 0.70434535
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Fix",
+          "score": 0.5218134
+        },
+        {
+          "doc": "vpn-access",
+          "section": "Checks",
+          "score": 0.47174978
+        },
+        {
+          "doc": "wifi",
+          "section": "Symptoms",
+          "score": 0.45984632
+        },
+        {
+          "doc": "software-install",
+          "section": "When to escalate",
+          "score": 0.37308952
+        }
+      ],
+      "also": [
+        {
+          "doc": "company-profile",
+          "kind": "reference",
+          "section": "Core systems",
+          "score": 0.62111175
+        }
+      ]
+    },
+    {
+      "id": "INC-SML-0061",
+      "family": "SML",
+      "expected": "sso-mfa",
+      "top": "sso-mfa",
+      "score": 0.8060249,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.8060249,
+      "best_wrong_score": 0.5720501,
+      "ranked": [
+        {
+          "doc": "sso-mfa",
+          "section": "Symptoms",
+          "score": 0.8060249
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Fix",
+          "score": 0.5720501
+        },
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.48408076
+        },
+        {
+          "doc": "disk-encryption",
+          "section": "Known causes",
+          "score": 0.43907034
+        },
+        {
+          "doc": "outlook",
+          "section": "Known causes",
+          "score": 0.42893487
+        }
+      ],
+      "also": [
+        {
+          "doc": "company-profile",
+          "kind": "reference",
+          "section": "Core systems",
+          "score": 0.56168497
+        }
+      ]
+    },
+    {
+      "id": "INC-SML-0063",
+      "family": "SML",
+      "expected": "sso-mfa",
+      "top": "sso-mfa",
+      "score": 0.7474374,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.7474374,
+      "best_wrong_score": 0.6413506,
+      "ranked": [
+        {
+          "doc": "sso-mfa",
+          "section": "Symptoms",
+          "score": 0.7474374
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Symptoms",
+          "score": 0.6413506
+        },
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.440704
+        },
+        {
+          "doc": "wifi",
+          "section": "Symptoms",
+          "score": 0.43346688
+        },
+        {
+          "doc": "shared-drive",
+          "section": "Known causes",
+          "score": 0.4044346
+        }
+      ],
+      "also": [
+        {
+          "doc": "sec-04-account-lockout",
+          "kind": "policy",
+          "section": null,
+          "score": 0.47724915
+        }
+      ]
+    },
+    {
+      "id": "INC-VDA-0001",
+      "family": "VDA",
+      "expected": "vpn-access",
+      "top": "vpn-access",
+      "score": 0.77097803,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.77097803,
+      "best_wrong_score": 0.49823564,
+      "ranked": [
+        {
+          "doc": "vpn-access",
+          "section": "Symptoms",
+          "score": 0.77097803
+        },
+        {
+          "doc": "wifi",
+          "section": "Symptoms",
+          "score": 0.49823564
+        },
+        {
+          "doc": "shared-drive",
+          "section": "Checks",
+          "score": 0.41049364
+        },
+        {
+          "doc": "sso-mfa",
+          "section": "Symptoms",
+          "score": 0.4014942
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Fix",
+          "score": 0.39037943
+        }
+      ],
+      "also": [
+        {
+          "doc": "company-profile",
+          "kind": "reference",
+          "section": "Core systems",
+          "score": 0.4617548
+        }
+      ]
+    },
+    {
+      "id": "INC-VDA-0005",
+      "family": "VDA",
+      "expected": "vpn-access",
+      "top": "vpn-access",
+      "score": 0.76252484,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.76252484,
+      "best_wrong_score": 0.44957086,
+      "ranked": [
+        {
+          "doc": "vpn-access",
+          "section": "Symptoms",
+          "score": 0.76252484
+        },
+        {
+          "doc": "wifi",
+          "section": "Symptoms",
+          "score": 0.44957086
+        },
+        {
+          "doc": "sso-mfa",
+          "section": "Symptoms",
+          "score": 0.39806646
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Fix",
+          "score": 0.38748777
+        },
+        {
+          "doc": "shared-drive",
+          "section": "Checks",
+          "score": 0.35266685
+        }
+      ],
+      "also": [
+        {
+          "doc": "company-profile",
+          "kind": "reference",
+          "section": "Core systems",
+          "score": 0.45083266
+        }
+      ]
+    },
+    {
+      "id": "INC-VDA-0007",
+      "family": "VDA",
+      "expected": "vpn-access",
+      "top": "vpn-access",
+      "score": 0.7211519,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.7211519,
+      "best_wrong_score": 0.5271206,
+      "ranked": [
+        {
+          "doc": "vpn-access",
+          "section": "Checks",
+          "score": 0.7211519
+        },
+        {
+          "doc": "wifi",
+          "section": "Symptoms",
+          "score": 0.5271206
+        },
+        {
+          "doc": "sso-mfa",
+          "section": "Symptoms",
+          "score": 0.44054416
+        },
+        {
+          "doc": "shared-drive",
+          "section": "Checks",
+          "score": 0.41425267
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Fix",
+          "score": 0.38382447
+        }
+      ],
+      "also": [
+        {
+          "doc": "company-profile",
+          "kind": "reference",
+          "section": "Core systems",
+          "score": 0.52047783
+        }
+      ]
+    },
+    {
+      "id": "INC-VDA-0009",
+      "family": "VDA",
+      "expected": "vpn-access",
+      "top": "vpn-access",
+      "score": 0.76843274,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.76843274,
+      "best_wrong_score": 0.47584957,
+      "ranked": [
+        {
+          "doc": "vpn-access",
+          "section": "Checks",
+          "score": 0.76843274
+        },
+        {
+          "doc": "wifi",
+          "section": "Symptoms",
+          "score": 0.47584957
+        },
+        {
+          "doc": "shared-drive",
+          "section": "Checks",
+          "score": 0.4637798
+        },
+        {
+          "doc": "sso-mfa",
+          "section": "Symptoms",
+          "score": 0.44239074
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Fix",
+          "score": 0.42091334
+        }
+      ],
+      "also": [
+        {
+          "doc": "company-profile",
+          "kind": "reference",
+          "section": "Core systems",
+          "score": 0.4739225
+        }
+      ]
+    },
+    {
+      "id": "INC-VDA-0021",
+      "family": "VDA",
+      "expected": "vpn-access",
+      "top": "vpn-access",
+      "score": 0.76842654,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.76842654,
+      "best_wrong_score": 0.43026263,
+      "ranked": [
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.76842654
+        },
+        {
+          "doc": "wifi",
+          "section": "Symptoms",
+          "score": 0.43026263
+        },
+        {
+          "doc": "shared-drive",
+          "section": "Checks",
+          "score": 0.42291063
+        },
+        {
+          "doc": "sso-mfa",
+          "section": "Symptoms",
+          "score": 0.40906838
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Fix",
+          "score": 0.385009
+        }
+      ],
+      "also": [
+        {
+          "doc": "company-profile",
+          "kind": "reference",
+          "section": "Core systems",
+          "score": 0.49605832
+        }
+      ]
+    },
+    {
+      "id": "INC-VDA-0024",
+      "family": "VDA",
+      "expected": "vpn-access",
+      "top": "vpn-access",
+      "score": 0.74976283,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.74976283,
+      "best_wrong_score": 0.4629817,
+      "ranked": [
+        {
+          "doc": "vpn-access",
+          "section": "Symptoms",
+          "score": 0.74976283
+        },
+        {
+          "doc": "wifi",
+          "section": "Symptoms",
+          "score": 0.4629817
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Fix",
+          "score": 0.44588333
+        },
+        {
+          "doc": "sso-mfa",
+          "section": "Symptoms",
+          "score": 0.4400667
+        },
+        {
+          "doc": "shared-drive",
+          "section": "Checks",
+          "score": 0.38189203
+        }
+      ],
+      "also": [
+        {
+          "doc": "company-profile",
+          "kind": "reference",
+          "section": "Core systems",
+          "score": 0.47688165
+        }
+      ]
+    },
+    {
+      "id": "INC-VDA-0030",
+      "family": "VDA",
+      "expected": "vpn-access",
+      "top": "vpn-access",
+      "score": 0.77406913,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.77406913,
+      "best_wrong_score": 0.45534354,
+      "ranked": [
+        {
+          "doc": "vpn-access",
+          "section": "Symptoms",
+          "score": 0.77406913
+        },
+        {
+          "doc": "sso-mfa",
+          "section": "Symptoms",
+          "score": 0.45534354
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Fix",
+          "score": 0.3994905
+        },
+        {
+          "doc": "wifi",
+          "section": "Symptoms",
+          "score": 0.39550033
+        },
+        {
+          "doc": "software-install",
+          "section": "When to escalate",
+          "score": 0.37216192
+        }
+      ],
+      "also": [
+        {
+          "doc": "company-profile",
+          "kind": "reference",
+          "section": "Core systems",
+          "score": 0.48855436
+        }
+      ]
+    },
+    {
+      "id": "INC-VDA-0035",
+      "family": "VDA",
+      "expected": "vpn-access",
+      "top": "vpn-access",
+      "score": 0.7739606,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.7739606,
+      "best_wrong_score": 0.4670748,
+      "ranked": [
+        {
+          "doc": "vpn-access",
+          "section": "Checks",
+          "score": 0.7739606
+        },
+        {
+          "doc": "wifi",
+          "section": "Symptoms",
+          "score": 0.4670748
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Fix",
+          "score": 0.41043535
+        },
+        {
+          "doc": "sso-mfa",
+          "section": "Symptoms",
+          "score": 0.40542528
+        },
+        {
+          "doc": "shared-drive",
+          "section": "Checks",
+          "score": 0.38899547
+        }
+      ],
+      "also": [
+        {
+          "doc": "company-profile",
+          "kind": "reference",
+          "section": "Core systems",
+          "score": 0.48911983
+        }
+      ]
+    },
+    {
+      "id": "INC-VDA-0041",
+      "family": "VDA",
+      "expected": "vpn-access",
+      "top": "vpn-access",
+      "score": 0.76369697,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.76369697,
+      "best_wrong_score": 0.50070655,
+      "ranked": [
+        {
+          "doc": "vpn-access",
+          "section": "Symptoms",
+          "score": 0.76369697
+        },
+        {
+          "doc": "wifi",
+          "section": "Symptoms",
+          "score": 0.50070655
+        },
+        {
+          "doc": "sso-mfa",
+          "section": "Symptoms",
+          "score": 0.4215808
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Fix",
+          "score": 0.41413152
+        },
+        {
+          "doc": "shared-drive",
+          "section": "Checks",
+          "score": 0.39972085
+        }
+      ],
+      "also": [
+        {
+          "doc": "company-profile",
+          "kind": "reference",
+          "section": "Core systems",
+          "score": 0.53856415
+        }
+      ]
+    },
+    {
+      "id": "INC-VDA-0056",
+      "family": "VDA",
+      "expected": "vpn-access",
+      "top": "vpn-access",
+      "score": 0.73684263,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.73684263,
+      "best_wrong_score": 0.4965642,
+      "ranked": [
+        {
+          "doc": "vpn-access",
+          "section": "Checks",
+          "score": 0.73684263
+        },
+        {
+          "doc": "sso-mfa",
+          "section": "Symptoms",
+          "score": 0.4965642
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Fix",
+          "score": 0.4407674
+        },
+        {
+          "doc": "wifi",
+          "section": "Symptoms",
+          "score": 0.41794348
+        },
+        {
+          "doc": "outlook",
+          "section": "Known causes",
+          "score": 0.38250884
+        }
+      ],
+      "also": [
+        {
+          "doc": "company-profile",
+          "kind": "reference",
+          "section": "Core systems",
+          "score": 0.4380883
+        }
+      ]
+    },
+    {
+      "id": "INC-VDA-0062",
+      "family": "VDA",
+      "expected": "vpn-access",
+      "top": "vpn-access",
+      "score": 0.77713704,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.77713704,
+      "best_wrong_score": 0.44790605,
+      "ranked": [
+        {
+          "doc": "vpn-access",
+          "section": "Symptoms",
+          "score": 0.77713704
+        },
+        {
+          "doc": "sso-mfa",
+          "section": "Symptoms",
+          "score": 0.44790605
+        },
+        {
+          "doc": "wifi",
+          "section": "Symptoms",
+          "score": 0.43806297
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Fix",
+          "score": 0.42808414
+        },
+        {
+          "doc": "software-install",
+          "section": "When to escalate",
+          "score": 0.39022648
+        }
+      ],
+      "also": [
+        {
+          "doc": "company-profile",
+          "kind": "reference",
+          "section": "Core systems",
+          "score": 0.5071753
+        }
+      ]
+    },
+    {
+      "id": "INC-WCI-0002",
+      "family": "WCI",
+      "expected": "wifi",
+      "top": "wifi",
+      "score": 0.69772696,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.69772696,
+      "best_wrong_score": 0.5937264,
+      "ranked": [
+        {
+          "doc": "wifi",
+          "section": "Symptoms",
+          "score": 0.69772696
+        },
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.5937264
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Checks",
+          "score": 0.4889868
+        },
+        {
+          "doc": "sso-mfa",
+          "section": "Known causes",
+          "score": 0.48706126
+        },
+        {
+          "doc": "shared-drive",
+          "section": "Known causes",
+          "score": 0.37624007
+        }
+      ],
+      "also": [
+        {
+          "doc": "company-profile",
+          "kind": "reference",
+          "section": "Core systems",
+          "score": 0.45959067
+        }
+      ]
+    },
+    {
+      "id": "INC-WCI-0004",
+      "family": "WCI",
+      "expected": "wifi",
+      "top": "wifi",
+      "score": 0.75753224,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.75753224,
+      "best_wrong_score": 0.57715666,
+      "ranked": [
+        {
+          "doc": "wifi",
+          "section": "Symptoms",
+          "score": 0.75753224
+        },
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.57715666
+        },
+        {
+          "doc": "sso-mfa",
+          "section": "Symptoms",
+          "score": 0.48879313
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Checks",
+          "score": 0.48021048
+        },
+        {
+          "doc": "device-compliance",
+          "section": "Fix",
+          "score": 0.43437934
+        }
+      ],
+      "also": [
+        {
+          "doc": "company-profile",
+          "kind": "reference",
+          "section": "Core systems",
+          "score": 0.45678544
+        }
+      ]
+    },
+    {
+      "id": "INC-WCI-0029",
+      "family": "WCI",
+      "expected": "wifi",
+      "top": "wifi",
+      "score": 0.63554883,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.63554883,
+      "best_wrong_score": 0.4999347,
+      "ranked": [
+        {
+          "doc": "wifi",
+          "section": "Symptoms",
+          "score": 0.63554883
+        },
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.4999347
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Fix",
+          "score": 0.46971267
+        },
+        {
+          "doc": "sso-mfa",
+          "section": "Fix",
+          "score": 0.45175132
+        },
+        {
+          "doc": "device-compliance",
+          "section": "Error codes",
+          "score": 0.39563778
+        }
+      ],
+      "also": [
+        {
+          "doc": "company-profile",
+          "kind": "reference",
+          "section": "Core systems",
+          "score": 0.4332404
+        }
+      ]
+    },
+    {
+      "id": "INC-WCI-0036",
+      "family": "WCI",
+      "expected": "wifi",
+      "top": "wifi",
+      "score": 0.7230754,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.7230754,
+      "best_wrong_score": 0.48697162,
+      "ranked": [
+        {
+          "doc": "wifi",
+          "section": "Symptoms",
+          "score": 0.7230754
+        },
+        {
+          "doc": "vpn-access",
+          "section": "When to escalate",
+          "score": 0.48697162
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Fix",
+          "score": 0.4137233
+        },
+        {
+          "doc": "shared-drive",
+          "section": "Symptoms",
+          "score": 0.41293848
+        },
+        {
+          "doc": "sso-mfa",
+          "section": "Fix",
+          "score": 0.3824876
+        }
+      ],
+      "also": [
+        {
+          "doc": "company-profile",
+          "kind": "reference",
+          "section": "Core systems",
+          "score": 0.43698975
+        }
+      ]
+    },
+    {
+      "id": "INC-WCI-0039",
+      "family": "WCI",
+      "expected": "wifi",
+      "top": "wifi",
+      "score": 0.7002042,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.7002042,
+      "best_wrong_score": 0.4543421,
+      "ranked": [
+        {
+          "doc": "wifi",
+          "section": "Symptoms",
+          "score": 0.7002042
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Checks",
+          "score": 0.4543421
+        },
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.44139427
+        },
+        {
+          "doc": "sso-mfa",
+          "section": "Known causes",
+          "score": 0.4264292
+        },
+        {
+          "doc": "shared-drive",
+          "section": "Known causes",
+          "score": 0.3984887
+        }
+      ],
+      "also": [
+        {
+          "doc": "company-profile",
+          "kind": "reference",
+          "section": "Core systems",
+          "score": 0.41690665
+        }
+      ]
+    },
+    {
+      "id": "INC-WCI-0049",
+      "family": "WCI",
+      "expected": "wifi",
+      "top": "wifi",
+      "score": 0.7465234,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.7465234,
+      "best_wrong_score": 0.5243062,
+      "ranked": [
+        {
+          "doc": "wifi",
+          "section": "Symptoms",
+          "score": 0.7465234
+        },
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.5243062
+        },
+        {
+          "doc": "sso-mfa",
+          "section": "Known causes",
+          "score": 0.46945503
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Checks",
+          "score": 0.44679013
+        },
+        {
+          "doc": "shared-drive",
+          "section": "Known causes",
+          "score": 0.36327672
+        }
+      ],
+      "also": [
+        {
+          "doc": "company-profile",
+          "kind": "reference",
+          "section": "Core systems",
+          "score": 0.4115381
+        }
+      ]
+    },
+    {
+      "id": "INC-WCI-0056",
+      "family": "WCI",
+      "expected": "wifi",
+      "top": "wifi",
+      "score": 0.72458446,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.72458446,
+      "best_wrong_score": 0.538963,
+      "ranked": [
+        {
+          "doc": "wifi",
+          "section": "Symptoms",
+          "score": 0.72458446
+        },
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.538963
+        },
+        {
+          "doc": "sso-mfa",
+          "section": "Symptoms",
+          "score": 0.45736623
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Checks",
+          "score": 0.44503322
+        },
+        {
+          "doc": "shared-drive",
+          "section": "Known causes",
+          "score": 0.3929875
+        }
+      ],
+      "also": [
+        {
+          "doc": "company-profile",
+          "kind": "reference",
+          "section": "Core systems",
+          "score": 0.45559442
+        }
+      ]
+    },
+    {
+      "id": "INC-WCI-0057",
+      "family": "WCI",
+      "expected": "wifi",
+      "top": "wifi",
+      "score": 0.71351206,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.71351206,
+      "best_wrong_score": 0.47003925,
+      "ranked": [
+        {
+          "doc": "wifi",
+          "section": "Symptoms",
+          "score": 0.71351206
+        },
+        {
+          "doc": "vpn-access",
+          "section": "When to escalate",
+          "score": 0.47003925
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Checks",
+          "score": 0.44642383
+        },
+        {
+          "doc": "sso-mfa",
+          "section": "When to escalate",
+          "score": 0.4337362
+        },
+        {
+          "doc": "teams",
+          "section": "Known causes",
+          "score": 0.40766138
+        }
+      ],
+      "also": [
+        {
+          "doc": "company-profile",
+          "kind": "reference",
+          "section": "Core systems",
+          "score": 0.41774037
+        }
+      ]
+    },
+    {
+      "id": "INC-SIB-V0002",
+      "family": "SIB",
+      "expected": "software-install",
+      "top": "software-install",
+      "score": 0.7237061,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.7237061,
+      "best_wrong_score": 0.39625603,
+      "ranked": [
+        {
+          "doc": "software-install",
+          "section": "Symptoms",
+          "score": 0.7237061
+        },
+        {
+          "doc": "shared-drive",
+          "section": "Symptoms",
+          "score": 0.39625603
+        },
+        {
+          "doc": "device-compliance",
+          "section": "Symptoms",
+          "score": 0.3652737
+        },
+        {
+          "doc": "vpn-access",
+          "section": "When to escalate",
+          "score": 0.35948068
+        },
+        {
+          "doc": "wifi",
+          "section": "Symptoms",
+          "score": 0.35861164
+        }
+      ],
+      "also": [
+        {
+          "doc": "sec-07-software-and-admin-rights",
+          "kind": "policy",
+          "section": null,
+          "score": 0.6124929
+        }
+      ]
+    },
+    {
+      "id": "INC-LPD-V0007",
+      "family": "LPD",
+      "expected": "laptop-performance",
+      "top": "laptop-performance",
+      "score": 0.65915084,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.65915084,
+      "best_wrong_score": 0.43794975,
+      "ranked": [
+        {
+          "doc": "laptop-performance",
+          "section": "Known causes",
+          "score": 0.65915084
+        },
+        {
+          "doc": "wifi",
+          "section": "Known causes",
+          "score": 0.43794975
+        },
+        {
+          "doc": "teams",
+          "section": "Known causes",
+          "score": 0.40311837
+        },
+        {
+          "doc": "outlook",
+          "section": "Known causes",
+          "score": 0.37076044
+        },
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.33176723
+        }
+      ],
+      "also": []
+    },
+    {
+      "id": "INC-VDA-V0012",
+      "family": "VDA",
+      "expected": "vpn-access",
+      "top": "vpn-access",
+      "score": 0.74763006,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.74763006,
+      "best_wrong_score": 0.45865065,
+      "ranked": [
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.74763006
+        },
+        {
+          "doc": "shared-drive",
+          "section": "Checks",
+          "score": 0.45865065
+        },
+        {
+          "doc": "sso-mfa",
+          "section": "Symptoms",
+          "score": 0.44501683
+        },
+        {
+          "doc": "wifi",
+          "section": "Symptoms",
+          "score": 0.4393583
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Fix",
+          "score": 0.42525178
+        }
+      ],
+      "also": [
+        {
+          "doc": "company-profile",
+          "kind": "reference",
+          "section": "Core systems",
+          "score": 0.5000344
+        }
+      ]
+    },
+    {
+      "id": "INC-PDQ-V0013",
+      "family": "PDQ",
+      "expected": "printing",
+      "top": "printing",
+      "score": 0.81425864,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.81425864,
+      "best_wrong_score": 0.33118385,
+      "ranked": [
+        {
+          "doc": "printing",
+          "section": "Symptoms",
+          "score": 0.81425864
+        },
+        {
+          "doc": "hardware-peripherals",
+          "section": "Error codes",
+          "score": 0.33118385
+        },
+        {
+          "doc": "shared-drive",
+          "section": "Symptoms",
+          "score": 0.3274387
+        },
+        {
+          "doc": "onedrive",
+          "section": "Known causes",
+          "score": 0.3104877
+        },
+        {
+          "doc": "teams",
+          "section": "Error codes",
+          "score": 0.30898497
+        }
+      ],
+      "also": [
+        {
+          "doc": "escalation-queues",
+          "kind": "reference",
+          "section": null,
+          "score": 0.3933882
+        }
+      ]
+    },
+    {
+      "id": "INC-WCI-V0022",
+      "family": "WCI",
+      "expected": "wifi",
+      "top": "wifi",
+      "score": 0.76868534,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.76868534,
+      "best_wrong_score": 0.48430723,
+      "ranked": [
+        {
+          "doc": "wifi",
+          "section": "Symptoms",
+          "score": 0.76868534
+        },
+        {
+          "doc": "vpn-access",
+          "section": "When to escalate",
+          "score": 0.48430723
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Fix",
+          "score": 0.41998205
+        },
+        {
+          "doc": "sso-mfa",
+          "section": "Symptoms",
+          "score": 0.40473318
+        },
+        {
+          "doc": "shared-drive",
+          "section": "Symptoms",
+          "score": 0.3696466
+        }
+      ],
+      "also": [
+        {
+          "doc": "company-profile",
+          "kind": "reference",
+          "section": "Core systems",
+          "score": 0.43480805
+        }
+      ]
+    },
+    {
+      "id": "INC-WCI-V0023",
+      "family": "WCI",
+      "expected": "wifi",
+      "top": "wifi",
+      "score": 0.6694666,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.6694666,
+      "best_wrong_score": 0.4846079,
+      "ranked": [
+        {
+          "doc": "wifi",
+          "section": "Symptoms",
+          "score": 0.6694666
+        },
+        {
+          "doc": "vpn-access",
+          "section": "Fix",
+          "score": 0.4846079
+        },
+        {
+          "doc": "teams",
+          "section": "Symptoms",
+          "score": 0.41695836
+        },
+        {
+          "doc": "sso-mfa",
+          "section": "Known causes",
+          "score": 0.4069764
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Known causes",
+          "score": 0.38801903
+        }
+      ],
+      "also": [
+        {
+          "doc": "company-profile",
+          "kind": "reference",
+          "section": "Known organizational quirks",
+          "score": 0.37289757
+        }
+      ]
+    },
+    {
+      "id": "INC-WCI-V0024",
+      "family": "WCI",
+      "expected": "wifi",
+      "top": "wifi",
+      "score": 0.7197053,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.7197053,
+      "best_wrong_score": 0.4224272,
+      "ranked": [
+        {
+          "doc": "wifi",
+          "section": "Symptoms",
+          "score": 0.7197053
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Fix",
+          "score": 0.4224272
+        },
+        {
+          "doc": "sso-mfa",
+          "section": "Fix",
+          "score": 0.4149349
+        },
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.41292998
+        },
+        {
+          "doc": "shared-drive",
+          "section": "Symptoms",
+          "score": 0.3351116
+        }
+      ],
+      "also": [
+        {
+          "doc": "company-profile",
+          "kind": "reference",
+          "section": "Core systems",
+          "score": 0.40799516
+        }
+      ]
+    },
+    {
+      "id": "INC-SDA-V0028",
+      "family": "SDA",
+      "expected": "shared-drive",
+      "top": "shared-drive",
+      "score": 0.7040153,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.7040153,
+      "best_wrong_score": 0.37471098,
+      "ranked": [
+        {
+          "doc": "shared-drive",
+          "section": "Symptoms",
+          "score": 0.7040153
+        },
+        {
+          "doc": "onedrive",
+          "section": "Known causes",
+          "score": 0.37471098
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Checks",
+          "score": 0.36994338
+        },
+        {
+          "doc": "sso-mfa",
+          "section": "Symptoms",
+          "score": 0.30337924
+        },
+        {
+          "doc": "software-install",
+          "section": "When to escalate",
+          "score": 0.30130488
+        }
+      ],
+      "also": [
+        {
+          "doc": "sec-11-access-requests",
+          "kind": "policy",
+          "section": null,
+          "score": 0.44863445
+        }
+      ]
+    },
+    {
+      "id": "INC-SDA-V0030",
+      "family": "SDA",
+      "expected": "shared-drive",
+      "top": "shared-drive",
+      "score": 0.689393,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.689393,
+      "best_wrong_score": 0.3887244,
+      "ranked": [
+        {
+          "doc": "shared-drive",
+          "section": "Symptoms",
+          "score": 0.689393
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Checks",
+          "score": 0.3887244
+        },
+        {
+          "doc": "software-install",
+          "section": "When to escalate",
+          "score": 0.36574733
+        },
+        {
+          "doc": "onedrive",
+          "section": "Known causes",
+          "score": 0.3449801
+        },
+        {
+          "doc": "wifi",
+          "section": "Symptoms",
+          "score": 0.32748282
+        }
+      ],
+      "also": [
+        {
+          "doc": "sec-11-access-requests",
+          "kind": "policy",
+          "section": null,
+          "score": 0.5093031
+        }
+      ]
+    },
+    {
+      "id": "INC-DCP-V0035",
+      "family": "DCP",
+      "expected": "device-compliance",
+      "top": "device-compliance",
+      "score": 0.6364619,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.6364619,
+      "best_wrong_score": 0.58307236,
+      "ranked": [
+        {
+          "doc": "device-compliance",
+          "section": "Symptoms",
+          "score": 0.6364619
+        },
+        {
+          "doc": "outlook",
+          "section": "Known causes",
+          "score": 0.58307236
+        },
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.46331316
+        },
+        {
+          "doc": "sso-mfa",
+          "section": "Known causes",
+          "score": 0.46080482
+        },
+        {
+          "doc": "disk-encryption",
+          "section": "Known causes",
+          "score": 0.438775
+        }
+      ],
+      "also": [
+        {
+          "doc": "sec-09-device-compliance",
+          "kind": "policy",
+          "section": null,
+          "score": 0.5700007
+        }
+      ]
+    },
+    {
+      "id": "INC-OES-V0040",
+      "family": "OES",
+      "expected": "outlook",
+      "top": "outlook",
+      "score": 0.73450625,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.73450625,
+      "best_wrong_score": 0.37992874,
+      "ranked": [
+        {
+          "doc": "outlook",
+          "section": "Known causes",
+          "score": 0.73450625
+        },
+        {
+          "doc": "onedrive",
+          "section": "Symptoms",
+          "score": 0.37992874
+        },
+        {
+          "doc": "sso-mfa",
+          "section": "Known causes",
+          "score": 0.37874675
+        },
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.37153155
+        },
+        {
+          "doc": "teams",
+          "section": "When to escalate",
+          "score": 0.34065062
+        }
+      ],
+      "also": []
+    },
+    {
+      "id": "INC-OES-V0042",
+      "family": "OES",
+      "expected": "outlook",
+      "top": "outlook",
+      "score": 0.7273422,
+      "hit": true,
+      "false_match": false,
+      "rank": 1,
+      "right_score": 0.7273422,
+      "best_wrong_score": 0.39818186,
+      "ranked": [
+        {
+          "doc": "outlook",
+          "section": "Symptoms",
+          "score": 0.7273422
+        },
+        {
+          "doc": "sso-mfa",
+          "section": "Known causes",
+          "score": 0.39818186
+        },
+        {
+          "doc": "account-lockout",
+          "section": "Checks",
+          "score": 0.3853904
+        },
+        {
+          "doc": "device-compliance",
+          "section": "Error codes",
+          "score": 0.36367774
+        },
+        {
+          "doc": "vpn-access",
+          "section": "Known causes",
+          "score": 0.3334631
+        }
+      ],
+      "also": []
+    }
+  ]
+}

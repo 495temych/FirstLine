@@ -73,8 +73,6 @@ test("the scoreboard shows a saved evaluation", async ({ page }) => {
   await page.getByRole("button", { name: "Scoreboard" }).click();
   await expect(page.getByText("rules set (tiny)")).toBeVisible();
   await expect(page.getByLabel("Open an evaluation")).toBeVisible();
-  await expect(page.getByText("unseen, development")).toBeVisible();
-  await expect(page.getByLabel("Open a retrieval score")).toBeVisible();
 });
 
 test("the tickets tab can be filtered", async ({ page }) => {
@@ -150,6 +148,26 @@ test("how it works fits a phone", async ({ page }) => {
   await page.goto("/");
   await page.getByRole("button", { name: "How it works" }).click();
   await expect(page.getByText(/correct first pass/).first()).toBeVisible();
+  const overflow = await page.evaluate(
+    () => document.documentElement.scrollWidth - window.innerWidth,
+  );
+  expect(overflow).toBeLessThanOrEqual(0);
+});
+
+test("retrieval shows its scores and runs a search", async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 812 });
+  await page.goto("/");
+  await page.getByRole("button", { name: "Retrieval" }).click();
+  await expect(
+    page.getByText(/correctly finds none/, { exact: false }),
+  ).toBeVisible();
+  await page
+    .getByLabel("A request, as someone would write it")
+    .fill("My VPN drops");
+  await page
+    .getByRole("button", { name: "Search the knowledge base, free" })
+    .click();
+  await expect(page.getByText("The knowledge base is empty.")).toBeVisible();
   const overflow = await page.evaluate(
     () => document.documentElement.scrollWidth - window.innerWidth,
   );

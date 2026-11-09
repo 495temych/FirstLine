@@ -4,11 +4,13 @@ import { Tickets } from "./Tickets";
 import { Assistant } from "./Assistant";
 import { Queue } from "./Queue";
 import { HowItWorks } from "./HowItWorks";
+import { Retrieval } from "./Retrieval";
 
 const tabs = [
   "Queue",
   "Assistant",
   "Scoreboard",
+  "Retrieval",
   "Tickets",
   "How it works",
 ] as const;
@@ -55,6 +57,7 @@ export function App() {
         </div>
         {tab === "Scoreboard" && <Scoreboard />}
         {tab === "Tickets" && <Tickets />}
+        {tab === "Retrieval" && <Retrieval />}
         {tab === "How it works" && <HowItWorks />}
       </main>
     </>

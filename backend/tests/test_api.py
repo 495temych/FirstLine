@@ -228,13 +228,6 @@ def test_evaluations_show_a_saved_run(client, monkeypatch):
     assert runs[0]["summary"]["n"] == 5
 
 
-def test_evaluations_show_saved_retrieval_scores(client):
-    assert client.get("/api/evaluations").json()["retrieval"] == []
-    run = {"id": "20261107-retrieval-dev", "set": "dev"}
-    retrieval_score.save_run(run)
-    assert client.get("/api/evaluations").json()["retrieval"] == [run]
-
-
 def test_tickets_to_review_have_requesters_and_labels(client):
     tickets = client.get("/api/tickets").json()
     assert len(tickets) == 206

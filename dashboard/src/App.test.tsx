@@ -76,13 +76,14 @@ async function triage(run: Partial<Run> = {}) {
   await screen.findByText("My VPN fails", { selector: ".query" });
 }
 
-it("opens on the Queue, with four more tabs", async () => {
+it("opens on the Queue, with five more tabs", async () => {
   render(<App />);
   expect(screen.getByRole("heading", { name: "FirstLine" })).toBeDefined();
   for (const tab of [
     "Queue",
     "Assistant",
     "Scoreboard",
+    "Retrieval",
     "Tickets",
     "How it works",
   ]) {
@@ -278,25 +279,10 @@ it("says when no statistics exist yet", async () => {
 });
 
 it("says when the scoreboard has no evaluations", async () => {
-  replies["/api/evaluations"] = { ...evaluations, runs: [], retrieval: [] };
-  render(<App />);
-  click("Scoreboard");
-  expect(await screen.findByText(/No evaluations yet/)).toBeDefined();
-});
-
-it("shows retrieval scores with no evaluations, and opens another one", async () => {
   replies["/api/evaluations"] = { ...evaluations, runs: [] };
   render(<App />);
   click("Scoreboard");
-  expect(await screen.findByText("unseen, development")).toBeDefined();
-  expect(screen.queryByLabelText("Open an evaluation")).toBeNull();
-  expect(screen.getByText("Account lockout")).toBeDefined();
-  fireEvent.change(screen.getByLabelText("Open a retrieval score"), {
-    target: { value: "20261107-retrieval-unseen_dev" },
-  });
-  expect(screen.getByText("Certificate expiry")).toBeDefined();
-  expect(screen.getByText("93%")).toBeDefined();
-  expect(screen.queryByText("Account lockout")).toBeNull();
+  expect(await screen.findByText(/No evaluations yet/)).toBeDefined();
 });
 
 it("shows saved evaluations and opens another one", async () => {

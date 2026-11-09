@@ -13,6 +13,7 @@ RUNS_DIR = config.EVALS_DIR / "retrieval"
 DEFAULT_SPLITS = ("dev", "unseen_dev")
 SPLITS = ("kb", "dev", "held_out", "unseen_dev", "unseen_held_out")
 RECALL_AT = 2
+RANKS_KEPT = 5  # each ticket keeps its best few playbooks, for the Retrieval page
 HIT_RATE_FLOOR = 0.95
 
 
@@ -33,12 +34,24 @@ def _rank_of(expected_doc: str | None, ranked: list[dict]) -> int | None:
     return docs.index(expected_doc) + 1 if expected_doc in docs else None
 
 
+def _scores(expected_doc: str | None, ranked: list[dict]) -> tuple:
+    """The right playbook's score, and the best wrong one's."""
+    right = next((r.get("score") for r in ranked if r["doc"] == expected_doc), None)
+    wrong = next((r.get("score") for r in ranked if r["doc"] != expected_doc), None)
+    return right, wrong
+
+
 def score_ticket(
     ticket: dict, expected_doc: str | None, retrieved: list[dict], ranked: list[dict]
 ) -> dict:
-    """Score the playbook returned against the one the family should find."""
+    """Score the playbook returned against the one the family should find.
+
+    The row keeps the best playbooks with their scores, and the other sections
+    returned, so a saved score shows why each ticket matched as it did.
+    """
     top = next((r for r in retrieved if r["kind"] == "playbook"), None)
     doc = top["doc"] if top else None
+    right_score, best_wrong_score = _scores(expected_doc, ranked)
     return {
         "id": ticket["id"],
         "family": family_of(ticket["id"]),
@@ -48,6 +61,22 @@ def score_ticket(
         "hit": expected_doc is not None and doc == expected_doc,
         "false_match": expected_doc is None and doc is not None,
         "rank": _rank_of(expected_doc, ranked),
+        "right_score": right_score,
+        "best_wrong_score": best_wrong_score,
+        "ranked": [
+            {"doc": r["doc"], "section": r.get("section"), "score": r.get("score")}
+            for r in ranked[:RANKS_KEPT]
+        ],
+        "also": [
+            {
+                "doc": r["doc"],
+                "kind": r["kind"],
+                "section": r.get("section"),
+                "score": r["score"],
+            }
+            for r in retrieved
+            if r["kind"] != "playbook"
+        ],
     }
 
 
@@ -128,6 +157,7 @@ def evaluate(name: str) -> dict:
         "top_k": retrieval.TOP_K,
         "summary": summarize(rows),
         "by_family": by_family(rows, families),
+        "tickets": rows,
     }
 
 

@@ -276,6 +276,12 @@ Each design decision so far, with its reason and its trade-off.
 - **Reason:** a page that explains the agent is only worth reading if it is true. Tests fail when a node or tool has no explanation, when the gates differ from the nodes that wait for a person, or when a drawn line isn't a route the graph takes.
 - **Trade-off:** the explanations still need a person to keep them accurate, and the examples come from whichever development run is newest.
 
+## Retrieval has its own page, and one rule decides a match
+
+- **Decision:** saved retrieval scores keep each ticket's ranked playbooks, and the Retrieval tab draws them, replacing the Scoreboard's retrieval tables. `why_matched` in `agent/retrieval.py` is the one place that decides a match, and both search and the page's "Try a search" use it.
+- **Reason:** a hit rate alone can't show why the thresholds sit where they do. The per-ticket scores show the gap between the weakest right match and the strongest unseen one, and a reader can test the rule on their own words for free.
+- **Trade-off:** a saved development score grows from 1 KB to about 140 KB. Each ticket keeps only its best five playbooks, enough to explain it.
+
 ## Known limitations
 
 - **Synthetic knowledge base.** A real deployment needs real client documentation.
