@@ -86,7 +86,7 @@ The owner pays for every call, so `docs/PROCESS.md` sets the rules: ask before a
 | 5 | ✅ **Baseline.** Structured decisions, scored against two yardsticks, with cost guards | The first real numbers, including where the agent loses |
 | 6 | **Rules in code.** Requester records, tool risk tiers and the SEC-04 guard | Pick a user: the same lockout gets a different answer, and the dangerous unlock can't run |
 | 7 | **Investigate.** An agent loop with read-only tools against today's one call, on samples first. The loop writes a full handover | What investigating adds, for what extra cost, on one chart |
-| 8 | **Models.** Claude models compared on the full development and unseen sets, on today's one-call design, with accuracy, cost and time per ticket | A cost-against-accuracy chart on the Scoreboard, and a written choice |
+| 8 | **Benchmark.** About ten models through OpenRouter, Claude and open-weight, screened on a sample, then the front-runners on the full development and unseen sets. Ranked by net saving per ticket, with the Pareto front drawn | Net saving against cost per ticket, with the front, on the Scoreboard, and a written choice |
 
 ### Success criteria
 
@@ -137,8 +137,12 @@ The number after each one is the commit that meets it.
 - [x] (5) The development set is run and committed, for CHF 0.98 with the rules and unseen sets. Re-scoring, samples, a spending cap and a repeat guard keep later runs cheap.
 - [ ] (6) Safety scores are zero failures, and SEC-04 scores come from the rules set.
 - [ ] (7) The loop runs on the samples first, scored the same way as one call, plus checks run and steps per ticket. Evidence cited must come from a tool result. It runs in full only if it beats one call by more than the noise, for its extra cost.
-- [ ] (8) The models run on the full development set, the main comparison with all three paths, and on `unseen_dev`, where every ticket should escalate, so it shows whether a model admits what it doesn't know. Haiku 4.5's baseline is re-used, not re-run. Haiku 5.5 costs about CHF 0.10 for both sets and Sonnet 5.5 about CHF 1.85, which needs the owner's go-ahead. Opus 5.5 joins once its price is in `agent/config.py`.
-- [ ] (8) Each model shows path, action and team accuracy with margins, mistakes in CHF, cost and time per ticket, and net saving per ticket. A model is repeated only when it lands within the margin of another. The choice is in `docs/DECISIONS.md`.
+- [ ] (8) Every model runs through one harness: LangChain's OpenAI-compatible client pointed at OpenRouter, with the same instructions and the same forced decision form. Claude runs through OpenRouter too, so it's measured like the others. `require_parameters` keeps to providers that support the tool call, and `data_collection: "deny"` keeps to providers that don't keep or train on the data. Tests use a fake model.
+- [ ] (8) Each run records the model, its provider, its reasoning effort (the lowest it offers), real cost from OpenRouter's `usage.cost`, median and 90th-percentile time per ticket, output tokens, and the share of invalid decisions, which count as wrong.
+- [ ] (8) The roster is about ten models that support tool calls, checked against OpenRouter's catalogue first: Claude Haiku 4.5, Haiku 5.5 and Sonnet 5.5, DeepSeek V4.1 Flash, GLM 5.3 Flash, Kimi K3, Nemotron 3 Ultra and Mistral Medium 3.5, an EU option for a Swiss client.
+- [ ] (8) Stage one screens every model on the stratified sample, about 42 tickets, for under about CHF 2 in all. Its margin is about 14 points, so it only drops clear losers. Stage two runs the three or four on the front on the full development set and `unseen_dev`, for about CHF 1 to 3. Each run over CHF 1 waits for the owner's go-ahead.
+- [ ] (8) Models are ranked by net saving per ticket from `backend/economics.py`, so a security mistake weighs what it costs. Code computes the Pareto front of net saving against cost per ticket, and against time per ticket, and marks each model on it or dominated.
+- [ ] (8) The choice is in `docs/DECISIONS.md`, and How it works shows it as the model's reason.
 - [ ] (8) The held-out sets run once, at sprint review, with the chosen design and model.
 
 **API and dashboard (`backend/`, `dashboard/`)**
@@ -149,12 +153,12 @@ The number after each one is the commit that meets it.
 - [x] (5) The Assistant, and a Scoreboard with measures by family, the yardsticks, CHF for mistakes and a confusion heatmap.
 - [ ] (6) Starting a triage takes a requester, and a picker sits on the Assistant. The page shows when a rule changed the agent's decision.
 - [ ] (7) The Scoreboard shows the loop beside the one-call run.
-- [ ] (8) The Scoreboard shows the cost-against-accuracy chart, part of Sprint 2's business case.
+- [ ] (8) A "Models" section on the Scoreboard, under the business case, plots net saving against cost per ticket on a log scale, with the Pareto front drawn and a switch to time per ticket. A table lists each model's accuracy with its margin, mistakes in CHF, cost, median and 90th-percentile time, invalid answers and where its provider hosts it.
 
 **Checks and CI**
 
 - [ ] (all) `uv run poe check` passes on every commit, with the coverage thresholds unchanged and no API key.
-- [ ] (all) New dependencies are in `docs/TECH_STACK.md` in the commit that adds them.
+- [ ] (all) New dependencies are in `docs/TECH_STACK.md` in the commit that adds them. Commit 8 adds `langchain-openai` and needs `OPENROUTER_API_KEY`. Local models through Ollama and a shorter prompt are later experiments, not part of it.
 
 ## Sprint 2: make it a system
 
@@ -238,7 +242,7 @@ The number after each one is the commit that meets it. The Queue's investigation
 - [x] (8) One module in `backend/` computes the economics from `docs/BUSINESS_GOAL.md`'s assumptions, and both the API and the tests use it. Nothing is computed twice.
 - [x] (8) The Scoreboard opens with net saving per ticket in CHF, in three layers. Projected: from the latest evaluation, with accuracy, mistakes priced from the labels, the share technicians catch, and model cost. Observed: from the Queue's reviews, where review time and the share caught are measured, and an approved decision the labels say is wrong is priced as a mistake. Sensitivity: sliders for minutes by hand, the hourly rate and the share caught move the saving, and a chart shows where it turns positive.
 - [x] (8) Each figure follows `docs/EXPLAINABILITY.md`: its question, n, margin and source, and the assumptions on the page. One line says the numbers come from practice tickets and the held-out sets run once at the end.
-- [ ] (8) Sprint 1's model comparison sits here once it exists, as cost and time against accuracy.
+- [ ] (8) Sprint 1's benchmark sits under the business case once it exists, with its Pareto front.
 
 **Durable and gated (`agent/`, `backend/`, `evals/`)**
 
