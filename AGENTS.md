@@ -18,6 +18,8 @@ IMPORTANT: before you plan, build or change anything, read each of these in full
 8. `docs/DECISIONS.md`: design decisions, their trade-offs and the known limitations
 9. `docs/BRAND.md`: how the dashboard looks, before any dashboard work
 10. `docs/EXPLAINABILITY.md`: how a page explains the project, before any dashboard work
+11. `docs/BUDGET.md`: how we keep spending low, before choosing a model, service or run
+12. `docs/SWISS.md`: where data may go, before adding a service or provider
 
 ## Folders
 

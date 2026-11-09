@@ -56,6 +56,14 @@ When asked to implement, as in "Please implement commit 3", build that one commi
 3. Tick off its criteria and update `docs/STATUS.md`.
 4. Commit, show the running result, and stop for review.
 
+## Docs
+
+The docs disclose progressively: `AGENTS.md` is the map, each doc opens with what it's for and where its details live, and the details come after.
+
+- **One home per fact.** A rule, number or decision is written once, in the doc it belongs to. Others link to it instead of repeating it.
+- **Principles above rules above code.** A principle doc (`docs/BUDGET.md`, `docs/SWISS.md`) says why, `docs/PROCESS.md` and `docs/TECH_STACK.md` say what we do here, and the code is the final word.
+- **Change it in its home.** When a fact changes, change the one place it lives, and check that nothing else restates it.
+
 ## Rules
 
 - Tests never call a model. Use a stub. `conftest.py` makes an unstubbed model raise, and the browser tests use `e2e/server.py`.
@@ -70,7 +78,7 @@ When asked to implement, as in "Please implement commit 3", build that one commi
 
 ## Spending
 
-The owner pays for every model call, so we spend as little as gets a trustworthy number. A full practice run of 206 tickets costs about CHF 1 today.
+The owner pays for every model call, so we spend as little as gets a trustworthy number. The principles are in `docs/BUDGET.md`, and these are the rules for model runs. A full practice run of 206 tickets costs about CHF 1 today.
 
 - **Ask before any run over CHF 1**, and say what it costs and why it's needed. Smaller runs still get a line saying what they cost.
 - **Never re-run the model when only the labels change.** Use `--rescore`, which is free.
