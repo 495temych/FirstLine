@@ -177,7 +177,7 @@ The number after each one is the commit that meets it.
 | 5 | **Durable and gated.** Retries, no repeated actions, spending limits per batch, and a release gate: a change ships only if its Langfuse experiment passes | Kill a batch mid-run and it carries on without doing anything twice. A worse change is refused | Idempotency, `RetryPolicy`, evals as a release gate |
 | 9 ✅ | **Three groups.** The tabs regroup into Try it (Queue, Assistant), Is it worth it? (Money, Models) and How it works (Workflow, Harness, Knowledge base, Retrieval, Tickets, Evaluations), each view with its own link, and each group opens with what its views show | Send someone a link straight to a playbook or a model's run | Explain the system in layers |
 | 10 | **Knowledge base.** A tab to explore what the agent knows: a cause map from each playbook's causes to the path, fix or queue they lead to, the policies that override them, the families with no playbook, and how the agent does on each | Click a cause and see the fix it allows, its risk tier, and how often the agent gets it right | Make the knowledge, not just the answer, inspectable |
-| 11 | **The harness.** A tab that draws what surrounds the model on one ticket: what it reads, the one tool it can call to decide, the form it fills, the limits it runs under, and the checks code makes on its answer. The fixes it proposes stay on Workflow | Pick a ticket and see exactly what the model read and what it answered | Agents need a harness: instructions, tools, limits and checks |
+| 11 ✅ | **The harness.** A tab that draws what surrounds the model on one ticket: what it reads, the one tool it can call to decide, the form it fills, the limits it runs under, and the checks code makes on its answer. The fixes it proposes stay on Workflow | Pick a ticket and see exactly what the model read and what it answered | Agents need a harness: instructions, tools, limits and checks |
 
 The Queue's first version is in: batches, live states, review with measured time, traces in the UI and the value in CHF. Since commit 3a it keeps its record in Supabase and survives a restart. The agent doesn't investigate yet.
 
@@ -269,11 +269,11 @@ The number after each one is the commit that meets it. The Queue's investigation
 
 **The harness (`backend/`, `dashboard/`)**
 
-- [ ] (11) `GET /api/harness` builds the view from the code, with no model calls: the instructions file and its sections, how search chooses sections (embedding model, thresholds, how many), what the model reads and in what order, the model, its provider, reasoning effort, token limit and retries, the decision form's fields in order with their descriptions from `agent/decision.py`, and every check code makes on the answer, with where a failure goes.
-- [ ] (11) A "Harness" tab under How it works draws one ticket's model call as a schematic: what goes in, the model, the one tool it calls to decide, the form it fills, code's checks, and the human gate after. Only the tools used to decide are drawn; the fixes it may propose are counted and link to Workflow.
-- [ ] (11) It says plainly that there's no loop yet: the model decides in one pass and can't look anything up, and the investigation loop of Sprint 1's commit 7 would change that.
-- [ ] (11) Picking a development ticket shows what the model read, its search results with scores, and what the default model decided in its latest saved run, for free.
-- [ ] (11) A test fails when a decision field or a check has no explanation, and the schematic has a text equivalent. It passes the checklist in `docs/EXPLAINABILITY.md`.
+- [x] (11) `GET /api/harness` builds the view from the code, with no model calls: the instructions file and its sections, how search chooses sections (embedding model, thresholds, how many), what the model reads and in what order, the model, its provider, reasoning effort, token limit and retries, the decision form's fields in order with their descriptions from `agent/decision.py`, and every check code makes on the answer, with where a failure goes.
+- [x] (11) A "Harness" tab under How it works draws one ticket's model call as a schematic: what goes in, the model, the one tool it calls to decide, the form it fills, code's checks, and the human gate after. Only the tools used to decide are drawn; the fixes it may propose are counted and link to Workflow.
+- [x] (11) It says plainly that there's no loop yet: the model decides in one pass and can't look anything up, and the investigation loop of Sprint 1's commit 7 would change that.
+- [x] (11) Picking a development ticket shows what the model read, its search results with scores, and what the default model decided in its latest saved run, for free.
+- [x] (11) A test fails when a decision field or a check has no explanation, and the schematic has a text equivalent. It passes the checklist in `docs/EXPLAINABILITY.md`.
 
 **Durable and gated (`agent/`, `backend/`, `evals/`)**
 

@@ -11,6 +11,7 @@ import type { Run } from "./api";
 import { App } from "./App";
 import { presets } from "./presets";
 import { benchmark } from "./test-benchmark";
+import { harness, vpnTicket } from "./test-harness";
 import { insights } from "./test-insights";
 import { overview } from "./test-overview";
 import {
@@ -52,6 +53,8 @@ beforeEach(() => {
     "/api/benchmark": benchmark,
     "/api/insights": insights,
     "/api/overview": overview,
+    "/api/harness": harness,
+    [`/api/harness/tickets/${vpnTicket.id}`]: vpnTicket,
   };
   window.history.replaceState(null, "", "/");
   vi.stubGlobal("fetch", vi.fn(reply));
@@ -150,6 +153,20 @@ it("opens each group with its question and findings, linked to their views", asy
   expect(screen.getByText("20261109T105136-retrieval-dev")).toBeDefined();
   open("See Retrieval");
   expect(window.location.search).toBe("?view=retrieval");
+});
+
+it("explains the harness under How it works", async () => {
+  render(<App />);
+  open("How it works", "Harness");
+  expect(window.location.search).toBe("?view=harness");
+  expect(
+    await screen.findByRole("list", {
+      name: "One ticket's model call, station by station",
+    }),
+  ).toBeDefined();
+  expect(
+    await screen.findByRole("list", { name: "Found for this ticket" }),
+  ).toBeDefined();
 });
 
 it("keeps a modified click for the browser to open in a new tab", () => {

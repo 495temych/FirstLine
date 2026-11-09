@@ -3,6 +3,7 @@ import { api } from "./api";
 import { Assistant } from "./Assistant";
 import { BusinessCase } from "./BusinessCase";
 import { Evaluations } from "./Evaluations";
+import { Harness } from "./Harness";
 import { HowItWorks } from "./HowItWorks";
 import type { Insights } from "./insights";
 import { Models } from "./Models";
@@ -132,6 +133,7 @@ export function App() {
         {view === "money" && <BusinessCase />}
         {view === "models" && <Models />}
         {view === "workflow" && <HowItWorks />}
+        {view === "harness" && <Harness />}
         {view === "retrieval" && <Retrieval />}
         {view === "tickets" && <Tickets />}
         {view === "evaluations" && <Evaluations />}

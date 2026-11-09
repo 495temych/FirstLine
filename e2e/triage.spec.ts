@@ -224,3 +224,19 @@ test("the business case fits a phone", async ({ page }) => {
   );
   expect(overflow).toBeLessThanOrEqual(0);
 });
+
+test("the harness draws one call and fits a phone", async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 812 });
+  await page.goto("/");
+  await open(page, "How it works", "Harness");
+  await expect(
+    page.getByRole("complementary", { name: "The loop" }),
+  ).toContainText("No loop yet.");
+  await expect(
+    page.getByText("record_decision, which it must call"),
+  ).toBeVisible();
+  const overflow = await page.evaluate(
+    () => document.documentElement.scrollWidth - window.innerWidth,
+  );
+  expect(overflow).toBeLessThanOrEqual(0);
+});

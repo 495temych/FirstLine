@@ -22,6 +22,7 @@ export const groups = [
     label: "How it works",
     views: [
       { id: "workflow", label: "Workflow" },
+      { id: "harness", label: "Harness" },
       { id: "retrieval", label: "Retrieval" },
       { id: "tickets", label: "Tickets" },
       { id: "evaluations", label: "Evaluations" },

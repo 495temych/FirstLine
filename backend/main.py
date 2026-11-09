@@ -20,6 +20,7 @@ from agent.graph import build_graph, initial_state
 from backend import (
     benchmark,
     economics,
+    harness,
     insights,
     overview,
     queue_board,
@@ -57,6 +58,7 @@ app.include_router(retrieval_view.router)
 app.include_router(economics.router)
 app.include_router(benchmark.router)
 app.include_router(insights.router)
+app.include_router(harness.router)
 
 _gate_lock = Lock()  # two answers to one gate must not both pass its check
 

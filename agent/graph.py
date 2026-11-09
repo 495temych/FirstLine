@@ -205,7 +205,8 @@ def _is_api_error(exc: BaseException) -> bool:
     )
 
 
-_API_RETRY = RetryPolicy(max_attempts=3, retry_on=_is_api_error)
+MODEL_ATTEMPTS = 3  # a model call that fails for a passing reason is tried this often
+_API_RETRY = RetryPolicy(max_attempts=MODEL_ATTEMPTS, retry_on=_is_api_error)
 
 
 def _is_search_error(exc: BaseException) -> bool:
