@@ -1,6 +1,5 @@
 import type { Benchmark } from "./benchmark";
 import type { Harness, HarnessTicket } from "./harnessData";
-import type { Insights } from "./insights";
 export type Path =
   "SELF_SERVE" | "AUTO_FIX" | "ESCALATE" | "OUT_OF_SCOPE" | "NO_TOOLS";
 
@@ -517,7 +516,6 @@ export const api = {
   overview: () => request<Overview>("/api/overview"),
   retrieval: () => request<RetrievalView>("/api/retrieval"),
   benchmark: () => request<Benchmark>("/api/benchmark"),
-  insights: () => request<Insights>("/api/insights"),
   harness: () => request<Harness>("/api/harness"),
   harnessTicket: (id: string) =>
     request<HarnessTicket>(`/api/harness/tickets/${id}`),

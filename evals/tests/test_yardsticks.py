@@ -44,16 +44,3 @@ def test_the_classifier_learns_from_the_text():
 def test_yardsticks_train_only_on_the_knowledge_base_split():
     assert yardsticks.TRAINING_SPLIT == "kb"
     assert len(runner.load_imported(yardsticks.TRAINING_SPLIT)) == 384
-
-
-def test_the_family_alone_decides_most_answers():
-    def answer(family, path):
-        return {}, {"family": family, "paths": [path], "tools": [], "queues": []}
-
-    pairs = [
-        answer("a", "SELF_SERVE"),
-        answer("a", "SELF_SERVE"),
-        answer("a", "ESCALATE"),
-        answer("b", "OUT_OF_SCOPE"),
-    ]
-    assert yardsticks.family_decides(pairs) == 3

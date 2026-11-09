@@ -4,7 +4,7 @@ One always gives the most common answer. The other is a small classifier on the 
 text. Neither ever decides a real ticket, and the classifier stays out of `agent/`.
 """
 
-from collections import Counter, defaultdict
+from collections import Counter
 
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
@@ -13,7 +13,6 @@ from sklearn.pipeline import Pipeline, make_pipeline
 from evals import scoring
 
 TRAINING_SPLIT = "kb"
-LABELS_SOURCE = "data/evals/cause_labels.json"  # where each ticket's answer is kept
 SEPARATOR = "|"
 
 
@@ -53,11 +52,3 @@ def score(pairs: list[tuple[dict, dict]], training: list[tuple[dict, dict]]) -> 
         "most_common": _score(pairs, [common] * len(pairs)),
         "classifier": _score(pairs, list(classifier.predict(texts))),
     }
-
-
-def family_decides(pairs: list[tuple[dict, dict]]) -> int:
-    """How many tickets get the right answer from their family's most common one."""
-    by_family: dict[str, Counter] = defaultdict(Counter)
-    for _, answer in pairs:
-        by_family[answer["family"]][target(answer)] += 1
-    return sum(c.most_common(1)[0][1] for c in by_family.values())

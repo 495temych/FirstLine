@@ -78,9 +78,6 @@ test("a gate survives a reload", async ({ page }) => {
 test("each group shows its views, and a saved evaluation", async ({ page }) => {
   await page.goto("/");
   await open(page, "Is it worth it?");
-  await expect(
-    page.getByText("Does it pay, and on which model?"),
-  ).toBeVisible();
   await expect(page.getByText(/nothing to project/)).toBeVisible();
   await open(page, "Models");
   await expect(

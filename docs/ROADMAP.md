@@ -253,7 +253,7 @@ The number after each one is the commit that meets it. The Queue's investigation
 - [x] (9) Every saved run moves from under Models to its own Evaluations tab, so the business group keeps only the answer.
 - [x] (9) Each view has its own link, such as `?view=kb&doc=vpn-access`, and a reload or a shared link opens the same view. A paused Assistant run still opens from its link.
 - [x] (9) The navigation works with the keyboard and at phone width, with no sideways scrolling.
-- [x] (9) Each group opens with its question and two or three findings that answer it, from `GET /api/insights`, built from saved runs, the benchmark and the Queue's reviews, with no model calls. A group with no data says what would fill it.
+- [x] (9) Each group opened with its question and two or three findings. The owner found them hard to read and not needed, so they were removed; each view now opens with its own answer.
 - [x] (9) Tabs that aren't built yet, such as Knowledge base before commit 10, don't appear.
 
 **Knowledge base (`backend/`, `dashboard/`)**

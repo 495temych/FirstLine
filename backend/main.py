@@ -21,7 +21,6 @@ from backend import (
     benchmark,
     economics,
     harness,
-    insights,
     overview,
     queue_board,
     retrieval_view,
@@ -57,7 +56,6 @@ app.include_router(overview.router)
 app.include_router(retrieval_view.router)
 app.include_router(economics.router)
 app.include_router(benchmark.router)
-app.include_router(insights.router)
 app.include_router(harness.router)
 
 _gate_lock = Lock()  # two answers to one gate must not both pass its check

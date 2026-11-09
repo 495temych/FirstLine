@@ -12,7 +12,6 @@ import { App } from "./App";
 import { presets } from "./presets";
 import { benchmark } from "./test-benchmark";
 import { harness, vpnTicket } from "./test-harness";
-import { insights } from "./test-insights";
 import { overview } from "./test-overview";
 import {
   baseRun,
@@ -51,7 +50,6 @@ beforeEach(() => {
     "/api/stats": stats,
     "/api/queue": emptyQueue,
     "/api/benchmark": benchmark,
-    "/api/insights": insights,
     "/api/overview": overview,
     "/api/harness": harness,
     [`/api/harness/tickets/${vpnTicket.id}`]: vpnTicket,
@@ -141,18 +139,6 @@ it("opens the Queue for a link to a view that doesn't exist", () => {
   expect(
     screen.getByRole("link", { name: "Queue" }).getAttribute("aria-current"),
   ).toBe("page");
-});
-
-it("opens each group with its question and findings, linked to their views", async () => {
-  render(<App />);
-  open("How it works");
-  expect(
-    await screen.findByText("Why does it decide that, and how do we know?"),
-  ).toBeDefined();
-  expect(screen.getByText(/Search finds the right playbook/)).toBeDefined();
-  expect(screen.getByText("20261109T105136-retrieval-dev")).toBeDefined();
-  open("See Retrieval");
-  expect(window.location.search).toBe("?view=retrieval");
 });
 
 it("explains the harness under How it works", async () => {

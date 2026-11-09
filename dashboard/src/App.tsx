@@ -1,17 +1,14 @@
 import { useEffect, useState, type MouseEvent } from "react";
-import { api } from "./api";
 import { Assistant } from "./Assistant";
 import { BusinessCase } from "./BusinessCase";
 import { Evaluations } from "./Evaluations";
 import { Harness } from "./Harness";
 import { HowItWorks } from "./HowItWorks";
-import type { Insights } from "./insights";
 import { Models } from "./Models";
-import { groupOf, groups, labelOf, linkTo, viewFrom, type ViewId } from "./nav";
+import { groupOf, groups, linkTo, viewFrom, type ViewId } from "./nav";
 import { Queue } from "./Queue";
 import { Retrieval } from "./Retrieval";
 import { Tickets } from "./Tickets";
-import { useLoad } from "./useLoad";
 
 /** A link to a view that opens without reloading the page. */
 function ViewLink({
@@ -40,43 +37,10 @@ function ViewLink({
   );
 }
 
-function GroupIntro({
-  insights,
-  view,
-  go,
-}: Readonly<{ insights: Insights; view: ViewId; go: (view: ViewId) => void }>) {
-  const group = groupOf(view);
-  const { question, findings } = insights[group.id];
-  return (
-    <section className="group-intro" aria-label={question}>
-      <p className="group-question">{question}</p>
-      <ul>
-        {findings.map((f) => (
-          <li key={f.text}>
-            {f.text}{" "}
-            <span className="quiet">
-              <code>{f.source}</code>
-              {f.view !== view && (
-                <>
-                  {", "}
-                  <ViewLink view={f.view} current={false} go={go}>
-                    {`See ${labelOf(f.view)}`}
-                  </ViewLink>
-                </>
-              )}
-            </span>
-          </li>
-        ))}
-      </ul>
-    </section>
-  );
-}
-
 export function App() {
   const [view, setView] = useState<ViewId>(() =>
     viewFrom(window.location.search),
   );
-  const { data: insights } = useLoad(api.insights);
   const group = groupOf(view);
 
   useEffect(() => {
@@ -122,7 +86,6 @@ export function App() {
         ))}
       </nav>
       <main>
-        {insights && <GroupIntro insights={insights} view={view} go={go} />}
         {/* Both stay mounted, so a running batch or a paused run survives a switch. */}
         <div hidden={view !== "queue"}>
           <Queue />
