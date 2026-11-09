@@ -36,6 +36,8 @@ export interface Benchmark {
   sets: Record<BenchmarkSet, { set: BenchmarkSet; entries: BenchmarkEntry[] }>;
   rule: string;
   chosen: { model: string | null; label: string | null; best: string } | null;
+  /** The model the product runs on today, which the owner sets. */
+  default: { model: string; label: string };
   insights: { question: string; answer: string }[];
   catch_rate: number;
 }

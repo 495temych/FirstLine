@@ -7,9 +7,16 @@ test.beforeEach(async ({ page }) => {
   );
 });
 
+/** Opens a group, then one of its views, through their links. */
+async function open(page: Page, ...names: string[]) {
+  for (const name of names) {
+    await page.getByRole("link", { name, exact: true }).click();
+  }
+}
+
 async function triage(page: Page, ticket: string) {
   await page.goto("/");
-  await page.getByRole("button", { name: "Assistant" }).click();
+  await open(page, "Assistant");
   await page.getByLabel("Describe the issue").fill(ticket);
   await page.getByRole("button", { name: "Triage this ticket" }).click();
 }
@@ -68,21 +75,36 @@ test("a gate survives a reload", async ({ page }) => {
   await expect(page.getByText("Fix ran (simulated)")).toBeVisible();
 });
 
-test("the scoreboard shows a saved evaluation", async ({ page }) => {
+test("each group shows its views, and a saved evaluation", async ({ page }) => {
   await page.goto("/");
-  await page.getByRole("button", { name: "Scoreboard" }).click();
+  await open(page, "Is it worth it?");
+  await expect(
+    page.getByText("Does it pay, and on which model?"),
+  ).toBeVisible();
   await expect(page.getByText(/nothing to project/)).toBeVisible();
-  await page.getByRole("button", { name: "Models: which one?" }).click();
+  await open(page, "Models");
   await expect(
     page.getByText(/No model has a development run yet/),
   ).toBeVisible();
+  await open(page, "How it works", "Evaluations");
   await expect(page.getByText("rules set (tiny)")).toBeVisible();
   await expect(page.getByLabel("Open an evaluation")).toBeVisible();
 });
 
+test("a shared link opens its view, and back returns", async ({ page }) => {
+  await page.goto("/?view=retrieval");
+  await expect(
+    page.getByRole("link", { name: "Retrieval", exact: true }),
+  ).toHaveAttribute("aria-current", "page");
+  await open(page, "Tickets");
+  await expect(page).toHaveURL(/view=tickets/);
+  await page.goBack();
+  await expect(page).toHaveURL(/view=retrieval/);
+});
+
 test("the tickets tab can be filtered", async ({ page }) => {
   await page.goto("/");
-  await page.getByRole("button", { name: "Tickets", exact: true }).click();
+  await open(page, "How it works", "Tickets");
   await expect(page.getByText("206 of 206 tickets")).toBeVisible();
   await page.getByRole("button", { name: "records" }).click();
   await expect(page.getByText("5 of 206 tickets")).toBeVisible();
@@ -134,7 +156,7 @@ test("the queue fits a phone", async ({ page }) => {
 
 test("how it works follows a ticket along its route", async ({ page }) => {
   await page.goto("/");
-  await page.getByRole("button", { name: "How it works" }).click();
+  await open(page, "How it works");
   await expect(page.getByText(/correct first pass/).first()).toBeVisible();
   await page.getByLabel("Escalate").check();
   await page
@@ -151,7 +173,7 @@ test("how it works follows a ticket along its route", async ({ page }) => {
 test("how it works fits a phone", async ({ page }) => {
   await page.setViewportSize({ width: 375, height: 812 });
   await page.goto("/");
-  await page.getByRole("button", { name: "How it works" }).click();
+  await open(page, "How it works");
   await expect(page.getByText(/correct first pass/).first()).toBeVisible();
   const overflow = await page.evaluate(
     () => document.documentElement.scrollWidth - window.innerWidth,
@@ -162,7 +184,7 @@ test("how it works fits a phone", async ({ page }) => {
 test("retrieval shows its scores and runs a search", async ({ page }) => {
   await page.setViewportSize({ width: 375, height: 812 });
   await page.goto("/");
-  await page.getByRole("button", { name: "Retrieval" }).click();
+  await open(page, "How it works", "Retrieval");
   await expect(
     page.getByText(/correctly finds none/, { exact: false }),
   ).toBeVisible();
@@ -182,9 +204,10 @@ test("retrieval shows its scores and runs a search", async ({ page }) => {
 test("the model benchmark fits a phone", async ({ page }) => {
   await page.setViewportSize({ width: 375, height: 812 });
   await page.goto("/");
-  await page.getByRole("button", { name: "Scoreboard" }).click();
-  await page.getByRole("button", { name: "Models: which one?" }).click();
-  await expect(page.getByText("Every saved run")).toBeVisible();
+  await open(page, "Is it worth it?", "Models");
+  await expect(
+    page.getByText(/No model has a development run yet/),
+  ).toBeVisible();
   const overflow = await page.evaluate(
     () => document.documentElement.scrollWidth - window.innerWidth,
   );
@@ -194,7 +217,7 @@ test("the model benchmark fits a phone", async ({ page }) => {
 test("the business case fits a phone", async ({ page }) => {
   await page.setViewportSize({ width: 375, height: 812 });
   await page.goto("/");
-  await page.getByRole("button", { name: "Scoreboard" }).click();
+  await open(page, "Is it worth it?");
   await expect(page.getByText(/nothing to project/)).toBeVisible();
   const overflow = await page.evaluate(
     () => document.documentElement.scrollWidth - window.innerWidth,

@@ -155,7 +155,11 @@ def _price(ticket: dict) -> int:
     )
 
 
-def observed(tickets: list[dict], **rates) -> dict | None:
+def observed(
+    tickets: list[dict],
+    minutes_by_hand: float = MINUTES_BY_HAND,
+    chf_per_hour: float = CHF_PER_HOUR,
+) -> dict | None:
     """From the Queue's reviews: what technicians approved, how long they took, and
     how many wrong decisions they caught. Only the approved ones are priced.
     """
@@ -174,6 +178,7 @@ def observed(tickets: list[dict], **rates) -> dict | None:
         "bill_chf": sum(cost for _, cost in wrong) / n,
         "catch_rate": 1 - len(slipped) / len(wrong) if wrong else 1.0,
     }
+    rates = {"minutes_by_hand": minutes_by_hand, "chf_per_hour": chf_per_hour}
     return {**_layer(counted, rates), "wrong": len(wrong), "slipped": len(slipped)}
 
 

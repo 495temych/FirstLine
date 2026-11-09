@@ -69,7 +69,7 @@ function Lede({ data }: Readonly<{ data: Benchmark }>) {
     <section className="how-goal" aria-labelledby="pick">
       <h2 id="pick">
         {pick
-          ? `Run FirstLine on ${pick.label}. It saves ${francs(pick.net_chf)} a ticket, for ${perThousand(pick.cost_chf)} per 1'000 tickets.`
+          ? `The rule picks ${pick.label}. It saves ${francs(pick.net_chf)} a ticket, for ${perThousand(pick.cost_chf)} per 1'000 tickets.`
           : "No model passes the rule yet."}
       </h2>
       <p>
@@ -83,6 +83,11 @@ function Lede({ data }: Readonly<{ data: Benchmark }>) {
           </>
         )}
       </p>
+      {data.chosen.model !== data.default.model && (
+        <p>
+          FirstLine still runs on {data.default.label}, until the owner chooses.
+        </p>
+      )}
     </section>
   );
 }

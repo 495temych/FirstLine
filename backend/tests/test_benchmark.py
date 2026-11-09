@@ -137,6 +137,14 @@ def test_a_security_mistake_on_the_rules_set_rules_a_model_out():
     }
 
 
+def test_the_view_names_the_model_the_product_runs_on(monkeypatch):
+    monkeypatch.setenv("MODEL_NAME", "claude-haiku-4-5-20251001")
+    assert benchmark.view([])["default"] == {
+        "model": "claude-haiku-4-5-20251001",
+        "label": "Claude Haiku 4.5",
+    }
+
+
 def test_no_development_run_means_no_choice_and_no_insights():
     view = benchmark.view([])
     assert view["chosen"] is None

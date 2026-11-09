@@ -40,7 +40,7 @@ net saving     = minutes saved × rate per minute − model cost − cost of mis
 mistakes missed = mistake bill × (1 − share of wrong decisions the technician catches)
 ```
 
-Every ticket costs a review. A ticket the technician rejects also costs the full first pass by hand, which is the cautious case, because a correction is often quicker than starting again. Every decision is reviewed, so a wrong one costs money only when the technician misses it. `backend/economics.py` is the one place these sums are done, and the Scoreboard shows them.
+Every ticket costs a review. A ticket the technician rejects also costs the full first pass by hand, which is the cautious case, because a correction is often quicker than starting again. Every decision is reviewed, so a wrong one costs money only when the technician misses it. `backend/economics.py` is the one place these sums are done, and the Money view shows them.
 
 | Input | Value | Status |
 |---|---|---|

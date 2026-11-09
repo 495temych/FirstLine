@@ -8,7 +8,7 @@ I worked in L1 IT support. FirstLine is how I'd now put AI into a service desk, 
 
 | Promise | The client's question | What you can see |
 |---|---|---|
-| **Proven** | Is it better than what we have, and what does it cost? | The Scoreboard: the agent against two free yardsticks, in CHF, with margins of error |
+| **Proven** | Is it better than what we have, and what does it cost? | Is it worth it?: the agent against two free yardsticks, in CHF, with margins of error, and the models compared |
 | **Safe** | Can it do something dangerous? | The agent proposes, code enforces, and a person approves every fix |
 | **Observable** | Can we see why it decided? | Every decision traced, from what it read to what a person did *(Sprint 2)* |
 | **Shippable** | Can it run in our cloud, within budget? | Azure Container Apps, Key Vault, API Management, and Claude through Microsoft Foundry *(Sprint 3)* |

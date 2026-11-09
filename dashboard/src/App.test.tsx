@@ -11,6 +11,8 @@ import type { Run } from "./api";
 import { App } from "./App";
 import { presets } from "./presets";
 import { benchmark } from "./test-benchmark";
+import { insights } from "./test-insights";
+import { overview } from "./test-overview";
 import {
   baseRun,
   declined,
@@ -48,6 +50,8 @@ beforeEach(() => {
     "/api/stats": stats,
     "/api/queue": emptyQueue,
     "/api/benchmark": benchmark,
+    "/api/insights": insights,
+    "/api/overview": overview,
   };
   window.history.replaceState(null, "", "/");
   vi.stubGlobal("fetch", vi.fn(reply));
@@ -62,10 +66,17 @@ const click = (name: string | RegExp) => {
   fireEvent.click(screen.getByRole("button", { name }));
 };
 
+/** Opens a group, then one of its views, through their links. */
+const open = (...names: string[]) => {
+  for (const name of names) {
+    fireEvent.click(screen.getByRole("link", { name }));
+  }
+};
+
 /** The Queue opens first, so the Assistant needs its tab. */
 function showAssistant() {
   render(<App />);
-  click("Assistant");
+  open("Assistant");
 }
 
 async function triage(run: Partial<Run> = {}) {
@@ -78,25 +89,75 @@ async function triage(run: Partial<Run> = {}) {
   await screen.findByText("My VPN fails", { selector: ".query" });
 }
 
-it("opens on the Queue, with five more tabs", async () => {
+it("opens on the Queue, in the first of three groups", async () => {
   render(<App />);
   expect(screen.getByRole("heading", { name: "FirstLine" })).toBeDefined();
-  for (const tab of [
-    "Queue",
-    "Assistant",
-    "Scoreboard",
-    "Retrieval",
-    "Tickets",
-    "How it works",
-  ]) {
-    expect(screen.getByRole("button", { name: tab })).toBeDefined();
-  }
+  const groupNav = screen.getByRole("navigation", { name: "Groups" });
   expect(
-    (await screen.findByRole("button", { name: "Queue" })).getAttribute(
-      "aria-current",
-    ),
+    within(groupNav)
+      .getAllByRole("link")
+      .map((a) => a.textContent),
+  ).toEqual(["Try it", "Is it worth it?", "How it works"]);
+  const views = screen.getByRole("navigation", { name: "Try it" });
+  expect(
+    within(views)
+      .getByRole("link", { name: "Queue" })
+      .getAttribute("aria-current"),
   ).toBe("page");
   expect(await screen.findByText(/The board is empty/)).toBeDefined();
+});
+
+it("gives every view its own link, and follows back and forward", async () => {
+  render(<App />);
+  open("Is it worth it?");
+  expect(window.location.search).toBe("?view=money");
+  open("Models");
+  expect(window.location.search).toBe("?view=models");
+  expect(
+    screen.getByRole("link", { name: "Models" }).getAttribute("href"),
+  ).toBe("?view=models");
+  window.history.pushState(null, "", "?view=tickets");
+  fireEvent(window, new PopStateEvent("popstate"));
+  expect(await screen.findByText("2 of 2 tickets")).toBeDefined();
+});
+
+it("opens the view a shared link names", async () => {
+  window.history.replaceState(null, "", "/?view=evaluations");
+  render(<App />);
+  expect(await screen.findByText("rules set (tiny)")).toBeDefined();
+  expect(
+    screen
+      .getByRole("link", { name: "Evaluations" })
+      .getAttribute("aria-current"),
+  ).toBe("page");
+});
+
+it("opens the Queue for a link to a view that doesn't exist", () => {
+  window.history.replaceState(null, "", "/?view=nowhere");
+  render(<App />);
+  expect(
+    screen.getByRole("link", { name: "Queue" }).getAttribute("aria-current"),
+  ).toBe("page");
+});
+
+it("opens each group with its question and findings, linked to their views", async () => {
+  render(<App />);
+  open("How it works");
+  expect(
+    await screen.findByText("Why does it decide that, and how do we know?"),
+  ).toBeDefined();
+  expect(screen.getByText(/Search finds the right playbook/)).toBeDefined();
+  expect(screen.getByText("20261109T105136-retrieval-dev")).toBeDefined();
+  open("See Retrieval");
+  expect(window.location.search).toBe("?view=retrieval");
+});
+
+it("keeps a modified click for the browser to open in a new tab", () => {
+  render(<App />);
+  fireEvent.click(screen.getByRole("link", { name: "How it works" }), {
+    metaKey: true,
+  });
+  expect(window.location.search).toBe("");
 });
 
 it("shows the example tickets on the Assistant", () => {
@@ -163,7 +224,7 @@ it("waits at the fix gate and then shows the result", async () => {
   click("Run fix");
   expect(await screen.findByText("Fix ran (simulated)")).toBeDefined();
   expect(calls.at(-1)?.body).toEqual({ gate: "confirm_fix", approved: true });
-  expect(window.location.search).toBe("?run=run1");
+  expect(window.location.search).toBe("?view=assistant&run=run1");
 });
 
 it("offers a pre-filled ticket after a declined fix", async () => {
@@ -283,15 +344,13 @@ it("says when no statistics exist yet", async () => {
 it("says when the scoreboard has no evaluations", async () => {
   replies["/api/evaluations"] = { ...evaluations, runs: [] };
   render(<App />);
-  click("Scoreboard");
-  click("Models: which one?");
+  open("How it works", "Evaluations");
   expect(await screen.findByText(/No evaluations yet/)).toBeDefined();
 });
 
 it("shows saved evaluations and opens another one", async () => {
   render(<App />);
-  click("Scoreboard");
-  click("Models: which one?");
+  open("How it works", "Evaluations");
   expect(await screen.findByText("rules set (tiny)")).toBeDefined();
   expect(
     screen.getByText("rules set, held-out (sample, re-scored)"),
@@ -314,14 +373,13 @@ it("shows saved evaluations and opens another one", async () => {
 it("shows a scoreboard failure", async () => {
   replies["/api/evaluations"] = new Error("offline");
   render(<App />);
-  click("Scoreboard");
-  click("Models: which one?");
+  open("How it works", "Evaluations");
   expect(await screen.findByText("offline")).toBeDefined();
 });
 
 it("shows tickets, their first detail and the lockout count", async () => {
   render(<App />);
-  click("Tickets");
+  open("How it works", "Tickets");
   expect(await screen.findByText("2 of 2 tickets")).toBeDefined();
   expect(screen.getByRole("heading", { level: 2 }).textContent).toBe(
     "My VPN keeps disconnecting",
@@ -332,7 +390,7 @@ it("shows tickets, their first detail and the lockout count", async () => {
 
 it("selects a ticket", async () => {
   render(<App />);
-  click("Tickets");
+  open("How it works", "Tickets");
   fireEvent.click(await screen.findByRole("button", { name: "T-002" }));
   expect(screen.getByRole("heading", { level: 2 }).textContent).toBe(
     "I'm locked out",
@@ -342,7 +400,7 @@ it("selects a ticket", async () => {
 
 it("filters tickets", async () => {
   render(<App />);
-  click("Tickets");
+  open("How it works", "Tickets");
   await screen.findByText("2 of 2 tickets");
   click("records");
   expect(screen.getByText("1 of 2 tickets")).toBeDefined();
@@ -354,7 +412,7 @@ it("filters tickets", async () => {
 
 it("filters tickets by family and cause, and shows the cause", async () => {
   render(<App />);
-  click("Tickets");
+  open("How it works", "Tickets");
   await screen.findByText("2 of 2 tickets");
   fireEvent.change(screen.getByLabelText("Family"), {
     target: { value: "Account lockout" },

@@ -72,7 +72,7 @@ function Value({ view }: Readonly<{ view: QueueView }>) {
       </dl>
       <p className="caption">
         What this work is worth in francs, with any mistakes that slipped
-        through priced, is on the Scoreboard.
+        through priced, is under Is it worth it?, Money.
       </p>
     </section>
   );

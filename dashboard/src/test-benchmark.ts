@@ -85,6 +85,7 @@ export const benchmark: Benchmark = {
   },
   rule: "The cheapest model on the cost front whose net saving is within the margin of the best.",
   chosen: { model: "cheap", label: "Cheap model", best: "dear" },
+  default: { model: "dear", label: "Dear model" },
   insights: [
     {
       question: "Which model saves the most?",

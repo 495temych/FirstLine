@@ -14,6 +14,7 @@ import argparse
 
 from fastapi import APIRouter
 
+from agent import config
 from agent.models import label
 from backend import economics
 from evals import runner, scoring
@@ -271,6 +272,7 @@ def view(runs: list[dict] | None = None) -> dict:
         "sets": sets,
         "rule": RULE,
         "chosen": choose(sets),
+        "default": {"model": config.model_name(), "label": label(config.model_name())},
         "insights": insights(sets),
         "catch_rate": economics.CATCH_RATE,
     }

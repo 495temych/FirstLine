@@ -257,8 +257,8 @@ function Proof({ overview }: Readonly<{ overview: Overview }>) {
       )}
       {result && (
         <p className="caption">
-          From run <code>{result.run}</code> on {result.date.slice(0, 10)}. The
-          Scoreboard has the full breakdown.
+          From run <code>{result.run}</code> on {result.date.slice(0, 10)}.
+          Evaluations has the full breakdown.
         </p>
       )}
     </section>

@@ -175,8 +175,9 @@ The number after each one is the commit that meets it.
 | 7 | **Retrieval.** A page of the core retrieval measures, how sure each match is, and a search anyone can try | Type a request and watch which playbook it finds, and how strongly | RAG evaluation |
 | 8 ✅ | **The business case.** The Scoreboard answers "is it worth it?" in CHF: projected from the evaluations, observed from the Queue's reviews, and how it moves if the assumptions are wrong | Change the minutes by hand and watch the saving and break-even move | Unit economics, measuring value, not only accuracy |
 | 5 | **Durable and gated.** Retries, no repeated actions, spending limits per batch, and a release gate: a change ships only if its Langfuse experiment passes | Kill a batch mid-run and it carries on without doing anything twice. A worse change is refused | Idempotency, `RetryPolicy`, evals as a release gate |
-| 9 | **Three groups.** The tabs regroup into Try it (Queue, Assistant), Is it worth it? (Money, Models) and How it works (Workflow, Knowledge base, Retrieval, Tickets, Evaluations), each view with its own link | Send someone a link straight to a playbook or a model's run | Explain the system in layers |
+| 9 ✅ | **Three groups.** The tabs regroup into Try it (Queue, Assistant), Is it worth it? (Money, Models) and How it works (Workflow, Harness, Knowledge base, Retrieval, Tickets, Evaluations), each view with its own link, and each group opens with what its views show | Send someone a link straight to a playbook or a model's run | Explain the system in layers |
 | 10 | **Knowledge base.** A tab to explore what the agent knows: a cause map from each playbook's causes to the path, fix or queue they lead to, the policies that override them, the families with no playbook, and how the agent does on each | Click a cause and see the fix it allows, its risk tier, and how often the agent gets it right | Make the knowledge, not just the answer, inspectable |
+| 11 | **The harness.** A tab that draws what surrounds the model on one ticket: what it reads, the one tool it can call to decide, the form it fills, the limits it runs under, and the checks code makes on its answer. The fixes it proposes stay on Workflow | Pick a ticket and see exactly what the model read and what it answered | Agents need a harness: instructions, tools, limits and checks |
 
 The Queue's first version is in: batches, live states, review with measured time, traces in the UI and the value in CHF. Since commit 3a it keeps its record in Supabase and survives a restart. The agent doesn't investigate yet.
 
@@ -248,10 +249,12 @@ The number after each one is the commit that meets it. The Queue's investigation
 
 **Three groups (`dashboard/`)**
 
-- [ ] (9) The masthead has three groups, Try it, Is it worth it? and How it works, and each group has one row of tabs: Queue and Assistant; Money and Models; Workflow, Knowledge base, Retrieval, Tickets and Evaluations.
-- [ ] (9) Every saved run moves from under Models to its own Evaluations tab, so the business group keeps only the answer.
-- [ ] (9) Each view has its own link, such as `?view=kb&doc=vpn-access`, and a reload or a shared link opens the same view. A paused Assistant run still opens from its link.
-- [ ] (9) The navigation works with the keyboard and at phone width, with no sideways scrolling, in light and dark mode.
+- [x] (9) The masthead has three groups, Try it, Is it worth it? and How it works, and each group has one row of tabs: Queue and Assistant; Money and Models; Workflow, Harness, Knowledge base, Retrieval, Tickets and Evaluations.
+- [x] (9) Every saved run moves from under Models to its own Evaluations tab, so the business group keeps only the answer.
+- [x] (9) Each view has its own link, such as `?view=kb&doc=vpn-access`, and a reload or a shared link opens the same view. A paused Assistant run still opens from its link.
+- [x] (9) The navigation works with the keyboard and at phone width, with no sideways scrolling, in light and dark mode.
+- [x] (9) Each group opens with its question and two or three findings that answer it, from `GET /api/insights`, built from saved runs, the benchmark and the Queue's reviews, with no model calls. A group with no data says what would fill it.
+- [x] (9) Tabs that aren't built yet, such as Knowledge base before commit 10, don't appear.
 
 **Knowledge base (`backend/`, `dashboard/`)**
 
@@ -263,6 +266,14 @@ The number after each one is the commit that meets it. The Queue's investigation
 - [ ] (10) Each policy lists what it forces and the code that enforces it.
 - [ ] (10) Find highlights matching causes and sections in the browser, for free, and links to the Retrieval tab's ranked search.
 - [ ] (10) A test fails if a playbook, cause, policy or fix in the data has no place on the map.
+
+**The harness (`backend/`, `dashboard/`)**
+
+- [ ] (11) `GET /api/harness` builds the view from the code, with no model calls: the instructions file and its sections, how search chooses sections (embedding model, thresholds, how many), what the model reads and in what order, the model, its provider, reasoning effort, token limit and retries, the decision form's fields in order with their descriptions from `agent/decision.py`, and every check code makes on the answer, with where a failure goes.
+- [ ] (11) A "Harness" tab under How it works draws one ticket's model call as a schematic: what goes in, the model, the one tool it calls to decide, the form it fills, code's checks, and the human gate after. Only the tools used to decide are drawn; the fixes it may propose are counted and link to Workflow.
+- [ ] (11) It says plainly that there's no loop yet: the model decides in one pass and can't look anything up, and the investigation loop of Sprint 1's commit 7 would change that.
+- [ ] (11) Picking a development ticket shows what the model read, its search results with scores, and what the default model decided in its latest saved run, for free.
+- [ ] (11) A test fails when a decision field or a check has no explanation, and the schematic has a text equivalent. It passes the checklist in `docs/EXPLAINABILITY.md`.
 
 **Durable and gated (`agent/`, `backend/`, `evals/`)**
 

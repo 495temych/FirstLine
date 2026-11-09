@@ -41,11 +41,16 @@ it("opens with the model the rule picks, and the rule", async () => {
   render(<Models />);
   const lede = await screen.findByRole("heading", {
     level: 2,
-    name: /Run FirstLine/,
+    name: /The rule picks/,
   });
   expect(lede.textContent).toBe(
-    "Run FirstLine on Cheap model. It saves CHF 2.00 a ticket, for CHF 1.00 per 1'000 tickets.",
+    "The rule picks Cheap model. It saves CHF 2.00 a ticket, for CHF 1.00 per 1'000 tickets.",
   );
+  expect(
+    screen.getByText(
+      "FirstLine still runs on Dear model, until the owner chooses.",
+    ),
+  ).toBeDefined();
   expect(
     screen.getByText(/The rule, set before the runs: the cheapest/),
   ).toBeDefined();
