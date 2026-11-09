@@ -37,6 +37,8 @@ The demo walks through six steps, each with proof in this repository.
 
 The 745 synthetic incidents give us knowledge, an exam and recorded check results. The labels are frozen: drafted by rules from each incident's root cause, with the owner's seven decisions and the two causes the agent disputed most reviewed by hand. We don't dig further into the data's quirks. The README says plainly that the tickets are synthetic and the labels approximate.
 
+We tune on the development tickets, as a support team learns from its own history. Rigor goes where a reader would notice it: margins of error, the yardsticks and mistakes priced in CHF. The held-out sets are one check at the end, mentioned once on the Scoreboard rather than beside every number.
+
 ## The three sprints
 
 | Sprint | Course week | Question it answers | Where it runs | Done when |
@@ -58,6 +60,15 @@ Each store has one job, so nothing has two sources of truth.
 | Model and safety layer | Microsoft Foundry | Claude and other models, and Content Safety Prompt Shields | No, it holds no data of ours |
 | Gateway | Azure API Management | Keys, rate limits, token budgets and logs | No, it holds rules, not data |
 
+### Where MCP fits
+
+MCP is how the agent's read-only tools get served, not a way into our stores.
+
+- **The agent, with Sprint 1's commit 7.** The investigation tools (search the knowledge base, look up the requester, find similar incidents, run a check) are served by FirstLine's own small MCP server, read-only by construction. The loop finds them through MCP instead of hardcoded schemas, which closes that known limitation. Similar incidents come from Qdrant's `incidents` collection, from Sprint 2's commit 2.
+- **Not the vendors' servers, for the agent.** Supabase's MCP server can run any SQL and apply migrations, and Qdrant's can write. Both are wider than least privilege allows.
+- **Development, now.** Supabase's MCP server in read-only mode, scoped to this project, lets Claude Code inspect the system of record while we build. It's local configuration only, with nothing in the product.
+- **Sprint 3.** API Management can front the MCP server, with the same keys, limits and logs as the model calls.
+
 ### Spending
 
 The owner pays for every call, so `docs/PROCESS.md` sets the rules: ask before any run over CHF 1, re-score instead of re-running, practise on samples, and run held-out sets once. The whole plan should cost about CHF 5 in model calls, plus Azure, which is torn down between demos.
@@ -75,7 +86,7 @@ The owner pays for every call, so `docs/PROCESS.md` sets the rules: ask before a
 | 5 | ✅ **Baseline.** Structured decisions, scored against two yardsticks, with cost guards | The first real numbers, including where the agent loses |
 | 6 | **Rules in code.** Requester records, tool risk tiers and the SEC-04 guard | Pick a user: the same lockout gets a different answer, and the dangerous unlock can't run |
 | 7 | **Investigate.** An agent loop with read-only tools against today's one call, on samples first. The loop writes a full handover | What investigating adds, for what extra cost, on one chart |
-| 8 | **Choose.** Claude models compared on a sample, more than once, and the design and model chosen | A written choice, backed by a cost-against-accuracy chart |
+| 8 | **Models.** Claude models compared on the full development and unseen sets, on today's one-call design, with accuracy, cost and time per ticket | A cost-against-accuracy chart on the Scoreboard, and a written choice |
 
 ### Success criteria
 
@@ -113,6 +124,7 @@ The number after each one is the commit that meets it.
 - [ ] (6) `agent/rules.py` holds pure functions that both modes call. A user with 2+ lockouts on a lockout ticket ends at `SEC-INCIDENT`, and a sensitive tool in the Assistant becomes a ticket.
 - [ ] (6) Stub-model tests try to break each rule. The fix can't run, and a user with 2 lockouts and a printer ticket is not overridden.
 - [ ] (7) `agent/queue.py` investigates one ticket with four read-only tools: search the knowledge base, look up the requester, find similar incidents and run a check. It ends in the same decision format as the Assistant.
+- [ ] (7) The four tools are served by FirstLine's own MCP server, which has no tool that changes anything, and the loop discovers them through MCP. Tests run the server in memory.
 - [ ] (7) The loop stops at its limits on steps and cost and escalates with what it found. A check the ticket doesn't have returns no result.
 - [ ] (7) A test proves the loop can't reach a tool that changes a system, and that similar-incident search reads knowledge base split tickets only.
 - [ ] (7) An escalation carries a full handover. Code fills in the requester, device, priority, SLA deadline, applications, checks with their evidence, similar incidents and what's unknown. The model writes only the likely cause, what's ruled out and the next step, citing that evidence.
@@ -125,7 +137,8 @@ The number after each one is the commit that meets it.
 - [x] (5) The development set is run and committed, for CHF 0.98 with the rules and unseen sets. Re-scoring, samples, a spending cap and a repeat guard keep later runs cheap.
 - [ ] (6) Safety scores are zero failures, and SEC-04 scores come from the rules set.
 - [ ] (7) The loop runs on the samples first, scored the same way as one call, plus checks run and steps per ticket. Evidence cited must come from a tool result. It runs in full only if it beats one call by more than the noise, for its extra cost.
-- [ ] (8) At least two Claude models run on the samples, more than once. A chart shows accuracy against cost per ticket, and the choice is in `docs/DECISIONS.md`.
+- [ ] (8) The models run on the full development set, the main comparison with all three paths, and on `unseen_dev`, where every ticket should escalate, so it shows whether a model admits what it doesn't know. Haiku 4.5's baseline is re-used, not re-run. Haiku 5.5 costs about CHF 0.10 for both sets and Sonnet 5.5 about CHF 1.85, which needs the owner's go-ahead. Opus 5.5 joins once its price is in `agent/config.py`.
+- [ ] (8) Each model shows path, action and team accuracy with margins, mistakes in CHF, cost and time per ticket, and net saving per ticket. A model is repeated only when it lands within the margin of another. The choice is in `docs/DECISIONS.md`.
 - [ ] (8) The held-out sets run once, at sprint review, with the chosen design and model.
 
 **API and dashboard (`backend/`, `dashboard/`)**
@@ -136,7 +149,7 @@ The number after each one is the commit that meets it.
 - [x] (5) The Assistant, and a Scoreboard with measures by family, the yardsticks, CHF for mistakes and a confusion heatmap.
 - [ ] (6) Starting a triage takes a requester, and a picker sits on the Assistant. The page shows when a rule changed the agent's decision.
 - [ ] (7) The Scoreboard shows the loop beside the one-call run.
-- [ ] (8) The Scoreboard shows the cost-against-accuracy chart.
+- [ ] (8) The Scoreboard shows the cost-against-accuracy chart, part of Sprint 2's business case.
 
 **Checks and CI**
 
@@ -156,6 +169,7 @@ The number after each one is the commit that meets it.
 | 4 | 🟡 **The Queue.** Load a batch, order it in code, and approve, correct or reject each decision with its evidence | A technician clears a morning batch, and technician time per ticket is measured | The human's step |
 | 6 ✅ | **How it works.** An overview page of the goal, the route a ticket takes, the model, the tools and the services, built from the code | A recruiter understands the agent in two minutes without opening the repository | Explainability, a single source of truth |
 | 7 | **Retrieval.** A page of the core retrieval measures, how sure each match is, and a search anyone can try | Type a request and watch which playbook it finds, and how strongly | RAG evaluation |
+| 8 | **The business case.** The Scoreboard answers "is it worth it?" in CHF: projected from the evaluations, observed from the Queue's reviews, and how it moves if the assumptions are wrong | Change the minutes by hand and watch the saving and break-even move | Unit economics, measuring value, not only accuracy |
 | 5 | **Durable and gated.** Retries, no repeated actions, spending limits per batch, and a release gate: a change ships only if its Langfuse experiment passes | Kill a batch mid-run and it carries on without doing anything twice. A worse change is refused | Idempotency, `RetryPolicy`, evals as a release gate |
 
 The Queue's first version is in: batches, live states, review with measured time, traces in the UI and the value in CHF. Since commit 3a it keeps its record in Supabase and survives a restart. The agent doesn't investigate yet.
@@ -217,6 +231,14 @@ The number after each one is the commit that meets it. The Queue's investigation
 - [x] (7) "Try a search" ranks the knowledge base for any text the reader types, with the scores and the threshold, through `POST /api/retrieval/search`. It's free, because embeddings run on this machine and no model is called.
 - [ ] (7) The view shows how retrieval changes the decision: path accuracy with and without it, from saved runs. The view reads both from saved runs and shows the one with search. None is saved without it, because with search off the agent answers in plain text with no path to score. Measuring it needs a run where the decision form gets no playbook, about CHF 0.65 on the development set, and waits for the owner's go-ahead.
 - [ ] (6, 7) Both pages pass the checklist in `docs/EXPLAINABILITY.md`: phone width, light and dark, keyboard, and screenshots reviewed.
+
+**The business case (`backend/`, `dashboard/`)**
+
+- [ ] (8) The Queue keeps what a technician needs to trust the batch: states, approved unchanged, agent time per ticket and model cost. Net saving and time saved move to the Scoreboard.
+- [ ] (8) One module in `backend/` computes the economics from `docs/BUSINESS_GOAL.md`'s assumptions, and both the API and the tests use it. Nothing is computed twice.
+- [ ] (8) The Scoreboard opens with net saving per ticket in CHF, in three layers. Projected: from the latest evaluation, with accuracy, mistakes priced from the labels and model cost. Observed: from the Queue's reviews, where measured review time replaces the assumed 2 minutes and a rejected or corrected decision is priced as a mistake. Sensitivity: sliders for minutes by hand and the hourly rate move the saving and the 13% break-even.
+- [ ] (8) Each figure follows `docs/EXPLAINABILITY.md`: its question, n, margin and source, and the assumptions on the page. One line says the numbers come from practice tickets and the held-out sets run once at the end.
+- [ ] (8) Sprint 1's model comparison sits here once it exists, as cost and time against accuracy.
 
 **Durable and gated (`agent/`, `backend/`, `evals/`)**
 
