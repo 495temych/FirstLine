@@ -126,6 +126,26 @@ def per_path(rows: list[dict]) -> dict[str, dict]:
     return measures
 
 
+def balanced_accuracy(rows: list[dict]) -> float | None:
+    """Path accuracy averaged over the expected paths, so a model that escalates
+    everything can't hide behind a set that's mostly escalations.
+    """
+    shares = [
+        _share(group, "path_correct")
+        for path in PATHS
+        if (group := [r for r in rows if r["expected_path"] == path])
+    ]
+    return _average(shares)
+
+
+def percentile(values: list[float], q: float) -> float | None:
+    """The value below which a share q of them fall, by the nearest rank."""
+    if not values:
+        return None
+    ordered = sorted(values)
+    return ordered[min(int(q * len(ordered)), len(ordered) - 1)]
+
+
 def cohens_kappa(rows: list[dict]) -> float | None:
     """Agreement beyond chance. A constant answer scores 0."""
     n = len(rows)
@@ -173,7 +193,11 @@ def summarize(rows: list[dict]) -> dict:
         "cost_per_ticket_usd": usd,
         "cost_per_ticket_chf": None if usd is None else usd * USD_TO_CHF,
         "time_per_ticket_sec": _average([r["time_sec"] for r in rows]),
+        "time_p50_sec": percentile([r["time_sec"] for r in rows], 0.5),
+        "time_p90_sec": percentile([r["time_sec"] for r in rows], 0.9),
+        "balanced_accuracy": balanced_accuracy(rows),
         "failed": sum(r["error"] is not None for r in rows),
+        "invalid": sum(r["error"] is not None or r.get("invalid", False) for r in rows),
     }
 
 

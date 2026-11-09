@@ -107,23 +107,36 @@ def _layer(counted: dict, rates: dict) -> dict:
 
 
 def projected(catch_rate: float = CATCH_RATE, **rates) -> dict | None:
-    """From the latest development evaluation. A decision right in full counts as
-    approved unchanged, and a wrong one costs its price unless a technician
-    catches it, at the assumed rate.
+    """From the default model's latest full development evaluation. A decision right
+    in full counts as approved unchanged, and a wrong one costs its price unless a
+    technician catches it, at the assumed rate. Other models' runs are the benchmark's.
     """
-    run = next((r for r in runner.load_runs() if r["set"] == EVAL_SET), None)
+    run = next((r for r in runner.default_runs() if r["set"] == EVAL_SET), None)
     if run is None:
         return None
-    s = run["summary"]
+    layer = from_summary(run["summary"], catch_rate, **rates)
+    return {**layer, "source": run["id"], "model": run["model"]}
+
+
+def from_summary(
+    s: dict,
+    catch_rate: float = CATCH_RATE,
+    minutes_by_hand: float = MINUTES_BY_HAND,
+    chf_per_hour: float = CHF_PER_HOUR,
+) -> dict:
+    """Net saving per ticket from an evaluation's summary, or a yardstick's, which
+    has no model cost.
+    """
     counted = {
         "share": s["action_accuracy"],
         "n": s["n"],
         "review_minutes": REVIEW_MINUTES,
-        "model_chf": s["cost_per_ticket_chf"],
+        "model_chf": s.get("cost_per_ticket_chf") or 0.0,
         "bill_chf": s["mistake_cost_chf"] / s["n"],
         "catch_rate": catch_rate,
     }
-    return {**_layer(counted, rates), "source": run["id"], "model": run["model"]}
+    rates = {"minutes_by_hand": minutes_by_hand, "chf_per_hour": chf_per_hour}
+    return _layer(counted, rates)
 
 
 @cache

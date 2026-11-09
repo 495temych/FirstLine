@@ -1,3 +1,4 @@
+import type { Benchmark } from "./benchmark";
 export type Path =
   "SELF_SERVE" | "AUTO_FIX" | "ESCALATE" | "OUT_OF_SCOPE" | "NO_TOOLS";
 
@@ -513,6 +514,7 @@ export const api = {
   stats: () => request<Stats>("/api/stats"),
   overview: () => request<Overview>("/api/overview"),
   retrieval: () => request<RetrievalView>("/api/retrieval"),
+  benchmark: () => request<Benchmark>("/api/benchmark"),
   business: (rates?: Rates) =>
     request<BusinessCase>(
       rates

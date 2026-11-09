@@ -14,10 +14,13 @@ retrieval. Neither calls a model.
 import argparse
 import hashlib
 import json
+import os
+from concurrent.futures import ThreadPoolExecutor
 from datetime import UTC, datetime
 
 from agent import config, run_triage, tracing
-from agent.decision import DECISION_TOOL
+from agent.decision import DECISION_TOOL, UNREADABLE
+from agent.models import MODELS
 from agent.tool_schemas import TOOL_POLICY, TOOLS
 from evals import retrieval_score, scoring, yardsticks
 
@@ -27,6 +30,7 @@ PREFIXES = {"rules": "rules_", "rules_held_out": "rules_held_out_"}
 IMPORTED_SETS = ("dev", "held_out", "unseen_dev", "unseen_held_out")
 REVIEW_SPLITS = ("dev", "unseen_dev")  # the imported tickets a person may read
 SAMPLE_PER_FAMILY = 3
+WORKERS = 4  # tickets in flight at once. Each call is still timed on its own
 SPENDING_CAP_CHF = 1.00  # the most a run may cost without --max-chf
 TYPICAL_TOKENS = (6000, 600)  # input and output, when no saved run gives a cost
 VERSION_KEYS = ("version", "instructions_version", "tools_version", "kb_version")
@@ -40,6 +44,8 @@ DECISION_KEYS = (
     "output_tokens",
     "time_sec",
     "error",
+    "cost_usd",
+    "invalid",
 )
 LABEL_FILES = (
     "rules_answers.json",
@@ -193,6 +199,8 @@ def decision(result: dict) -> dict:
         "output_tokens": usage["output_tokens"],
         "time_sec": result["response_time_sec"],
         "error": result["error"],
+        "cost_usd": usage.get("cost_usd"),
+        "invalid": result.get("reasoning") == UNREADABLE,
     }
 
 
@@ -219,9 +227,30 @@ def score_ticket(ticket: dict, answer: dict, made: dict, model: str) -> dict:
         "retrieval_correct": scoring.retrieval_correct(answer, retrieved),
         "input_tokens": made["input_tokens"],
         "output_tokens": made["output_tokens"],
-        "cost_usd": config.cost_usd(model, made["input_tokens"], made["output_tokens"]),
+        "cost_usd": cost_of(made, model),
         "time_sec": made["time_sec"],
         "error": made["error"],
+        "invalid": bool(made.get("invalid")),
+    }
+
+
+def cost_of(made: dict, model: str) -> float | None:
+    """What the provider says a call cost, or else its tokens at the list price."""
+    if made.get("cost_usd") is not None:
+        return made["cost_usd"]
+    return config.cost_usd(model, made["input_tokens"], made["output_tokens"])
+
+
+def serving(model: str) -> dict:
+    """Who served a run, where, and at what reasoning effort."""
+    m = MODELS.get(model)
+    if m is None:
+        return {"lab": "anthropic", "provider": None, "region": "US", "effort": None}
+    return {
+        "lab": m.lab,
+        "provider": m.provider or m.lab,
+        "region": m.region,
+        "effort": m.effort,
     }
 
 
@@ -238,6 +267,7 @@ def _assemble(
         "tiny": kind.get("tiny", False),
         "sample": kind.get("sample", False),
         "model": model,
+        "serving": serving(model),
         **versions,
         "labels_version": labels_version(),
         "summary": scoring.summarize(rows),
@@ -267,12 +297,14 @@ def evaluate(name: str, tiny: bool = False, sampled: bool = False) -> dict:
     model = config.model_name()
     pairs = select(name, tiny, sampled)
     session = f"{datetime.now(UTC):%Y%m%dT%H%M%S}-{name}"
-    rows = [
-        score_ticket(
-            ticket, answer, decision(_traced_attempt(ticket, name, session)), model
-        )
-        for ticket, answer in pairs
-    ]
+
+    def one(pair: tuple[dict, dict]) -> dict:
+        ticket, answer = pair
+        made = decision(_traced_attempt(ticket, name, session))
+        return score_ticket(ticket, answer, made, model)
+
+    with ThreadPoolExecutor(max_workers=WORKERS) as pool:
+        rows = list(pool.map(one, pairs))
     tracing.flush()
     return _assemble(
         name, pairs, rows, model, current_versions(), tiny=tiny, sample=sampled
@@ -284,7 +316,9 @@ def rescore(run: dict) -> dict:
     saved = {row["id"]: row for row in run["tickets"]}
     pairs = [(t, a) for t, a in load_any(run["set"]) if t["id"] in saved]
     rows = [
-        score_ticket(t, a, {k: saved[t["id"]][k] for k in DECISION_KEYS}, run["model"])
+        score_ticket(
+            t, a, {k: saved[t["id"]].get(k) for k in DECISION_KEYS}, run["model"]
+        )
         for t, a in pairs
     ]
     versions = {key: run[key] for key in VERSION_KEYS}
@@ -349,6 +383,18 @@ def load_runs() -> list[dict]:
     paths = sorted(RUNS_DIR.glob("*.json"), reverse=True)
     runs = [json.loads(p.read_text()) for p in paths]
     return [run for run in runs if "yardsticks" in run]
+
+
+def default_runs(*, full: bool = True) -> list[dict]:
+    """The default model's runs, newest first: what the product runs on. With `full`,
+    samples and tiny runs are left out. Other models' runs belong to the benchmark.
+    """
+    return [
+        run
+        for run in load_runs()
+        if run.get("model") == config.model_name()
+        and not (full and (run.get("tiny") or run.get("sample")))
+    ]
 
 
 def _percent(share: float | None) -> str:
@@ -457,7 +503,14 @@ def main() -> None:
         help="a set to score retrieval on, instead of the development sets",
     )
     parser.add_argument("--save", action="store_true", help="keep the retrieval score")
+    parser.add_argument(
+        "--model",
+        choices=sorted(MODELS),
+        help="the model to evaluate, instead of MODEL_NAME or the default",
+    )
     args = parser.parse_args()
+    if args.model:
+        os.environ["MODEL_NAME"] = args.model
     if args.retrieval:
         retrieval_score.main(args.split, args.save)
         return

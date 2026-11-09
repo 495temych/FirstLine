@@ -3,7 +3,7 @@
 import pytest
 from fastapi.testclient import TestClient
 
-from agent import retrieval
+from agent import config, retrieval
 from backend import main, retrieval_view
 from evals import retrieval_score, runner
 
@@ -78,7 +78,12 @@ def test_the_decision_with_and_without_search_comes_from_saved_runs(client):
         "path_margin": 0.08,
         "cost_per_ticket_chf": 0.005,
     }
-    base = {"set": "dev", "summary": summary, "yardsticks": {}}
+    base = {
+        "set": "dev",
+        "model": config.model_name(),
+        "summary": summary,
+        "yardsticks": {},
+    }
     runner.save_run({**base, "id": "a-dev"})
     body = client.get("/api/retrieval").json()["decision"]
     assert body["with_search"]["path_accuracy"] == 0.73

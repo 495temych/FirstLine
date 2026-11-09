@@ -5,6 +5,8 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
+from agent.models import MODELS
+
 ROOT = Path(__file__).resolve().parent.parent
 KB_DIR = ROOT / "data" / "kb"
 # The usage log before Supabase. Only the Langfuse upload reads it now.
@@ -15,12 +17,8 @@ EVALS_DIR = ROOT / "data" / "evals"
 SOURCE_DIR = ROOT / "labs" / "synthetic_tickets"
 DEFAULT_MODEL = "claude-haiku-4-5-20251001"
 
-# US dollars per million tokens: (input, output).
-PRICES = {
-    "claude-haiku-4-5-20251001": (1.00, 5.00),
-    "claude-haiku-5-5": (0.10, 0.50),
-    "claude-sonnet-5-5": (2.00, 10.00),
-}
+# US dollars per million tokens: (input, output). The models are in agent/models.py.
+PRICES = {name: model.price for name, model in MODELS.items()}
 
 load_dotenv(ROOT / ".env")
 

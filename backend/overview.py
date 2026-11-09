@@ -193,7 +193,7 @@ LIMITS: list[str] = [
 
 def _example_tickets() -> dict[str, dict]:
     """One ticket per path the agent got right, from the newest development run."""
-    runs = [r for r in runner.load_runs() if r["set"] == EXAMPLE_SET]
+    runs = [r for r in runner.default_runs() if r["set"] == EXAMPLE_SET]
     if not runs:
         return {}
     examples: dict[str, dict] = {}
@@ -227,7 +227,7 @@ def _listed(value: object) -> list[str]:
 
 def _result() -> dict | None:
     """The latest development run's headline numbers."""
-    runs = [r for r in runner.load_runs() if r["set"] == EXAMPLE_SET]
+    runs = [r for r in runner.default_runs() if r["set"] == EXAMPLE_SET]
     if not runs:
         return None
     run = runs[0]

@@ -1803,3 +1803,131 @@ button.link {
   width: 100%;
   accent-color: var(--ink);
 }
+
+/* The Scoreboard's two views */
+.sub-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  border-bottom: 1px solid var(--rule);
+}
+
+.sub-tabs button {
+  border: 0;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  background: none;
+  color: var(--ink-soft);
+  padding: 0.5rem 0.875rem;
+}
+
+.sub-tabs button[aria-current="page"] {
+  border-bottom-color: var(--ink);
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.runs-heading {
+  margin-top: 1.5rem;
+}
+
+/* The model benchmark */
+.insights {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+  gap: 1rem 2rem;
+  margin: 0;
+}
+
+.insights dt {
+  font-weight: 600;
+}
+
+.insights dd {
+  margin: 0.25rem 0 0;
+  max-width: 60ch;
+}
+
+.chart .yardstick line {
+  stroke: var(--ink-soft);
+  stroke-dasharray: 6 4;
+}
+
+.chart .yardstick text {
+  fill: var(--ink-soft);
+}
+
+.chart .front-line {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 2;
+}
+
+.model-range {
+  stroke: var(--ink-soft);
+  stroke-width: 1;
+}
+
+.model-mark {
+  stroke-width: 2;
+}
+
+.model-front .model-mark {
+  fill: var(--ink);
+  stroke: var(--panel);
+}
+
+.model-beaten .model-mark {
+  fill: var(--panel);
+  stroke: var(--ink-soft);
+}
+
+.model-sample .model-mark {
+  stroke-dasharray: 2 2;
+}
+
+.model-picked .model-mark {
+  stroke: var(--ink);
+  stroke-width: 3;
+  fill: var(--panel);
+}
+
+.model-label {
+  fill: var(--ink);
+  font-weight: 600;
+}
+
+.key-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid var(--ink-soft);
+}
+
+.key-front {
+  background: var(--ink);
+  border-color: var(--ink);
+}
+
+.key-beaten {
+  background: var(--panel);
+}
+
+.key-line.key-yardstick {
+  border-top: 2px dashed var(--ink-soft);
+}
+
+.models-table .quiet-row {
+  color: var(--ink-soft);
+}
+
+.models-table th[scope="row"] {
+  text-align: left;
+  font-weight: 600;
+}
+
+@media (max-width: 600px) {
+  .chart .model-label {
+    font-size: 14px;
+  }
+}

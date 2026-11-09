@@ -86,7 +86,7 @@ The owner pays for every call, so `docs/PROCESS.md` sets the rules: ask before a
 | 5 | ✅ **Baseline.** Structured decisions, scored against two yardsticks, with cost guards | The first real numbers, including where the agent loses |
 | 6 | **Rules in code.** Requester records, tool risk tiers and the SEC-04 guard | Pick a user: the same lockout gets a different answer, and the dangerous unlock can't run |
 | 7 | **Investigate.** An agent loop with read-only tools against today's one call, on samples first. The loop writes a full handover | What investigating adds, for what extra cost, on one chart |
-| 8 | **Benchmark.** About ten models through OpenRouter, Claude and open-weight, screened on a sample, then the front-runners on the full development and unseen sets. Ranked by net saving per ticket, with the Pareto front drawn | Net saving against cost per ticket, with the front, on the Scoreboard, and a written choice |
+| 8 | **Benchmark.** Ten light models, Claude, OpenAI and open-weight, on the full development, unseen and rules sets. Ranked by net saving per ticket, with the Pareto front drawn | Net saving against cost per ticket, with the front, on the Scoreboard, and a written choice |
 
 ### Success criteria
 
@@ -137,12 +137,12 @@ The number after each one is the commit that meets it.
 - [x] (5) The development set is run and committed, for CHF 0.98 with the rules and unseen sets. Re-scoring, samples, a spending cap and a repeat guard keep later runs cheap.
 - [ ] (6) Safety scores are zero failures, and SEC-04 scores come from the rules set.
 - [ ] (7) The loop runs on the samples first, scored the same way as one call, plus checks run and steps per ticket. Evidence cited must come from a tool result. It runs in full only if it beats one call by more than the noise, for its extra cost.
-- [ ] (8) Every model runs through one harness: LangChain's OpenAI-compatible client pointed at OpenRouter, with the same instructions and the same forced decision form. Claude runs through OpenRouter too, so it's measured like the others. `require_parameters` keeps to providers that support the tool call, and `data_collection: "deny"` keeps to providers that don't keep or train on the data. Tests use a fake model.
-- [ ] (8) Each run records the model, its provider, its reasoning effort (the lowest it offers), real cost from OpenRouter's `usage.cost`, median and 90th-percentile time per ticket, output tokens, and the share of invalid decisions, which count as wrong.
-- [ ] (8) The roster is about ten models that support tool calls, checked against OpenRouter's catalogue first: Claude Haiku 4.5, Haiku 5.5 and Sonnet 5.5, DeepSeek V4.1 Flash, GLM 5.3 Flash, Kimi K3, Nemotron 3 Ultra and Mistral Medium 3.5, an EU option for a Swiss client.
-- [ ] (8) Stage one screens every model on the stratified sample, about 42 tickets, for under about CHF 2 in all. Its margin is about 14 points, so it only drops clear losers. Stage two runs the three or four on the front on the full development set and `unseen_dev`, for about CHF 1 to 3. Each run over CHF 1 waits for the owner's go-ahead.
-- [ ] (8) Models are ranked by net saving per ticket from `backend/economics.py`, so a security mistake weighs what it costs. Code computes the Pareto front of net saving against cost per ticket, and against time per ticket, and marks each model on it or dominated.
-- [ ] (8) The choice is in `docs/DECISIONS.md`, and How it works shows it as the model's reason.
+- [x] (8) Every model runs through one harness, `agent/models.py`, with the same instructions and the same forced decision tool. Claude goes to Anthropic and OpenAI's models to OpenAI, on their own keys. The rest go through OpenRouter, each pinned to one provider with no fallback, keeping to providers that support the tool call and don't keep prompts. A model whose provider can't force the tool is only offered it, and says so. Tests use a fake model.
+- [x] (8) Each run records the model, who served it, where, and at what reasoning effort (the lowest it accepts), the provider's own reported cost where there is one, median and 90th-percentile time per ticket, and invalid decisions, which count as wrong.
+- [x] (8) The roster is ten light models with tool calls, checked against OpenRouter's catalogue and each lab's list: Claude Haiku 4.5 and 5.5, GPT-6 Luna, GPT-5 nano and GPT-6.1 Terra, gpt-oss-120b, Gemini 3.1 Flash-Lite and Mistral Small (both on EU endpoints), DeepSeek V4.1 Flash, Qwen 3.7 Flash and GLM 5.3 Flash. A free smoke test and a five-ticket preflight of each passed, for about CHF 0.03.
+- [x] (8) Every model but GPT-6.1 Terra runs on all of `dev`, `unseen_dev` and `rules`, 206 tickets, for about CHF 1 in all, after the owner's go-ahead. Haiku 4.5's saved runs are re-scored, not re-run. Terra, the dearest, runs on the sample first, and in full only if it lands on the front.
+- [x] (8) Models are ranked by net saving per ticket from `backend/economics.py`, so a security mistake weighs what it costs. `uv run -m backend.benchmark` computes the Pareto front of net saving against cost per ticket, and against median time, and marks each model on it or beaten. The two yardsticks sit beside them as the bar to clear, off the front. Balanced accuracy shows whether a model just escalates everything.
+- [ ] (8) The rule is written before the runs: the cheapest model on the front whose net saving is within the margin of the best, with no security mistake on the rules set. The choice is in `docs/DECISIONS.md`, becomes the default model, and How it works shows it as the model's reason. *(The result is recorded. The rule picks Qwen 3.7 Flash, whose invalid answers and unconfirmed region the rule didn't cover, so the default waits for the owner.)*
 - [ ] (8) The held-out sets run once, at sprint review, with the chosen design and model.
 
 **API and dashboard (`backend/`, `dashboard/`)**
@@ -153,7 +153,7 @@ The number after each one is the commit that meets it.
 - [x] (5) The Assistant, and a Scoreboard with measures by family, the yardsticks, CHF for mistakes and a confusion heatmap.
 - [ ] (6) Starting a triage takes a requester, and a picker sits on the Assistant. The page shows when a rule changed the agent's decision.
 - [ ] (7) The Scoreboard shows the loop beside the one-call run.
-- [ ] (8) A "Models" section on the Scoreboard, under the business case, plots net saving against cost per ticket on a log scale, with the Pareto front drawn and a switch to time per ticket. A table lists each model's accuracy with its margin, mistakes in CHF, cost, median and 90th-percentile time, invalid answers and where its provider hosts it.
+- [x] (8) A "Models" section on the Scoreboard, under the business case, plots net saving against cost per ticket on a log scale, with the Pareto front drawn and a switch to time per ticket. A table lists each model's accuracy with its margin, mistakes in CHF, cost, median and 90th-percentile time, invalid answers and where its provider hosts it.
 
 **Checks and CI**
 
@@ -175,6 +175,8 @@ The number after each one is the commit that meets it.
 | 7 | **Retrieval.** A page of the core retrieval measures, how sure each match is, and a search anyone can try | Type a request and watch which playbook it finds, and how strongly | RAG evaluation |
 | 8 ✅ | **The business case.** The Scoreboard answers "is it worth it?" in CHF: projected from the evaluations, observed from the Queue's reviews, and how it moves if the assumptions are wrong | Change the minutes by hand and watch the saving and break-even move | Unit economics, measuring value, not only accuracy |
 | 5 | **Durable and gated.** Retries, no repeated actions, spending limits per batch, and a release gate: a change ships only if its Langfuse experiment passes | Kill a batch mid-run and it carries on without doing anything twice. A worse change is refused | Idempotency, `RetryPolicy`, evals as a release gate |
+| 9 | **Three groups.** The tabs regroup into Try it (Queue, Assistant), Is it worth it? (Money, Models) and How it works (Workflow, Knowledge base, Retrieval, Tickets, Evaluations), each view with its own link | Send someone a link straight to a playbook or a model's run | Explain the system in layers |
+| 10 | **Knowledge base.** A tab to explore what the agent knows: a cause map from each playbook's causes to the path, fix or queue they lead to, the policies that override them, the families with no playbook, and how the agent does on each | Click a cause and see the fix it allows, its risk tier, and how often the agent gets it right | Make the knowledge, not just the answer, inspectable |
 
 The Queue's first version is in: batches, live states, review with measured time, traces in the UI and the value in CHF. Since commit 3a it keeps its record in Supabase and survives a restart. The agent doesn't investigate yet.
 
@@ -242,7 +244,25 @@ The number after each one is the commit that meets it. The Queue's investigation
 - [x] (8) One module in `backend/` computes the economics from `docs/BUSINESS_GOAL.md`'s assumptions, and both the API and the tests use it. Nothing is computed twice.
 - [x] (8) The Scoreboard opens with net saving per ticket in CHF, in three layers. Projected: from the latest evaluation, with accuracy, mistakes priced from the labels, the share technicians catch, and model cost. Observed: from the Queue's reviews, where review time and the share caught are measured, and an approved decision the labels say is wrong is priced as a mistake. Sensitivity: sliders for minutes by hand, the hourly rate and the share caught move the saving, and a chart shows where it turns positive.
 - [x] (8) Each figure follows `docs/EXPLAINABILITY.md`: its question, n, margin and source, and the assumptions on the page. One line says the numbers come from practice tickets and the held-out sets run once at the end.
-- [ ] (8) Sprint 1's benchmark sits under the business case once it exists, with its Pareto front.
+- [x] (8) Sprint 1's benchmark sits under the business case once it exists, with its Pareto front.
+
+**Three groups (`dashboard/`)**
+
+- [ ] (9) The masthead has three groups, Try it, Is it worth it? and How it works, and each group has one row of tabs: Queue and Assistant; Money and Models; Workflow, Knowledge base, Retrieval, Tickets and Evaluations.
+- [ ] (9) Every saved run moves from under Models to its own Evaluations tab, so the business group keeps only the answer.
+- [ ] (9) Each view has its own link, such as `?view=kb&doc=vpn-access`, and a reload or a shared link opens the same view. A paused Assistant run still opens from its link.
+- [ ] (9) The navigation works with the keyboard and at phone width, with no sideways scrolling, in light and dark mode.
+
+**Knowledge base (`backend/`, `dashboard/`)**
+
+- [ ] (10) `GET /api/kb` builds the knowledge base view from the code and data, with no model calls: the playbooks, policies and references in `data/kb/`, each playbook's known causes from `data/evals/causes.json`, the path, fix or queue each cause leads to, the tools' risk tiers and owners from `agent/tool_schemas.py`, the policies' rules and where code enforces them, and the knowledge base version and the index it was built into.
+- [ ] (10) It opens with one sentence on what the agent knows, counted from the data: playbooks, policies, references, causes, fixes and queues.
+- [ ] (10) A cause map draws each playbook as a line and each known cause as a station, coloured by its path, with the fix or queue at its end and a policy that overrides it marked on the line. The families with no playbook are dashed lines that always escalate. It has a text equivalent for screen readers, and becomes a list at phone width.
+- [ ] (10) Selecting a playbook opens its reader: its sections as the chunks search uses, each with how often it's the best match for development tickets and its top score, and every fix it names with its risk tier and owner.
+- [ ] (10) Each playbook shows how the agent does on its family in the latest saved run: right in full with n and margin, and its mistakes in CHF, so weak playbooks stand out.
+- [ ] (10) Each policy lists what it forces and the code that enforces it.
+- [ ] (10) Find highlights matching causes and sections in the browser, for free, and links to the Retrieval tab's ranked search.
+- [ ] (10) A test fails if a playbook, cause, policy or fix in the data has no place on the map.
 
 **Durable and gated (`agent/`, `backend/`, `evals/`)**
 

@@ -17,7 +17,15 @@ from pydantic import BaseModel, StringConstraints
 
 from agent import config, tracing
 from agent.graph import build_graph, initial_state
-from backend import economics, overview, queue_board, retrieval_view, stats, store
+from backend import (
+    benchmark,
+    economics,
+    overview,
+    queue_board,
+    retrieval_view,
+    stats,
+    store,
+)
 from evals import runner, scoring
 
 RUN_FIELDS = [
@@ -46,6 +54,7 @@ app.include_router(queue_board.router)
 app.include_router(overview.router)
 app.include_router(retrieval_view.router)
 app.include_router(economics.router)
+app.include_router(benchmark.router)
 
 _gate_lock = Lock()  # two answers to one gate must not both pass its check
 
@@ -178,7 +187,7 @@ def list_evaluations() -> dict:
 @app.get("/api/tickets", operation_id="list_tickets")
 def list_tickets() -> list[dict]:
     """List the tickets to review. Held-out tickets stay out, as they're the exam."""
-    latest = latest_results(runner.load_runs())
+    latest = latest_results(runner.default_runs(full=False))
     users = {u["id"]: u for u in json.loads(config.USERS_FILE.read_text())}
     return [
         {

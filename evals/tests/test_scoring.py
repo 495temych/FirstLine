@@ -204,3 +204,28 @@ def test_families_are_summarised_apart():
     family = scoring.by_family([row])["VPN access"]
     assert family["cause_accuracy"] == 1
     assert family["cost_per_ticket_chf"] == pytest.approx(0.008)
+
+
+def test_balanced_accuracy_weighs_each_expected_path_alike():
+    # Always escalating: right on 3 escalations, wrong on 1 fix.
+    rows = [row("ESCALATE") for _ in range(3)] + [
+        row("ESCALATE", expected_path="AUTO_FIX", path_correct=False)
+    ]
+    assert scoring.summarize(rows)["path_accuracy"] == 0.75
+    assert scoring.balanced_accuracy(rows) == 0.5
+    assert scoring.balanced_accuracy([]) is None
+
+
+def test_percentiles_use_the_nearest_rank():
+    times = [1.0, 2.0, 3.0, 4.0, 10.0]
+    assert scoring.percentile(times, 0.5) == 3.0
+    assert scoring.percentile(times, 0.9) == 10.0
+    assert scoring.percentile([], 0.5) is None
+
+
+def test_an_unreadable_decision_counts_as_invalid():
+    rows = [row(), row(invalid=True), row(error="boom")]
+    s = scoring.summarize(rows)
+    assert s["invalid"] == 2
+    assert s["failed"] == 1
+    assert s["time_p50_sec"] == 2.0

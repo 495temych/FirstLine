@@ -59,7 +59,7 @@ def _history(runs: list[dict]) -> list[dict]:
 
 def _decision() -> dict:
     """Path accuracy on the development set, with search and without it."""
-    runs = [r for r in runner.load_runs() if r["set"] == "dev"]
+    runs = [r for r in runner.default_runs() if r["set"] == "dev"]
 
     def newest(searched: bool) -> dict | None:
         run = next((r for r in runs if r.get("use_retrieval", True) is searched), None)

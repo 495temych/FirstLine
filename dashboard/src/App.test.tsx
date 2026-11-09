@@ -10,6 +10,7 @@ import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import type { Run } from "./api";
 import { App } from "./App";
 import { presets } from "./presets";
+import { benchmark } from "./test-benchmark";
 import {
   baseRun,
   declined,
@@ -46,6 +47,7 @@ beforeEach(() => {
     "/api/tickets": tickets,
     "/api/stats": stats,
     "/api/queue": emptyQueue,
+    "/api/benchmark": benchmark,
   };
   window.history.replaceState(null, "", "/");
   vi.stubGlobal("fetch", vi.fn(reply));
@@ -282,12 +284,14 @@ it("says when the scoreboard has no evaluations", async () => {
   replies["/api/evaluations"] = { ...evaluations, runs: [] };
   render(<App />);
   click("Scoreboard");
+  click("Models: which one?");
   expect(await screen.findByText(/No evaluations yet/)).toBeDefined();
 });
 
 it("shows saved evaluations and opens another one", async () => {
   render(<App />);
   click("Scoreboard");
+  click("Models: which one?");
   expect(await screen.findByText("rules set (tiny)")).toBeDefined();
   expect(
     screen.getByText("rules set, held-out (sample, re-scored)"),
@@ -311,6 +315,7 @@ it("shows a scoreboard failure", async () => {
   replies["/api/evaluations"] = new Error("offline");
   render(<App />);
   click("Scoreboard");
+  click("Models: which one?");
   expect(await screen.findByText("offline")).toBeDefined();
 });
 

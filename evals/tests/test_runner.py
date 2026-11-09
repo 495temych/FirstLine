@@ -57,10 +57,11 @@ def test_a_failed_ticket_counts_as_an_escalation_and_the_run_goes_on(monkeypatch
     run = runner.evaluate("rules", tiny=True)
     assert run["summary"]["n"] == 5
     assert run["summary"]["failed"] == 1
-    first = run["tickets"][0]
-    assert first["path"] == "ESCALATE"
-    assert first["error"] == "TimeoutError: no answer"
-    assert first["cost_usd"] == 0
+    # Tickets run in parallel, so any one of them may be the one that failed.
+    failed = [t for t in run["tickets"] if t["error"]]
+    assert [t["error"] for t in failed] == ["TimeoutError: no answer"]
+    assert failed[0]["path"] == "ESCALATE"
+    assert failed[0]["cost_usd"] == 0
 
 
 @pytest.mark.usefixtures("stubbed")
@@ -257,3 +258,44 @@ def test_the_same_run_is_not_repeated(stubbed, monkeypatch, capsys):
 
 def test_every_run_records_its_labels_version(stubbed):
     assert len(runner.evaluate("rules", tiny=True)["labels_version"]) == 8
+
+
+def test_the_cost_the_provider_reports_beats_the_list_price(stubbed, monkeypatch):
+    def reported(text, use_retrieval):
+        usage = {"input_tokens": 1000, "output_tokens": 200, "cost_usd": 0.0001}
+        return {**always_escalate(text, use_retrieval), "usage": usage}
+
+    monkeypatch.setattr(runner, "run_triage", reported)
+    run = runner.evaluate("rules", tiny=True)
+    assert run["tickets"][0]["cost_usd"] == 0.0001
+
+
+def test_an_unreadable_decision_is_marked_invalid(stubbed, monkeypatch):
+    def unreadable(text, use_retrieval):
+        return {**always_escalate(text, use_retrieval), "reasoning": runner.UNREADABLE}
+
+    monkeypatch.setattr(runner, "run_triage", unreadable)
+    run = runner.evaluate("rules", tiny=True)
+    assert run["summary"]["invalid"] == 5
+    assert run["summary"]["failed"] == 0
+
+
+def test_a_run_records_who_served_it(stubbed, monkeypatch):
+    monkeypatch.setenv("MODEL_NAME", "mistralai/mistral-small-2603")
+    run = runner.evaluate("rules", tiny=True)
+    assert run["serving"] == {
+        "lab": "openrouter",
+        "provider": "mistral/eu",
+        "region": "EU",
+        "effort": None,
+    }
+    assert runner.serving("claude-future")["lab"] == "anthropic"
+
+
+def test_the_model_flag_picks_the_model(stubbed, monkeypatch, capsys):
+    monkeypatch.setenv("MODEL_NAME", "")  # restored after the flag sets it
+    argv = ["evals", "--tiny", "--model", "gpt-5-nano"]
+    monkeypatch.setattr("sys.argv", argv)
+    runpy.run_module("evals", run_name="__main__")
+    assert "gpt-5-nano" in capsys.readouterr().out
+    assert runner.config.model_name() == "gpt-5-nano"

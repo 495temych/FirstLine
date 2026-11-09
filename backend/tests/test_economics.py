@@ -45,6 +45,7 @@ def saved_run(tmp_path, monkeypatch):
         "id": "a-dev",
         "set": "dev",
         "model": "claude-haiku-4-5-20251001",
+        "tiny": False,
         "summary": SUMMARY,
         "yardsticks": {},
     }
@@ -65,6 +66,15 @@ def test_projected_prices_only_the_mistakes_nobody_catches(saved_run):
     assert layer["per_year_chf"] == pytest.approx(layer["net_chf"] * 1500)
     assert layer["net_none_caught"] == pytest.approx(8.5 - 0.01 - 60)
     assert layer["net_all_caught"] == pytest.approx(8.5 - 0.01)
+
+
+def test_projected_reads_only_the_default_models_full_runs(saved_run, monkeypatch):
+    monkeypatch.setenv("MODEL_NAME", "claude-haiku-4-5-20251001")
+    runner.save_run({**saved_run, "id": "c-dev", "model": "gpt-6-luna"})
+    runner.save_run({**saved_run, "id": "d-dev-sample", "sample": True})
+    layer = economics.projected(**RATES)
+    assert layer is not None
+    assert layer["source"] == "a-dev"
 
 
 def test_catching_every_mistake_leaves_only_time_and_model(saved_run):

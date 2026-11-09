@@ -1,6 +1,6 @@
 # Tech stack
 
-- `agent/`: a LangGraph graph with `langchain-anthropic`, and `run_triage` as the entry point. It uses `claude-haiku-4-5-20251001` by default, or the model in the environment variable `MODEL_NAME` if set. The model's decision is a Pydantic class, which the model fills in through one forced tool call. Retrieval embeds locally with `sentence-transformers` and `all-MiniLM-L6-v2`.
+- `agent/`: a LangGraph graph with `langchain-anthropic`, and `run_triage` as the entry point. It uses `claude-haiku-4-5-20251001` by default, or the model in the environment variable `MODEL_NAME` if set. `agent/models.py` lists every model the benchmark compares, with its price, region and lowest reasoning effort: Claude through Anthropic, OpenAI's models through OpenAI with `langchain-openai`, and the rest through OpenRouter's OpenAI-compatible API, each pinned to one provider that doesn't keep prompts. The model's decision is a Pydantic class, which the model fills in through one forced tool call. Retrieval embeds locally with `sentence-transformers` and `all-MiniLM-L6-v2`.
 - `backend/`: FastAPI around the graph, with no triage logic of its own. Every operation has an `operation_id`, a one-line docstring and no optional inputs.
 - `dashboard/`: React, Vite and TypeScript in strict mode, with Queue, Assistant, Scoreboard, Retrieval, Tickets and How it works tabs. It reaches the agent only through the API. `docs/BRAND.md` has its look.
 - `e2e/`: Playwright tests of the real API and graph, with a stub model.
@@ -20,4 +20,4 @@ Still to come:
 - **Qdrant, next:** past incidents, and keyword search beside meaning for error codes.
 - **Microsoft Azure:** Container Apps, Key Vault, managed identity, API Management and Claude in Foundry.
 
-Python 3.12 with uv, all in `pyproject.toml`. Node 26 with npm, in the root `package.json`. The Anthropic key is `ANTHROPIC_API_KEY` in `.env`. Paths and settings are in `agent/config.py`.
+Python 3.12 with uv, all in `pyproject.toml`. Node 26 with npm, in the root `package.json`. The Anthropic key is `ANTHROPIC_API_KEY` in `.env`. The benchmark also needs `OPENAI_API_KEY` and `OPENROUTER_API_KEY`. Paths and settings are in `agent/config.py`.

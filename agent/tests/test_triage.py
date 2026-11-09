@@ -17,7 +17,7 @@ def test_run_triage_stops_at_the_first_gate(monkeypatch):
     assert result["tool_name"] == "reset_vpn_profile"
     assert result["tool_input"] == {"username": "a.b"}
     assert result["retrieved"] == [UNIT]
-    assert result["usage"] == {"input_tokens": 0, "output_tokens": 0}
+    assert result["usage"] == {"input_tokens": 0, "output_tokens": 0, "cost_usd": None}
 
 
 def test_usage_comes_from_the_model_reply():
@@ -25,4 +25,17 @@ def test_usage_comes_from_the_model_reply():
         content="",
         usage_metadata={"input_tokens": 12, "output_tokens": 3, "total_tokens": 15},
     )
-    assert graph.usage_of(msg) == {"input_tokens": 12, "output_tokens": 3}
+    assert graph.usage_of(msg) == {
+        "input_tokens": 12,
+        "output_tokens": 3,
+        "cost_usd": None,
+    }
+
+
+def test_usage_keeps_the_cost_the_provider_reports():
+    msg = AIMessage(
+        content="",
+        usage_metadata={"input_tokens": 12, "output_tokens": 3, "total_tokens": 15},
+        response_metadata={"token_usage": {"cost": 0.0004}},
+    )
+    assert graph.usage_of(msg)["cost_usd"] == 0.0004

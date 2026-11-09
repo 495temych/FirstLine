@@ -22,10 +22,11 @@ Rules this module follows:
 import time
 from functools import cache
 from pathlib import Path
-from typing import Any, Literal
+from typing import Literal
 
 import anthropic
-from langchain_anthropic import ChatAnthropic
+import openai
+from langchain_core.language_models import BaseChatModel
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 from langgraph.graph import END, START, StateGraph
 from langgraph.types import RetryPolicy, interrupt
@@ -42,6 +43,7 @@ from agent.decision import (
     read_decision,
     tool_guide,
 )
+from agent.models import chat_model, tool_choice
 from agent.retrieval import retrieve
 
 _PROMPT_FILE = Path(__file__).parent / "prompt.md"
@@ -180,25 +182,25 @@ def ticket_for(state: GraphState) -> dict:
 
 # ── Model ───────────────────────────────────────────────────────────────────────
 @cache
-def _get_llm() -> ChatAnthropic:
-    # max_retries=0: transient API errors are retried by the node's RetryPolicy, not
-    # twice over by the SDK as well.
-    settings: dict[str, Any] = {
-        "model": model_name(),
-        "max_tokens": 2048,
-        "max_retries": 0,
-    }
-    return ChatAnthropic(**settings)
+def _client(name: str) -> BaseChatModel:
+    return chat_model(name)
+
+
+def _get_llm() -> BaseChatModel:
+    return _client(model_name())
 
 
 def _is_api_error(exc: BaseException) -> bool:
-    """Retry transient Anthropic failures only (network, timeout, 429, 5xx/529)."""
+    """Retry transient API failures only (network, timeout, 429, 5xx/529)."""
     return isinstance(
         exc,
         (
             anthropic.APIConnectionError,
             anthropic.RateLimitError,
             anthropic.InternalServerError,
+            openai.APIConnectionError,
+            openai.RateLimitError,
+            openai.InternalServerError,
         ),
     )
 
@@ -220,7 +222,8 @@ def _call_model(state: GraphState) -> tuple[AIMessage, float]:
     if state["use_retrieval"]:
         # Tools are withheld entirely when RAG is off, not just retrieval — the agent
         # must reason in plain text only and cannot propose or execute any action.
-        llm = llm.bind_tools([DECISION_TOOL], tool_choice=DECISION_TOOL_NAME)
+        choice = tool_choice(model_name(), DECISION_TOOL_NAME)
+        llm = llm.bind_tools([DECISION_TOOL], tool_choice=choice)
         instructions += f"\n\n**Remediation tools**\n{tool_guide()}"
     messages = [
         SystemMessage(instructions),
@@ -241,10 +244,13 @@ def retrieve_node(state: GraphState) -> dict:
 
 
 def usage_of(msg: AIMessage) -> dict:
+    """Tokens, and the cost when the provider reports it, as OpenRouter does."""
     meta = msg.usage_metadata or {}
+    reported = (msg.response_metadata.get("token_usage") or {}).get("cost")
     return {
         "input_tokens": meta.get("input_tokens", 0),
         "output_tokens": meta.get("output_tokens", 0),
+        "cost_usd": None if reported is None else float(reported),
     }
 
 

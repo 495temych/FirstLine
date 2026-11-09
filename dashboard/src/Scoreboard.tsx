@@ -9,6 +9,7 @@ import {
 import { chf, dateTime, pathLabels, percent, rappen, rate } from "./format";
 import { useLoad } from "./useLoad";
 import { BusinessCase } from "./BusinessCase";
+import { Models } from "./Models";
 
 const setNames: Record<string, string> = {
   kb: "knowledge base",
@@ -373,24 +374,52 @@ function Board({ runs, costs }: Readonly<Pick<Evaluations, "runs" | "costs">>) {
   );
 }
 
-export function Scoreboard() {
+function SavedRuns() {
   const { data, error } = useLoad(api.evaluations);
   if (error) return <p className="notice alert">{error}</p>;
   if (!data) return null;
+  return data.runs.length === 0 ? (
+    <p className="notice">
+      No evaluations yet. Run <code>uv run -m evals --tiny</code> to create one.
+    </p>
+  ) : (
+    <Board runs={data.runs} costs={data.costs} />
+  );
+}
+
+const views = ["Money", "Models"] as const;
+type View = (typeof views)[number];
+
+export function Scoreboard() {
+  const [view, setView] = useState<View>("Money");
   return (
     <>
-      <BusinessCase />
-      {data.runs.length === 0 ? (
-        <p className="notice">
-          No evaluations yet. Run <code>uv run -m evals --tiny</code> to create
-          one.
-        </p>
+      <nav className="sub-tabs" aria-label="Scoreboard">
+        {views.map((name) => (
+          <button
+            key={name}
+            type="button"
+            aria-current={view === name ? "page" : undefined}
+            onClick={() => {
+              setView(name);
+            }}
+          >
+            {name === "Money" ? "Money: is it worth it?" : "Models: which one?"}
+          </button>
+        ))}
+      </nav>
+      {view === "Money" ? (
+        <BusinessCase />
       ) : (
-        <Board runs={data.runs} costs={data.costs} />
+        <>
+          <Models />
+          <h2 className="runs-heading">Every saved run</h2>
+          <SavedRuns />
+          <p className="caption">
+            Retrieval has its own tab, with every saved score.
+          </p>
+        </>
       )}
-      <p className="caption">
-        Retrieval has its own tab, with every saved score.
-      </p>
     </>
   );
 }
