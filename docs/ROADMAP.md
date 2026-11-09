@@ -237,7 +237,7 @@ The number after each one is the commit that meets it. The Queue's investigation
 - [x] (7) A chart shows the right playbook's score against the best wrong one for every ticket, with the thresholds drawn in, so a reader sees why the thresholds sit where they do. Clicking a ticket opens its ranked sections.
 - [x] (7) "Try a search" ranks the knowledge base for any text the reader types, with the scores and the threshold, through `POST /api/retrieval/search`. It's free, because embeddings run on this machine and no model is called.
 - [ ] (7) The view shows how retrieval changes the decision: path accuracy with and without it, from saved runs. The view reads both from saved runs and shows the one with search. None is saved without it, because with search off the agent answers in plain text with no path to score. Measuring it needs a run where the decision form gets no playbook, about CHF 0.65 on the development set, and waits for the owner's go-ahead.
-- [ ] (6, 7) Both pages pass the checklist in `docs/EXPLAINABILITY.md`: phone width, light and dark, keyboard, and screenshots reviewed.
+- [ ] (6, 7) Both pages pass the checklist in `docs/EXPLAINABILITY.md`: phone width, keyboard, and screenshots reviewed.
 
 **The business case (`backend/`, `dashboard/`)**
 
@@ -252,7 +252,7 @@ The number after each one is the commit that meets it. The Queue's investigation
 - [x] (9) The masthead has three groups, Try it, Is it worth it? and How it works, and each group has one row of tabs: Queue and Assistant; Money and Models; Workflow, Harness, Knowledge base, Retrieval, Tickets and Evaluations.
 - [x] (9) Every saved run moves from under Models to its own Evaluations tab, so the business group keeps only the answer.
 - [x] (9) Each view has its own link, such as `?view=kb&doc=vpn-access`, and a reload or a shared link opens the same view. A paused Assistant run still opens from its link.
-- [x] (9) The navigation works with the keyboard and at phone width, with no sideways scrolling, in light and dark mode.
+- [x] (9) The navigation works with the keyboard and at phone width, with no sideways scrolling.
 - [x] (9) Each group opens with its question and two or three findings that answer it, from `GET /api/insights`, built from saved runs, the benchmark and the Queue's reviews, with no model calls. A group with no data says what would fill it.
 - [x] (9) Tabs that aren't built yet, such as Knowledge base before commit 10, don't appear.
 

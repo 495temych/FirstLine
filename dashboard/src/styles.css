@@ -1,5 +1,5 @@
 :root {
-  color-scheme: light dark;
+  color-scheme: light;
   --paper: #e9eef0;
   --panel: #ffffff;
   --ink: #12263a;
@@ -20,27 +20,6 @@
   --wash: #dde5e9;
   --sans: "Familjen Grotesk", system-ui, sans-serif;
   --mono: "IBM Plex Mono", ui-monospace, monospace;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --paper: #0c1b29;
-    --panel: #14283a;
-    --ink: #e6edf0;
-    --ink-soft: #a3b5c1;
-    --rule: #2b4254;
-    --band: #07131e;
-    --band-ink: #e6edf0;
-    --band-soft: #93a8b6;
-    --self-serve: #5ccb94;
-    --auto-fix: #8fb0ff;
-    --escalate: #f79a62;
-    --out-of-scope: #a3b1bd;
-    --no-tools: #c3a5f5;
-    --good-wash: #173a2c;
-    --alert-wash: #45261a;
-    --wash: #1e3546;
-  }
 }
 
 * {
@@ -667,17 +646,8 @@ tr[data-selected="true"] td {
   --hue: var(--self-serve);
 }
 
-@media (prefers-color-scheme: light) {
-  .matrix td.cell[data-strong="true"] {
-    color: var(--panel);
-  }
-}
-
-/* Dark mode keeps light text, so the shading stops short of it. */
-@media (prefers-color-scheme: dark) {
-  .matrix td.cell {
-    --depth: 0.6;
-  }
+.matrix td.cell[data-strong="true"] {
+  color: var(--panel);
 }
 
 .matrix td.cell small {

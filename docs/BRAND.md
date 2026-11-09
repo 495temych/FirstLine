@@ -11,12 +11,14 @@ From Google Fonts:
 
 ## Colors
 
-- **Paper**: `#E9EEF0` in light mode, `#0C1B29` in dark
-- **Panels**: `#FFFFFF` in light mode, `#14283A` in dark
-- **Ink**: `#12263A` in light mode, `#E6EDF0` in dark
+- **Paper**: `#E9EEF0`
+- **Panels**: `#FFFFFF`
+- **Ink**: `#12263A`
 - **Signal amber**: `#F2B705`. Use it for human gates and nothing else.
 
-Each path has one color, which the route line takes on. Dark mode uses a lighter version of each.
+The dashboard has one light theme, whatever the system setting.
+
+Each path has one color, which the route line takes on.
 
 - **Self-serve**: `#1B7A4B`
 - **Auto-fix**: `#2450B2`

@@ -70,7 +70,7 @@ A decision links to its Langfuse trace. A score links to its saved run, and a to
 
 ## The quality floor
 
-- It works at phone width (375 px) with no sideways scrolling, and in light and dark mode.
+- It works at phone width (375 px) with no sideways scrolling.
 - Everything can be reached and used with the keyboard, with a visible focus ring.
 - Every diagram has a text equivalent for screen readers, such as a list of stations or a table of values.
 - Text contrast meets WCAG AA.
@@ -84,4 +84,4 @@ A decision links to its Langfuse trace. A score links to its saved run, and a to
 4. Give each number its question, n, what good looks like, uncertainty and source.
 5. Choose the one interaction that teaches the most, and say what it costs.
 6. Say where the thing it explains fails.
-7. Run a design pass with the frontend-design skill against `docs/BRAND.md`, then review screenshots in light, dark and at phone width.
+7. Run a design pass with the frontend-design skill against `docs/BRAND.md`, then review screenshots on desktop and at phone width.
