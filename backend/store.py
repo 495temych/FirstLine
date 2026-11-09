@@ -1,8 +1,12 @@
-"""Where the Queue keeps its record: Supabase, or memory when there's no database.
+"""Where FirstLine keeps its record: Supabase, or memory when there's no database.
 
-The board saves each step here as it happens, and reads everything back when the
-backend starts. A ticket's state is never stored. It follows from what happened to the
-ticket, its events, decision and review, through `state_of`, in both versions.
+The Queue's board saves each step here as it happens, and reads everything back when
+the backend starts. Each Assistant run is a ticket too, with its decision and the
+person's answers at its gates, which the usage statistics read. LangGraph's own
+checkpoints sit in the same database, through `checkpointer`.
+
+A ticket's state is never stored. It follows from what happened to the ticket, its
+events, decision and review, through `state_of`, in both versions.
 
 What Supabase doesn't hold, such as a ticket's title, SLA and requester's profile, the
 board joins from `data/` by id, so no copy can drift.
@@ -11,15 +15,20 @@ board joins from `data/` by id, so no copy can drift.
 import os
 from collections import defaultdict
 from datetime import UTC, datetime
+from functools import cache
 from threading import Lock
 from typing import Protocol, TypedDict
 
+from langgraph.checkpoint.base import BaseCheckpointSaver
+from langgraph.checkpoint.memory import InMemorySaver
+from langgraph.checkpoint.postgres import PostgresSaver
 from psycopg import Connection
-from psycopg.rows import dict_row
+from psycopg.rows import DictRow, dict_row
 from psycopg.types.json import Jsonb
 from psycopg_pool import ConnectionPool
 
 REVIEWER = "technician"  # until people sign in
+ASSISTANT_REQUESTER = "anonymous"  # until the Assistant has a requester picker
 CONNECT_TIMEOUT_SEC = 30  # the session pooler can be slow to answer on a bad network
 POOL_SIZE = 4  # two workers, a review and the board's reads
 
@@ -30,6 +39,7 @@ ACTORS = {
     "decided": "agent",
     "failed": "agent",
     "reviewed": "person",
+    "answered": "person",
     "action_ran": "code",
 }
 
@@ -85,6 +95,19 @@ class Event(TypedDict):
     detail: dict
 
 
+class Answer(TypedDict):
+    gate: str
+    approved: bool
+
+
+class Run(TypedDict):
+    """One Assistant run, as the usage statistics read it."""
+
+    path: str
+    latency_ms: int | None
+    answers: list[Answer]
+
+
 def state_of(events: list[Event], decided: bool, reviewed: bool) -> str:
     """A ticket's state, from what has happened to it."""
     if reviewed:
@@ -131,6 +154,9 @@ class Store(Protocol):
     def decided(self, ticket_id: str, decision: Proposal) -> None: ...
     def reviewed(self, ticket_id: str, review: Verdict, outcome: dict) -> None: ...
     def tickets(self) -> list[Saved]: ...
+    def add_run(self, run_id: str, text: str, decision: Proposal) -> None: ...
+    def answered(self, run_id: str, answer: Answer, outcome: dict | None) -> None: ...
+    def runs(self) -> list[Run]: ...
 
 
 class MemoryStore:
@@ -143,6 +169,7 @@ class MemoryStore:
         self._events: dict[str, list[Event]] = defaultdict(list)
         self._decisions: dict[str, Proposal] = {}
         self._reviews: dict[str, tuple[Verdict, str]] = {}
+        self._runs: dict[str, Run] = {}
 
     def ticket_ids(self) -> set[str]:
         with self._lock:
@@ -192,6 +219,28 @@ class MemoryStore:
                 for ticket_id, batch in self._batch_of.items()
             ]
 
+    def add_run(self, run_id: str, text: str, decision: Proposal) -> None:
+        with self._lock:
+            self._runs[run_id] = {
+                "path": decision["path"],
+                "latency_ms": decision["latency_ms"],
+                "answers": [],
+            }
+            self._event(run_id, "decided", {"path": decision["path"]})
+
+    def answered(self, run_id: str, answer: Answer, outcome: dict | None) -> None:
+        with self._lock:
+            self._runs[run_id]["answers"].append(answer)
+            self._event(run_id, "answered", dict(answer))
+            if outcome is not None:
+                self._event(run_id, "action_ran", outcome)
+
+    def runs(self) -> list[Run]:
+        with self._lock:
+            return [
+                {**run, "answers": list(run["answers"])} for run in self._runs.values()
+            ]
+
 
 def _add_event(conn: Connection, ticket_id: str, kind: str, detail: dict) -> None:
     conn.execute(
@@ -207,6 +256,19 @@ values (%(ticket_id)s, %(path)s, %(tool)s, %(tool_input)s, %(queue)s, %(priority
   %(cause)s, %(reasoning)s, %(summary)s, %(retrieved)s, %(model)s, %(version)s,
   %(trace_id)s, %(cost_usd)s, %(latency_ms)s)
 """
+
+
+def _add_decision(conn: Connection, ticket_id: str, decision: Proposal) -> None:
+    tool_input = decision["tool_input"]
+    values = {
+        **decision,
+        "ticket_id": ticket_id,
+        "tool_input": None if tool_input is None else Jsonb(tool_input),
+        "retrieved": Jsonb(decision["retrieved"]),
+    }
+    conn.execute(ADD_DECISION, values)
+    _add_event(conn, ticket_id, "decided", {"path": decision["path"]})
+
 
 ADD_REVIEW = """
 insert into reviews (decision_id, verdict, correction, reviewer, seconds_spent, note)
@@ -231,6 +293,18 @@ READ_REVIEWS = """
 select d.ticket_id, r.verdict, r.correction, r.reviewer, r.seconds_spent, r.note,
   r.created_at
 from reviews r join decisions d on d.id = r.decision_id
+"""
+
+
+READ_RUNS = """
+select t.id, d.path, d.latency_ms,
+  coalesce(
+    (select jsonb_agg(e.detail order by e.id) from events e
+     where e.ticket_id = t.id and e.kind = 'answered'),
+    '[]'::jsonb
+  ) as answers
+from tickets t join decisions d on d.ticket_id = t.id
+where t.mode = 'assistant' order by t.created_at, t.id
 """
 
 
@@ -292,7 +366,8 @@ class PostgresStore:
 
     def ticket_ids(self) -> set[str]:
         with self._conn() as conn:
-            return {row[0] for row in conn.execute("select id from tickets")}
+            rows = conn.execute("select id from tickets where mode = 'queue'")
+            return {row[0] for row in rows}
 
     def add_batch(self, note: str, tickets: list[Arrival]) -> str:
         with self._conn() as conn:
@@ -320,17 +395,8 @@ class PostgresStore:
             _add_event(conn, ticket_id, "failed", {"error": error})
 
     def decided(self, ticket_id: str, decision: Proposal) -> None:
-        values = {
-            **decision,
-            "ticket_id": ticket_id,
-            "tool_input": None
-            if decision["tool_input"] is None
-            else Jsonb(decision["tool_input"]),
-            "retrieved": Jsonb(decision["retrieved"]),
-        }
         with self._conn() as conn:
-            conn.execute(ADD_DECISION, values)
-            _add_event(conn, ticket_id, "decided", {"path": decision["path"]})
+            _add_decision(conn, ticket_id, decision)
 
     def reviewed(self, ticket_id: str, review: Verdict, outcome: dict) -> None:
         correction = (
@@ -382,8 +448,59 @@ class PostgresStore:
             for t in tickets
         ]
 
+    def add_run(self, run_id: str, text: str, decision: Proposal) -> None:
+        with self._conn() as conn:
+            conn.execute(
+                "insert into tickets (id, text, requester, mode)"
+                " values (%s, %s, %s, 'assistant')",
+                [run_id, text, ASSISTANT_REQUESTER],
+            )
+            _add_decision(conn, run_id, decision)
+
+    def answered(self, run_id: str, answer: Answer, outcome: dict | None) -> None:
+        with self._conn() as conn:
+            _add_event(conn, run_id, "answered", dict(answer))
+            if outcome is not None:
+                _add_event(conn, run_id, "action_ran", outcome)
+
+    def runs(self) -> list[Run]:
+        with self._conn() as conn, conn.cursor(row_factory=dict_row) as cur:
+            rows = cur.execute(READ_RUNS).fetchall()
+        return [
+            {"path": r["path"], "latency_ms": r["latency_ms"], "answers": r["answers"]}
+            for r in rows
+        ]
+
 
 def open_store() -> Store:
     """Supabase when `SUPABASE_DB_URL` is set, otherwise memory."""
     url = os.getenv("SUPABASE_DB_URL")
     return PostgresStore(url) if url else MemoryStore()
+
+
+@cache
+def shared() -> Store:
+    """The backend's one record, opened on first use."""
+    return open_store()
+
+
+def checkpointer() -> BaseCheckpointSaver:
+    """Where LangGraph saves a paused run: Supabase, or memory without it.
+
+    The tables come from `uv run -m backend.migrate`, so the backend never creates
+    them, and a missing table fails loudly instead of being made without security.
+    """
+    url = os.getenv("SUPABASE_DB_URL")
+    if not url:
+        return InMemorySaver()
+    pool = ConnectionPool(
+        url,
+        connection_class=Connection[DictRow],
+        open=True,  # the graph is built on first use, so it can connect now
+        min_size=1,
+        max_size=POOL_SIZE,
+        timeout=CONNECT_TIMEOUT_SEC,
+        # As LangGraph requires: each write commits at once, and rows are dicts.
+        kwargs={"autocommit": True, "prepare_threshold": None, "row_factory": dict_row},
+    )
+    return PostgresSaver(pool)

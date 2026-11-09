@@ -23,9 +23,8 @@ def _graph():
 
 def run_triage(query: str, use_retrieval: bool) -> dict:
     """Run triage and return a structured result dict."""
-    # log_runs=False: eval/library callers must not write to the app's usage log.
     config: RunnableConfig = {
-        "configurable": {"thread_id": uuid4().hex, "log_runs": False},
+        "configurable": {"thread_id": uuid4().hex},
         "callbacks": tracing.callbacks(),
     }
     out = _graph().invoke(initial_state(query, use_retrieval), config)

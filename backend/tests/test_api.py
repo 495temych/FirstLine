@@ -1,17 +1,17 @@
 """API tests, with a stub model and temporary files."""
 
-import csv
 import json
 from unittest.mock import patch
 
 import anthropic
 import httpx2
+import psycopg
 import pytest
 from fastapi.testclient import TestClient
 
 from agent import config, graph, tools
 from agent.tests.fakes import UNIT, FakeLLM, escalate, fix, out_of_scope, steps, text
-from backend import main, stats
+from backend import main, store
 from evals import retrieval_score, runner
 
 AUTO_FIX = fix("reset_vpn_profile", "Reset the profile.", username="a.b")
@@ -21,17 +21,9 @@ OUT_OF_SCOPE = out_of_scope()
 
 
 @pytest.fixture
-def log(tmp_path):
-    return tmp_path / "logs.csv"
-
-
-@pytest.fixture
-def client(tmp_path, log, monkeypatch):
+def client(tmp_path, monkeypatch):
     """The API against temporary files, with retrieval stubbed."""
     monkeypatch.setenv("ANTHROPIC_API_KEY", "test-key")
-    monkeypatch.setattr(config, "CHECKPOINT_DB", tmp_path / "checkpoints.sqlite")
-    monkeypatch.setattr(graph, "LOG_FILE", log)
-    monkeypatch.setattr(stats, "LOG_FILE", log)
     monkeypatch.setattr(graph, "retrieve", lambda q: [UNIT])
     monkeypatch.setattr(runner, "RUNS_DIR", tmp_path / "runs")
     monkeypatch.setattr(retrieval_score, "RUNS_DIR", tmp_path / "retrieval")
@@ -54,9 +46,8 @@ def answer(client, run, gate, approved):
     return client.post(url, json={"gate": gate, "approved": approved})
 
 
-def logged_rows(log):
-    with open(log, newline="") as f:
-        return list(csv.DictReader(f))
+def runs():
+    return store.shared().runs()
 
 
 def stub_triage(text, use_retrieval):
@@ -121,15 +112,15 @@ def test_auto_fix_waits_at_its_gate_and_the_tool_has_not_run(client, monkeypatch
     dispatch.assert_not_called()
 
 
-def test_a_confirmed_fix_runs_and_is_logged(client, log, monkeypatch):
+def test_a_confirmed_fix_runs_and_is_recorded(client, monkeypatch):
     run = start(client, monkeypatch, AUTO_FIX)
     done = answer(client, run, "confirm_fix", True).json()
     assert done["pending"] is None
     assert done["human_decision"] == {"fix": True}
     assert done["tool_result"]["simulated"] is True
-    row = logged_rows(log)[0]
-    assert row["decision_path"] == "AUTO_FIX"
-    assert row["confirmed"] == "true"
+    (run,) = runs()
+    assert run["path"] == "AUTO_FIX"
+    assert run["answers"] == [{"gate": "confirm_fix", "approved": True}]
 
 
 def test_a_declined_fix_gives_a_pre_filled_ticket(client, monkeypatch):
@@ -143,13 +134,13 @@ def test_a_declined_fix_gives_a_pre_filled_ticket(client, monkeypatch):
     assert done["tool_result"]["action"] == "create_escalation_ticket"
 
 
-def test_escalate_creates_no_ticket_when_declined(client, log, monkeypatch):
+def test_escalate_creates_no_ticket_when_declined(client, monkeypatch):
     run = start(client, monkeypatch, ESCALATE)
     assert run["pending"]["ticket"]["queue"] == "SEC-INCIDENT"
     done = answer(client, run, "confirm_ticket", False).json()
     assert done["tool_result"] is None
     assert done["human_decision"] == {"ticket": False}
-    assert logged_rows(log)[0]["escalation_queue"] == "SEC-INCIDENT"
+    assert runs()[0]["answers"] == [{"gate": "confirm_ticket", "approved": False}]
 
 
 def test_escalate_creates_a_ticket_when_confirmed(client, monkeypatch):
@@ -174,11 +165,11 @@ def test_failed_self_serve_goes_to_the_ticket_gate(client, monkeypatch):
     assert waiting["pending"]["ticket"]["source"] == "self_serve"
 
 
-def test_out_of_scope_takes_no_action(client, log, monkeypatch):
+def test_out_of_scope_takes_no_action(client, monkeypatch):
     run = start(client, monkeypatch, OUT_OF_SCOPE)
     assert run["path"] == "OUT_OF_SCOPE"
     assert run["pending"] is None
-    assert logged_rows(log)[0]["decision_path"] == "OUT_OF_SCOPE"
+    assert runs()[0]["path"] == "OUT_OF_SCOPE"
 
 
 def test_retrieval_off_gives_no_tools_and_no_path(client, monkeypatch):
@@ -186,6 +177,7 @@ def test_retrieval_off_gives_no_tools_and_no_path(client, monkeypatch):
     assert run["path"] == "NO_TOOLS"
     assert run["pending"] is None
     assert run["retrieved"] == []
+    assert runs() == []  # a comparison only, not a use of the Assistant
 
 
 def test_a_gate_can_only_be_answered_when_it_is_the_one_waiting(client, monkeypatch):
@@ -195,19 +187,31 @@ def test_a_gate_can_only_be_answered_when_it_is_the_one_waiting(client, monkeypa
     assert client.get(f"/api/runs/{run['id']}").json()["tool_result"] is None
 
 
-def test_a_repeated_answer_changes_nothing(client, log, monkeypatch):
+def test_a_repeated_answer_changes_nothing(client, monkeypatch):
     run = start(client, monkeypatch, AUTO_FIX)
     assert answer(client, run, "confirm_fix", True).status_code == 200
     assert answer(client, run, "confirm_fix", True).status_code == 409
-    assert len(logged_rows(log)) == 1
+    assert len(runs()[0]["answers"]) == 1
 
 
-def test_a_paused_run_survives_a_restart(client, monkeypatch):
+def test_a_paused_run_survives_a_restart(client, monkeypatch, empty_postgres):
+    monkeypatch.setenv("SUPABASE_DB_URL", empty_postgres)
     run = start(client, monkeypatch, AUTO_FIX)
     main._graph.cache_clear()  # what a new process starts with
+    store.shared.cache_clear()
     read = client.get(f"/api/runs/{run['id']}").json()
     assert read["pending"]["kind"] == "confirm_fix"
     assert answer(client, run, "confirm_fix", True).json()["tool_result"]
+    with psycopg.connect(empty_postgres) as conn:
+        kinds = conn.execute(
+            "select kind, actor from events where ticket_id = %s order by id",
+            [run["id"]],
+        ).fetchall()
+    assert kinds == [
+        ("decided", "agent"),
+        ("answered", "person"),
+        ("action_ran", "code"),
+    ]
 
 
 def test_evaluations_start_empty_and_name_the_costs(client):

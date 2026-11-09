@@ -7,8 +7,8 @@ from dotenv import load_dotenv
 
 ROOT = Path(__file__).resolve().parent.parent
 KB_DIR = ROOT / "data" / "kb"
+# The usage log before Supabase. Only the Langfuse upload reads it now.
 LOG_FILE = ROOT / "logs.csv"
-CHECKPOINT_DB = ROOT / "checkpoints.sqlite"
 USERS_FILE = ROOT / "data" / "records" / "users.json"
 TICKETS_DIR = ROOT / "data" / "tickets"
 EVALS_DIR = ROOT / "data" / "evals"

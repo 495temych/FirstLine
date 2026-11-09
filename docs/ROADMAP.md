@@ -152,8 +152,10 @@ The number after each one is the commit that meets it.
 | 1 | ✅ **Langfuse.** One trace per ticket, tagged runs and scores on traces, with personal data redacted before anything leaves the Mac | Click a decision and follow it, with no names in the trace | Traces, experiments, sending only what the task needs |
 | 2 | **Qdrant.** Sections and past incidents move to Qdrant, with hybrid search for error codes | Retrieval scores before and after, beside each other | Search by meaning and keywords, retrieval evals |
 | 3a | ✅ **Supabase: the Queue.** The board's batches, decisions, reviews and events live in Postgres | Restart the backend mid-batch: the board comes back, and unfinished tickets carry on | A system of record, states computed from data |
-| 3b | **Supabase: the Assistant.** Postgres replaces SQLite checkpoints and `logs.csv` | A paused Assistant ticket survives a restart, and usage statistics read Postgres | Durable checkpoints |
+| 3b | ✅ **Supabase: the Assistant.** Postgres replaces SQLite checkpoints and `logs.csv` | A paused Assistant ticket survives a restart, and usage statistics read Postgres | Durable checkpoints |
 | 4 | 🟡 **The Queue.** Load a batch, order it in code, and approve, correct or reject each decision with its evidence | A technician clears a morning batch, and technician time per ticket is measured | The human's step |
+| 6 | **How it works.** An overview page of the goal, the route a ticket takes, the model, the tools and the services, built from the code | A recruiter understands the agent in two minutes without opening the repository | Explainability, a single source of truth |
+| 7 | **Retrieval.** A page of the core retrieval measures, how sure each match is, and a search anyone can try | Type a request and watch which playbook it finds, and how strongly | RAG evaluation |
 | 5 | **Durable and gated.** Retries, no repeated actions, spending limits per batch, and a release gate: a change ships only if its Langfuse experiment passes | Kill a batch mid-run and it carries on without doing anything twice. A worse change is refused | Idempotency, `RetryPolicy`, evals as a release gate |
 
 The Queue's first version is in: batches, live states, review with measured time, traces in the UI and the value in CHF. Since commit 3a it keeps its record in Supabase and survives a restart. The agent doesn't investigate yet.
@@ -190,8 +192,8 @@ The number after each one is the commit that meets it. The Queue's investigation
 - [x] (3a) What isn't in Supabase, such as the title, SLA and requester's profile, is joined from `data/` by id, so no copy can drift. A decision records the runner's version hash, so it says which instructions, tools and knowledge base made it.
 - [x] (3a) `uv run -m backend.migrate` applies new migrations, records each in `schema_migrations`, and does nothing on a second run. A second migration keeps each retrieved section's score.
 - [x] (3a) After a restart the board comes back as it was. Tickets that were queued or working go back to the agent once, a ticket with a decision is never triaged again, and the desk never hands out a ticket already in Supabase.
-- [ ] (3b) LangGraph's checkpoints are in Postgres, so a paused Assistant ticket survives a restart. `checkpoints.sqlite` is no longer written.
-- [ ] (3b) An Assistant run is a ticket, a decision and its events in Supabase instead of a row in `logs.csv`, and the usage statistics read Postgres. The old rows stay in Langfuse.
+- [x] (3b) LangGraph's checkpoints are in Postgres, so a paused Assistant ticket survives a restart. `checkpoints.sqlite` is no longer written.
+- [x] (3b) An Assistant run is a ticket, a decision and its events in Supabase instead of a row in `logs.csv`, and the usage statistics read Postgres. The old rows stay in Langfuse.
 
 **The Queue (`backend/queue_board.py`, `dashboard/`)**
 
@@ -200,6 +202,21 @@ The number after each one is the commit that meets it. The Queue's investigation
 - [x] (4) Review time per ticket is measured, and the board shows the time saved and the net saving in CHF, with its assumptions on the page.
 - [ ] (4) The Queue uses the investigation and rules from Sprint 1's commits 6 and 7 once they exist, and a ticket shows the checks the agent ran and any rule that changed its decision.
 - [ ] (4) A technician can clear a batch from the keyboard: next ticket, approve, reroute and reject.
+
+**Explainability (`dashboard/`, `backend/`)**
+
+`docs/EXPLAINABILITY.md` holds the rules both pages follow.
+
+- [ ] (6) `GET /api/overview` builds everything the page shows from the code: the goal and its measure, the model and its price per ticket, LangGraph's real nodes and edges, the 17 tools with risk tier, owner and whether they change a system, the four paths, the rules, the services and what each holds, and the current versions. Nothing about the agent is typed into the dashboard.
+- [ ] (6) A "How it works" tab opens with the goal in one sentence, then the route as a schematic. Clicking a station explains what happens there, with a real ticket's data, and amber marks the stations where a person decides.
+- [ ] (6) The tools are grouped by risk tier, the model shows why it was chosen and what a ticket costs, and the services show which one is the source of truth for what. Each part names where it fails, from the known limitations.
+- [ ] (6) A test fails when a graph node or tool has no explanation, so the page can't fall behind the code. The schematic has a text equivalent.
+- [ ] (7) Saved retrieval scores keep each ticket's ranked sections and scores. Saving them again is free, with no model calls.
+- [ ] (7) A "Retrieval" view shows hit rate, how high the right playbook ranks (MRR), recall and false matches on unseen families. Each comes with its question, n, the floor `poe check` enforces, and how it moved across saved runs.
+- [ ] (7) A chart shows the right playbook's score against the best wrong one for every ticket, with the thresholds drawn in, so a reader sees why the thresholds sit where they do. Clicking a ticket opens its ranked sections.
+- [ ] (7) "Try a search" ranks the knowledge base for any text the reader types, with the scores and the threshold, through `POST /api/retrieval/search`. It's free, because embeddings run on this machine and no model is called.
+- [ ] (7) The view shows how retrieval changes the decision: path accuracy with and without it, from saved runs.
+- [ ] (6, 7) Both pages pass the checklist in `docs/EXPLAINABILITY.md`: phone width, light and dark, keyboard, and screenshots reviewed.
 
 **Durable and gated (`agent/`, `backend/`, `evals/`)**
 

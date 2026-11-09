@@ -6,14 +6,14 @@
 - `e2e/`: Playwright tests of the real API and graph, with a stub model.
 - `evals/`: the evaluation runner and scoring. Scoring is plain code. The simple-classifier yardstick uses scikit-learn, and nothing else is trained.
 - `data/`: the knowledge base, invented client records and labelled tickets. The agent never sees the answer files in `data/evals/`.
-- `checkpoints.sqlite` holds graph state and `logs.csv` holds the usage log. Both are at the repo root and out of git.
+- Graph state and the usage record live in Supabase, or in memory without `SUPABASE_DB_URL`. The old `logs.csv` stays at the repo root, out of git, for the Langfuse upload only.
 
 Services arrive in Sprint 2 and hosting in Sprint 3. Each is added here in full by the commit that brings it in.
 
 - **Langfuse** (`langfuse` 5.0, kept below 5.1 until that settles): Langfuse Cloud in the EU region traces every Assistant, Queue and evaluation run through LangChain's callback, in `agent/tracing.py`. It exports only its own spans, and masks emails, employee ids and IP addresses first. Practice sets are Langfuse datasets, and saved runs are experiments. Tracing is off without `LANGFUSE_PUBLIC_KEY` and `LANGFUSE_SECRET_KEY`, and tests switch it off.
 
 - **Qdrant** (`qdrant-client` 1.20): Qdrant Cloud holds the knowledge base sections in `kb_sections`, embedded on this machine and built by `uv run -m agent.index`. Search refuses an index built from another knowledge base or embedding model. Without `QDRANT_URL`, and in tests and `poe check`, the same code searches an in-memory index built on first use.
-- **Supabase** (Postgres 17, EU Central): the system of record. The schema is in `supabase/migrations/`: batches, tickets, decisions, reviews and an append-only audit trail. Row-level security is on with no policies, so the publishable key reads nothing, and the backend connects directly through `SUPABASE_DB_URL`, the session pooler. The Queue reads and writes it through `backend/store.py` with `psycopg` 3 and `psycopg-pool`, or keeps the same record in memory without `SUPABASE_DB_URL`. `uv run -m backend.migrate` applies new migrations and records them in `schema_migrations`. The store's tests run on a throwaway Postgres 17 through `testcontainers`, so `poe check` needs Docker. LangGraph's checkpoint tables come with commit 3b, and sign-in later.
+- **Supabase** (Postgres 17, EU Central): the system of record. The schema is in `supabase/migrations/`: batches, tickets, decisions, reviews and an append-only audit trail. Row-level security is on with no policies, so the publishable key reads nothing, and the backend connects directly through `SUPABASE_DB_URL`, the session pooler. The Queue reads and writes it through `backend/store.py` with `psycopg` 3 and `psycopg-pool`, or keeps the same record in memory without `SUPABASE_DB_URL`. `uv run -m backend.migrate` applies new migrations and records them in `schema_migrations`. The store's tests run on a throwaway Postgres 17 through `testcontainers`, so `poe check` needs Docker. LangGraph's checkpoints use `langgraph-checkpoint-postgres`, whose tables `backend.migrate` creates with row-level security on. Sign-in comes later.
 
 Still to come:
 

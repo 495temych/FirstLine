@@ -20,6 +20,7 @@ def postgres_url() -> Iterator[str]:
         url = container.get_connection_url()
         with psycopg.connect(url, autocommit=True) as conn:
             migrate.apply(conn)
+        migrate.checkpoint_tables(url)
         yield url
 
 

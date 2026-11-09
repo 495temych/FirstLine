@@ -3,12 +3,12 @@
 No API calls and no embeddings — `graph.retrieve` and `graph._get_llm` are patched.
 """
 
-import csv
 from typing import cast
 
 import pytest
 from langchain_core.runnables import RunnableConfig
 from langgraph.checkpoint.memory import InMemorySaver
+from langgraph.graph import END
 from langgraph.types import Command
 from qdrant_client.http.exceptions import ResponseHandlingException
 
@@ -34,7 +34,7 @@ def test_routers():
     assert g.route_start(state({"use_retrieval": True})) == "retrieve"
     assert g.route_start(state({"use_retrieval": False})) == "no_tools"
     for path, dest in [
-        ("OUT_OF_SCOPE", "log"),
+        ("OUT_OF_SCOPE", "__end__"),
         ("SELF_SERVE", "self_serve_wait"),
         ("AUTO_FIX", "confirm_fix"),
         ("ESCALATE", "confirm_ticket"),
@@ -54,10 +54,11 @@ def test_routers():
     )
     assert (
         g.route_after_confirm_ticket(state({"human_decision": {"ticket": False}}))
-        == "log"
+        == "__end__"
     )
     assert (
-        g.route_after_self_serve(state({"human_decision": {"resolved": True}})) == "log"
+        g.route_after_self_serve(state({"human_decision": {"resolved": True}}))
+        == "__end__"
     )
     assert (
         g.route_after_self_serve(state({"human_decision": {"resolved": False}}))
@@ -68,7 +69,6 @@ def test_routers():
 # ── graph flows with a fake model ───────────────────────────────────────────────
 @pytest.fixture
 def env(tmp_path, monkeypatch):
-    monkeypatch.setattr(g, "LOG_FILE", tmp_path / "logs.csv")
     monkeypatch.setattr(g, "retrieve", lambda q: [UNIT])
 
     class Env:
@@ -86,12 +86,6 @@ def env(tmp_path, monkeypatch):
         def resume(self, value):
             return self.graph.invoke(Command(resume=value), self.config)
 
-        def rows(self):
-            if not g.LOG_FILE.exists():
-                return []
-            with open(g.LOG_FILE, newline="") as f:
-                return list(csv.DictReader(f))
-
     return Env()
 
 
@@ -99,17 +93,12 @@ def test_auto_fix_confirm(env):
     env.use(fix("reset_vpn_profile", "Stale cert.", username="current.user"))
     out = env.start()
     assert out["__interrupt__"][0].value["kind"] == "confirm_fix"
-    assert env.rows() == []  # nothing logged and nothing executed before the decision
+    assert out.get("tool_result") is None  # nothing runs before the decision
     out = env.resume(True)
     assert "__interrupt__" not in out
     assert out["tool_result"]["action"] == "reset_vpn_profile"
-    (row,) = env.rows()
-    assert (row["decision_path"], row["tool_called"], row["confirmed"]) == (
-        "AUTO_FIX",
-        "reset_vpn_profile",
-        "true",
-    )
-    assert row["retrieved_units"] == "vpn"
+    assert out["human_decision"] == {"fix": True}
+    assert [u["doc"] for u in out["retrieved"]] == ["vpn"]
 
 
 def test_auto_fix_decline_then_send_ticket(env):
@@ -125,12 +114,7 @@ def test_auto_fix_decline_then_send_ticket(env):
     assert out.get("tool_result") is None  # fix did not run
     out = env.resume(True)
     assert out["tool_result"]["action"] == "create_escalation_ticket"
-    (row,) = env.rows()
-    assert (row["decision_path"], row["tool_called"], row["confirmed"]) == (
-        "AUTO_FIX",
-        "reset_vpn_profile",
-        "false",
-    )
+    assert (out["path"], out["human_decision"]["fix"]) == ("AUTO_FIX", False)
 
 
 def test_escalate_cancel_creates_no_ticket(env):
@@ -139,18 +123,7 @@ def test_escalate_cancel_creates_no_ticket(env):
     assert out["__interrupt__"][0].value["ticket"]["queue"] == "SEC-INCIDENT"
     out = env.resume(False)
     assert out.get("tool_result") is None
-    (row,) = env.rows()
-    assert (
-        row["decision_path"],
-        row["escalation_queue"],
-        row["priority"],
-        row["confirmed"],
-    ) == (
-        "ESCALATE",
-        "SEC-INCIDENT",
-        "P2-High",
-        "",
-    )
+    assert out["human_decision"] == {"ticket": False}
 
 
 def test_self_serve_not_resolved_becomes_ticket(env):
@@ -163,33 +136,30 @@ def test_self_serve_not_resolved_becomes_ticket(env):
     assert "monitor dead" in ticket["summary"]
     out = env.resume(True)
     assert out["tool_result"]["queue"] == "DESK-SUPPORT"
-    (row,) = env.rows()
-    assert (row["decision_path"], row["tool_called"]) == ("SELF_SERVE", "")
+    assert (out["path"], out["tool_name"]) == ("SELF_SERVE", None)
 
 
-def test_self_serve_resolved_logs_without_ticket(env):
+def test_self_serve_resolved_ends_without_ticket(env):
     env.use(steps("Reseat the cable."))
     env.start()
     out = env.resume(True)
     assert out.get("tool_result") is None
-    assert len(env.rows()) == 1
+    assert "__interrupt__" not in out
 
 
-def test_out_of_scope_logs_immediately(env):
+def test_out_of_scope_ends_immediately(env):
     env.use(out_of_scope())
     out = env.start("weather?")
     assert "__interrupt__" not in out
-    (row,) = env.rows()
-    assert row["decision_path"] == "OUT_OF_SCOPE"
+    assert out["path"] == "OUT_OF_SCOPE"
 
 
-def test_rag_off_has_no_tools_and_is_not_logged(env):
+def test_rag_off_has_no_tools(env):
     env.use([text("Generic advice.")])
     out = env.start(use_retrieval=False)
     assert env.llm.bound_tools is None
     assert (out["path"], out["retrieved"], out["tool_name"]) == ("NO_TOOLS", [], None)
     assert out["reasoning"] == "Generic advice."
-    assert env.rows() == []
 
 
 def test_new_run_on_same_thread_does_not_inherit_old_decisions(env):
@@ -210,17 +180,12 @@ def test_new_query_while_interrupt_pending_starts_fresh_run(env):
     env.start("second")  # previous run was still paused; abandoned, not resumed
     out = env.resume(True)
     assert out["query"] == "second"
-    # The abandoned run never reached `log`, so only the completed one is recorded.
-    assert [r["query"] for r in env.rows()] == ["second"]
-
-
-def test_log_runs_false_skips_logging(env):
-    env.use(out_of_scope())
-    cfg = {"configurable": {"thread_id": "t2", "log_runs": False}}
-    env.graph.invoke(g.initial_state("weather?", True), cfg)
-    assert env.rows() == []
 
 
 def test_a_search_that_cannot_reach_the_index_is_retried():
     assert g._is_search_error(ResponseHandlingException(OSError("timed out")))
     assert not g._is_search_error(ValueError("bad input"))
+
+
+def test_done_is_langgraphs_end():
+    assert g.DONE == END

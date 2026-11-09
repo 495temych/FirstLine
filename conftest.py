@@ -7,6 +7,7 @@ from typing import NoReturn
 import pytest
 
 from agent import graph, retrieval
+from backend import store
 
 
 def _no_model_in_tests() -> NoReturn:
@@ -29,6 +30,7 @@ def no_qdrant_cloud(monkeypatch: pytest.MonkeyPatch) -> None:
 def no_supabase(monkeypatch: pytest.MonkeyPatch) -> None:
     """Keep the Queue's record in memory, whatever database .env names."""
     monkeypatch.delenv("SUPABASE_DB_URL", raising=False)
+    store.shared.cache_clear()
 
 
 @pytest.fixture(autouse=True)

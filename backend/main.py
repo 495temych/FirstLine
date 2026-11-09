@@ -2,7 +2,6 @@
 
 import json
 import os
-import sqlite3
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from functools import cache
@@ -13,14 +12,12 @@ from uuid import uuid4
 import anthropic
 from fastapi import FastAPI, HTTPException
 from langchain_core.runnables import RunnableConfig
-from langgraph.checkpoint.sqlite import SqliteSaver
 from langgraph.types import Command, StateSnapshot
 from pydantic import BaseModel, StringConstraints
 
 from agent import config, tracing
 from agent.graph import build_graph, initial_state
-from backend import queue_board, stats
-from backend.store import open_store
+from backend import queue_board, stats, store
 from evals import retrieval_score, runner, scoring
 
 RUN_FIELDS = [
@@ -40,7 +37,7 @@ RUN_FIELDS = [
 @asynccontextmanager
 async def lifespan(_: FastAPI) -> AsyncIterator[None]:
     """The Queue reads its record back, from Supabase when it's set up."""
-    queue_board.start(open_store())
+    queue_board.start(store.shared())
     yield
 
 
@@ -63,10 +60,8 @@ class GateAnswer(BaseModel):
 
 @cache
 def _graph():
-    # check_same_thread=False: FastAPI runs each request on a worker thread, and
-    # SqliteSaver serializes access with an internal lock.
-    connection = sqlite3.connect(config.CHECKPOINT_DB, check_same_thread=False)
-    return build_graph(SqliteSaver(connection))
+    """The graph, saving paused runs in Supabase so they survive a restart."""
+    return build_graph(store.checkpointer())
 
 
 def _thread(run_id: str) -> RunnableConfig:
@@ -126,7 +121,12 @@ def start_triage(ticket: NewTicket) -> dict:
             )
     except anthropic.APIError as exc:
         raise HTTPException(502, f"The model call failed: {exc}") from exc
-    return _view(run_id, _snapshot(run_id))
+    snapshot = _snapshot(run_id)
+    values = snapshot.values
+    if values["path"] in stats.PATHS:  # a run without retrieval is a comparison only
+        decision = queue_board.proposal_of(values, values["response_time_sec"], None)
+        store.shared().add_run(run_id, ticket.text, decision)
+    return _view(run_id, snapshot)
 
 
 @app.get("/api/runs/{run_id}", operation_id="read_run")
@@ -144,7 +144,14 @@ def answer_gate(run_id: str, answer: GateAnswer) -> dict:
             raise HTTPException(409, "This run isn't waiting at that gate.")
         with _traced(run_id):
             _graph().invoke(Command(resume=answer.approved), _thread(run_id))
-    return _view(run_id, _snapshot(run_id))
+        snapshot = _snapshot(run_id)
+        ran = not snapshot.next and snapshot.values["tool_result"] is not None
+        store.shared().answered(
+            run_id,
+            {"gate": answer.gate, "approved": answer.approved},
+            snapshot.values["tool_result"] if ran else None,
+        )
+    return _view(run_id, snapshot)
 
 
 def readable(run: dict) -> dict:
@@ -184,5 +191,5 @@ def list_tickets() -> list[dict]:
 
 @app.get("/api/stats", operation_id="read_stats")
 def read_stats() -> dict:
-    """Read the live usage statistics from logs.csv."""
-    return {**stats.summary_stats(), "paths": stats.PATHS}
+    """Read the live usage statistics from the Assistant's runs."""
+    return {**stats.summary_stats(store.shared().runs()), "paths": stats.PATHS}

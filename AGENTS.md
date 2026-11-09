@@ -17,6 +17,7 @@ IMPORTANT: before you plan, build or change anything, read each of these in full
 7. `docs/STATUS.md`: what's built and which rules code enforces
 8. `docs/DECISIONS.md`: design decisions, their trade-offs and the known limitations
 9. `docs/BRAND.md`: how the dashboard looks, before any dashboard work
+10. `docs/EXPLAINABILITY.md`: how a page explains the project, before any dashboard work
 
 ## Folders
 

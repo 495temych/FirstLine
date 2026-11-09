@@ -19,9 +19,7 @@ Rules this module follows:
     set.
 """
 
-import csv
 import time
-from datetime import UTC, datetime
 from functools import cache
 from pathlib import Path
 from typing import Any, Literal
@@ -29,14 +27,13 @@ from typing import Any, Literal
 import anthropic
 from langchain_anthropic import ChatAnthropic
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
-from langchain_core.runnables import RunnableConfig
 from langgraph.graph import END, START, StateGraph
 from langgraph.types import RetryPolicy, interrupt
 from qdrant_client.http.exceptions import ResponseHandlingException
 from typing_extensions import TypedDict
 
 from agent import tools
-from agent.config import LOG_FILE, model_name
+from agent.config import model_name
 from agent.decision import (
     DECISION_TOOL,
     DECISION_TOOL_NAME,
@@ -49,18 +46,6 @@ from agent.retrieval import retrieve
 
 _PROMPT_FILE = Path(__file__).parent / "prompt.md"
 
-LOG_FIELDS = [
-    "timestamp",
-    "query",
-    "retrieved_units",
-    "decision_path",
-    "diagnostic_summary",
-    "tool_called",
-    "confirmed",
-    "escalation_queue",
-    "priority",
-    "response_time_sec",
-]
 
 HEADER_MARKERS = 2  # the opening and closing ** of a bare markdown header
 MIN_SUMMARY_CHARS = 15  # shorter lines are labels, not a diagnosis
@@ -190,34 +175,6 @@ def ticket_for(state: GraphState) -> dict:
         "queue": ti.get("queue", DEFAULT_QUEUE),
         "priority": ti.get("priority", DEFAULT_PRIORITY),
         "summary": ti.get("summary", "—"),
-    }
-
-
-def build_log_row(state: GraphState, now: datetime) -> dict:
-    units = state["retrieved"] or []
-    retrieved_units = (
-        ";".join(
-            u["doc"] + (f"::{u['section']}" if u["section"] else "") for u in units
-        )
-        or "none"
-    )
-    tool_input = state["tool_input"] or {}
-    is_escalate = state["path"] == "ESCALATE"
-    # `confirmed` is only meaningful for AUTO_FIX, the one path where declining prevents
-    # an action. It records the fix decision, not the follow-up ticket's.
-    fix = state["human_decision"].get("fix")
-    confirmed = "" if state["path"] != "AUTO_FIX" or fix is None else str(fix).lower()
-    return {
-        "timestamp": now.isoformat(),
-        "query": state["query"],
-        "retrieved_units": retrieved_units,
-        "decision_path": state["path"],
-        "diagnostic_summary": diagnostic_summary(state["reasoning"])[:150],
-        "tool_called": state["tool_name"] or "",
-        "confirmed": confirmed,
-        "escalation_queue": tool_input.get("queue", "") if is_escalate else "",
-        "priority": tool_input.get("priority", "") if is_escalate else "",
-        "response_time_sec": f"{state['response_time_sec']:.2f}",
     }
 
 
@@ -391,23 +348,10 @@ def create_ticket(state: GraphState) -> dict:
     }
 
 
-def log(state: GraphState, config: RunnableConfig) -> dict:
-    """Append one row with the final state. Callers that only want the decision (eval)
-    pass configurable `log_runs=False` so evaluations don't pollute logs.csv."""
-    if not config.get("configurable", {}).get("log_runs", True):
-        return {}
-    row = build_log_row(state, datetime.now(UTC))
-    # Header goes out once — when the file doesn't exist yet or is empty.
-    needs_header = not LOG_FILE.exists() or LOG_FILE.stat().st_size == 0
-    with open(LOG_FILE, "a", newline="") as f:
-        writer = csv.DictWriter(f, fieldnames=LOG_FIELDS)
-        if needs_header:
-            writer.writeheader()
-        writer.writerow(row)
-    return {}
+# LangGraph's END, whose value this is, typed so the routers can return it.
+DONE: Literal["__end__"] = "__end__"
 
-
-TriageRoute = Literal["log", "self_serve_wait", "confirm_fix", "confirm_ticket"]
+TriageRoute = Literal["__end__", "self_serve_wait", "confirm_fix", "confirm_ticket"]
 
 
 # ── Routers (pure) ──────────────────────────────────────────────────────────────
@@ -417,7 +361,7 @@ def route_start(state: GraphState) -> Literal["retrieve", "no_tools"]:
 
 def route_after_triage(state: GraphState) -> TriageRoute:
     routes: dict[str, TriageRoute] = {
-        "OUT_OF_SCOPE": "log",
+        "OUT_OF_SCOPE": DONE,
         "SELF_SERVE": "self_serve_wait",
         "AUTO_FIX": "confirm_fix",
         "ESCALATE": "confirm_ticket",
@@ -431,12 +375,14 @@ def route_after_confirm_fix(
     return "execute_tool" if state["human_decision"]["fix"] else "draft_ticket"
 
 
-def route_after_confirm_ticket(state: GraphState) -> Literal["create_ticket", "log"]:
-    return "create_ticket" if state["human_decision"]["ticket"] else "log"
+def route_after_confirm_ticket(
+    state: GraphState,
+) -> Literal["create_ticket", "__end__"]:
+    return "create_ticket" if state["human_decision"]["ticket"] else DONE
 
 
-def route_after_self_serve(state: GraphState) -> Literal["log", "draft_ticket"]:
-    return "log" if state["human_decision"]["resolved"] else "draft_ticket"
+def route_after_self_serve(state: GraphState) -> Literal["__end__", "draft_ticket"]:
+    return DONE if state["human_decision"]["resolved"] else "draft_ticket"
 
 
 # ── Graph ───────────────────────────────────────────────────────────────────────
@@ -452,7 +398,6 @@ def build_graph(checkpointer):
     g.add_node("execute_tool", execute_tool)
     g.add_node("draft_ticket", draft_ticket)
     g.add_node("create_ticket", create_ticket)
-    g.add_node("log", log)
 
     g.add_conditional_edges(START, route_start)
     g.add_edge("no_tools", END)
@@ -461,9 +406,8 @@ def build_graph(checkpointer):
     g.add_conditional_edges("confirm_fix", route_after_confirm_fix)
     g.add_conditional_edges("confirm_ticket", route_after_confirm_ticket)
     g.add_conditional_edges("self_serve_wait", route_after_self_serve)
-    g.add_edge("execute_tool", "log")
+    g.add_edge("execute_tool", END)
     g.add_edge("draft_ticket", "confirm_ticket")
-    g.add_edge("create_ticket", "log")
-    g.add_edge("log", END)
+    g.add_edge("create_ticket", END)
 
     return g.compile(checkpointer=checkpointer)

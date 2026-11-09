@@ -54,11 +54,11 @@ Each design decision so far, with its reason and its trade-off.
 - **Reason:** an agent with no grounding shouldn't be able to propose an action. It also shows plainly what the knowledge base adds.
 - **Trade-off:** the on/off comparison stays visual rather than measured, and those runs aren't logged.
 
-## The SQLite checkpointer
+## Checkpoints in Postgres
 
-- **Decision:** store graph state in `checkpoints.sqlite`.
-- **Reason:** a pending confirmation is stored thread state, with no database server to run. Each ticket has its own thread, and its id is in the dashboard's URL, so a paused ticket survives a reload or a backend restart.
-- **Trade-off:** one machine only.
+- **Decision:** store graph state in Supabase through LangGraph's Postgres checkpointer, replacing `checkpoints.sqlite`. `backend.migrate` creates its tables and turns row-level security on. The backend never creates them.
+- **Reason:** a pending confirmation is stored thread state. Each ticket has its own thread, and its id is in the dashboard's URL, so a paused ticket survives a reload or a backend restart, on any machine that reaches the database.
+- **Trade-off:** the Assistant needs the database to keep a paused run. Without `SUPABASE_DB_URL` runs are kept in memory and a restart loses them.
 
 ## Logging from the final state
 
@@ -98,9 +98,15 @@ Each design decision so far, with its reason and its trade-off.
 
 ## Evaluations and usage statistics stay apart
 
-- **Decision:** the Scoreboard reads saved evaluations, and the live statistics read `logs.csv`. Neither stands in for the other.
+- **Decision:** the Scoreboard reads saved evaluations, and the live statistics read the Assistant's runs in Supabase. Neither stands in for the other. The API records a run, not the graph, so evaluations need no switch to stay out of the record.
 - **Reason:** a fixed labelled set measures quality, and real usage shows volume and speed.
-- **Trade-off:** response time covers the agent's decision only, not the fix, so it is a proxy for time to resolution. Below five logged runs the app says the sample is too small.
+- **Trade-off:** response time covers the agent's decision only, not the fix, so it is a proxy for time to resolution. Below five runs the app says the sample is too small.
+
+## Automation counts outcomes, not proposals
+
+- **Decision:** a run counts as automated only when the person approved the fix or said the self-serve steps worked. A declined fix, steps that didn't help and an escalation don't count, and nor does a run still waiting. The rate is over runs in scope.
+- **Reason:** the measure is technician time saved, as in the Queue's value panel. A proposal the person turned down saved nobody anything.
+- **Trade-off:** while runs wait at a gate, the rate reads low until they're answered.
 
 ## The Queue is the core product
 

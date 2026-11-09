@@ -20,7 +20,6 @@ def test_model_name_overrides_the_default(monkeypatch):
 
 def test_usage_files_stay_at_the_repo_root():
     assert config.LOG_FILE == config.ROOT / "logs.csv"
-    assert config.CHECKPOINT_DB == config.ROOT / "checkpoints.sqlite"
     assert (config.ROOT / "pyproject.toml").exists()
 
 

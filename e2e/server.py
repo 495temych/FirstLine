@@ -1,7 +1,7 @@
 """The real API and graph with a stub model, so the browser tests cost nothing.
 
 The ticket text picks the stub's answer. Everything is written to a temporary folder,
-so `logs.csv` and `checkpoints.sqlite` stay untouched.
+and the record and paused runs are kept in memory, never in Supabase.
 """
 
 import os
@@ -14,9 +14,9 @@ os.environ["SUPABASE_DB_URL"] = ""  # and the Queue keeps its record in memory
 
 import uvicorn
 
-from agent import config, graph, retrieval
+from agent import graph, retrieval
 from agent.tests.fakes import UNIT, FakeLLM, escalate, fix, out_of_scope, steps
-from backend import main, stats
+from backend import main
 from evals import retrieval_score, runner
 
 ANSWERS = {
@@ -44,9 +44,6 @@ class StubLLM(FakeLLM):
 
 def prepare(folder: Path) -> None:
     """Point everything at temporary files and save one evaluation."""
-    config.CHECKPOINT_DB = folder / "checkpoints.sqlite"
-    graph.LOG_FILE = folder / "logs.csv"
-    stats.LOG_FILE = folder / "logs.csv"
     runner.RUNS_DIR = folder / "runs"
     retrieval_score.RUNS_DIR = folder / "retrieval"
     llm = StubLLM()

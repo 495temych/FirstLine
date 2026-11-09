@@ -66,7 +66,7 @@ When asked to implement, as in "Please implement commit 3", build that one commi
 - Keep `docs/STATUS.md` up to date.
 - Live runs cost money. Follow "Spending" below.
 - Never open the held-out set when changing the instructions, and never give the agent an answer file.
-- `logs.csv` and `checkpoints.sqlite` are real usage data. Keep them out of tests.
+- Supabase, `logs.csv` and `checkpoints.sqlite` hold real usage data. Keep them out of tests: tests use memory or a throwaway Postgres.
 
 ## Spending
 

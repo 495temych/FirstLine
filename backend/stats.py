@@ -1,48 +1,49 @@
-"""Summary statistics over logs.csv — real usage from actual runs through the app,
-not synthetic data and not an evaluation. Standalone: `uv run -m backend.stats`.
-Also served by the API to the dashboard, next to (but clearly
-distinct from) the Scoreboard's evaluations.
+"""Usage statistics over the Assistant's real runs, read from the record: not synthetic
+data and not an evaluation. Standalone: `uv run -m backend.stats`. Also served by the
+API to the dashboard, next to (but clearly distinct from) the Scoreboard's evaluations.
 """
 
-import csv
-
-from agent.config import LOG_FILE
+from backend import store
+from backend.store import Run
 
 PATHS = ["SELF_SERVE", "AUTO_FIX", "ESCALATE", "OUT_OF_SCOPE"]
 MIN_ROWS_FOR_STABLE_RATE = 5
 
 
-def _read_rows() -> list[dict]:
-    if not LOG_FILE.exists():
-        return []
-    with open(LOG_FILE, newline="") as f:
-        return list(csv.DictReader(f))
+def automated(run: Run) -> bool:
+    """Whether this run counts towards the automation rate.
 
-
-def summary_stats() -> dict:
-    """Reads logs.csv fresh (no caching — must reflect the latest logged run) and
-    computes: total, count/% by decision_path, automation rate, avg response time
-    by decision_path. n is 0 and rates are None if the log is empty.
+    A run has its proposed `path`, and `answers`: what the person said at each gate,
+    in order, as {"gate": "confirm_fix" | "confirm_ticket" | "self_serve",
+    "approved": bool}. A run still paused at its first gate has no answers yet.
     """
-    rows = _read_rows()
-    n = len(rows)
+    # The outcome counts, not the proposal: a declined fix or self-serve steps that
+    # didn't help end with a technician. A run still waiting counts as not yet.
+    first = run["answers"][0] if run["answers"] else None
+    return (
+        first is not None
+        and first["approved"]
+        and first["gate"] in ("confirm_fix", "self_serve")
+    )
 
-    by_path = {p: [r for r in rows if r.get("decision_path") == p] for p in PATHS}
+
+def summary_stats(runs: list[Run]) -> dict:
+    """Count by path, automation rate and average response time by path. n is 0 and
+    rates are None when there are no runs yet.
+    """
+    n = len(runs)
+    by_path = {p: [r for r in runs if r["path"] == p] for p in PATHS}
     counts = {p: len(by_path[p]) for p in PATHS}
     pct = {p: (counts[p] / n * 100) if n else 0.0 for p in PATHS}
 
-    denom = n - counts["OUT_OF_SCOPE"]
+    in_scope = n - counts["OUT_OF_SCOPE"]
     automation_rate = (
-        (counts["SELF_SERVE"] + counts["AUTO_FIX"]) / denom * 100 if denom > 0 else None
+        sum(automated(r) for r in runs) / in_scope * 100 if in_scope > 0 else None
     )
 
     avg_response_time_sec = {}
     for p in PATHS:
-        times = [
-            float(r["response_time_sec"])
-            for r in by_path[p]
-            if r.get("response_time_sec")
-        ]
+        times = [r["latency_ms"] / 1000 for r in by_path[p] if r["latency_ms"]]
         avg_response_time_sec[p] = (sum(times) / len(times)) if times else None
 
     return {
@@ -55,22 +56,20 @@ def summary_stats() -> dict:
     }
 
 
-def print_summary(stats: dict | None = None) -> None:
-    stats = stats if stats is not None else summary_stats()
+def print_summary(stats: dict) -> None:
     print(
-        f"Live session stats — {stats['n']} logged queries from actual app runs "
-        f"(logs.csv). This is NOT an evaluation.\n"
+        f"Live session stats — {stats['n']} Assistant runs from the record. "
+        f"This is NOT an evaluation.\n"
     )
 
     if stats["n"] == 0:
-        print("No queries logged yet. Run some queries through the app first.")
+        print("No runs yet. Triage some tickets in the Assistant first.")
         return
 
     if stats["low_sample"]:
         print(
             f"Sample size too small for a stable rate (< {MIN_ROWS_FOR_STABLE_RATE} "
-            f"rows) "
-            f"— numbers below are illustrative only, not a reliable rate.\n"
+            f"runs) — numbers below are illustrative only, not a reliable rate.\n"
         )
 
     print("Count and % by decision path:")
@@ -78,13 +77,9 @@ def print_summary(stats: dict | None = None) -> None:
         print(f"  {p:12s} {stats['counts'][p]:3d}  ({stats['pct'][p]:.0f}%)")
 
     if stats["automation_rate"] is not None:
-        print(
-            f"\nAutomation rate (SELF_SERVE + AUTO_FIX, over total minus "
-            f"OUT_OF_SCOPE): "
-            f"{stats['automation_rate']:.0f}%"
-        )
+        print(f"\nAutomation rate, over runs in scope: {stats['automation_rate']:.0f}%")
     else:
-        print("\nAutomation rate: n/a (no non-OUT_OF_SCOPE queries logged yet)")
+        print("\nAutomation rate: n/a (no runs in scope yet)")
 
     print(
         "\nAgent response time (proxy for MTTR — measures decision latency, not full "
@@ -96,4 +91,4 @@ def print_summary(stats: dict | None = None) -> None:
 
 
 if __name__ == "__main__":
-    print_summary()
+    print_summary(summary_stats(store.shared().runs()))

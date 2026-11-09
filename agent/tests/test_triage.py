@@ -6,10 +6,8 @@ from agent import graph, run_triage
 from agent.tests.fakes import UNIT, FakeLLM, fix
 
 
-def test_run_triage_stops_at_the_first_gate_and_logs_nothing(tmp_path, monkeypatch):
-    log = tmp_path / "logs.csv"
+def test_run_triage_stops_at_the_first_gate(monkeypatch):
     llm = FakeLLM(fix("reset_vpn_profile", "Reset it.", username="a.b"))
-    monkeypatch.setattr(graph, "LOG_FILE", log)
     monkeypatch.setattr(graph, "retrieve", lambda q: [UNIT])
     monkeypatch.setattr(graph, "_get_llm", lambda: llm)
 
@@ -20,7 +18,6 @@ def test_run_triage_stops_at_the_first_gate_and_logs_nothing(tmp_path, monkeypat
     assert result["tool_input"] == {"username": "a.b"}
     assert result["retrieved"] == [UNIT]
     assert result["usage"] == {"input_tokens": 0, "output_tokens": 0}
-    assert not log.exists()
 
 
 def test_usage_comes_from_the_model_reply():

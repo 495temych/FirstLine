@@ -3,6 +3,7 @@
 import psycopg
 import pytest
 
+from backend import migrate
 from backend import store as record
 from backend.store import MemoryStore, PostgresStore, Proposal, Verdict
 
@@ -159,3 +160,33 @@ def test_the_record_is_supabase_only_when_it_is_set_up(monkeypatch):
     store = record.open_store()
     assert isinstance(store, PostgresStore)  # it connects only when first used
     store.close()
+
+
+def test_an_assistant_run_keeps_its_answers_apart_from_the_queue(store):
+    store.add_run("run-1", "My VPN drops", PROPOSAL)
+    store.answered("run-1", {"gate": "confirm_fix", "approved": False}, None)
+    store.answered("run-1", {"gate": "confirm_ticket", "approved": True}, OUTCOME)
+    store.add_run("run-2", "What's the weather?", {**PROPOSAL, "path": "OUT_OF_SCOPE"})
+    assert store.runs() == [
+        {
+            "path": "AUTO_FIX",
+            "latency_ms": 5300,
+            "answers": [
+                {"gate": "confirm_fix", "approved": False},
+                {"gate": "confirm_ticket", "approved": True},
+            ],
+        },
+        {"path": "OUT_OF_SCOPE", "latency_ms": 5300, "answers": []},
+    ]
+    assert store.tickets() == []
+    assert store.ticket_ids() == set()
+
+
+def test_the_checkpoint_tables_are_closed_to_the_public_key(empty_postgres):
+    with psycopg.connect(empty_postgres) as conn:
+        rows = conn.execute(
+            "select relname, relrowsecurity from pg_class"
+            " where relname like 'checkpoint%' and relkind = 'r'"
+        ).fetchall()
+    assert {name for name, _ in rows} == set(migrate.CHECKPOINT_TABLES)
+    assert all(secured for _, secured in rows)
