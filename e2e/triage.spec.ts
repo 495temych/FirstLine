@@ -128,3 +128,30 @@ test("the queue fits a phone", async ({ page }) => {
   );
   expect(overflow).toBeLessThanOrEqual(0);
 });
+
+test("how it works follows a ticket along its route", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("button", { name: "How it works" }).click();
+  await expect(page.getByText(/correct first pass/).first()).toBeVisible();
+  await page.getByLabel("Escalate").check();
+  await page
+    .getByRole("button", { name: /Approve the ticket/ })
+    .first()
+    .click();
+  await expect(page.getByText("A person decides here.")).toBeVisible();
+  const overflow = await page.evaluate(
+    () => document.documentElement.scrollWidth - window.innerWidth,
+  );
+  expect(overflow).toBeLessThanOrEqual(0);
+});
+
+test("how it works fits a phone", async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 812 });
+  await page.goto("/");
+  await page.getByRole("button", { name: "How it works" }).click();
+  await expect(page.getByText(/correct first pass/).first()).toBeVisible();
+  const overflow = await page.evaluate(
+    () => document.documentElement.scrollWidth - window.innerWidth,
+  );
+  expect(overflow).toBeLessThanOrEqual(0);
+});

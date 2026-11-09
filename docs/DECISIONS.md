@@ -270,6 +270,12 @@ Each design decision so far, with its reason and its trade-off.
 - **Reason:** two Queue workers opening Qdrant at once timed out on a slow network. A retried search costs nothing, unlike a retried model call.
 - **Trade-off:** a dead network now takes longer to fail.
 
+## The "How it works" page is built from the code
+
+- **Decision:** `GET /api/overview` reads the route from LangGraph's own graph, the tools from `agent/tool_schemas.py`, the model and price from `agent/config.py`, and the results and example tickets from the newest development run. Only the plain-English explanations live in `backend/overview.py`.
+- **Reason:** a page that explains the agent is only worth reading if it is true. Tests fail when a node or tool has no explanation, when the gates differ from the nodes that wait for a person, or when a drawn line isn't a route the graph takes.
+- **Trade-off:** the explanations still need a person to keep them accurate, and the examples come from whichever development run is newest.
+
 ## Known limitations
 
 - **Synthetic knowledge base.** A real deployment needs real client documentation.

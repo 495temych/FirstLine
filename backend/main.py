@@ -17,7 +17,7 @@ from pydantic import BaseModel, StringConstraints
 
 from agent import config, tracing
 from agent.graph import build_graph, initial_state
-from backend import queue_board, stats, store
+from backend import overview, queue_board, stats, store
 from evals import retrieval_score, runner, scoring
 
 RUN_FIELDS = [
@@ -43,6 +43,7 @@ async def lifespan(_: FastAPI) -> AsyncIterator[None]:
 
 app = FastAPI(title="FirstLine", lifespan=lifespan)
 app.include_router(queue_board.router)
+app.include_router(overview.router)
 
 _gate_lock = Lock()  # two answers to one gate must not both pass its check
 

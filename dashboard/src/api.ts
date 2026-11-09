@@ -292,6 +292,88 @@ export interface Trace {
   steps: TraceStep[];
 }
 
+/** The four paths a decision can take. "NO_TOOLS" is a comparison only. */
+export type RoutePath = Exclude<Path, "NO_TOOLS">;
+
+export interface StationInfo {
+  name: string;
+  does: string;
+  cannot: string;
+  code: string;
+  gate: boolean;
+}
+
+export interface Line {
+  path: RoutePath;
+  label: string;
+  means: string;
+  stations: string[];
+  otherwise: string[];
+  otherwise_when: string;
+}
+
+export interface Example {
+  id: string;
+  title: string;
+  family: string;
+  cause: string;
+  retrieved: string[];
+  tool: string | null;
+  queue: string | null;
+}
+
+export interface ToolInfo {
+  name: string;
+  does: string;
+  tier: "routine" | "sensitive";
+  owner: string | null;
+  escalation: boolean;
+}
+
+export interface Overview {
+  goal: {
+    sentence: string;
+    worth_it: string;
+    minutes_by_hand: number;
+    review_minutes: number;
+    chf_per_hour: number;
+    break_even: number;
+  };
+  result: {
+    run: string;
+    date: string;
+    n: number;
+    path_accuracy: number;
+    path_margin: number;
+    cost_per_ticket_chf: number;
+    time_per_ticket_sec: number;
+    classifier_path_accuracy: number;
+  } | null;
+  trunk: string[];
+  lines: Line[];
+  stations: Record<string, StationInfo>;
+  examples: Partial<Record<RoutePath, Example>>;
+  model: {
+    name: string;
+    input_usd_per_million: number | null;
+    output_usd_per_million: number | null;
+    calls_per_ticket: number;
+    how: string;
+    why: string;
+  };
+  tools: ToolInfo[];
+  tiers: Record<string, string>;
+  queues: string[];
+  services: {
+    name: string;
+    holds: string;
+    truth: boolean;
+    connected: boolean;
+  }[];
+  limits: string[];
+  versions: Record<string, string>;
+}
+
 async function request<T>(url: string, init?: RequestInit): Promise<T> {
   const response = await fetch(url, init);
   if (response.ok) return (await response.json()) as T;
@@ -323,6 +405,7 @@ export const api = {
   evaluations: () => request<Evaluations>("/api/evaluations"),
   tickets: () => request<LabelledTicket[]>("/api/tickets"),
   stats: () => request<Stats>("/api/stats"),
+  overview: () => request<Overview>("/api/overview"),
   queue: () => request<QueueView>("/api/queue"),
   loadBatch: () => post<QueueView>("/api/queue/load", {}),
   review: (id: string, body: ReviewBody) =>

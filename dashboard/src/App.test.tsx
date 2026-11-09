@@ -76,10 +76,16 @@ async function triage(run: Partial<Run> = {}) {
   await screen.findByText("My VPN fails", { selector: ".query" });
 }
 
-it("opens on the Queue, with three more tabs", async () => {
+it("opens on the Queue, with four more tabs", async () => {
   render(<App />);
   expect(screen.getByRole("heading", { name: "FirstLine" })).toBeDefined();
-  for (const tab of ["Queue", "Assistant", "Scoreboard", "Tickets"]) {
+  for (const tab of [
+    "Queue",
+    "Assistant",
+    "Scoreboard",
+    "Tickets",
+    "How it works",
+  ]) {
     expect(screen.getByRole("button", { name: tab })).toBeDefined();
   }
   expect(

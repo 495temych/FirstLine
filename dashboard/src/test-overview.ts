@@ -1,0 +1,128 @@
+import type { Overview, StationInfo } from "./api";
+
+const station = (name: string, gate = false): StationInfo => ({
+  name,
+  does: `${name} does its job.`,
+  cannot: `${name} can't run anything.`,
+  code: "agent/graph.py",
+  gate,
+});
+
+export const overview: Overview = {
+  goal: {
+    sentence: "Every ticket gets a correct first pass.",
+    worth_it: "It's worth doing if it saves time.",
+    minutes_by_hand: 15,
+    review_minutes: 2,
+    chf_per_hour: 60,
+    break_even: 2 / 15,
+  },
+  result: {
+    run: "20261108T010442-dev-rescored",
+    date: "2026-11-08T01:04:42+00:00",
+    n: 129,
+    path_accuracy: 0.73,
+    path_margin: 0.076,
+    cost_per_ticket_chf: 0.0051,
+    time_per_ticket_sec: 5.3,
+    classifier_path_accuracy: 0.93,
+  },
+  trunk: ["retrieve", "triage"],
+  lines: [
+    {
+      path: "AUTO_FIX",
+      label: "Auto-fix",
+      means: "A known fix.",
+      stations: ["confirm_fix", "execute_tool"],
+      otherwise: ["confirm_ticket"],
+      otherwise_when: "If the fix is declined",
+    },
+    {
+      path: "ESCALATE",
+      label: "Escalate",
+      means: "Another team acts.",
+      stations: ["confirm_ticket"],
+      otherwise: [],
+      otherwise_when: "If the ticket is declined, nothing is sent",
+    },
+    {
+      path: "OUT_OF_SCOPE",
+      label: "Out of scope",
+      means: "No action.",
+      stations: [],
+      otherwise: [],
+      otherwise_when: "",
+    },
+  ],
+  stations: {
+    retrieve: station("Search the knowledge base"),
+    triage: station("Decide"),
+    confirm_fix: station("Approve the fix", true),
+    execute_tool: station("Run the fix"),
+    confirm_ticket: station("Approve the ticket", true),
+  },
+  examples: {
+    AUTO_FIX: {
+      id: "INC-DCP-0004",
+      title: "Device marked noncompliant",
+      family: "Device compliance",
+      cause: "Stale check-in",
+      retrieved: ["device-compliance"],
+      tool: "force_intune_sync",
+      queue: null,
+    },
+    ESCALATE: {
+      id: "INC-ALP-0012",
+      title: "Account locked again",
+      family: "Account lockout and password",
+      cause: "Stale phone credentials",
+      retrieved: [],
+      tool: "create_escalation_ticket",
+      queue: "SEC-INCIDENT",
+    },
+  },
+  model: {
+    name: "claude-haiku-4-5-20251001",
+    input_usd_per_million: 1,
+    output_usd_per_million: 5,
+    calls_per_ticket: 1,
+    how: "One forced tool call.",
+    why: "The cheapest that works.",
+  },
+  tools: [
+    {
+      name: "force_intune_sync",
+      does: "Syncs the device.",
+      tier: "routine",
+      owner: "service_desk",
+      escalation: false,
+    },
+    {
+      name: "restart_print_spooler",
+      does: "Restarts the spooler.",
+      tier: "sensitive",
+      owner: "service_desk",
+      escalation: false,
+    },
+    {
+      name: "create_escalation_ticket",
+      does: "Opens a ticket.",
+      tier: "sensitive",
+      owner: null,
+      escalation: true,
+    },
+  ],
+  tiers: { routine: "Their own device.", sensitive: "A technician only." },
+  queues: ["SEC-INCIDENT"],
+  services: [
+    { name: "Supabase", holds: "Tickets", truth: true, connected: true },
+    { name: "Qdrant", holds: "The index", truth: false, connected: false },
+  ],
+  limits: ["The knowledge base is synthetic."],
+  versions: {
+    version: "93b8e4f5",
+    instructions_version: "aaaa1111",
+    tools_version: "bbbb2222",
+    kb_version: "916db54c",
+  },
+};

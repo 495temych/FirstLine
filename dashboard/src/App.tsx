@@ -3,8 +3,15 @@ import { Scoreboard } from "./Scoreboard";
 import { Tickets } from "./Tickets";
 import { Assistant } from "./Assistant";
 import { Queue } from "./Queue";
+import { HowItWorks } from "./HowItWorks";
 
-const tabs = ["Queue", "Assistant", "Scoreboard", "Tickets"] as const;
+const tabs = [
+  "Queue",
+  "Assistant",
+  "Scoreboard",
+  "Tickets",
+  "How it works",
+] as const;
 type Tab = (typeof tabs)[number];
 
 export function App() {
@@ -48,6 +55,7 @@ export function App() {
         </div>
         {tab === "Scoreboard" && <Scoreboard />}
         {tab === "Tickets" && <Tickets />}
+        {tab === "How it works" && <HowItWorks />}
       </main>
     </>
   );
