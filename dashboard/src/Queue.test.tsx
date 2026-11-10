@@ -10,6 +10,7 @@ import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import { Queue } from "./Queue";
 import {
   busyQueue,
+  closedTicket,
   emptyQueue,
   escalationTicket,
   queueTicket,
@@ -55,10 +56,15 @@ const click = (name: string | RegExp) => {
   fireEvent.click(screen.getByRole("button", { name }));
 };
 
+/** Opens a ticket's card by its title. */
+const pick = (title: string) => {
+  fireEvent.click(screen.getByText(title, { selector: ".card-title" }));
+};
+
 async function open(title: string) {
   render(<Queue />);
   await screen.findByText(title);
-  click(title);
+  pick(title);
 }
 
 it("starts empty and loads a batch from the service desk", async () => {
@@ -71,17 +77,49 @@ it("starts empty and loads a batch from the service desk", async () => {
   expect(calls.some((c) => c.url === "/api/queue/load")).toBe(true);
 });
 
-it("shows how many tickets are in each state", async () => {
+it("puts each ticket in the column of its state, with a count", async () => {
   render(<Queue />);
-  const pipeline = await screen.findByRole("list", {
-    name: "Tickets by state",
-  });
-  const count = (label: string) =>
-    within(pipeline).getByText(label).nextElementSibling?.textContent;
-  expect(count("Queued")).toBe("1");
-  expect(count("Waiting for a technician")).toBe("2");
-  expect(count("Closed")).toBe("1");
-  expect(count("Failed")).toBe("1");
+  const column = async (name: string) =>
+    within(await screen.findByRole("list", { name }));
+  expect(
+    (await column("Waiting for a technician, 2 tickets")).getAllByRole(
+      "button",
+    ),
+  ).toHaveLength(2);
+  expect(
+    (await column("Queued, 1 tickets")).getByText(
+      "Printer on floor 3 is jammed",
+    ),
+  ).toBeDefined();
+  expect(
+    (await column("Agent working, 0 tickets")).queryAllByRole("button"),
+  ).toHaveLength(0);
+  expect(
+    (await column("Closed, 1 tickets")).getByText("VPN certificate expired"),
+  ).toBeDefined();
+  expect(
+    (await column("Failed, 1 tickets")).getByText("Needs a person"),
+  ).toBeDefined();
+});
+
+it("shows the latest closed tickets, and the rest on request", async () => {
+  const closed = Array.from({ length: 8 }, (_, i) => ({
+    ...closedTicket,
+    id: `INC-CLS-${i.toString()}`,
+    title: `Closed ticket ${i.toString()}`,
+    review: closedTicket.review && {
+      ...closedTicket.review,
+      at: `2026-11-10T09:0${i.toString()}:00Z`,
+    },
+  }));
+  replies["/api/queue"] = { ...busyQueue, tickets: closed };
+  render(<Queue />);
+  expect(await screen.findByText("Closed ticket 7")).toBeDefined();
+  expect(screen.queryByText("Closed ticket 1")).toBeNull();
+  click("Show 2 more");
+  expect(screen.getByText("Closed ticket 1")).toBeDefined();
+  click("Show the latest only");
+  expect(screen.queryByText("Closed ticket 1")).toBeNull();
 });
 
 it("shows how the batch went, and sends the money to its own view", async () => {
@@ -100,17 +138,19 @@ it("shows how the batch went, and sends the money to its own view", async () => 
 it("labels each ticket with its status and the agent's decision", async () => {
   render(<Queue />);
   await screen.findByText(queueTicket.title);
-  expect(screen.getAllByText("Waiting for review")).toHaveLength(2);
   expect(screen.getByText("Rerouted")).toBeDefined();
-  expect(screen.getByText("Failed", { selector: ".chip" })).toBeDefined();
   expect(screen.getAllByText("reset_vpn_profile").length).toBeGreaterThan(0);
   expect(screen.getByText("SEC-INCIDENT")).toBeDefined();
-  expect(screen.getByText("Not yet")).toBeDefined();
+  const card = screen.getByRole("button", { name: /VPN drops every few/ });
+  expect(card.className).toContain("path-AUTO_FIX");
 });
 
-it("asks for a ticket to be chosen", async () => {
-  render(<Queue />);
-  expect(await screen.findByText(/Choose a ticket/)).toBeDefined();
+it("asks for a ticket to be chosen, and closes the drawer", async () => {
+  await open(queueTicket.title);
+  expect(screen.queryByText(/Choose a ticket/)).toBeNull();
+  click("Close");
+  expect(screen.queryByRole("complementary", { name: "Ticket" })).toBeNull();
+  expect(screen.getByText(/Choose a ticket/)).toBeDefined();
 });
 
 it("shows a ticket's evidence, reasoning and proposal", async () => {
@@ -212,7 +252,7 @@ it("shows what happened to a closed ticket", async () => {
 it("shows a queued ticket and a failed one", async () => {
   await open("Printer on floor 3 is jammed");
   expect(screen.getByText(/The agent will pick it up next/)).toBeDefined();
-  click("Wi-Fi keeps dropping");
+  pick("Wi-Fi keeps dropping");
   expect(screen.getByRole("alert").textContent).toContain(
     "RuntimeError: model unavailable",
   );

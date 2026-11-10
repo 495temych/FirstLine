@@ -809,58 +809,6 @@ button.link {
   color: var(--ink-soft);
 }
 
-.pipeline {
-  list-style: none;
-  margin: 0;
-  padding: 1rem 1.25rem;
-  background: var(--panel);
-  border-radius: 6px;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
-  gap: 1rem;
-  position: relative;
-}
-
-.stage {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  align-items: center;
-  column-gap: 0.5rem;
-}
-
-.stage-dot {
-  width: 0.875rem;
-  height: 0.875rem;
-  border-radius: 50%;
-  border: 3px solid var(--ink-soft);
-  background: var(--panel);
-}
-
-.stage-review .stage-dot {
-  border-color: var(--signal);
-  background: var(--signal);
-}
-
-.stage-closed .stage-dot {
-  border-color: var(--self-serve);
-  background: var(--self-serve);
-}
-
-.stage-failed .stage-dot {
-  border-color: var(--escalate);
-}
-
-.stage-label {
-  color: var(--ink-soft);
-}
-
-.stage-count {
-  grid-column: 2;
-  font-size: 2rem;
-  font-weight: 700;
-  line-height: 1.1;
-}
-
 .value {
   background: var(--panel);
   border-radius: 6px;
@@ -879,23 +827,198 @@ button.link {
 
 .board {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(360px, 30rem);
+  grid-template-columns: minmax(0, 1fr);
   gap: 1.5rem;
   align-items: start;
 }
 
-.board tbody tr {
+.board.open {
+  grid-template-columns: minmax(0, 1fr) minmax(360px, 30rem);
+}
+
+.board-main {
+  display: grid;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+/* The board: one column per state, in the order a ticket moves */
+/* Every column stays in one row, so a ticket's route reads left to right */
+.kanban {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.75rem;
+  align-items: start;
+}
+
+.kanban[data-columns="5"] {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.column {
+  background: var(--wash);
+  border-radius: 6px;
+  padding: 0.75rem;
+  display: grid;
+  gap: 0.625rem;
+  min-height: 8rem;
+  align-content: start;
+}
+
+.column h3 {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.column-dot {
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 50%;
+  border: 3px solid var(--ink-soft);
+  background: var(--panel);
+}
+
+/* The technician's column is the human gate, so it wears the signal */
+.column-review {
+  background: color-mix(in srgb, var(--signal) 14%, var(--wash));
+}
+
+.column-review .column-dot {
+  border-color: var(--signal);
+  background: var(--signal);
+}
+
+.column-closed .column-dot {
+  border-color: var(--self-serve);
+  background: var(--self-serve);
+}
+
+.column-failed .column-dot {
+  border-color: var(--escalate);
+}
+
+.column-count {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.column ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.card {
+  width: 100%;
+  display: grid;
+  gap: 0.25rem;
+  text-align: left;
+  font: inherit;
+  color: var(--ink);
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-left: 4px solid var(--line, var(--rule));
+  border-radius: 6px;
+  padding: 0.625rem 0.75rem;
   cursor: pointer;
 }
 
-.board td.wide {
-  min-width: 14rem;
+.card:hover {
+  border-color: var(--ink-soft);
+  border-left-color: var(--line, var(--ink-soft));
 }
 
-.board td.wide button.link {
-  text-align: left;
+.card[aria-pressed="true"] {
+  outline: 2px solid var(--ink);
+  outline-offset: 1px;
+}
+
+.card-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  color: var(--ink-soft);
+}
+
+.card-meta code {
+  font-size: 0.75rem;
+}
+
+.priority {
+  text-transform: capitalize;
+}
+
+.priority-high {
+  color: var(--escalate);
   font-weight: 600;
-  text-decoration: none;
+}
+
+.card-title {
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.card .quiet {
+  font-size: 0.8125rem;
+}
+
+.card-decision {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.25rem 0.5rem;
+  font-size: 0.8125rem;
+}
+
+.card-decision code {
+  font-size: 0.75rem;
+  color: var(--ink-soft);
+  overflow-wrap: anywhere;
+}
+
+.card .chip {
+  justify-self: start;
+}
+
+.working::before {
+  content: "";
+  display: inline-block;
+  width: 0.5rem;
+  height: 0.5rem;
+  margin-right: 0.375rem;
+  border-radius: 50%;
+  background: var(--ink-soft);
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  50% {
+    opacity: 0.25;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .working::before {
+    animation: none;
+  }
+}
+
+.drawer {
+  position: sticky;
+  top: 1rem;
+  max-height: calc(100vh - 2rem);
+  overflow-y: auto;
+}
+
+.drawer .close {
+  justify-self: end;
 }
 
 .ticket-id {
@@ -913,12 +1036,6 @@ button.link {
   background: var(--wash);
 }
 
-.chip-review {
-  background: var(--signal);
-  color: var(--signal-ink);
-  font-weight: 600;
-}
-
 .chip-approved {
   background: var(--good-wash);
 }
@@ -931,22 +1048,9 @@ button.link {
   background: var(--alert-wash);
 }
 
-.chip-working {
-  color: var(--ink-soft);
-}
-
-.decision {
-  display: grid;
-}
-
 .path-tag {
   color: var(--line);
   font-weight: 600;
-}
-
-.decision code {
-  font-size: 0.75rem;
-  color: var(--ink-soft);
 }
 
 .path-OUT_OF_SCOPE {
@@ -1080,7 +1184,13 @@ button.link {
 }
 
 @media (max-width: 960px) {
-  .board {
+  .board.open {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* Until the phone layout, narrow screens stack the columns */
+  .kanban,
+  .kanban[data-columns="5"] {
     grid-template-columns: minmax(0, 1fr);
   }
 

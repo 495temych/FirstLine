@@ -128,14 +128,13 @@ test("the queue works a batch and waits for a technician", async ({ page }) => {
   await page
     .getByRole("button", { name: /Load 8 tickets from the service desk/ })
     .click();
-  const states = page.getByRole("list", { name: "Tickets by state" });
-  await expect(states.getByText("Waiting for a technician")).toBeVisible();
-  await expect(page.locator(".chip-review")).toHaveCount(8);
-  await page.locator("td.wide button.link").first().click();
+  const waiting = page.locator(".column-review .card");
+  await expect(waiting).toHaveCount(8);
+  await waiting.first().click();
   await expect(page.getByText(/Tracing is off/)).toBeVisible();
   await page.getByRole("button", { name: /^Approve and/ }).click();
-  await expect(page.locator(".chip-review")).toHaveCount(7);
-  await expect(page.locator(".chip-approved")).toHaveCount(1);
+  await expect(waiting).toHaveCount(7);
+  await expect(page.locator(".column-closed .chip-approved")).toHaveCount(1);
   await expect(
     page.getByRole("region", { name: "How the batch went" }),
   ).toContainText("1 of 1");

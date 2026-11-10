@@ -1,50 +1,10 @@
 import { useCallback, useEffect, useState } from "react";
-import { api, type QueueState, type QueueTicket, type QueueView } from "./api";
+import { api, type QueueTicket, type QueueView } from "./api";
 import { QueueDetail } from "./QueueDetail";
-import { pathLabels, rappen, seconds } from "./format";
+import { rappen, seconds } from "./format";
+import { Board } from "./QueueBoard";
 
 const POLL_MS = 1000;
-
-const stations: { state: QueueState; label: string }[] = [
-  { state: "queued", label: "Queued" },
-  { state: "working", label: "Agent working" },
-  { state: "review", label: "Waiting for a technician" },
-  { state: "closed", label: "Closed" },
-];
-
-const verdictLabels = {
-  approved: "Approved",
-  corrected: "Rerouted",
-  rejected: "Rejected",
-};
-
-function statusOf(ticket: QueueTicket) {
-  if (ticket.review) return verdictLabels[ticket.review.verdict];
-  return {
-    queued: "Queued",
-    working: "Agent working",
-    review: "Waiting for review",
-    closed: "Closed",
-    failed: "Failed",
-  }[ticket.state];
-}
-
-function Pipeline({ view }: Readonly<{ view: QueueView }>) {
-  const shown = view.counts.failed
-    ? [...stations, { state: "failed" as const, label: "Failed" }]
-    : stations;
-  return (
-    <ol className="pipeline" aria-label="Tickets by state">
-      {shown.map(({ state, label }) => (
-        <li key={state} className={`stage stage-${state}`}>
-          <span className="stage-dot" aria-hidden="true" />
-          <span className="stage-label">{label}</span>
-          <span className="stage-count">{view.counts[state]}</span>
-        </li>
-      ))}
-    </ol>
-  );
-}
 
 function Value({ view }: Readonly<{ view: QueueView }>) {
   const value = view.value;
@@ -75,84 +35,6 @@ function Value({ view }: Readonly<{ view: QueueView }>) {
         through priced, is under Is it worth it?, Money.
       </p>
     </section>
-  );
-}
-
-function Decision({ ticket }: Readonly<{ ticket: QueueTicket }>) {
-  const decision = ticket.decision;
-  if (!decision) {
-    return (
-      <span className="quiet">
-        {ticket.state === "failed" ? "None, see the error" : "Not yet"}
-      </span>
-    );
-  }
-  const target = decision.tool ?? decision.queue;
-  return (
-    <span className={`decision path-${decision.path}`}>
-      <span className="path-tag">{pathLabels[decision.path]}</span>
-      {target && <code>{target}</code>}
-    </span>
-  );
-}
-
-function TicketList(
-  props: Readonly<{
-    tickets: QueueTicket[];
-    selected?: string;
-    onSelect: (id: string) => void;
-  }>,
-) {
-  return (
-    <div className="table-scroll">
-      <table>
-        <thead>
-          <tr>
-            <th scope="col">Priority</th>
-            <th scope="col">Ticket</th>
-            <th scope="col">Requester</th>
-            <th scope="col">Status</th>
-            <th scope="col">Agent's decision</th>
-          </tr>
-        </thead>
-        <tbody>
-          {props.tickets.map((ticket) => (
-            <tr
-              key={ticket.id}
-              data-selected={ticket.id === props.selected}
-              onClick={() => {
-                props.onSelect(ticket.id);
-              }}
-            >
-              <td>{ticket.priority}</td>
-              <td className="wide">
-                <button
-                  type="button"
-                  className="link"
-                  onClick={() => {
-                    props.onSelect(ticket.id);
-                  }}
-                >
-                  {ticket.title}
-                </button>
-                <small className="ticket-id">{ticket.id}</small>
-              </td>
-              <td>{ticket.requester.name}</td>
-              <td>
-                <span
-                  className={`chip chip-${ticket.review?.verdict ?? ticket.state}`}
-                >
-                  {statusOf(ticket)}
-                </span>
-              </td>
-              <td>
-                <Decision ticket={ticket} />
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
   );
 }
 
@@ -252,7 +134,6 @@ export function Queue() {
       )}
       {view && (
         <>
-          <Pipeline view={view} />
           <Value view={view} />
           {view.tickets.length === 0 ? (
             <p className="waiting">
@@ -260,26 +141,38 @@ export function Queue() {
               it.
             </p>
           ) : (
-            <div className="board">
-              <TicketList
-                tickets={view.tickets}
-                selected={selected}
-                onSelect={setSelected}
-              />
-              <aside className="detail" aria-label="Ticket">
-                {current ? (
+            <div className={current ? "board open" : "board"}>
+              <div className="board-main">
+                {!current && (
+                  <p className="caption">
+                    Choose a ticket to see the agent&apos;s work and decide.
+                  </p>
+                )}
+                <Board
+                  tickets={view.tickets}
+                  selected={selected}
+                  onSelect={setSelected}
+                />
+              </div>
+              {current && (
+                <aside className="detail drawer" aria-label="Ticket">
+                  <button
+                    type="button"
+                    className="link close"
+                    onClick={() => {
+                      setSelected(undefined);
+                    }}
+                  >
+                    Close
+                  </button>
                   <QueueDetail
                     key={current.id}
                     ticket={current}
                     queues={view.queues}
                     onDecided={(ticket) => void decided(ticket)}
                   />
-                ) : (
-                  <p className="waiting">
-                    Choose a ticket to see the agent's work and decide.
-                  </p>
-                )}
-              </aside>
+                </aside>
+              )}
             </div>
           )}
         </>

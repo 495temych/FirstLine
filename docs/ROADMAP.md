@@ -233,7 +233,8 @@ The number after each one is the commit that meets it. The Queue's investigation
 - [x] (4) A ticket opens with its decision, reasoning, knowledge used, proposed action and trace. Nothing runs until a technician approves, sends it to another team or rejects it with a reason.
 - [x] (4) Review time per ticket is measured, and the board shows the time saved and the net saving in CHF, with its assumptions on the page.
 - [ ] (4) The Queue uses the investigation and rules from Sprint 1's commits 6 and 7 once they exist, and a ticket shows the checks the agent ran and any rule that changed its decision.
-- [ ] (4) A technician can clear a batch from the keyboard: next ticket, approve, reroute and reject.
+- [x] (4) The board is a Kanban of the computed states, with the human gate in amber, each card coloured by the agent's path, and the review in a drawer beside it. Cards move only when their state changes, never by dragging.
+- [ ] (4) A technician can clear a batch from the keyboard: next ticket, approve, reroute and reject. *(Not needed for now, at the owner's call.)*
 
 **Explainability (`dashboard/`, `backend/`)**
 
@@ -310,7 +311,7 @@ The number after each one is the commit that meets it. The Queue's investigation
 | 2 | **Container.** The app builds into one image, with no secrets in it | The same image runs locally | Configuration and secrets |
 | 3 | **Azure and Foundry.** Infrastructure as code, Container Apps, Key Vault, managed identity and budget alerts. Claude through Microsoft Foundry, plus one cross-vendor comparison on a sample | A hosted demo with one command to tear it down, and Claude beside another vendor's model on the same chart | Where it runs, cloud hygiene, choosing models with evidence |
 | 4 | **Gateway.** API Management in front of every model call, with rate limits and token budgets, logging first and enforcing after | A spending limit that blocks a call | Gateways, log-only then enforce |
-| 5 | **Handover and demo.** A one-page autonomy policy, a runbook, measures against the Sprint 1 baseline, a password on the demo, a replay mode so visitors cost nothing, and a 3-minute video | A client could run it without you, and a recruiter can click through it for free | Handover and adoption |
+| 5 | **Handover and demo.** A phone layout for the Queue board, a one-page autonomy policy, a runbook, measures against the Sprint 1 baseline, a password on the demo, a replay mode so visitors cost nothing, and a 3-minute video | A client could run it without you, and a recruiter can click through it for free | Handover and adoption |
 
 ### The demo
 
