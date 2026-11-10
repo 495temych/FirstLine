@@ -48,7 +48,7 @@ it("opens with the model the rule picks, and the rule", async () => {
   );
   expect(
     screen.getByText(
-      "FirstLine still runs on Dear model, until the owner chooses.",
+      "The owner chose Dear model as FirstLine's model instead, for how it does on unseen families, its reliability and its EU region.",
     ),
   ).toBeDefined();
   expect(

@@ -15,7 +15,7 @@ USERS_FILE = ROOT / "data" / "records" / "users.json"
 TICKETS_DIR = ROOT / "data" / "tickets"
 EVALS_DIR = ROOT / "data" / "evals"
 SOURCE_DIR = ROOT / "labs" / "synthetic_tickets"
-DEFAULT_MODEL = "claude-haiku-4-5-20251001"
+DEFAULT_MODEL = "google/gemini-3.1-flash-lite"  # the owner's choice, docs/DECISIONS.md
 
 # US dollars per million tokens: (input, output). The models are in agent/models.py.
 PRICES = {name: model.price for name, model in MODELS.items()}

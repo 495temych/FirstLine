@@ -29,7 +29,8 @@ def always_escalate(text, use_retrieval):
 def stubbed(tmp_path, monkeypatch):
     monkeypatch.setattr(runner, "RUNS_DIR", tmp_path)
     monkeypatch.setattr(runner, "run_triage", always_escalate)
-    monkeypatch.delenv("MODEL_NAME", raising=False)
+    # The sums below assume Haiku 4.5's prices, whatever the default.
+    monkeypatch.setenv("MODEL_NAME", "claude-haiku-4-5-20251001")
     return tmp_path
 
 

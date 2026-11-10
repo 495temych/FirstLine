@@ -85,7 +85,9 @@ function Lede({ data }: Readonly<{ data: Benchmark }>) {
       </p>
       {data.chosen.model !== data.default.model && (
         <p>
-          FirstLine still runs on {data.default.label}, until the owner chooses.
+          The owner chose {data.default.label} as FirstLine&apos;s model
+          instead, for how it does on unseen families, its reliability and its
+          EU region.
         </p>
       )}
     </section>

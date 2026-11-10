@@ -40,7 +40,9 @@ def board(monkeypatch):
 
 
 @pytest.fixture
-def client(board):
+def client(board, monkeypatch):
+    # The cost sums below assume Haiku 4.5's prices, whatever the default.
+    monkeypatch.setenv("MODEL_NAME", "claude-haiku-4-5-20251001")
     return TestClient(main.app)
 
 

@@ -41,6 +41,7 @@ def test_the_catch_rate_needed_to_pay():
 @pytest.fixture
 def saved_run(tmp_path, monkeypatch):
     monkeypatch.setattr(runner, "RUNS_DIR", tmp_path)
+    monkeypatch.setenv("MODEL_NAME", "claude-haiku-4-5-20251001")
     run = {
         "id": "a-dev",
         "set": "dev",
