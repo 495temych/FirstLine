@@ -41,11 +41,13 @@ We tune on the development tickets, as a support team learns from its own histor
 
 ## The three sprints
 
-| Sprint | Course week | Question it answers | Where it runs | Done when |
+Each sprint is one phase of `docs/FRAMEWORK.md`, the reusable framework this roadmap follows, and one course week.
+
+| Sprint | Phase | Question it answers | Where it runs | Done when |
 |---|---|---|---|---|
-| 1. Prove it | Week 1: AI Engineer | Does the agent beat a free baseline, safely and cheaply? | Your Mac, with Claude's API | A chosen design and model, with real numbers |
-| 2. Make it a system | Week 2: AI Architect | Can it run a whole queue, observed and durable? | Your Mac, with Langfuse, Qdrant and Supabase | The Queue works end to end, with every ticket traced |
-| 3. Deliver it | Week 3: AI FDE | Could a client run it safely in their own cloud? | Microsoft Azure | A hosted demo, a handover pack and a 3-minute video |
+| 1. Prove it | Feasibility: the use case, the money, the data, the core, the budget, and the design and model | Is triage worth automating, with which design and model, at what cost? | Your Mac, with model APIs | A go decision, with the chosen design and model and the cost per ticket |
+| 2. Make it a system | Integrate and extend: traces, a system of record, search, MCP tools, a conversation, and the dashboard | Can it run a whole queue, observed, durable and usable? | Your Mac, with Langfuse, Qdrant and Supabase | The Queue works end to end, every ticket traced, with measured review times |
+| 3. Deliver it | Production: security, the cloud, cost control and handover | Could a client run it safely in their own cloud? | Microsoft Azure | A hosted demo, a handover pack and a 3-minute video |
 
 ### What each service is for
 
@@ -64,7 +66,7 @@ Each store has one job, so nothing has two sources of truth.
 
 MCP is how the agent's read-only tools get served, not a way into our stores.
 
-- **The agent, with Sprint 1's commit 7.** The investigation tools (search the knowledge base, look up the requester, find similar incidents, run a check) are served by FirstLine's own small MCP server, read-only by construction. The loop finds them through MCP instead of hardcoded schemas, which closes that known limitation. Similar incidents come from Qdrant's `incidents` collection, from Sprint 2's commit 2.
+- **The agent, with Sprint 2's commit 12.** The investigation tools (search the knowledge base, look up the requester, find similar incidents, run a check) start as plain read-only functions in Sprint 1's commit 7, where the loop is measured. Commit 12 serves them from FirstLine's own small MCP server, read-only by construction, and the loop finds them through MCP instead of hardcoded schemas, which closes that known limitation. Similar incidents come from Qdrant's `incidents` collection, from Sprint 2's commit 2.
 - **Not the vendors' servers, for the agent.** Supabase's MCP server can run any SQL and apply migrations, and Qdrant's can write. Both are wider than least privilege allows.
 - **Development, now.** Supabase's MCP server in read-only mode, scoped to this project, lets Claude Code inspect the system of record while we build. It's local configuration only, with nothing in the product.
 - **Sprint 3.** API Management can front the MCP server, with the same keys, limits and logs as the model calls.
@@ -75,7 +77,7 @@ The owner pays for every call, so `docs/PROCESS.md` sets the rules: ask before a
 
 ## Sprint 1: prove it
 
-**Week 1 in one line: start from a business problem you can measure, and test the agent on your own task against a simple baseline.**
+**Phase 1, feasibility on one machine: define the use case and its money, build the exam and the core, estimate the budget, and choose the design and model with evidence.** Week 1 in one line: start from a business problem you can measure, and test the agent on your own task against a simple baseline.
 
 | # | Commit | Demo moment |
 |---|---|---|
@@ -85,8 +87,9 @@ The owner pays for every call, so `docs/PROCESS.md` sets the rules: ask before a
 | 4 | ✅ **Labels.** Named causes drafted by rules, then frozen after the owner's review | Each ticket's cause and expected path on the Tickets page |
 | 5 | ✅ **Baseline.** Structured decisions, scored against two yardsticks, with cost guards | The first real numbers, including where the agent loses |
 | 6 | **Rules in code.** Requester records, tool risk tiers and the SEC-04 guard | Pick a user: the same lockout gets a different answer, and the dangerous unlock can't run |
-| 7 | **Investigate.** An agent loop with read-only tools against today's one call, on samples first. The loop writes a full handover | What investigating adds, for what extra cost, on one chart |
+| 7 | **Investigate.** An agent loop with read-only lookup tools against today's one call, on samples first, with the default model. The loop writes a full handover | What investigating adds, for what extra cost, on one chart |
 | 8 | **Benchmark.** Ten light models, Claude, OpenAI and open-weight, on the full development, unseen and rules sets. Ranked by net saving per ticket, with the Pareto front drawn | Net saving against cost per ticket, with the front, on the Scoreboard, and a written choice |
+| 9 ✅ | **The business case.** "Is it worth it?" in CHF: projected from the evaluations, observed from the Queue's reviews, and how it moves if the assumptions are wrong. *(Built in Sprint 2 as its commit 8, and moved here, because the budget is a feasibility question)* | Change the minutes by hand and watch the saving and break-even move |
 
 ### Success criteria
 
@@ -124,7 +127,7 @@ The number after each one is the commit that meets it.
 - [ ] (6) `agent/rules.py` holds pure functions that both modes call. A user with 2+ lockouts on a lockout ticket ends at `SEC-INCIDENT`, and a sensitive tool in the Assistant becomes a ticket.
 - [ ] (6) Stub-model tests try to break each rule. The fix can't run, and a user with 2 lockouts and a printer ticket is not overridden.
 - [ ] (7) `agent/queue.py` investigates one ticket with four read-only tools: search the knowledge base, look up the requester, find similar incidents and run a check. It ends in the same decision format as the Assistant.
-- [ ] (7) The four tools are served by FirstLine's own MCP server, which has no tool that changes anything, and the loop discovers them through MCP. Tests run the server in memory.
+- [ ] (7) The four tools are plain read-only functions in `agent/`, so commit 12 of Sprint 2 can serve them over MCP unchanged.
 - [ ] (7) The loop stops at its limits on steps and cost and escalates with what it found. A check the ticket doesn't have returns no result.
 - [ ] (7) A test proves the loop can't reach a tool that changes a system, and that similar-incident search reads knowledge base split tickets only.
 - [ ] (7) An escalation carries a full handover. Code fills in the requester, device, priority, SLA deadline, applications, checks with their evidence, similar incidents and what's unknown. The model writes only the likely cause, what's ruled out and the next step, citing that evidence.
@@ -155,6 +158,14 @@ The number after each one is the commit that meets it.
 - [ ] (7) The Scoreboard shows the loop beside the one-call run.
 - [x] (8) A "Models" section on the Scoreboard, under the business case, plots net saving against cost per ticket on a log scale, with the Pareto front drawn and a switch to time per ticket. A table lists each model's accuracy with its margin, mistakes in CHF, cost, median and 90th-percentile time, invalid answers and where its provider hosts it.
 
+**The business case (`backend/`, `dashboard/`)**
+
+- [x] (9) The Queue keeps what a technician needs to trust the batch: states, approved unchanged, agent time per ticket and model cost. Net saving and time saved move to the Scoreboard.
+- [x] (9) One module in `backend/` computes the economics from `docs/BUSINESS_GOAL.md`'s assumptions, and both the API and the tests use it. Nothing is computed twice.
+- [x] (9) The Scoreboard opens with net saving per ticket in CHF, in three layers. Projected: from the latest evaluation, with accuracy, mistakes priced from the labels, the share technicians catch, and model cost. Observed: from the Queue's reviews, where review time and the share caught are measured, and an approved decision the labels say is wrong is priced as a mistake. Sensitivity: sliders for minutes by hand, the hourly rate and the share caught move the saving, and a chart shows where it turns positive.
+- [x] (9) Each figure follows `docs/EXPLAINABILITY.md`: its question, n, margin and source, and the assumptions on the page. One line says the numbers come from practice tickets and the held-out sets run once at the end.
+- [x] (9) The benchmark of commit 8 sits under the business case, with its Pareto front.
+
 **Checks and CI**
 
 - [ ] (all) `uv run poe check` passes on every commit, with the coverage thresholds unchanged and no API key.
@@ -162,7 +173,7 @@ The number after each one is the commit that meets it.
 
 ## Sprint 2: make it a system
 
-**Week 2 in one line: keep logic in code, measure everything, and make long work durable.**
+**Phase 2, integrate and extend: traces, a system of record and search as services, the agent's tools over MCP, a conversation in the Assistant, and a dashboard that explains it.** Week 2 in one line: keep logic in code, measure everything, and make long work durable.
 
 | # | Commit | Demo moment | Course idea |
 |---|---|---|---|
@@ -173,11 +184,11 @@ The number after each one is the commit that meets it.
 | 4 | 🟡 **The Queue.** Load a batch, order it in code, and approve, correct or reject each decision with its evidence | A technician clears a morning batch, and technician time per ticket is measured | The human's step |
 | 6 ✅ | **How it works.** An overview page of the goal, the route a ticket takes, the model, the tools and the services, built from the code | A recruiter understands the agent in two minutes without opening the repository | Explainability, a single source of truth |
 | 7 | **Retrieval.** A page of the core retrieval measures, how sure each match is, and a search anyone can try | Type a request and watch which playbook it finds, and how strongly | RAG evaluation |
-| 8 ✅ | **The business case.** The Scoreboard answers "is it worth it?" in CHF: projected from the evaluations, observed from the Queue's reviews, and how it moves if the assumptions are wrong | Change the minutes by hand and watch the saving and break-even move | Unit economics, measuring value, not only accuracy |
 | 5 | **Durable and gated.** Retries, no repeated actions, spending limits per batch, and a release gate: a change ships only if its Langfuse experiment passes | Kill a batch mid-run and it carries on without doing anything twice. A worse change is refused | Idempotency, `RetryPolicy`, evals as a release gate |
 | 9 ✅ | **Three groups.** The tabs regroup into Try it (Queue, Assistant), Is it worth it? (Money, Models) and How it works (Workflow, Harness, Knowledge base, Retrieval, Tickets, Evaluations), each view with its own link, and each group opens with what its views show | Send someone a link straight to a playbook or a model's run | Explain the system in layers |
 | 10 | **Knowledge base.** A tab to explore what the agent knows: a cause map from each playbook's causes to the path, fix or queue they lead to, the policies that override them, the families with no playbook, and how the agent does on each | Click a cause and see the fix it allows, its risk tier, and how often the agent gets it right | Make the knowledge, not just the answer, inspectable |
 | 11 ✅ | **The harness.** A tab that draws what surrounds the model on one ticket: what it reads, the one tool it can call to decide, the form it fills, the limits it runs under, and the checks code makes on its answer. The fixes it proposes stay on Workflow | Pick a ticket and see exactly what the model read and what it answered | Agents need a harness: instructions, tools, limits and checks |
+| 12 | **A conversation, with MCP.** The lookup tools from Sprint 1's commit 7 move behind FirstLine's own read-only MCP server. The Assistant asks the requester when something essential is missing, and a technician can question a decision in the Queue | An employee is asked which laptop, and the answer changes the fix. A technician asks "why not escalate?" and gets the evidence | MCP, multi-turn agents, the human in the loop |
 
 The Queue's first version is in: batches, live states, review with measured time, traces in the UI and the value in CHF. Since commit 3a it keeps its record in Supabase and survives a restart. The agent doesn't investigate yet.
 
@@ -239,14 +250,6 @@ The number after each one is the commit that meets it. The Queue's investigation
 - [ ] (7) The view shows how retrieval changes the decision: path accuracy with and without it, from saved runs. The view reads both from saved runs and shows the one with search. None is saved without it, because with search off the agent answers in plain text with no path to score. Measuring it needs a run where the decision form gets no playbook, about CHF 0.65 on the development set, and waits for the owner's go-ahead.
 - [ ] (6, 7) Both pages pass the checklist in `docs/EXPLAINABILITY.md`: phone width, keyboard, and screenshots reviewed.
 
-**The business case (`backend/`, `dashboard/`)**
-
-- [x] (8) The Queue keeps what a technician needs to trust the batch: states, approved unchanged, agent time per ticket and model cost. Net saving and time saved move to the Scoreboard.
-- [x] (8) One module in `backend/` computes the economics from `docs/BUSINESS_GOAL.md`'s assumptions, and both the API and the tests use it. Nothing is computed twice.
-- [x] (8) The Scoreboard opens with net saving per ticket in CHF, in three layers. Projected: from the latest evaluation, with accuracy, mistakes priced from the labels, the share technicians catch, and model cost. Observed: from the Queue's reviews, where review time and the share caught are measured, and an approved decision the labels say is wrong is priced as a mistake. Sensitivity: sliders for minutes by hand, the hourly rate and the share caught move the saving, and a chart shows where it turns positive.
-- [x] (8) Each figure follows `docs/EXPLAINABILITY.md`: its question, n, margin and source, and the assumptions on the page. One line says the numbers come from practice tickets and the held-out sets run once at the end.
-- [x] (8) Sprint 1's benchmark sits under the business case once it exists, with its Pareto front.
-
 **Three groups (`dashboard/`)**
 
 - [x] (9) The masthead has three groups, Try it, Is it worth it? and How it works, and each group has one row of tabs: Queue and Assistant; Money and Models; Workflow, Harness, Knowledge base, Retrieval, Tickets and Evaluations.
@@ -275,6 +278,14 @@ The number after each one is the commit that meets it. The Queue's investigation
 - [x] (11) Picking a development ticket shows what the model read, its search results with scores, and what the default model decided in its latest saved run, for free.
 - [x] (11) A test fails when a decision field or a check has no explanation, and the schematic has a text equivalent. It passes the checklist in `docs/EXPLAINABILITY.md`.
 
+**A conversation, with MCP (`agent/`, `backend/`, `dashboard/`, `evals/`)**
+
+- [ ] (12) FirstLine's own MCP server serves the four lookup tools and has no tool that changes anything. The loop discovers them through MCP, and tests run the server in memory.
+- [ ] (12) The Assistant can pause to ask the requester one question when something essential is missing, through the same pause and resume as the human gates, and the conversation is kept in the checkpoints. The Queue never asks: it escalates and says what's missing.
+- [ ] (12) In the Queue, a technician can ask about a decision. The agent answers from the trace and the same read-only tools, and can't change the decision.
+- [ ] (12) A simulated requester, a model that knows the ticket's hidden facts, answers the Assistant's questions in evaluations. Labels say when asking was right, and asking too often counts against it. Its cost is stated and agreed before it runs.
+- [ ] (12) The Harness view draws the loop and the conversation, from the code.
+
 **Durable and gated (`agent/`, `backend/`, `evals/`)**
 
 - [ ] (5) Model calls and searches retry on connection errors, with limits, and a model call isn't retried after the model has answered. *(Searches retry since commit 4.)*
@@ -291,7 +302,7 @@ The number after each one is the commit that meets it. The Queue's investigation
 
 ## Sprint 3: deliver it
 
-**Week 3 in one line: decide what the agent may do, secure it in layers, run it in the client's cloud, and hand it over.**
+**Phase 3, production: security in layers, the client's cloud, cost control, operations and handover.** Week 3 in one line: decide what the agent may do, secure it in layers, run it in the client's cloud, and hand it over.
 
 | # | Commit | Demo moment | Course idea |
 |---|---|---|---|
@@ -352,7 +363,7 @@ We're leaving some things out on purpose, and each is a choice we can defend:
 - **Ranking the families by value.** The handover names the next family to automate, from the Sprint 1 numbers.
 - **Local and open-weight models.** Claude is enough. A local model is plan C if a client won't send data to a provider.
 - **Fine-tuning.** Our tickets are too few and too alike.
-- **MCP, sub-agents and A2A.** One agent with our own tools doesn't need them.
+- **Sub-agents and A2A.** One agent with our own tools doesn't need them. MCP serves only our own read-only tools, from Sprint 2's commit 12.
 - **Foundry Agent Service.** It would replace the gates and checkpoints we built on purpose.
 - **Self-hosted Langfuse.** Too much to run for a demo.
 

@@ -10,7 +10,7 @@ IMPORTANT: before you plan, build or change anything, read each of these in full
 
 1. `docs/BUSINESS_GOAL.md`: what success means, and how we count it
 2. `docs/SPEC.md`: what the business needs
-3. `docs/ROADMAP.md`: the current sprint and where the product is heading
+3. `docs/ROADMAP.md`: the current sprint and where the product is heading, by the phases in `docs/FRAMEWORK.md`
 4. `docs/TECH_STACK.md`: the tech choices
 5. `docs/CODE_STANDARDS.md`: how to write the code
 6. `docs/PROCESS.md`: how to run, plan, build and check the work

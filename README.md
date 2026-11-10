@@ -101,6 +101,7 @@ Checks, with no API key needed: `uv run poe check`.
 
 - [What it must do](docs/SPEC.md)
 - [The current sprint and where it's heading](docs/ROADMAP.md)
+- [The three-phase framework the sprints follow](docs/FRAMEWORK.md)
 - [The tech choices](docs/TECH_STACK.md)
 - [How the dashboard looks](docs/BRAND.md)
 - [How to write the code](docs/CODE_STANDARDS.md)

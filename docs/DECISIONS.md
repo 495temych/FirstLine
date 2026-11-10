@@ -155,6 +155,7 @@ Each design decision so far, with its reason and its trade-off.
 - **Decision:** Sprint 1 proves the agent locally, Sprint 2 makes it a system with Langfuse, Qdrant and Supabase, and Sprint 3 delivers it on Azure with Microsoft Foundry. The plan was cut from 23 commits to 18, keeping every tool and dropping dataset work, self-improvement and a third design.
 - **Reason:** each sprint answers one question, and the order follows the risk: first whether it works, then whether it runs, then whether a client can trust it.
 - **Trade-off:** there's no batch screen until Sprint 2, so the workflow that proves the value comes later than it would if we built it on SQLite first. In exchange, nothing gets built twice.
+- **Update, 10 November 2026:** the sprints became the three phases of a reusable framework, `docs/FRAMEWORK.md`: feasibility on one machine, integrate and extend, and production. The business case moved to Sprint 1, because the budget is a feasibility question, and serving the lookup tools over MCP moved to Sprint 2's new commit 12 with the conversation, because it's integration. The loop itself stays in Sprint 1, where it's measured against one call.
 
 ## One home for each kind of data
 
