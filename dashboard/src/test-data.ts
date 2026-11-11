@@ -8,6 +8,7 @@ import type {
   Stats,
   Trace,
 } from "./api";
+import type { Person } from "./people";
 
 export const unit = {
   doc: "vpn",
@@ -34,7 +35,56 @@ export const baseRun: Run = {
     tool_name: "reset_vpn_profile",
     tool_input: { username: "a.b" },
   },
+  rule: null,
 };
+
+export const requesters: Person[] = [
+  {
+    id: "s.keller",
+    name: "Sara Keller",
+    department: "Finance",
+    office: "Zürich",
+    lockouts_24h: 2,
+    device: {
+      id: "LT-SKELLER",
+      model: "ThinkPad T14",
+      image: "2026-06",
+      age_years: 2,
+      battery_health: 90,
+    },
+    rules_set: true,
+  },
+  {
+    id: "m.huber",
+    name: "Marc Huber",
+    department: "Sales",
+    office: "Munich",
+    lockouts_24h: 1,
+    device: {
+      id: "LT-MHUBER",
+      model: "HP EliteBook 840",
+      image: "2026-04",
+      age_years: 2,
+      battery_health: 90,
+    },
+    rules_set: true,
+  },
+  {
+    id: "a.hussain",
+    name: "Amir Hussain",
+    department: "Finance",
+    office: "Charlotte",
+    lockouts_24h: 0,
+    device: {
+      id: "LT-AHUSSAIN",
+      model: "HP EliteBook 840",
+      image: "2026-06",
+      age_years: 2,
+      battery_health: 90,
+    },
+    rules_set: false,
+  },
+];
 
 export const draft = {
   source: "escalate" as const,

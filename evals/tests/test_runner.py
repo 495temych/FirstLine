@@ -20,7 +20,7 @@ def result(path, tool=None, tool_input=None):
     }
 
 
-def always_escalate(text, use_retrieval):
+def always_escalate(text, use_retrieval, **_):
     queue = {"queue": "SEC-INCIDENT", "summary": "s", "priority": "P2-High"}
     return result("ESCALATE", "create_escalation_ticket", queue)
 
@@ -50,7 +50,7 @@ def test_a_run_records_what_was_measured():
 
 @pytest.mark.usefixtures("stubbed")
 def test_a_failed_ticket_counts_as_an_escalation_and_the_run_goes_on(monkeypatch):
-    def fail_once(text, use_retrieval):
+    def fail_once(text, use_retrieval, **_):
         monkeypatch.setattr(runner, "run_triage", always_escalate)
         raise TimeoutError("no answer")
 
@@ -121,7 +121,7 @@ def test_tiny_only_applies_to_the_rules_sets(stubbed, monkeypatch, capsys):
 
 
 def test_a_failed_ticket_has_no_cause(stubbed, monkeypatch):
-    def fail(text, use_retrieval):
+    def fail(text, use_retrieval, **_):
         raise RuntimeError("down")
 
     monkeypatch.setattr(runner, "run_triage", fail)
@@ -130,7 +130,7 @@ def test_a_failed_ticket_has_no_cause(stubbed, monkeypatch):
     assert row["error"] == "RuntimeError: down"
 
 
-def no_model(text, use_retrieval):
+def no_model(text, use_retrieval, **_):
     raise AssertionError("re-scoring must not call the model")
 
 
@@ -262,7 +262,7 @@ def test_every_run_records_its_labels_version(stubbed):
 
 
 def test_the_cost_the_provider_reports_beats_the_list_price(stubbed, monkeypatch):
-    def reported(text, use_retrieval):
+    def reported(text, use_retrieval, **_):
         usage = {"input_tokens": 1000, "output_tokens": 200, "cost_usd": 0.0001}
         return {**always_escalate(text, use_retrieval), "usage": usage}
 
@@ -272,7 +272,7 @@ def test_the_cost_the_provider_reports_beats_the_list_price(stubbed, monkeypatch
 
 
 def test_an_unreadable_decision_is_marked_invalid(stubbed, monkeypatch):
-    def unreadable(text, use_retrieval):
+    def unreadable(text, use_retrieval, **_):
         return {**always_escalate(text, use_retrieval), "reasoning": runner.UNREADABLE}
 
     monkeypatch.setattr(runner, "run_triage", unreadable)
@@ -300,3 +300,31 @@ def test_the_model_flag_picks_the_model(stubbed, monkeypatch, capsys):
     runpy.run_module("evals", run_name="__main__")
     assert "gpt-5-nano" in capsys.readouterr().out
     assert runner.config.model_name() == "gpt-5-nano"
+
+
+def test_each_ticket_runs_in_queue_mode_with_its_requester(tmp_path, monkeypatch):
+    monkeypatch.setattr(runner, "RUNS_DIR", tmp_path)
+    seen = []
+
+    def overridden(text, use_retrieval, requester=None, mode=None):
+        seen.append((requester, mode))
+        rule = {"rule": "SEC-04", "reason": "r", "proposed": {}}
+        return {**always_escalate(text, use_retrieval), "rule": rule}
+
+    monkeypatch.setattr(runner, "run_triage", overridden)
+    run = runner.evaluate("rules", tiny=True)
+    tickets = {t["id"]: t for t, _ in runner.load_any("rules", tiny=True)}
+    assert seen
+    assert all(mode == "queue" for _, mode in seen)
+    assert {r for r, _ in seen} == {t["requester"] for t in tickets.values()}
+    assert {row["rule"] for row in run["tickets"]} == {"SEC-04"}
+    assert run["summary"]["sec04_failures"] == 0
+
+
+def test_the_rules_are_part_of_the_tools_version(tmp_path, monkeypatch):
+    before = runner.tools_version()
+    (tmp_path / "agent").mkdir()
+    rules = runner.config.ROOT / "agent" / "rules.py"
+    (tmp_path / "agent" / "rules.py").write_bytes(rules.read_bytes() + b"# changed")
+    monkeypatch.setattr(runner.config, "ROOT", tmp_path)
+    assert runner.tools_version() != before

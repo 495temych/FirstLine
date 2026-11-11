@@ -15,7 +15,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, HTTPException, Path
 
-from agent import config, decision, graph, models, retrieval
+from agent import config, decision, graph, models, records, retrieval, rules
 from agent.tool_schemas import FIX_TOOLS, QUEUES
 from backend import overview
 from evals import runner
@@ -40,6 +40,16 @@ READS: list[dict] = [
         "role": "system",
         "what": "Each fix's name, values and what it does, so it can name one.",
         "code": "tool_guide in agent/decision.py",
+    },
+    {
+        "name": "The requester's record",
+        "role": "user",
+        "what": (
+            "Their username, department, office, floor, device and groups, from the"
+            " staff directory. Never their name or email, nor their lockout count,"
+            " which code reads for SEC-04."
+        ),
+        "code": "requester_block in agent/graph.py",
     },
     {
         "name": "The ticket",
@@ -101,6 +111,22 @@ CHECKS: list[dict] = [
         "code": "MODEL_ATTEMPTS in agent/graph.py",
     },
     {
+        "when": "The requester has 2+ lockouts in the records, on a lockout ticket",
+        "then": (
+            f"It goes to {rules.SECURITY_QUEUE} at {rules.SECURITY_PRIORITY} under"
+            " SEC-04, whatever the model proposed, and the override is kept."
+        ),
+        "code": "sec04 in agent/rules.py",
+    },
+    {
+        "when": "In the Assistant, the fix it names is a sensitive one",
+        "then": (
+            f"It becomes a ticket to {rules.TECHNICIAN_QUEUE} naming the fix, because"
+            " only a technician may run it."
+        ),
+        "code": "sensitive_fix in agent/rules.py",
+    },
+    {
         "when": "The path is Out of scope",
         "then": "Nothing runs and no ticket is opened.",
         "code": "route_after_triage in agent/graph.py",
@@ -108,8 +134,9 @@ CHECKS: list[dict] = [
 ]
 
 LOOP = (
-    "The model answers in one pass: it can't look up the"
-    " requester, run a check or search again, so all it knows is what it was given."
+    "The model answers in one pass: it's given the requester's record, but it can't"
+    " look up a device, run a check or search again, so all it knows is what it was"
+    " given."
     " Sprint 1's commit 7 tests a loop with four read-only tools against this one call,"
     " and keeps it only if it earns its extra cost."
 )
@@ -212,7 +239,9 @@ def read(ticket_id: str) -> dict | None:
         "found": [
             {k: u[k] for k in ("doc", "kind", "section", "score")} for u in found
         ],
-        "message": graph.build_user_message(ticket["text"], found, True),
+        "message": graph.build_user_message(
+            ticket["text"], found, True, records.requester(ticket.get("requester"))
+        ),
         "answer": {
             "path": ticket["path"],
             "cause": ticket.get("cause"),

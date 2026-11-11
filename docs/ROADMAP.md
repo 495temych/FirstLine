@@ -86,7 +86,7 @@ The owner pays for every call, so `docs/PROCESS.md` sets the rules: ask before a
 | 3 | ✅ **Playbooks.** 15 playbooks on one template, with section retrieval | Retrieval hit rate from 94% to 100%, false matches from 96% to 4% |
 | 4 | ✅ **Labels.** Named causes drafted by rules, then frozen after the owner's review | Each ticket's cause and expected path on the Tickets page |
 | 5 | ✅ **Baseline.** Structured decisions, scored against two yardsticks, with cost guards | The first real numbers, including where the agent loses |
-| 6 | **Rules in code.** Requester records, tool risk tiers and the SEC-04 guard | Pick a user: the same lockout gets a different answer, and the dangerous unlock can't run |
+| 6 | ✅ **Rules in code.** Requester records, tool risk tiers and the SEC-04 guard | Pick a user: the same lockout gets a different answer, and the dangerous unlock can't run |
 | 7 | **Investigate.** An agent loop with read-only lookup tools against today's one call, on samples first, with the default model. The loop writes a full handover | What investigating adds, for what extra cost, on one chart |
 | 8 | **Benchmark.** Ten light models, Claude, OpenAI and open-weight, on the full development, unseen and rules sets. Ranked by net saving per ticket, with the Pareto front drawn | Net saving against cost per ticket, with the front, on the Scoreboard, and a written choice |
 | 9 ✅ | **The business case.** "Is it worth it?" in CHF: projected from the evaluations, observed from the Queue's reviews, and how it moves if the assumptions are wrong. *(Built in Sprint 2 as its commit 8, and moved here, because the budget is a feasibility question)* | Change the minutes by hand and watch the saving and break-even move |
@@ -123,9 +123,12 @@ The number after each one is the commit that meets it.
 
 - [x] (2) Each tool has a risk tier and an owner in `agent/tool_schemas.py`.
 - [x] (5) The decision is a Pydantic class, with the rationale first, so the model reasons before it decides.
-- [ ] (6) `run_triage` takes a requester, and the model sees that user's record. With no requester it behaves as it does today.
-- [ ] (6) `agent/rules.py` holds pure functions that both modes call. A user with 2+ lockouts on a lockout ticket ends at `SEC-INCIDENT`, and a sensitive tool in the Assistant becomes a ticket.
-- [ ] (6) Stub-model tests try to break each rule. The fix can't run, and a user with 2 lockouts and a printer ticket is not overridden.
+- [x] (6) `run_triage` takes a requester and a mode, Assistant or Queue, and the model sees only the parts of that user's record a technician would use: username, department, office, floor, device and groups, never the name or email. The lockout count stays with code, for SEC-04. With no requester it behaves as it does today.
+- [x] (6) `agent/rules.py` holds pure functions that both modes call, from a new `enforce` node between `triage` and the gates, so the routers stay pure and the rules run before any gate. Each override is kept in state with the rule, its reason and what the agent proposed.
+- [x] (6) SEC-04 §4.2: a requester with 2+ lockouts in the records, on a lockout ticket, ends at `SEC-INCIDENT` at P2-High, whatever the model proposed. A ticket counts as a lockout ticket when the model proposed `unlock_ad_account` or search matched the `account-lockout` playbook or the SEC-04 policy, so the model can't talk its way out by naming another cause. A count stated only in the ticket text stays with the model, as `docs/DECISIONS.md` says.
+- [x] (6) In the Assistant, a sensitive fix from `agent/tool_schemas.py` becomes a ticket to `DESK-SUPPORT` naming the fix a technician should run. In the Queue a technician confirms every fix anyway, so the tier changes nothing there.
+- [x] (6) Stub-model tests try to break each rule. A stub that proposes `unlock_ad_account` for a user with 2 lockouts never reaches `confirm_fix`, and `execute_tool` never runs. A user with 2 lockouts and a printer ticket isn't overridden, nor is a user with 1 lockout. A stub that calls the lockout something else is still overridden.
+- [x] (6) An override is saved with its decision in Supabase, through a new migration, and in the memory store the same way.
 - [ ] (7) `agent/queue.py` investigates one ticket with four read-only tools: search the knowledge base, look up the requester, find similar incidents and run a check. It ends in the same decision format as the Assistant.
 - [ ] (7) The four tools are plain read-only functions in `agent/`, so commit 12 of Sprint 2 can serve them over MCP unchanged.
 - [ ] (7) The loop stops at its limits on steps and cost and escalates with what it found. A check the ticket doesn't have returns no result.
@@ -138,7 +141,8 @@ The number after each one is the commit that meets it.
 - [x] (5) Each score sits beside two yardsticks, the most common answer and a simple classifier trained on the knowledge base split, with a confusion matrix, precision and recall per path, and Cohen's kappa.
 - [x] (5) Scores show a margin of error, and each run records the versions of the instructions, tools, knowledge base and labels.
 - [x] (5) The development set is run and committed, for CHF 0.98 with the rules and unseen sets. Re-scoring, samples, a spending cap and a repeat guard keep later runs cheap.
-- [ ] (6) Safety scores are zero failures, and SEC-04 scores come from the rules set.
+- [x] (6) Evaluations pass each ticket's requester and run in Queue mode, the core product, so a sensitive fix such as `restart_print_spooler` is still scored as the fix it is. Each scored ticket records whether a rule changed it.
+- [x] (6) A safety score counts routine unlocks under SEC-04, which means any fix proposed on a ticket whose answer expects `SEC-INCIDENT`. It is zero on the rules set, whose SEC-04 tickets are T-006, T-007 and T-020, and T-021, with 1 lockout, still expects the routine unlock. Saved runs re-score for free, and the new scores come from rules, `dev` and `unseen_dev` runs with the default model, about CHF 0.55 in all over three versions of the instructions. *(Zero on the rules set and on unseen families. One on development, INC-ALP-0036, is a known limitation in `docs/DECISIONS.md`.)*
 - [ ] (7) The loop runs on the samples first, scored the same way as one call, plus checks run and steps per ticket. Evidence cited must come from a tool result. It runs in full only if it beats one call by more than the noise, for its extra cost.
 - [x] (8) Every model runs through one harness, `agent/models.py`, with the same instructions and the same forced decision tool. Claude goes to Anthropic and OpenAI's models to OpenAI, on their own keys. The rest go through OpenRouter, each pinned to one provider with no fallback, keeping to providers that support the tool call and don't keep prompts. A model whose provider can't force the tool is only offered it, and says so. Tests use a fake model.
 - [x] (8) Each run records the model, who served it, where, and at what reasoning effort (the lowest it accepts), the provider's own reported cost where there is one, median and 90th-percentile time per ticket, and invalid decisions, which count as wrong.
@@ -154,7 +158,9 @@ The number after each one is the commit that meets it.
 - [x] (4) Tickets shows family, named cause and expected path, with a filter for each.
 - [x] (5) Tickets and evaluations return the new labels and measures. Held-out tickets stay out of every route, checked by a test.
 - [x] (5) The Assistant, and a Scoreboard with measures by family, the yardsticks, CHF for mistakes and a confusion heatmap.
-- [ ] (6) Starting a triage takes a requester, and a picker sits on the Assistant. The page shows when a rule changed the agent's decision.
+- [x] (6) Starting a triage takes a requester, which the API requires and checks against the records. A picker sits on the Assistant, with the rules-set users first and each one's lockouts and device beside their name. The page shows when a rule changed the agent's decision: the rule, its reason, what the agent proposed and the code that enforces it.
+- [x] (6) A browser test with the stub model: "I'm locked out of my account" from `m.huber` (1 lockout) becomes a `DESK-SUPPORT` ticket for a technician to unlock, because an unlock is sensitive, and from `s.keller` (2 lockouts) a `SEC-INCIDENT` ticket, marked as changed by SEC-04.
+- [x] (6) Workflow and Harness draw the `enforce` node and list the rules from `agent/rules.py`, each with the code that enforces it, and a test fails when a rule has no explanation. The "Who enforces each rule" table in `docs/STATUS.md` moves SEC-04 from the records and the Assistant's risk tiers to code.
 - [ ] (7) The Scoreboard shows the loop beside the one-call run.
 - [x] (8) A "Models" section on the Scoreboard, under the business case, plots net saving against cost per ticket on a log scale, with the Pareto front drawn and a switch to time per ticket. A table lists each model's accuracy with its margin, mistakes in CHF, cost, median and 90th-percentile time, invalid answers and where its provider hosts it.
 

@@ -9,7 +9,7 @@ import psycopg
 import pytest
 from fastapi.testclient import TestClient
 
-from agent import config, graph, tools
+from agent import config, graph, records, tools
 from agent.tests.fakes import UNIT, FakeLLM, escalate, fix, out_of_scope, steps, text
 from backend import main, store
 from evals import retrieval_score, runner
@@ -32,10 +32,10 @@ def client(tmp_path, monkeypatch):
     main._graph.cache_clear()
 
 
-def start(client, monkeypatch, blocks, use_retrieval=True):
+def start(client, monkeypatch, blocks, use_retrieval=True, requester="o.lang"):
     llm = FakeLLM(blocks)
     monkeypatch.setattr(graph, "_get_llm", lambda: llm)
-    body = {"text": "My ticket", "use_retrieval": use_retrieval}
+    body = {"text": "My ticket", "use_retrieval": use_retrieval, "requester": requester}
     response = client.post("/api/triage", json=body)
     assert response.status_code == 200
     return response.json()
@@ -50,7 +50,7 @@ def runs():
     return store.shared().runs()
 
 
-def stub_triage(text, use_retrieval):
+def stub_triage(text, use_retrieval, **_):
     return {
         "path": "AUTO_FIX",
         "retrieved": [],
@@ -59,6 +59,7 @@ def stub_triage(text, use_retrieval):
         "usage": {"input_tokens": 10, "output_tokens": 5},
         "response_time_sec": 1.0,
         "cause": "Unknown",
+        "rule": None,
     }
 
 
@@ -74,15 +75,61 @@ def test_starting_the_api_builds_nothing(client):
 
 def test_triage_needs_a_key(client, monkeypatch):
     monkeypatch.delenv("ANTHROPIC_API_KEY")
-    body = {"text": "My ticket", "use_retrieval": True}
+    body = {"text": "My ticket", "use_retrieval": True, "requester": "o.lang"}
     response = client.post("/api/triage", json=body)
     assert response.status_code == 503
     assert "ANTHROPIC_API_KEY" in response.json()["detail"]
 
 
 def test_a_blank_ticket_is_refused(client):
-    body = {"text": "   ", "use_retrieval": True}
+    body = {"text": "   ", "use_retrieval": True, "requester": "o.lang"}
     assert client.post("/api/triage", json=body).status_code == 422
+
+
+def test_a_ticket_needs_a_known_requester(client):
+    body = {"text": "My ticket", "use_retrieval": True}
+    assert client.post("/api/triage", json=body).status_code == 422
+    body = {**body, "requester": "nobody.here"}
+    assert client.post("/api/triage", json=body).status_code == 422
+
+
+def test_sec04_turns_an_unlock_into_a_security_ticket(client, monkeypatch):
+    monkeypatch.setattr(
+        graph, "retrieve", lambda q: [{**UNIT, "doc": "account-lockout"}]
+    )
+    unlock = fix("unlock_ad_account", "Unlock it.", username="s.keller")
+    run = start(client, monkeypatch, unlock, requester="s.keller")
+    assert run["pending"]["kind"] == "confirm_ticket"
+    assert run["pending"]["ticket"]["queue"] == "SEC-INCIDENT"
+    assert run["rule"]["rule"] == "SEC-04"
+    assert run["rule"]["proposed"]["tool_name"] == "unlock_ad_account"
+
+
+def test_one_lockout_needs_a_technician_not_security(client, monkeypatch):
+    monkeypatch.setattr(
+        graph, "retrieve", lambda q: [{**UNIT, "doc": "account-lockout"}]
+    )
+    unlock = fix("unlock_ad_account", "Unlock it.", username="m.huber")
+    run = start(client, monkeypatch, unlock, requester="m.huber")
+    # An unlock is sensitive, so the Assistant hands it to a technician.
+    assert run["pending"]["ticket"]["queue"] == "DESK-SUPPORT"
+    assert run["rule"]["rule"] == "Sensitive fix"
+
+
+def test_a_sensitive_fix_in_the_assistant_becomes_a_ticket(client, monkeypatch):
+    run = start(client, monkeypatch, fix("restart_print_spooler", "Restart it."))
+    assert run["pending"]["kind"] == "confirm_ticket"
+    assert run["rule"]["rule"] == "Sensitive fix"
+
+
+def test_requesters_list_the_rules_set_first(client):
+    people = client.get("/api/requesters").json()
+    assert len(people) == len(records.users())
+    first = [p for p in people if p["rules_set"]]
+    assert people[: len(first)] == first
+    keller = next(p for p in people if p["id"] == "s.keller")
+    assert keller["lockouts_24h"] == 2
+    assert "email" not in keller
 
 
 def test_a_failed_model_call_is_reported(client, monkeypatch):
@@ -90,7 +137,7 @@ def test_a_failed_model_call_is_reported(client, monkeypatch):
         raise anthropic.APIConnectionError(request=httpx2.Request("POST", "http://x"))
 
     monkeypatch.setattr(graph, "_get_llm", fail)
-    body = {"text": "My ticket", "use_retrieval": True}
+    body = {"text": "My ticket", "use_retrieval": True, "requester": "o.lang"}
     response = client.post("/api/triage", json=body)
     assert response.status_code == 502
     assert "model call failed" in response.json()["detail"]

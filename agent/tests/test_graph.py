@@ -81,7 +81,8 @@ def env(tmp_path, monkeypatch):
             monkeypatch.setattr(g, "_get_llm", lambda: self.llm)
 
         def start(self, query="q", use_retrieval=True):
-            return self.graph.invoke(g.initial_state(query, use_retrieval), self.config)
+            state = g.initial_state(query, use_retrieval, None, "queue")
+            return self.graph.invoke(state, self.config)
 
         def resume(self, value):
             return self.graph.invoke(Command(resume=value), self.config)

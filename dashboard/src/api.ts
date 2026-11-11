@@ -1,3 +1,4 @@
+import type { Person, RuleOverride } from "./people";
 import type { Benchmark } from "./benchmark";
 import type { Harness, HarnessTicket } from "./harnessData";
 export type Path =
@@ -53,6 +54,7 @@ export interface Run {
   ticket_draft: DraftTicket | null;
   tool_result: ToolResult | null;
   pending: Pending | null;
+  rule: RuleOverride | null;
 }
 
 export interface Decisions {
@@ -411,6 +413,13 @@ export interface StationInfo {
   gate: boolean;
 }
 
+/** A rule code enforces on every decision, from agent/rules.py. */
+export interface RuleInfo {
+  name: string;
+  does: string;
+  code: string;
+}
+
 export interface Line {
   path: RoutePath;
   label: string;
@@ -470,6 +479,7 @@ export interface Overview {
     why: string;
   };
   tools: ToolInfo[];
+  rules: RuleInfo[];
   tiers: Record<string, string>;
   queues: string[];
   services: {
@@ -505,8 +515,13 @@ function post<T>(url: string, body: object): Promise<T> {
 
 export const api = {
   health: () => request<{ api_key: boolean }>("/api/health"),
-  startTriage: (text: string, useRetrieval: boolean) =>
-    post<Run>("/api/triage", { text, use_retrieval: useRetrieval }),
+  startTriage: (text: string, useRetrieval: boolean, requester: string) =>
+    post<Run>("/api/triage", {
+      text,
+      use_retrieval: useRetrieval,
+      requester,
+    }),
+  requesters: () => request<Person[]>("/api/requesters"),
   readRun: (id: string) => request<Run>(`/api/runs/${id}`),
   answerGate: (id: string, gate: Gate, approved: boolean) =>
     post<Run>(`/api/runs/${id}/answer`, { gate, approved }),

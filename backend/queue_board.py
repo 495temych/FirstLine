@@ -149,6 +149,7 @@ def proposal_of(result: dict, seconds: float, trace_id: str | None) -> Proposal:
         "trace_id": trace_id,
         "cost_usd": cost_usd(result["usage"]),
         "latency_ms": round(seconds * 1000),
+        "rule": result["rule"],
     }
 
 
@@ -333,7 +334,10 @@ class Board:
                 trace_id=trace_id,
             ):
                 result = run_triage(
-                    f"{ticket['title']}\n\n{ticket['description']}", use_retrieval=True
+                    f"{ticket['title']}\n\n{ticket['description']}",
+                    use_retrieval=True,
+                    requester=ticket["requester"]["id"],
+                    mode="queue",
                 )
             elapsed = time.perf_counter() - started
         except Exception as exc:  # the batch carries on without this ticket

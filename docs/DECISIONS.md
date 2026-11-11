@@ -126,6 +126,30 @@ Each design decision so far, with its reason and its trade-off.
 - **Reason:** a needless escalation costs CHF 120, and a wrong unlock costs CHF 2,000. The policy says what to do, whatever past tickets did.
 - **Trade-off:** most lockout tickets go to security, though a real desk would call many of them a harmless phone. No imported ticket now expects `unlock_ad_account`, so only the rules set tests it. Code can guard the records, but a count in the ticket text has to be read by the model.
 
+## Rules in code, in their own node after the model
+
+- **Decision:** the rules live in `agent/rules.py` as pure functions of the decision, the requester's record, what search found and the mode. A new `enforce` node runs them between `triage` and the gates, and keeps any override in state with the rule, its reason, what the agent proposed and the code that enforced it. Supabase keeps it in `decisions.rule`.
+- **Reason:** the model proposes and code decides. A node of its own keeps the routers pure, runs the rules before any gate, and puts each override in the trace as a step of its own.
+- **Trade-off:** the first rule that changes a decision wins, so SEC-04 runs before the risk tier. A third rule will need its order thought through.
+
+## What counts as a lockout ticket
+
+- **Decision:** SEC-04 in code treats a ticket as a lockout when the model proposed `unlock_ad_account`, or search matched the `account-lockout` playbook or the SEC-04 policy. It ignores the model's own cause.
+- **Reason:** a rule that trusts the model's words can be talked out of. Search is deterministic and the proposed tool is a fact, so the model can't skip SEC-04 by calling the lockout something else.
+- **Trade-off:** a printer ticket from a user with 2 lockouts that happens to match the lockout policy would go to security too. A needless escalation costs CHF 120 against CHF 2,000 for a wrong unlock, so the rule leans that way on purpose.
+
+## The requester's record, without their name or email
+
+- **Decision:** the model reads the requester's username, department, office, floor, device and groups. Their name, email and lockout count stay out. The Assistant's API requires a requester, while `run_triage` still runs without one.
+- **Reason:** that's what a technician uses to triage, and the username and device id let the model fill in a fix with real values instead of `current.user`. Only what the task needs leaves, as `docs/SWISS.md` says. The lockout count was shown at first, and on `dev` it went from no SEC-04 failures to 7, CHF 17,720 in mistakes: the invented records show 0 lockouts for requesters whose tickets describe repeated ones, and the model believed the records. A firmer instruction brought it to 2. Hiding the count leaves SEC-04 on the records to code and the text to the model, as before.
+- **Trade-off:** the model can't use a count of 1 to call a lockout routine, as on T-021, so it may escalate one it could have fixed. A needless escalation costs CHF 120, against CHF 2,000 for a wrong unlock.
+
+## Evaluations run in Queue mode
+
+- **Decision:** evaluations pass each ticket's requester and run in Queue mode, where a technician confirms every fix, so the risk-tier rule doesn't apply. SEC-04 does.
+- **Reason:** the Queue is the core product, and the labels score the fix itself. In Assistant mode a sensitive fix, such as `restart_print_spooler` on T-003, would become a ticket and count as wrong.
+- **Trade-off:** the Assistant's own behaviour, sensitive fixes becoming tickets, is checked by tests, not scored.
+
 ## Named causes by rule
 
 - **Decision:** a ticket takes the cause its `root_cause` names first, using rules written on the knowledge base split. Vaguer wording counts only if nothing precise matches. Held-out tickets were labelled by the same rules, and nobody read them.
@@ -309,7 +333,8 @@ Each design decision so far, with its reason and its trade-off.
 - **Simulated tools.** Production needs least-privilege service accounts for AD, Intune, PaperCut and ServiceNow.
 - **Small corpus.** With 21 documents and 99 units, the thresholds and top 2 need revalidating at scale, and hundreds of units would need re-ranking.
 - **Search by meaning only.** Error codes and bare titles match poorly. `T-012`, a short Outlook sign-in request, ranks `sso-mfa` first. Keyword matching arrives with Qdrant in Sprint 2.
-- **The agent can invent parameters.** In a live Queue run it proposed a device id that isn't the requester's. The technician's review catches it, and the requester lookup in the investigation loop should prevent it.
+- **The agent can invent parameters.** In a live Queue run it proposed a device id that isn't the requester's. It now reads the requester's username and device id, and the technician's review still catches the rest.
+- **SEC-04 reads the records, not the ticket.** A count stated only in the text, such as "locked out twice today", is still the model's to read. On development the default model still unlocks INC-ALP-0036, a single lockout after a password reset that the labels send to security, on some runs and not others. A technician confirms every unlock in the Queue, and the Assistant hands every unlock to one.
 - **Single turn only.** Some real L1 issues need back-and-forth, which this design can't handle.
 - **No feedback loop.** The thresholds are set by inspection, not tuned from confirmed outcomes.
 - **Retrieval's cost and latency aren't measured.** The on/off switch shows the difference but doesn't quantify it.

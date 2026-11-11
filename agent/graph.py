@@ -3,7 +3,7 @@
 Flow (see README for the rendered diagram):
 
     START ─ use_retrieval? ─ off → no_tools → END
-                           └ on  → retrieve → triage ─ path:
+                           └ on  → retrieve → triage → enforce ─ path:
         OUT_OF_SCOPE → log
         SELF_SERVE   → self_serve_wait
         AUTO_FIX     → confirm_fix
@@ -33,7 +33,7 @@ from langgraph.types import RetryPolicy, interrupt
 from qdrant_client.http.exceptions import ResponseHandlingException
 from typing_extensions import TypedDict
 
-from agent import tools
+from agent import rules, tools
 from agent.config import model_name
 from agent.decision import (
     DECISION_TOOL,
@@ -57,6 +57,9 @@ MIN_SUMMARY_CHARS = 15  # shorter lines are labels, not a diagnosis
 class GraphState(TypedDict):
     query: str
     use_retrieval: bool
+    # The requester's record from data/records, or None when nobody is named.
+    requester: dict | None
+    mode: rules.Mode
     retrieved: list[dict]
     reasoning: str
     cause: str
@@ -71,13 +74,19 @@ class GraphState(TypedDict):
     tool_result: dict | None
     response_time_sec: float
     usage: dict | None
+    # Set when a rule in agent/rules.py changed the model's decision.
+    rule: rules.Override | None
 
 
-def initial_state(query: str, use_retrieval: bool) -> GraphState:
+def initial_state(
+    query: str, use_retrieval: bool, requester: dict | None, mode: rules.Mode
+) -> GraphState:
     """Full input for a new run. Every field is set, so nothing is left to chance."""
     return {
         "query": query,
         "use_retrieval": use_retrieval,
+        "requester": requester,
+        "mode": mode,
         "retrieved": [],
         "reasoning": "",
         "cause": "",
@@ -89,11 +98,41 @@ def initial_state(query: str, use_retrieval: bool) -> GraphState:
         "tool_result": None,
         "response_time_sec": 0.0,
         "usage": None,
+        "rule": None,
     }
 
 
 # ── Pure helpers ────────────────────────────────────────────────────────────────
-def build_user_message(query: str, retrieved: list[dict], use_retrieval: bool) -> str:
+# What a technician would use from the record. The name and email stay out, and so
+# does the lockout count: SEC-04 reads it in code, and a count of 0 in the records
+# talked the model out of the lockouts a ticket describes (docs/DECISIONS.md).
+REQUESTER_FIELDS = ("id", "department", "office", "floor", "groups")
+DEVICE_FIELDS = ("id", "model", "image", "age_years", "battery_health", "dock")
+
+
+def requester_block(requester: dict | None) -> str:
+    """The requester's record as the model reads it, or nothing without one."""
+    if requester is None:
+        return ""
+    lines = [f"- {field}: {requester.get(field)}" for field in REQUESTER_FIELDS]
+    device = requester.get("device") or {}
+    lines += [f"- device {field}: {device.get(field)}" for field in DEVICE_FIELDS]
+    return (
+        "Requester record (from the staff directory; `id` is the AD username and "
+        "`device id` the device):\n" + "\n".join(lines) + "\n\n"
+    )
+
+
+def build_user_message(
+    query: str,
+    retrieved: list[dict],
+    use_retrieval: bool,
+    requester: dict | None = None,
+) -> str:
+    return requester_block(requester) + _issue_message(query, retrieved, use_retrieval)
+
+
+def _issue_message(query: str, retrieved: list[dict], use_retrieval: bool) -> str:
     if retrieved:
         blocks = []
         for u in retrieved:
@@ -230,7 +269,10 @@ def _call_model(state: GraphState) -> tuple[AIMessage, float]:
         SystemMessage(instructions),
         HumanMessage(
             build_user_message(
-                state["query"], state["retrieved"], state["use_retrieval"]
+                state["query"],
+                state["retrieved"],
+                state["use_retrieval"],
+                state["requester"],
             )
         ),
     ]
@@ -262,6 +304,19 @@ def triage(state: GraphState) -> dict:
         "response_time_sec": elapsed,
         "usage": usage_of(msg),
     }
+
+
+def enforce(state: GraphState) -> dict:
+    """Apply the rules in code to the model's decision. They can overrule it."""
+    proposed: rules.Proposal = {
+        "path": state["path"],
+        "tool_name": state["tool_name"],
+        "tool_input": state["tool_input"],
+    }
+    decision, override = rules.enforce(
+        proposed, state["requester"], state["retrieved"], state["mode"]
+    )
+    return {**decision, "rule": override}
 
 
 def no_tools(state: GraphState) -> dict:
@@ -409,7 +464,9 @@ def build_graph(checkpointer):
     g.add_conditional_edges(START, route_start)
     g.add_edge("no_tools", END)
     g.add_edge("retrieve", "triage")
-    g.add_conditional_edges("triage", route_after_triage)
+    g.add_node("enforce", enforce)
+    g.add_edge("triage", "enforce")
+    g.add_conditional_edges("enforce", route_after_triage)
     g.add_conditional_edges("confirm_fix", route_after_confirm_fix)
     g.add_conditional_edges("confirm_ticket", route_after_confirm_ticket)
     g.add_conditional_edges("self_serve_wait", route_after_self_serve)

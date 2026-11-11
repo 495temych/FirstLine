@@ -14,9 +14,10 @@ async function open(page: Page, ...names: string[]) {
   }
 }
 
-async function triage(page: Page, ticket: string) {
+async function triage(page: Page, ticket: string, requester = "s.keller") {
   await page.goto("/");
   await open(page, "Assistant");
+  await page.getByLabel("Who is asking").selectOption(requester);
   await page.getByLabel("Describe the issue").fill(ticket);
   await page.getByRole("button", { name: "Triage this ticket" }).click();
 }
@@ -37,6 +38,22 @@ test("a declined fix gives a pre-filled ticket", async ({ page }) => {
     .getByRole("button", { name: "Create ticket", exact: true })
     .click();
   await expect(page.getByText(/Ticket INC\d+ created/)).toBeVisible();
+});
+
+test("the same lockout goes to security only for a repeat lockout", async ({
+  page,
+}) => {
+  await triage(page, "I'm locked out of my account", "s.keller");
+  await expect(page.getByText("Changed by a rule: SEC-04.")).toBeVisible();
+  await expect(page.getByText("SEC-INCIDENT", { exact: true })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Run fix" })).toBeHidden();
+
+  await triage(page, "I'm locked out of my account", "m.huber");
+  await expect(
+    page.getByText("Changed by a rule: Sensitive fix."),
+  ).toBeVisible();
+  await expect(page.getByText("DESK-SUPPORT", { exact: true })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Run fix" })).toBeHidden();
 });
 
 test("an escalation waits for confirmation", async ({ page }) => {

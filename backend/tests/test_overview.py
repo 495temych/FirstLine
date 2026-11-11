@@ -5,7 +5,7 @@ import json
 
 from fastapi.testclient import TestClient
 
-from agent import config, graph
+from agent import config, graph, rules
 from agent.tool_schemas import ESCALATION_TOOL, TOOL_POLICY, TOOLS
 from backend import main, overview, stats
 
@@ -49,6 +49,15 @@ def test_each_line_is_a_route_the_graph_really_takes():
             gate = line["stations"][0]
             otherwise = [gate, *line["otherwise"], END]
             assert follows_the_graph(otherwise), line["path"]
+
+
+def test_every_rule_is_explained_and_names_code_that_exists():
+    listed = overview.rules_list()
+    assert [r["name"] for r in listed] == list(rules.RULES)
+    for row in listed:
+        assert row["does"]
+        function, _, _ = row["code"].partition(" in ")
+        assert getattr(rules, function) is rules.RULES[row["name"]]
 
 
 def test_every_tool_is_explained_with_its_risk():

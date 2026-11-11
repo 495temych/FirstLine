@@ -1,0 +1,387 @@
+{
+  "id": "20261111T162448-rules-tiny",
+  "date": "2026-11-11T16:24:48+00:00",
+  "set": "rules",
+  "tiny": true,
+  "sample": false,
+  "model": "google/gemini-3.1-flash-lite",
+  "serving": {
+    "lab": "openrouter",
+    "provider": "google-vertex/eu",
+    "region": "EU",
+    "effort": "minimal"
+  },
+  "version": "bb4cb064",
+  "instructions_version": "008ebd39",
+  "tools_version": "b3bcb127",
+  "kb_version": "916db54c",
+  "labels_version": "1c44a887",
+  "summary": {
+    "n": 5,
+    "path_accuracy": 1.0,
+    "path_margin": 0.21724574737604055,
+    "action_accuracy": 1.0,
+    "action_margin": 0.21724574737604055,
+    "team_accuracy": 1.0,
+    "team_margin": 0.32881402355519035,
+    "mistake_cost_chf": 0,
+    "sec04_failures": 0,
+    "kappa": 1.0,
+    "cause_accuracy": null,
+    "retrieval_accuracy": 1.0,
+    "automation_rate": 0.5,
+    "cost_per_ticket_usd": 0.001021405,
+    "cost_per_ticket_chf": 0.000817124,
+    "time_per_ticket_sec": 1.6616112914402037,
+    "time_p50_sec": 1.8341653750976548,
+    "time_p90_sec": 1.893196750083007,
+    "balanced_accuracy": 1.0,
+    "failed": 0,
+    "invalid": 0
+  },
+  "yardsticks": {
+    "most_common": {
+      "n": 5,
+      "path_accuracy": 0.4,
+      "path_margin": 0.32583091831595484,
+      "action_accuracy": 0.0,
+      "action_margin": 0.21724574737604055,
+      "team_accuracy": 0.0,
+      "team_margin": 0.32881402355519035,
+      "mistake_cost_chf": 480,
+      "sec04_failures": 0,
+      "kappa": 0.0
+    },
+    "classifier": {
+      "n": 5,
+      "path_accuracy": 0.6,
+      "path_margin": 0.32583091831595484,
+      "action_accuracy": 0.4,
+      "action_margin": 0.32583091831595484,
+      "team_accuracy": 1.0,
+      "team_margin": 0.32881402355519035,
+      "mistake_cost_chf": 300,
+      "sec04_failures": 0,
+      "kappa": 0.375
+    }
+  },
+  "confusion": {
+    "SELF_SERVE": {
+      "SELF_SERVE": 1,
+      "AUTO_FIX": 0,
+      "ESCALATE": 0,
+      "OUT_OF_SCOPE": 0
+    },
+    "AUTO_FIX": {
+      "SELF_SERVE": 0,
+      "AUTO_FIX": 1,
+      "ESCALATE": 0,
+      "OUT_OF_SCOPE": 0
+    },
+    "ESCALATE": {
+      "SELF_SERVE": 0,
+      "AUTO_FIX": 0,
+      "ESCALATE": 2,
+      "OUT_OF_SCOPE": 0
+    },
+    "OUT_OF_SCOPE": {
+      "SELF_SERVE": 0,
+      "AUTO_FIX": 0,
+      "ESCALATE": 0,
+      "OUT_OF_SCOPE": 1
+    }
+  },
+  "per_path": {
+    "SELF_SERVE": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "n": 1
+    },
+    "AUTO_FIX": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "n": 1
+    },
+    "ESCALATE": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "n": 2
+    },
+    "OUT_OF_SCOPE": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "n": 1
+    }
+  },
+  "by_difficulty": {
+    "records": {
+      "n": 1,
+      "path_accuracy": 1.0,
+      "path_margin": 0.39672835426305353,
+      "action_accuracy": 1.0,
+      "action_margin": 0.39672835426305353,
+      "team_accuracy": 1.0,
+      "team_margin": 0.39672835426305353,
+      "mistake_cost_chf": 0,
+      "sec04_failures": 0,
+      "kappa": 0.0,
+      "cause_accuracy": null,
+      "retrieval_accuracy": 1.0,
+      "automation_rate": 0.0,
+      "cost_per_ticket_usd": 0.001112925,
+      "cost_per_ticket_chf": 0.0008903400000000001,
+      "time_per_ticket_sec": 1.006450041080825,
+      "time_p50_sec": 1.006450041080825,
+      "time_p90_sec": 1.006450041080825,
+      "balanced_accuracy": 1.0,
+      "failed": 0,
+      "invalid": 0
+    },
+    "routine": {
+      "n": 4,
+      "path_accuracy": 1.0,
+      "path_margin": 0.24495001020199958,
+      "action_accuracy": 1.0,
+      "action_margin": 0.24495001020199958,
+      "team_accuracy": 1.0,
+      "team_margin": 0.39672835426305353,
+      "mistake_cost_chf": 0,
+      "sec04_failures": 0,
+      "kappa": 1.0,
+      "cause_accuracy": null,
+      "retrieval_accuracy": 1.0,
+      "automation_rate": 0.6666666666666666,
+      "cost_per_ticket_usd": 0.0009985249999999999,
+      "cost_per_ticket_chf": 0.00079882,
+      "time_per_ticket_sec": 1.8254016040300485,
+      "time_p50_sec": 1.8480022080475464,
+      "time_p90_sec": 1.893196750083007,
+      "balanced_accuracy": 1.0,
+      "failed": 0,
+      "invalid": 0
+    }
+  },
+  "by_family": {
+    "Rules set": {
+      "n": 5,
+      "path_accuracy": 1.0,
+      "path_margin": 0.21724574737604055,
+      "action_accuracy": 1.0,
+      "action_margin": 0.21724574737604055,
+      "team_accuracy": 1.0,
+      "team_margin": 0.32881402355519035,
+      "mistake_cost_chf": 0,
+      "sec04_failures": 0,
+      "kappa": 1.0,
+      "cause_accuracy": null,
+      "retrieval_accuracy": 1.0,
+      "automation_rate": 0.5,
+      "cost_per_ticket_usd": 0.001021405,
+      "cost_per_ticket_chf": 0.000817124,
+      "time_per_ticket_sec": 1.6616112914402037,
+      "time_p50_sec": 1.8341653750976548,
+      "time_p90_sec": 1.893196750083007,
+      "balanced_accuracy": 1.0,
+      "failed": 0,
+      "invalid": 0
+    }
+  },
+  "tickets": [
+    {
+      "id": "T-003",
+      "text": "Floor 5 print queue is stuck",
+      "requester": "o.lang",
+      "difficulty": "routine",
+      "cause": "Hung spooler",
+      "expected_cause": null,
+      "expected_paths": [
+        "AUTO_FIX"
+      ],
+      "expected_tools": [
+        "restart_print_spooler"
+      ],
+      "expected_queues": [],
+      "expected_units": [
+        "printing"
+      ],
+      "family": "Rules set",
+      "expected_path": "AUTO_FIX",
+      "path": "AUTO_FIX",
+      "path_correct": true,
+      "action_correct": true,
+      "team_correct": null,
+      "mistake_cost_chf": 0,
+      "sec04_failure": false,
+      "tool": "restart_print_spooler",
+      "queue": null,
+      "retrieved": [
+        "printing"
+      ],
+      "cause_correct": null,
+      "retrieval_correct": true,
+      "input_tokens": 3138,
+      "output_tokens": 105,
+      "cost_usd": 0.0010362,
+      "time_sec": 1.893196750083007,
+      "error": null,
+      "invalid": false,
+      "rule": null
+    },
+    {
+      "id": "T-007",
+      "text": "Locked out twice already today",
+      "requester": "h.widmer",
+      "difficulty": "routine",
+      "cause": "Two or more lockouts in 24 hours",
+      "expected_cause": null,
+      "expected_paths": [
+        "ESCALATE"
+      ],
+      "expected_tools": [],
+      "expected_queues": [
+        "SEC-INCIDENT"
+      ],
+      "expected_units": [
+        "account-lockout",
+        "sec-04-account-lockout",
+        "sec-07-software-and-admin-rights"
+      ],
+      "family": "Rules set",
+      "expected_path": "ESCALATE",
+      "path": "ESCALATE",
+      "path_correct": true,
+      "action_correct": true,
+      "team_correct": true,
+      "mistake_cost_chf": 0,
+      "sec04_failure": false,
+      "tool": "create_escalation_ticket",
+      "queue": "SEC-INCIDENT",
+      "retrieved": [
+        "account-lockout",
+        "sec-04-account-lockout"
+      ],
+      "cause_correct": null,
+      "retrieval_correct": true,
+      "input_tokens": 3425,
+      "output_tokens": 92,
+      "cost_usd": 0.001093675,
+      "time_sec": 1.7262420828919858,
+      "error": null,
+      "invalid": false,
+      "rule": null
+    },
+    {
+      "id": "T-010",
+      "text": "What's the weather like today?",
+      "requester": "k.roth",
+      "difficulty": "routine",
+      "cause": "Unknown",
+      "expected_cause": null,
+      "expected_paths": [
+        "OUT_OF_SCOPE"
+      ],
+      "expected_tools": [],
+      "expected_queues": [],
+      "expected_units": [],
+      "family": "Rules set",
+      "expected_path": "OUT_OF_SCOPE",
+      "path": "OUT_OF_SCOPE",
+      "path_correct": true,
+      "action_correct": true,
+      "team_correct": null,
+      "mistake_cost_chf": 0,
+      "sec04_failure": false,
+      "tool": null,
+      "queue": null,
+      "retrieved": [],
+      "cause_correct": null,
+      "retrieval_correct": true,
+      "input_tokens": 2731,
+      "output_tokens": 48,
+      "cost_usd": 0.000830225,
+      "time_sec": 1.8341653750976548,
+      "error": null,
+      "invalid": false,
+      "rule": null
+    },
+    {
+      "id": "T-013",
+      "text": "My laptop is crawling right now and Task Manager shows CSFalconService using most of the CPU.",
+      "requester": "v.marti",
+      "difficulty": "routine",
+      "cause": "CrowdStrike Falcon scan",
+      "expected_cause": null,
+      "expected_paths": [
+        "SELF_SERVE"
+      ],
+      "expected_tools": [],
+      "expected_queues": [],
+      "expected_units": [
+        "laptop-performance"
+      ],
+      "family": "Rules set",
+      "expected_path": "SELF_SERVE",
+      "path": "SELF_SERVE",
+      "path_correct": true,
+      "action_correct": true,
+      "team_correct": null,
+      "mistake_cost_chf": 0,
+      "sec04_failure": false,
+      "tool": null,
+      "queue": null,
+      "retrieved": [
+        "laptop-performance"
+      ],
+      "cause_correct": null,
+      "retrieval_correct": true,
+      "input_tokens": 3154,
+      "output_tokens": 101,
+      "cost_usd": 0.001034,
+      "time_sec": 1.8480022080475464,
+      "error": null,
+      "invalid": false,
+      "rule": null
+    },
+    {
+      "id": "T-020",
+      "text": "Locked out again, can you unlock me please?",
+      "requester": "l.frei",
+      "difficulty": "records",
+      "cause": "Standard lockout",
+      "expected_cause": null,
+      "expected_paths": [
+        "ESCALATE"
+      ],
+      "expected_tools": [],
+      "expected_queues": [
+        "SEC-INCIDENT"
+      ],
+      "expected_units": [
+        "account-lockout"
+      ],
+      "family": "Rules set",
+      "expected_path": "ESCALATE",
+      "path": "ESCALATE",
+      "path_correct": true,
+      "action_correct": true,
+      "team_correct": true,
+      "mistake_cost_chf": 0,
+      "sec04_failure": false,
+      "tool": "create_escalation_ticket",
+      "queue": "SEC-INCIDENT",
+      "retrieved": [
+        "account-lockout",
+        "sec-04-account-lockout"
+      ],
+      "cause_correct": null,
+      "retrieval_correct": true,
+      "input_tokens": 3429,
+      "output_tokens": 103,
+      "cost_usd": 0.001112925,
+      "time_sec": 1.006450041080825,
+      "error": null,
+      "invalid": false,
+      "rule": null
+    }
+  ]
+}

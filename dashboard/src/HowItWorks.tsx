@@ -165,6 +165,21 @@ function StationPanel(
             </dd>
           </div>
         )}
+        {node === "enforce" && (
+          <div>
+            <dt>The rules, in the order they run</dt>
+            <dd>
+              <ul className="rule-list">
+                {props.overview.rules.map((rule) => (
+                  <li key={rule.name}>
+                    <strong>{rule.name}</strong>: {rule.does}{" "}
+                    <code>{rule.code}</code>
+                  </li>
+                ))}
+              </ul>
+            </dd>
+          </div>
+        )}
         <div>
           <dt>Where in the code</dt>
           <dd>

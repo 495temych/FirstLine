@@ -112,6 +112,13 @@ export const overview: Overview = {
       escalation: true,
     },
   ],
+  rules: [
+    {
+      name: "SEC-04",
+      does: "Two or more lockouts go to SEC-INCIDENT.",
+      code: "sec04 in agent/rules.py",
+    },
+  ],
   tiers: { routine: "Their own device.", sensitive: "A technician only." },
   queues: ["SEC-INCIDENT"],
   services: [

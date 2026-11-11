@@ -15,7 +15,7 @@ from langchain_core.runnables import RunnableConfig
 from langgraph.types import Command, StateSnapshot
 from pydantic import BaseModel, StringConstraints
 
-from agent import config, tracing
+from agent import config, records, tracing
 from agent.graph import build_graph, initial_state
 from backend import (
     benchmark,
@@ -40,6 +40,7 @@ RUN_FIELDS = [
     "human_decision",
     "ticket_draft",
     "tool_result",
+    "rule",
 ]
 
 
@@ -64,6 +65,8 @@ _gate_lock = Lock()  # two answers to one gate must not both pass its check
 class NewTicket(BaseModel):
     text: Annotated[str, StringConstraints(strip_whitespace=True, min_length=1)]
     use_retrieval: bool
+    # The AD username of the person asking, from the staff directory.
+    requester: str
 
 
 class GateAnswer(BaseModel):
@@ -127,19 +130,25 @@ def start_triage(ticket: NewTicket) -> dict:
     """Triage a ticket up to its first human gate."""
     if not os.environ.get("ANTHROPIC_API_KEY"):
         raise HTTPException(503, "ANTHROPIC_API_KEY isn't set. Add it to .env.")
+    if ticket.requester not in records.users():
+        raise HTTPException(422, "That requester isn't in the staff directory.")
     run_id = uuid4().hex
+    state = initial_state(
+        ticket.text,
+        ticket.use_retrieval,
+        records.requester(ticket.requester),
+        "assistant",
+    )
     try:
         with _traced(run_id):
-            _graph().invoke(
-                initial_state(ticket.text, ticket.use_retrieval), _thread(run_id)
-            )
+            _graph().invoke(state, _thread(run_id))
     except anthropic.APIError as exc:
         raise HTTPException(502, f"The model call failed: {exc}") from exc
     snapshot = _snapshot(run_id)
     values = snapshot.values
     if values["path"] in stats.PATHS:  # a run without retrieval is a comparison only
         decision = queue_board.proposal_of(values, values["response_time_sec"], None)
-        store.shared().add_run(run_id, ticket.text, decision)
+        store.shared().add_run(run_id, ticket.text, ticket.requester, decision)
     return _view(run_id, snapshot)
 
 
@@ -200,6 +209,25 @@ def list_tickets() -> list[dict]:
         }
         for ticket, answer in runner.load_review_tickets()
     ]
+
+
+@app.get("/api/requesters", operation_id="list_requesters")
+def list_requesters() -> list[dict]:
+    """List the staff a ticket can come from, the rules set's users first."""
+    rules_users = {ticket["requester"] for ticket, _ in runner.load_any("rules")}
+    people = [
+        {
+            "id": user["id"],
+            "name": user["name"],
+            "department": user["department"],
+            "office": user["office"],
+            "lockouts_24h": user["lockouts_24h"],
+            "device": user["device"],
+            "rules_set": user["id"] in rules_users,
+        }
+        for user in records.users().values()
+    ]
+    return sorted(people, key=lambda p: (not p["rules_set"], p["id"]))
 
 
 @app.get("/api/stats", operation_id="read_stats")

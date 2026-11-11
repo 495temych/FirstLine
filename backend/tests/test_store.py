@@ -26,6 +26,20 @@ PROPOSAL: Proposal = {
     "trace_id": "trace-1",
     "cost_usd": 0.0042,
     "latency_ms": 5300,
+    "rule": None,
+}
+OVERRIDDEN: Proposal = {
+    **PROPOSAL,
+    "path": "ESCALATE",
+    "tool": None,
+    "tool_input": None,
+    "queue": "SEC-INCIDENT",
+    "priority": "P2-High",
+    "rule": {
+        "rule": "SEC-04",
+        "reason": "2 lockouts in 24 hours.",
+        "proposed": {"path": "AUTO_FIX", "tool_name": "unlock_ad_account"},
+    },
 }
 APPROVED: Verdict = {
     "verdict": "approved",
@@ -68,6 +82,12 @@ def test_a_decision_comes_back_as_it_was_saved(store):
     ticket = by_id(store)["INC1"]
     assert ticket["state"] == "review"
     assert ticket["decision"] == PROPOSAL
+
+
+def test_a_rule_that_changed_a_decision_comes_back_with_it(store):
+    store.add_batch("morning", ARRIVALS)
+    store.decided("INC1", OVERRIDDEN)
+    assert by_id(store)["INC1"]["decision"] == OVERRIDDEN
 
 
 def test_a_review_closes_the_ticket_with_its_outcome(store):
@@ -163,10 +183,12 @@ def test_the_record_is_supabase_only_when_it_is_set_up(monkeypatch):
 
 
 def test_an_assistant_run_keeps_its_answers_apart_from_the_queue(store):
-    store.add_run("run-1", "My VPN drops", PROPOSAL)
+    store.add_run("run-1", "My VPN drops", "a.b", PROPOSAL)
     store.answered("run-1", {"gate": "confirm_fix", "approved": False}, None)
     store.answered("run-1", {"gate": "confirm_ticket", "approved": True}, OUTCOME)
-    store.add_run("run-2", "What's the weather?", {**PROPOSAL, "path": "OUT_OF_SCOPE"})
+    store.add_run(
+        "run-2", "What's the weather?", "c.d", {**PROPOSAL, "path": "OUT_OF_SCOPE"}
+    )
     assert store.runs() == [
         {
             "path": "AUTO_FIX",

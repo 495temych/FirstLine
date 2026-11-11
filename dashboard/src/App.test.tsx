@@ -19,6 +19,7 @@ import {
   draft,
   emptyQueue,
   evaluations,
+  requesters,
   result,
   stats,
   tickets,
@@ -45,6 +46,7 @@ beforeEach(() => {
   replies = {
     "/api/health": { status: "ok", api_key: true },
     "/api/triage": baseRun,
+    "/api/requesters": requesters,
     "/api/evaluations": evaluations,
     "/api/tickets": tickets,
     "/api/stats": stats,
@@ -83,6 +85,7 @@ function showAssistant() {
 async function triage(run: Partial<Run> = {}) {
   replies["/api/triage"] = { ...baseRun, ...run };
   showAssistant();
+  await screen.findByLabelText("Who is asking");
   fireEvent.change(screen.getByLabelText("Describe the issue"), {
     target: { value: "My VPN fails" },
   });
@@ -178,6 +181,7 @@ it("fills the ticket from an example without running it", () => {
 
 it("sends the retrieval switch with the ticket", async () => {
   showAssistant();
+  await screen.findByLabelText("Who is asking");
   fireEvent.click(screen.getByRole("switch"));
   fireEvent.change(screen.getByLabelText("Describe the issue"), {
     target: { value: "Help" },
@@ -187,8 +191,56 @@ it("sends the retrieval switch with the ticket", async () => {
     expect(calls.find((c) => c.url === "/api/triage")?.body).toEqual({
       text: "Help",
       use_retrieval: false,
+      requester: "s.keller",
     });
   });
+});
+
+it("sends the requester picked, and shows their record", async () => {
+  showAssistant();
+  const picker: HTMLSelectElement =
+    await screen.findByLabelText("Who is asking");
+  expect(
+    screen.getByText(/2 lockouts in 24 hours in the records/),
+  ).toBeDefined();
+  fireEvent.change(picker, { target: { value: "m.huber" } });
+  expect(
+    screen.getByText(/1 lockout in 24 hours in the records/),
+  ).toBeDefined();
+  fireEvent.change(screen.getByLabelText("Describe the issue"), {
+    target: { value: "Locked out" },
+  });
+  click("Triage this ticket");
+  await waitFor(() => {
+    expect(calls.find((c) => c.url === "/api/triage")?.body).toEqual({
+      text: "Locked out",
+      use_retrieval: true,
+      requester: "m.huber",
+    });
+  });
+});
+
+it("shows when a rule changed the agent's decision", async () => {
+  await triage({
+    path: "ESCALATE",
+    tool_name: "create_escalation_ticket",
+    tool_input: { queue: "SEC-INCIDENT", summary: "s", priority: "P2-High" },
+    pending: { kind: "confirm_ticket", ticket: draft },
+    rule: {
+      rule: "SEC-04",
+      reason: "2 lockouts in 24 hours in the records.",
+      code: "sec04 in agent/rules.py",
+      proposed: {
+        path: "AUTO_FIX",
+        tool_name: "unlock_ad_account",
+        tool_input: { username: "s.keller" },
+      },
+    },
+  });
+  const note = screen.getByRole("note");
+  expect(note.textContent).toContain("Changed by a rule: SEC-04.");
+  expect(note.textContent).toContain("Auto-fix, unlock_ad_account");
+  expect(note.textContent).toContain("sec04 in agent/rules.py");
 });
 
 it("blocks triage and explains when the key is missing", async () => {
@@ -299,6 +351,7 @@ it("explains a run with retrieval off", async () => {
 it("shows a failed triage", async () => {
   replies["/api/triage"] = 502;
   showAssistant();
+  await screen.findByLabelText("Who is asking");
   fireEvent.change(screen.getByLabelText("Describe the issue"), {
     target: { value: "Help" },
   });

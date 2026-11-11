@@ -17,6 +17,7 @@ FIX = {
     "tool_input": {"username": "a.b"},
     "retrieved": [{"doc": "vpn", "section": "Fix", "score": 0.61, "text": "..."}],
     "usage": {"input_tokens": 4000, "output_tokens": 200},
+    "rule": None,
 }
 ESCALATION = {
     **FIX,
@@ -35,7 +36,7 @@ def board(monkeypatch):
     """A fresh board that works each ticket as soon as it's loaded."""
     fresh = queue_board.Board(submit=lambda work: work())
     monkeypatch.setattr(queue_board, "board", fresh)
-    monkeypatch.setattr(queue_board, "run_triage", lambda text, use_retrieval: FIX)
+    monkeypatch.setattr(queue_board, "run_triage", lambda text, use_retrieval, **_: FIX)
     return fresh
 
 
@@ -125,7 +126,7 @@ def test_an_escalation_shows_its_team_and_no_tool(board):
         {},
         "b",
     )
-    queue_board.run_triage = lambda text, use_retrieval: ESCALATION
+    queue_board.run_triage = lambda text, use_retrieval, **_: ESCALATION
     board.work("T")
     decision = board.tickets["T"]["decision"]
     assert decision["queue"] == "SEC-INCIDENT"
@@ -136,7 +137,7 @@ def test_an_escalation_shows_its_team_and_no_tool(board):
 def test_a_failed_ticket_fails_alone(client, monkeypatch):
     calls = []
 
-    def flaky(text, use_retrieval):
+    def flaky(text, use_retrieval, **_):
         calls.append(text)
         if len(calls) == 1:
             raise RuntimeError("model unavailable")
@@ -161,7 +162,7 @@ def test_approving_a_fix_runs_it(client):
 
 def test_approving_an_escalation_opens_the_ticket(client, monkeypatch):
     monkeypatch.setattr(
-        queue_board, "run_triage", lambda text, use_retrieval: ESCALATION
+        queue_board, "run_triage", lambda text, use_retrieval, **_: ESCALATION
     )
     ticket = loaded(client)["tickets"][0]
     outcome = review(client, ticket["id"], verdict="approved").json()["review"]
@@ -198,7 +199,9 @@ def test_an_unknown_ticket_is_not_found(client):
 
 def test_a_fix_that_cannot_run_stays_for_review(client, monkeypatch):
     broken = {**FIX, "tool_input": {"wrong": "x"}}
-    monkeypatch.setattr(queue_board, "run_triage", lambda text, use_retrieval: broken)
+    monkeypatch.setattr(
+        queue_board, "run_triage", lambda text, use_retrieval, **_: broken
+    )
     ticket = loaded(client)["tickets"][0]
     response = review(client, ticket["id"], verdict="approved")
     assert response.status_code == 422
@@ -310,12 +313,12 @@ def test_unfinished_tickets_go_back_to_the_agent_once(monkeypatch):
     stopped = queue_board.Board(submit=lambda work: None)  # the backend stops at once
     stopped.load(queue_board.staff())
     first, second, *_ = stopped.tickets
-    monkeypatch.setattr(queue_board, "run_triage", lambda text, use_retrieval: FIX)
+    monkeypatch.setattr(queue_board, "run_triage", lambda text, use_retrieval, **_: FIX)
     stopped.work(first)
     stopped.store.started(second)  # it stopped while the agent was on this one
     worked = []
 
-    def counted(text, use_retrieval):
+    def counted(text, use_retrieval, **_):
         worked.append(text)
         return FIX
 
@@ -336,7 +339,7 @@ def test_the_desk_never_hands_out_a_ticket_twice(client, board):
 
 def test_a_restart_reads_the_board_back_from_postgres(postgres_store, monkeypatch):
     monkeypatch.setattr(
-        queue_board, "run_triage", lambda text, use_retrieval: ESCALATION
+        queue_board, "run_triage", lambda text, use_retrieval, **_: ESCALATION
     )
     before = queue_board.Board(submit=lambda work: work(), store=postgres_store)
     before.load(queue_board.staff())

@@ -12,8 +12,9 @@ from uuid import uuid4
 from langchain_core.runnables import RunnableConfig
 from langgraph.checkpoint.memory import InMemorySaver
 
-from agent import tracing
+from agent import records, tracing
 from agent.graph import build_graph, initial_state
+from agent.rules import Mode
 
 
 @cache
@@ -21,13 +22,23 @@ def _graph():
     return build_graph(InMemorySaver())
 
 
-def run_triage(query: str, use_retrieval: bool) -> dict:
-    """Run triage and return a structured result dict."""
+def run_triage(
+    query: str,
+    use_retrieval: bool,
+    requester: str | None = None,
+    mode: Mode = "queue",
+) -> dict:
+    """Run triage up to its first gate and return the decision, after the rules.
+
+    `requester` is an AD username from the staff directory, and with None the model
+    sees no record. The Queue and the evaluations run in "queue" mode.
+    """
     config: RunnableConfig = {
         "configurable": {"thread_id": uuid4().hex},
         "callbacks": tracing.callbacks(),
     }
-    out = _graph().invoke(initial_state(query, use_retrieval), config)
+    state = initial_state(query, use_retrieval, records.requester(requester), mode)
+    out = _graph().invoke(state, config)
     return {
         "retrieved": out["retrieved"],
         "use_retrieval": use_retrieval,
@@ -38,5 +49,7 @@ def run_triage(query: str, use_retrieval: bool) -> dict:
         "tool_input": out["tool_input"],
         "usage": out["usage"],
         "response_time_sec": out["response_time_sec"],
+        "rule": out["rule"],
+        "requester": requester,
         "query": query,
     }

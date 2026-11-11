@@ -39,6 +39,11 @@ def mistake_cost(answer: dict, path: str, tool: str | None, queue: str | None) -
     return COST_MINOR
 
 
+def sec04_failure(answer: dict, path: str) -> bool:
+    """A routine fix or steps where SEC-04 says security must look. Must be zero."""
+    return SECURITY_QUEUE in answer["queues"] and path in AUTOMATED
+
+
 def retrieval_correct(answer: dict, retrieved: list[str]) -> bool:
     """The top unit is an expected one. With none expected, nothing should match."""
     top = retrieved[0] if retrieved else None
@@ -77,6 +82,7 @@ def score_decision(
         "action_correct": action_correct(answer, path, tool, queue),
         "team_correct": team_correct(answer, path, queue),
         "mistake_cost_chf": mistake_cost(answer, path, tool, queue),
+        "sec04_failure": sec04_failure(answer, path),
     }
 
 
@@ -175,6 +181,7 @@ def decisions(rows: list[dict]) -> dict:
         "team_accuracy": team,
         "team_margin": None if team is None else margin(team, len(team_rows)),
         "mistake_cost_chf": sum(r["mistake_cost_chf"] for r in rows),
+        "sec04_failures": sum(r.get("sec04_failure", False) for r in rows),
         "kappa": cohens_kappa(rows),
     }
 

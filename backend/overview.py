@@ -12,7 +12,7 @@ from functools import cache
 from fastapi import APIRouter
 from langgraph.checkpoint.memory import InMemorySaver
 
-from agent import config
+from agent import config, rules
 from agent.graph import build_graph
 from agent.tool_schemas import ESCALATION_TOOL, QUEUES, TOOL_POLICY, TOOLS
 from backend import economics
@@ -48,6 +48,19 @@ STATIONS: dict[str, dict] = {
             "and team it names exists."
         ),
         "code": "triage in agent/graph.py, the form in agent/decision.py",
+    },
+    "enforce": {
+        "name": "Apply the rules",
+        "does": (
+            "Code checks the model's decision against the rules in agent/rules.py, "
+            "using the requester's record, and overrules it where a rule says so. "
+            "The override, its reason and what the model proposed are kept."
+        ),
+        "cannot": (
+            "Be argued with. The model never sees or calls this step, and it reads "
+            "the records and the search results, not the model's own words."
+        ),
+        "code": "enforce in agent/graph.py, the rules in agent/rules.py",
     },
     "no_tools": {
         "name": "Answer without the knowledge base",
@@ -139,7 +152,16 @@ LINES: list[dict] = [
         "otherwise_when": "",
     },
 ]
-TRUNK = ["retrieve", "triage"]
+TRUNK = ["retrieve", "triage", "enforce"]
+
+
+def rules_list() -> list[dict]:
+    """The rules code enforces, in the order they run, each with its explanation."""
+    return [
+        {"name": name, "does": rules.EXPLANATIONS[name], "code": rules.code_of(name)}
+        for name in rules.RULES
+    ]
+
 
 TIERS = {
     "routine": "A person may approve it for their own account or device.",
@@ -184,8 +206,10 @@ LIMITS: list[str] = [
     "Every tool is simulated. Production needs least-privilege service accounts.",
     "One model call per ticket, with no checks of its own yet. That arrives with "
     "the investigation loop.",
-    "It can invent a value, such as a device id that isn't the requester's. The "
-    "person who approves is the safeguard until it can look the requester up.",
+    "It sees the requester's record but can't look anything else up, so it can't "
+    "check a device or run a diagnostic. That arrives with the investigation loop.",
+    "SEC-04 in code reads lockouts from the records. A count written only in the "
+    'ticket, such as "locked out twice today", is still the model\'s to read.',
     "Search works by meaning only, so bare error codes match poorly.",
     "English only, though CorpLabs is Swiss.",
 ]
@@ -314,6 +338,7 @@ def read_overview() -> dict:
         "examples": _example_tickets(),
         "model": model(),
         "tools": tools(),
+        "rules": rules_list(),
         "tiers": TIERS,
         "queues": QUEUES,
         "services": [

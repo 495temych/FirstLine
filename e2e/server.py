@@ -24,6 +24,9 @@ ANSWERS = {
     "lockout": escalate(
         "SEC-INCIDENT", "Repeat lockout, a possible compromise.", "Repeat lockout"
     ),
+    "locked out": fix(
+        "unlock_ad_account", "A routine unlock.", username="current.user"
+    ),
     "steps": steps("Reseat the cable."),
     "weather": out_of_scope(),
 }
@@ -34,7 +37,8 @@ class StubLLM(FakeLLM):
         super().__init__([])
 
     def invoke(self, messages):
-        ticket = messages[-1].content
+        # Only the ticket picks the answer, not the requester's record before it.
+        ticket = messages[-1].content.partition("User issue: ")[2]
         self.blocks = next(
             (blocks for word, blocks in ANSWERS.items() if word in ticket),
             ANSWERS["weather"],

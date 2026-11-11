@@ -1,0 +1,1204 @@
+{
+  "id": "20261111T163001-rules",
+  "date": "2026-11-11T16:30:01+00:00",
+  "set": "rules",
+  "tiny": false,
+  "sample": false,
+  "model": "google/gemini-3.1-flash-lite",
+  "serving": {
+    "lab": "openrouter",
+    "provider": "google-vertex/eu",
+    "region": "EU",
+    "effort": "minimal"
+  },
+  "version": "063373d8",
+  "instructions_version": "0bb0e3a1",
+  "tools_version": "b3bcb127",
+  "kb_version": "916db54c",
+  "labels_version": "1c44a887",
+  "summary": {
+    "n": 25,
+    "path_accuracy": 0.84,
+    "path_margin": 0.14125333185830086,
+    "action_accuracy": 0.84,
+    "action_margin": 0.14125333185830086,
+    "team_accuracy": 0.75,
+    "team_margin": 0.2596262160196916,
+    "mistake_cost_chf": 480,
+    "sec04_failures": 0,
+    "kappa": 0.7584541062801932,
+    "cause_accuracy": null,
+    "retrieval_accuracy": 0.88,
+    "automation_rate": 0.5217391304347826,
+    "cost_per_ticket_usd": 0.001077032,
+    "cost_per_ticket_chf": 0.0008616256,
+    "time_per_ticket_sec": 1.087799541708082,
+    "time_p50_sec": 1.0896240000147372,
+    "time_p90_sec": 1.270045124925673,
+    "balanced_accuracy": 0.7847222222222222,
+    "failed": 0,
+    "invalid": 0
+  },
+  "yardsticks": {
+    "most_common": {
+      "n": 25,
+      "path_accuracy": 0.4,
+      "path_margin": 0.17928907275340872,
+      "action_accuracy": 0.08,
+      "action_margin": 0.11372259376924312,
+      "team_accuracy": 0.0,
+      "team_margin": 0.16220780975543844,
+      "mistake_cost_chf": 2280,
+      "sec04_failures": 0,
+      "kappa": 0.0
+    },
+    "classifier": {
+      "n": 25,
+      "path_accuracy": 0.56,
+      "path_margin": 0.18133804016716498,
+      "action_accuracy": 0.4,
+      "action_margin": 0.17928907275340872,
+      "team_accuracy": 0.625,
+      "team_margin": 0.27871019297733857,
+      "mistake_cost_chf": 1380,
+      "sec04_failures": 0,
+      "kappa": 0.3589743589743591
+    }
+  },
+  "confusion": {
+    "SELF_SERVE": {
+      "SELF_SERVE": 1,
+      "AUTO_FIX": 0,
+      "ESCALATE": 3,
+      "OUT_OF_SCOPE": 0
+    },
+    "AUTO_FIX": {
+      "SELF_SERVE": 0,
+      "AUTO_FIX": 10,
+      "ESCALATE": 0,
+      "OUT_OF_SCOPE": 0
+    },
+    "ESCALATE": {
+      "SELF_SERVE": 1,
+      "AUTO_FIX": 0,
+      "ESCALATE": 8,
+      "OUT_OF_SCOPE": 0
+    },
+    "OUT_OF_SCOPE": {
+      "SELF_SERVE": 0,
+      "AUTO_FIX": 0,
+      "ESCALATE": 0,
+      "OUT_OF_SCOPE": 2
+    }
+  },
+  "per_path": {
+    "SELF_SERVE": {
+      "precision": 0.5,
+      "recall": 0.25,
+      "n": 4
+    },
+    "AUTO_FIX": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "n": 10
+    },
+    "ESCALATE": {
+      "precision": 0.7272727272727273,
+      "recall": 0.8888888888888888,
+      "n": 9
+    },
+    "OUT_OF_SCOPE": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "n": 2
+    }
+  },
+  "by_difficulty": {
+    "hard": {
+      "n": 7,
+      "path_accuracy": 0.42857142857142855,
+      "path_margin": 0.29566442366417367,
+      "action_accuracy": 0.42857142857142855,
+      "action_margin": 0.29566442366417367,
+      "team_accuracy": 0.0,
+      "team_margin": 0.32881402355519035,
+      "mistake_cost_chf": 480,
+      "sec04_failures": 0,
+      "kappa": 0.06666666666666665,
+      "cause_accuracy": null,
+      "retrieval_accuracy": 0.7142857142857143,
+      "automation_rate": 0.2857142857142857,
+      "cost_per_ticket_usd": 0.0011018857142857143,
+      "cost_per_ticket_chf": 0.0008815085714285715,
+      "time_per_ticket_sec": 1.1681849108343678,
+      "time_p50_sec": 1.1438999589299783,
+      "time_p90_sec": 1.3494770000688732,
+      "balanced_accuracy": 0.5555555555555555,
+      "failed": 0,
+      "invalid": 0
+    },
+    "records": {
+      "n": 5,
+      "path_accuracy": 1.0,
+      "path_margin": 0.21724574737604055,
+      "action_accuracy": 1.0,
+      "action_margin": 0.21724574737604055,
+      "team_accuracy": 1.0,
+      "team_margin": 0.28075304022450887,
+      "mistake_cost_chf": 0,
+      "sec04_failures": 0,
+      "kappa": 1.0,
+      "cause_accuracy": null,
+      "retrieval_accuracy": 1.0,
+      "automation_rate": 0.4,
+      "cost_per_ticket_usd": 0.001113475,
+      "cost_per_ticket_chf": 0.0008907800000000001,
+      "time_per_ticket_sec": 1.0664024079916998,
+      "time_p50_sec": 1.0648044579429552,
+      "time_p90_sec": 1.1830422499915585,
+      "balanced_accuracy": 1.0,
+      "failed": 0,
+      "invalid": 0
+    },
+    "routine": {
+      "n": 13,
+      "path_accuracy": 1.0,
+      "path_margin": 0.11405092152764583,
+      "action_accuracy": 1.0,
+      "action_margin": 0.11405092152764583,
+      "team_accuracy": 1.0,
+      "team_margin": 0.28075304022450887,
+      "mistake_cost_chf": 0,
+      "sec04_failures": 0,
+      "kappa": 1.0,
+      "cause_accuracy": null,
+      "retrieval_accuracy": 0.9230769230769231,
+      "automation_rate": 0.7272727272727273,
+      "cost_per_ticket_usd": 0.0010496326923076923,
+      "cost_per_ticket_chf": 0.0008397061538461539,
+      "time_per_ticket_sec": 1.0527447789925366,
+      "time_p50_sec": 1.1033468330278993,
+      "time_p90_sec": 1.2232772919815034,
+      "balanced_accuracy": 1.0,
+      "failed": 0,
+      "invalid": 0
+    }
+  },
+  "by_family": {
+    "Rules set": {
+      "n": 25,
+      "path_accuracy": 0.84,
+      "path_margin": 0.14125333185830086,
+      "action_accuracy": 0.84,
+      "action_margin": 0.14125333185830086,
+      "team_accuracy": 0.75,
+      "team_margin": 0.2596262160196916,
+      "mistake_cost_chf": 480,
+      "sec04_failures": 0,
+      "kappa": 0.7584541062801932,
+      "cause_accuracy": null,
+      "retrieval_accuracy": 0.88,
+      "automation_rate": 0.5217391304347826,
+      "cost_per_ticket_usd": 0.001077032,
+      "cost_per_ticket_chf": 0.0008616256,
+      "time_per_ticket_sec": 1.087799541708082,
+      "time_p50_sec": 1.0896240000147372,
+      "time_p90_sec": 1.270045124925673,
+      "balanced_accuracy": 0.7847222222222222,
+      "failed": 0,
+      "invalid": 0
+    }
+  },
+  "tickets": [
+    {
+      "id": "T-001",
+      "text": "My VPN keeps disconnecting",
+      "requester": "o.lang",
+      "difficulty": "hard",
+      "cause": "Expired device certificate.",
+      "expected_cause": null,
+      "expected_paths": [
+        "AUTO_FIX",
+        "SELF_SERVE",
+        "ESCALATE"
+      ],
+      "expected_tools": [
+        "reset_vpn_profile"
+      ],
+      "expected_queues": [
+        "NET-VPN"
+      ],
+      "expected_units": [
+        "vpn-access"
+      ],
+      "family": "Rules set",
+      "expected_path": "AUTO_FIX",
+      "path": "AUTO_FIX",
+      "path_correct": true,
+      "action_correct": true,
+      "team_correct": false,
+      "mistake_cost_chf": 0,
+      "sec04_failure": false,
+      "tool": "reset_vpn_profile",
+      "queue": null,
+      "retrieved": [
+        "vpn-access"
+      ],
+      "cause_correct": null,
+      "retrieval_correct": true,
+      "input_tokens": 3256,
+      "output_tokens": 104,
+      "cost_usd": 0.001067,
+      "time_sec": 1.0697312919655815,
+      "error": null,
+      "invalid": false,
+      "rule": null
+    },
+    {
+      "id": "T-002",
+      "text": "Teams shows me as offline to everyone",
+      "requester": "g.ammann",
+      "difficulty": "routine",
+      "cause": "Corrupt local cache.",
+      "expected_cause": null,
+      "expected_paths": [
+        "AUTO_FIX"
+      ],
+      "expected_tools": [
+        "clear_teams_cache"
+      ],
+      "expected_queues": [],
+      "expected_units": [
+        "teams"
+      ],
+      "family": "Rules set",
+      "expected_path": "AUTO_FIX",
+      "path": "AUTO_FIX",
+      "path_correct": true,
+      "action_correct": true,
+      "team_correct": null,
+      "mistake_cost_chf": 0,
+      "sec04_failure": false,
+      "tool": "clear_teams_cache",
+      "queue": null,
+      "retrieved": [
+        "teams"
+      ],
+      "cause_correct": null,
+      "retrieval_correct": true,
+      "input_tokens": 2990,
+      "output_tokens": 105,
+      "cost_usd": 0.0009955,
+      "time_sec": 1.293275750009343,
+      "error": null,
+      "invalid": false,
+      "rule": null
+    },
+    {
+      "id": "T-003",
+      "text": "Floor 5 print queue is stuck",
+      "requester": "o.lang",
+      "difficulty": "routine",
+      "cause": "Hung spooler",
+      "expected_cause": null,
+      "expected_paths": [
+        "AUTO_FIX"
+      ],
+      "expected_tools": [
+        "restart_print_spooler"
+      ],
+      "expected_queues": [],
+      "expected_units": [
+        "printing"
+      ],
+      "family": "Rules set",
+      "expected_path": "AUTO_FIX",
+      "path": "AUTO_FIX",
+      "path_correct": true,
+      "action_correct": true,
+      "team_correct": null,
+      "mistake_cost_chf": 0,
+      "sec04_failure": false,
+      "tool": "restart_print_spooler",
+      "queue": null,
+      "retrieved": [
+        "printing"
+      ],
+      "cause_correct": null,
+      "retrieval_correct": true,
+      "input_tokens": 3199,
+      "output_tokens": 128,
+      "cost_usd": 0.001090925,
+      "time_sec": 1.1173391250194982,
+      "error": null,
+      "invalid": false,
+      "rule": null
+    },
+    {
+      "id": "T-004",
+      "text": "VPN cert error, gateway confirmed correct, offline for a month",
+      "requester": "v.marti",
+      "difficulty": "routine",
+      "cause": "Expired device certificate.",
+      "expected_cause": null,
+      "expected_paths": [
+        "AUTO_FIX"
+      ],
+      "expected_tools": [
+        "reset_vpn_profile"
+      ],
+      "expected_queues": [],
+      "expected_units": [
+        "vpn-access"
+      ],
+      "family": "Rules set",
+      "expected_path": "AUTO_FIX",
+      "path": "AUTO_FIX",
+      "path_correct": true,
+      "action_correct": true,
+      "team_correct": null,
+      "mistake_cost_chf": 0,
+      "sec04_failure": false,
+      "tool": "reset_vpn_profile",
+      "queue": null,
+      "retrieved": [
+        "vpn-access"
+      ],
+      "cause_correct": null,
+      "retrieval_correct": true,
+      "input_tokens": 3264,
+      "output_tokens": 112,
+      "cost_usd": 0.0010824,
+      "time_sec": 1.2232772919815034,
+      "error": null,
+      "invalid": false,
+      "rule": null
+    },
+    {
+      "id": "T-005",
+      "text": "Need Zoom installed, no admin rights, it's in Company Portal",
+      "requester": "f.gerber",
+      "difficulty": "routine",
+      "cause": "Standard account",
+      "expected_cause": null,
+      "expected_paths": [
+        "AUTO_FIX"
+      ],
+      "expected_tools": [
+        "push_approved_software"
+      ],
+      "expected_queues": [],
+      "expected_units": [
+        "software-install"
+      ],
+      "family": "Rules set",
+      "expected_path": "AUTO_FIX",
+      "path": "AUTO_FIX",
+      "path_correct": true,
+      "action_correct": true,
+      "team_correct": null,
+      "mistake_cost_chf": 0,
+      "sec04_failure": false,
+      "tool": "push_approved_software",
+      "queue": null,
+      "retrieved": [
+        "software-install",
+        "sec-07-software-and-admin-rights"
+      ],
+      "cause_correct": null,
+      "retrieval_correct": true,
+      "input_tokens": 3466,
+      "output_tokens": 125,
+      "cost_usd": 0.0011594,
+      "time_sec": 1.1107842499623075,
+      "error": null,
+      "invalid": false,
+      "rule": null
+    },
+    {
+      "id": "T-006",
+      "text": "I'm locked out of my account",
+      "requester": "s.keller",
+      "difficulty": "records",
+      "cause": "Standard lockout",
+      "expected_cause": null,
+      "expected_paths": [
+        "ESCALATE"
+      ],
+      "expected_tools": [],
+      "expected_queues": [
+        "SEC-INCIDENT"
+      ],
+      "expected_units": [
+        "account-lockout"
+      ],
+      "family": "Rules set",
+      "expected_path": "ESCALATE",
+      "path": "ESCALATE",
+      "path_correct": true,
+      "action_correct": true,
+      "team_correct": true,
+      "mistake_cost_chf": 0,
+      "sec04_failure": false,
+      "tool": "create_escalation_ticket",
+      "queue": "SEC-INCIDENT",
+      "retrieved": [
+        "account-lockout",
+        "sec-04-account-lockout"
+      ],
+      "cause_correct": null,
+      "retrieval_correct": true,
+      "input_tokens": 3490,
+      "output_tokens": 112,
+      "cost_usd": 0.00114455,
+      "time_sec": 1.0832224159967154,
+      "error": null,
+      "invalid": false,
+      "rule": null
+    },
+    {
+      "id": "T-007",
+      "text": "Locked out twice already today",
+      "requester": "h.widmer",
+      "difficulty": "routine",
+      "cause": "Repeat lockouts",
+      "expected_cause": null,
+      "expected_paths": [
+        "ESCALATE"
+      ],
+      "expected_tools": [],
+      "expected_queues": [
+        "SEC-INCIDENT"
+      ],
+      "expected_units": [
+        "account-lockout",
+        "sec-04-account-lockout",
+        "sec-07-software-and-admin-rights"
+      ],
+      "family": "Rules set",
+      "expected_path": "ESCALATE",
+      "path": "ESCALATE",
+      "path_correct": true,
+      "action_correct": true,
+      "team_correct": true,
+      "mistake_cost_chf": 0,
+      "sec04_failure": false,
+      "tool": "create_escalation_ticket",
+      "queue": "SEC-INCIDENT",
+      "retrieved": [
+        "account-lockout",
+        "sec-04-account-lockout"
+      ],
+      "cause_correct": null,
+      "retrieval_correct": true,
+      "input_tokens": 3486,
+      "output_tokens": 130,
+      "cost_usd": 0.00117315,
+      "time_sec": 1.2130190840689465,
+      "error": null,
+      "invalid": false,
+      "rule": null
+    },
+    {
+      "id": "T-008",
+      "text": "My OneDrive has been stuck syncing for two days",
+      "requester": "t.steiner",
+      "difficulty": "hard",
+      "cause": "Unsupported filename.",
+      "expected_cause": null,
+      "expected_paths": [
+        "ESCALATE"
+      ],
+      "expected_tools": [],
+      "expected_queues": [
+        "APP-M365"
+      ],
+      "expected_units": [
+        "onedrive"
+      ],
+      "family": "Rules set",
+      "expected_path": "ESCALATE",
+      "path": "SELF_SERVE",
+      "path_correct": false,
+      "action_correct": false,
+      "team_correct": false,
+      "mistake_cost_chf": 120,
+      "sec04_failure": false,
+      "tool": null,
+      "queue": null,
+      "retrieved": [
+        "onedrive",
+        "company-profile::Known organizational quirks"
+      ],
+      "cause_correct": null,
+      "retrieval_correct": true,
+      "input_tokens": 3224,
+      "output_tokens": 188,
+      "cost_usd": 0.0011968,
+      "time_sec": 1.270045124925673,
+      "error": null,
+      "invalid": false,
+      "rule": null
+    },
+    {
+      "id": "T-009",
+      "text": "My external monitor isn't detected when docked",
+      "requester": "i.bosshard",
+      "difficulty": "hard",
+      "cause": "Unknown",
+      "expected_cause": null,
+      "expected_paths": [
+        "SELF_SERVE",
+        "ESCALATE"
+      ],
+      "expected_tools": [],
+      "expected_queues": [],
+      "expected_units": [
+        "hardware-peripherals"
+      ],
+      "family": "Rules set",
+      "expected_path": "ESCALATE",
+      "path": "ESCALATE",
+      "path_correct": true,
+      "action_correct": true,
+      "team_correct": null,
+      "mistake_cost_chf": 0,
+      "sec04_failure": false,
+      "tool": "create_escalation_ticket",
+      "queue": "DESK-HARDWARE",
+      "retrieved": [
+        "hardware-peripherals"
+      ],
+      "cause_correct": null,
+      "retrieval_correct": true,
+      "input_tokens": 3098,
+      "output_tokens": 127,
+      "cost_usd": 0.0010615,
+      "time_sec": 1.1438999589299783,
+      "error": null,
+      "invalid": false,
+      "rule": null
+    },
+    {
+      "id": "T-010",
+      "text": "What's the weather like today?",
+      "requester": "k.roth",
+      "difficulty": "routine",
+      "cause": "Unknown",
+      "expected_cause": null,
+      "expected_paths": [
+        "OUT_OF_SCOPE"
+      ],
+      "expected_tools": [],
+      "expected_queues": [],
+      "expected_units": [],
+      "family": "Rules set",
+      "expected_path": "OUT_OF_SCOPE",
+      "path": "OUT_OF_SCOPE",
+      "path_correct": true,
+      "action_correct": true,
+      "team_correct": null,
+      "mistake_cost_chf": 0,
+      "sec04_failure": false,
+      "tool": null,
+      "queue": null,
+      "retrieved": [],
+      "cause_correct": null,
+      "retrieval_correct": true,
+      "input_tokens": 2792,
+      "output_tokens": 50,
+      "cost_usd": 0.0008503,
+      "time_sec": 0.6772642500000075,
+      "error": null,
+      "invalid": false,
+      "rule": null
+    },
+    {
+      "id": "T-011",
+      "text": "Outlook keeps asking for my password, and my Okta session was renewed yesterday.",
+      "requester": "h.widmer",
+      "difficulty": "routine",
+      "cause": "Stale saved credentials",
+      "expected_cause": null,
+      "expected_paths": [
+        "AUTO_FIX"
+      ],
+      "expected_tools": [
+        "clear_credential_manager"
+      ],
+      "expected_queues": [],
+      "expected_units": [
+        "outlook"
+      ],
+      "family": "Rules set",
+      "expected_path": "AUTO_FIX",
+      "path": "AUTO_FIX",
+      "path_correct": true,
+      "action_correct": true,
+      "team_correct": null,
+      "mistake_cost_chf": 0,
+      "sec04_failure": false,
+      "tool": "clear_credential_manager",
+      "queue": null,
+      "retrieved": [
+        "outlook",
+        "sec-04-account-lockout"
+      ],
+      "cause_correct": null,
+      "retrieval_correct": true,
+      "input_tokens": 3446,
+      "output_tokens": 108,
+      "cost_usd": 0.00112585,
+      "time_sec": 0.9984612088883296,
+      "error": null,
+      "invalid": false,
+      "rule": null
+    },
+    {
+      "id": "T-012",
+      "text": "Outlook has prompted me to sign in all morning. My last full Okta login was about three months ago.",
+      "requester": "b.brunner",
+      "difficulty": "hard",
+      "cause": "Stale MFA enrollment",
+      "expected_cause": null,
+      "expected_paths": [
+        "SELF_SERVE"
+      ],
+      "expected_tools": [],
+      "expected_queues": [],
+      "expected_units": [
+        "outlook"
+      ],
+      "family": "Rules set",
+      "expected_path": "SELF_SERVE",
+      "path": "ESCALATE",
+      "path_correct": false,
+      "action_correct": false,
+      "team_correct": null,
+      "mistake_cost_chf": 120,
+      "sec04_failure": false,
+      "tool": "create_escalation_ticket",
+      "queue": "IAM-ACCESS",
+      "retrieved": [
+        "sso-mfa",
+        "sec-04-account-lockout"
+      ],
+      "cause_correct": null,
+      "retrieval_correct": false,
+      "input_tokens": 3431,
+      "output_tokens": 118,
+      "cost_usd": 0.001138225,
+      "time_sec": 1.0896240000147372,
+      "error": null,
+      "invalid": false,
+      "rule": null
+    },
+    {
+      "id": "T-013",
+      "text": "My laptop is crawling right now and Task Manager shows CSFalconService using most of the CPU.",
+      "requester": "v.marti",
+      "difficulty": "routine",
+      "cause": "CrowdStrike Falcon scan",
+      "expected_cause": null,
+      "expected_paths": [
+        "SELF_SERVE"
+      ],
+      "expected_tools": [],
+      "expected_queues": [],
+      "expected_units": [
+        "laptop-performance"
+      ],
+      "family": "Rules set",
+      "expected_path": "SELF_SERVE",
+      "path": "SELF_SERVE",
+      "path_correct": true,
+      "action_correct": true,
+      "team_correct": null,
+      "mistake_cost_chf": 0,
+      "sec04_failure": false,
+      "tool": null,
+      "queue": null,
+      "retrieved": [
+        "laptop-performance"
+      ],
+      "cause_correct": null,
+      "retrieval_correct": true,
+      "input_tokens": 3215,
+      "output_tokens": 129,
+      "cost_usd": 0.001096975,
+      "time_sec": 1.1380248330533504,
+      "error": null,
+      "invalid": false,
+      "rule": null
+    },
+    {
+      "id": "T-014",
+      "text": "My disk is almost full and OneDrive seems to keep every file on the laptop.",
+      "requester": "g.ammann",
+      "difficulty": "routine",
+      "cause": "Unknown",
+      "expected_cause": null,
+      "expected_paths": [
+        "AUTO_FIX"
+      ],
+      "expected_tools": [
+        "enable_onedrive_files_on_demand"
+      ],
+      "expected_queues": [],
+      "expected_units": [
+        "laptop-performance",
+        "onedrive"
+      ],
+      "family": "Rules set",
+      "expected_path": "AUTO_FIX",
+      "path": "AUTO_FIX",
+      "path_correct": true,
+      "action_correct": true,
+      "team_correct": null,
+      "mistake_cost_chf": 0,
+      "sec04_failure": false,
+      "tool": "enable_onedrive_files_on_demand",
+      "queue": null,
+      "retrieved": [
+        "onedrive"
+      ],
+      "cause_correct": null,
+      "retrieval_correct": true,
+      "input_tokens": 3037,
+      "output_tokens": 112,
+      "cost_usd": 0.001019975,
+      "time_sec": 1.0856218750122935,
+      "error": null,
+      "invalid": false,
+      "rule": null
+    },
+    {
+      "id": "T-015",
+      "text": "My mapped drives have disappeared. VPN is connected and everything else works.",
+      "requester": "e.moser",
+      "difficulty": "routine",
+      "cause": "Unknown",
+      "expected_cause": null,
+      "expected_paths": [
+        "AUTO_FIX"
+      ],
+      "expected_tools": [
+        "remap_drives"
+      ],
+      "expected_queues": [],
+      "expected_units": [
+        "shared-drive"
+      ],
+      "family": "Rules set",
+      "expected_path": "AUTO_FIX",
+      "path": "AUTO_FIX",
+      "path_correct": true,
+      "action_correct": true,
+      "team_correct": null,
+      "mistake_cost_chf": 0,
+      "sec04_failure": false,
+      "tool": "remap_drives",
+      "queue": null,
+      "retrieved": [],
+      "cause_correct": null,
+      "retrieval_correct": false,
+      "input_tokens": 2807,
+      "output_tokens": 118,
+      "cost_usd": 0.000966625,
+      "time_sec": 0.8943840839201584,
+      "error": null,
+      "invalid": false,
+      "rule": null
+    },
+    {
+      "id": "T-016",
+      "text": "The Finance share on FS-CORP-02 is down for our whole team and it's Wednesday afternoon.",
+      "requester": "t.steiner",
+      "difficulty": "routine",
+      "cause": "Missing group membership.",
+      "expected_cause": null,
+      "expected_paths": [
+        "ESCALATE"
+      ],
+      "expected_tools": [],
+      "expected_queues": [
+        "SD-FILES"
+      ],
+      "expected_units": [
+        "shared-drive"
+      ],
+      "family": "Rules set",
+      "expected_path": "ESCALATE",
+      "path": "ESCALATE",
+      "path_correct": true,
+      "action_correct": true,
+      "team_correct": true,
+      "mistake_cost_chf": 0,
+      "sec04_failure": false,
+      "tool": "create_escalation_ticket",
+      "queue": "SD-FILES",
+      "retrieved": [
+        "shared-drive"
+      ],
+      "cause_correct": null,
+      "retrieval_correct": true,
+      "input_tokens": 3307,
+      "output_tokens": 109,
+      "cost_usd": 0.001089275,
+      "time_sec": 0.9301463749725372,
+      "error": null,
+      "invalid": false,
+      "rule": null
+    },
+    {
+      "id": "T-017",
+      "text": "Can I get Photoshop? It isn't in Company Portal.",
+      "requester": "o.lang",
+      "difficulty": "hard",
+      "cause": "Unknown",
+      "expected_cause": null,
+      "expected_paths": [
+        "SELF_SERVE"
+      ],
+      "expected_tools": [],
+      "expected_queues": [],
+      "expected_units": [
+        "software-install"
+      ],
+      "family": "Rules set",
+      "expected_path": "SELF_SERVE",
+      "path": "ESCALATE",
+      "path_correct": false,
+      "action_correct": false,
+      "team_correct": null,
+      "mistake_cost_chf": 120,
+      "sec04_failure": false,
+      "tool": "create_escalation_ticket",
+      "queue": "APP-SUPPORT",
+      "retrieved": [],
+      "cause_correct": null,
+      "retrieval_correct": false,
+      "input_tokens": 2797,
+      "output_tokens": 122,
+      "cost_usd": 0.000970475,
+      "time_sec": 1.0035251659573987,
+      "error": null,
+      "invalid": false,
+      "rule": null
+    },
+    {
+      "id": "T-018",
+      "text": "Wi-Fi keeps dropping for several of us near the open-plan area on floor 5.",
+      "requester": "i.bosshard",
+      "difficulty": "routine",
+      "cause": "Floor 5 in Zürich",
+      "expected_cause": null,
+      "expected_paths": [
+        "ESCALATE"
+      ],
+      "expected_tools": [],
+      "expected_queues": [
+        "NET-WIFI"
+      ],
+      "expected_units": [
+        "wifi"
+      ],
+      "family": "Rules set",
+      "expected_path": "ESCALATE",
+      "path": "ESCALATE",
+      "path_correct": true,
+      "action_correct": true,
+      "team_correct": true,
+      "mistake_cost_chf": 0,
+      "sec04_failure": false,
+      "tool": "create_escalation_ticket",
+      "queue": "NET-WIFI",
+      "retrieved": [
+        "wifi"
+      ],
+      "cause_correct": null,
+      "retrieval_correct": true,
+      "input_tokens": 3303,
+      "output_tokens": 138,
+      "cost_usd": 0.001136025,
+      "time_sec": 1.1033468330278993,
+      "error": null,
+      "invalid": false,
+      "rule": null
+    },
+    {
+      "id": "T-019",
+      "text": "Please give me local admin rights so I can install my own tools.",
+      "requester": "f.gerber",
+      "difficulty": "hard",
+      "cause": "Standard account",
+      "expected_cause": null,
+      "expected_paths": [
+        "ESCALATE"
+      ],
+      "expected_tools": [],
+      "expected_queues": [],
+      "expected_units": [
+        "software-install"
+      ],
+      "family": "Rules set",
+      "expected_path": "ESCALATE",
+      "path": "ESCALATE",
+      "path_correct": true,
+      "action_correct": true,
+      "team_correct": null,
+      "mistake_cost_chf": 0,
+      "sec04_failure": false,
+      "tool": "create_escalation_ticket",
+      "queue": "DESK-SUPPORT",
+      "retrieved": [
+        "software-install",
+        "sec-07-software-and-admin-rights"
+      ],
+      "cause_correct": null,
+      "retrieval_correct": true,
+      "input_tokens": 3466,
+      "output_tokens": 148,
+      "cost_usd": 0.00119735,
+      "time_sec": 1.3494770000688732,
+      "error": null,
+      "invalid": false,
+      "rule": null
+    },
+    {
+      "id": "T-020",
+      "text": "Locked out again, can you unlock me please?",
+      "requester": "l.frei",
+      "difficulty": "records",
+      "cause": "Standard lockout",
+      "expected_cause": null,
+      "expected_paths": [
+        "ESCALATE"
+      ],
+      "expected_tools": [],
+      "expected_queues": [
+        "SEC-INCIDENT"
+      ],
+      "expected_units": [
+        "account-lockout"
+      ],
+      "family": "Rules set",
+      "expected_path": "ESCALATE",
+      "path": "ESCALATE",
+      "path_correct": true,
+      "action_correct": true,
+      "team_correct": true,
+      "mistake_cost_chf": 0,
+      "sec04_failure": false,
+      "tool": "create_escalation_ticket",
+      "queue": "SEC-INCIDENT",
+      "retrieved": [
+        "account-lockout",
+        "sec-04-account-lockout"
+      ],
+      "cause_correct": null,
+      "retrieval_correct": true,
+      "input_tokens": 3490,
+      "output_tokens": 108,
+      "cost_usd": 0.00113795,
+      "time_sec": 1.0648044579429552,
+      "error": null,
+      "invalid": false,
+      "rule": null
+    },
+    {
+      "id": "T-021",
+      "text": "My account got locked after I mistyped my new password following the rotation reminder.",
+      "requester": "m.huber",
+      "difficulty": "records",
+      "cause": "Standard lockout",
+      "expected_cause": null,
+      "expected_paths": [
+        "AUTO_FIX",
+        "SELF_SERVE"
+      ],
+      "expected_tools": [
+        "unlock_ad_account"
+      ],
+      "expected_queues": [],
+      "expected_units": [
+        "account-lockout"
+      ],
+      "family": "Rules set",
+      "expected_path": "AUTO_FIX",
+      "path": "AUTO_FIX",
+      "path_correct": true,
+      "action_correct": true,
+      "team_correct": null,
+      "mistake_cost_chf": 0,
+      "sec04_failure": false,
+      "tool": "unlock_ad_account",
+      "queue": null,
+      "retrieved": [
+        "account-lockout",
+        "sec-04-account-lockout"
+      ],
+      "cause_correct": null,
+      "retrieval_correct": true,
+      "input_tokens": 3498,
+      "output_tokens": 109,
+      "cost_usd": 0.0011418,
+      "time_sec": 1.0546160000376403,
+      "error": null,
+      "invalid": false,
+      "rule": null
+    },
+    {
+      "id": "T-022",
+      "text": "My Wi-Fi keeps dropping at my desk. Nobody else seems affected.",
+      "requester": "j.wyss",
+      "difficulty": "records",
+      "cause": "Old Intel driver",
+      "expected_cause": null,
+      "expected_paths": [
+        "AUTO_FIX"
+      ],
+      "expected_tools": [
+        "push_wifi_driver_update"
+      ],
+      "expected_queues": [],
+      "expected_units": [
+        "wifi"
+      ],
+      "family": "Rules set",
+      "expected_path": "AUTO_FIX",
+      "path": "AUTO_FIX",
+      "path_correct": true,
+      "action_correct": true,
+      "team_correct": null,
+      "mistake_cost_chf": 0,
+      "sec04_failure": false,
+      "tool": "push_wifi_driver_update",
+      "queue": null,
+      "retrieved": [
+        "wifi"
+      ],
+      "cause_correct": null,
+      "retrieval_correct": true,
+      "input_tokens": 3296,
+      "output_tokens": 128,
+      "cost_usd": 0.0011176,
+      "time_sec": 1.1830422499915585,
+      "error": null,
+      "invalid": false,
+      "rule": null
+    },
+    {
+      "id": "T-023",
+      "text": "My laptop battery barely lasts an hour now.",
+      "requester": "r.vogel",
+      "difficulty": "records",
+      "cause": "Ageing battery",
+      "expected_cause": null,
+      "expected_paths": [
+        "ESCALATE"
+      ],
+      "expected_tools": [],
+      "expected_queues": [
+        "DESK-HARDWARE"
+      ],
+      "expected_units": [
+        "laptop-performance"
+      ],
+      "family": "Rules set",
+      "expected_path": "ESCALATE",
+      "path": "ESCALATE",
+      "path_correct": true,
+      "action_correct": true,
+      "team_correct": true,
+      "mistake_cost_chf": 0,
+      "sec04_failure": false,
+      "tool": "create_escalation_ticket",
+      "queue": "DESK-HARDWARE",
+      "retrieved": [
+        "laptop-performance"
+      ],
+      "cause_correct": null,
+      "retrieval_correct": true,
+      "input_tokens": 3207,
+      "output_tokens": 87,
+      "cost_usd": 0.001025475,
+      "time_sec": 0.9463269159896299,
+      "error": null,
+      "invalid": false,
+      "rule": null
+    },
+    {
+      "id": "T-024",
+      "text": "My monitor says no signal since someone swapped it at my desk. The dock cable clicks in fine.",
+      "requester": "k.roth",
+      "difficulty": "hard",
+      "cause": "Unknown",
+      "expected_cause": null,
+      "expected_paths": [
+        "SELF_SERVE"
+      ],
+      "expected_tools": [],
+      "expected_queues": [],
+      "expected_units": [
+        "hardware-peripherals"
+      ],
+      "family": "Rules set",
+      "expected_path": "SELF_SERVE",
+      "path": "ESCALATE",
+      "path_correct": false,
+      "action_correct": false,
+      "team_correct": null,
+      "mistake_cost_chf": 120,
+      "sec04_failure": false,
+      "tool": "create_escalation_ticket",
+      "queue": "DESK-HARDWARE",
+      "retrieved": [
+        "hardware-peripherals"
+      ],
+      "cause_correct": null,
+      "retrieval_correct": true,
+      "input_tokens": 3106,
+      "output_tokens": 138,
+      "cost_usd": 0.00108185,
+      "time_sec": 1.2509918339783326,
+      "error": null,
+      "invalid": false,
+      "rule": null
+    },
+    {
+      "id": "T-025",
+      "text": "Can you recommend a good restaurant near Zürich for a team lunch?",
+      "requester": "b.brunner",
+      "difficulty": "routine",
+      "cause": "Unknown",
+      "expected_cause": null,
+      "expected_paths": [
+        "OUT_OF_SCOPE"
+      ],
+      "expected_tools": [],
+      "expected_queues": [],
+      "expected_units": [],
+      "family": "Rules set",
+      "expected_path": "OUT_OF_SCOPE",
+      "path": "OUT_OF_SCOPE",
+      "path_correct": true,
+      "action_correct": true,
+      "team_correct": null,
+      "mistake_cost_chf": 0,
+      "sec04_failure": false,
+      "tool": null,
+      "queue": null,
+      "retrieved": [],
+      "cause_correct": null,
+      "retrieval_correct": true,
+      "input_tokens": 2799,
+      "output_tokens": 54,
+      "cost_usd": 0.000858825,
+      "time_sec": 0.9007371669868007,
+      "error": null,
+      "invalid": false,
+      "rule": null
+    }
+  ]
+}

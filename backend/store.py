@@ -28,7 +28,6 @@ from psycopg.types.json import Jsonb
 from psycopg_pool import ConnectionPool
 
 REVIEWER = "technician"  # until people sign in
-ASSISTANT_REQUESTER = "anonymous"  # until the Assistant has a requester picker
 CONNECT_TIMEOUT_SEC = 30  # the session pooler can be slow to answer on a bad network
 POOL_SIZE = 4  # two workers, a review and the board's reads
 
@@ -67,6 +66,7 @@ class Proposal(TypedDict):
     trace_id: str | None
     cost_usd: float | None
     latency_ms: int | None
+    rule: dict | None  # the override, when a rule in agent/rules.py changed it
 
 
 class Verdict(TypedDict):
@@ -154,7 +154,9 @@ class Store(Protocol):
     def decided(self, ticket_id: str, decision: Proposal) -> None: ...
     def reviewed(self, ticket_id: str, review: Verdict, outcome: dict) -> None: ...
     def tickets(self) -> list[Saved]: ...
-    def add_run(self, run_id: str, text: str, decision: Proposal) -> None: ...
+    def add_run(
+        self, run_id: str, text: str, requester: str, decision: Proposal
+    ) -> None: ...
     def answered(self, run_id: str, answer: Answer, outcome: dict | None) -> None: ...
     def runs(self) -> list[Run]: ...
 
@@ -219,7 +221,9 @@ class MemoryStore:
                 for ticket_id, batch in self._batch_of.items()
             ]
 
-    def add_run(self, run_id: str, text: str, decision: Proposal) -> None:
+    def add_run(
+        self, run_id: str, text: str, requester: str, decision: Proposal
+    ) -> None:
         with self._lock:
             self._runs[run_id] = {
                 "path": decision["path"],
@@ -251,19 +255,20 @@ def _add_event(conn: Connection, ticket_id: str, kind: str, detail: dict) -> Non
 
 ADD_DECISION = """
 insert into decisions (ticket_id, path, tool, tool_input, queue, priority, cause,
-  rationale, summary, retrieved, model, version, trace_id, cost_usd, latency_ms)
+  rationale, summary, retrieved, model, version, trace_id, cost_usd, latency_ms, rule)
 values (%(ticket_id)s, %(path)s, %(tool)s, %(tool_input)s, %(queue)s, %(priority)s,
   %(cause)s, %(reasoning)s, %(summary)s, %(retrieved)s, %(model)s, %(version)s,
-  %(trace_id)s, %(cost_usd)s, %(latency_ms)s)
+  %(trace_id)s, %(cost_usd)s, %(latency_ms)s, %(rule)s)
 """
 
 
 def _add_decision(conn: Connection, ticket_id: str, decision: Proposal) -> None:
-    tool_input = decision["tool_input"]
+    tool_input, rule = decision["tool_input"], decision["rule"]
     values = {
         **decision,
         "ticket_id": ticket_id,
         "tool_input": None if tool_input is None else Jsonb(tool_input),
+        "rule": None if rule is None else Jsonb(rule),
         "retrieved": Jsonb(decision["retrieved"]),
     }
     conn.execute(ADD_DECISION, values)
@@ -285,7 +290,7 @@ where t.mode = 'queue' order by b.created_at, t.id
 READ_DECISIONS = """
 select distinct on (ticket_id) ticket_id, path, cause, rationale as reasoning, tool,
   tool_input, queue, priority, summary, retrieved, model, version, trace_id, cost_usd,
-  latency_ms
+  latency_ms, rule
 from decisions order by ticket_id, created_at desc
 """
 
@@ -325,6 +330,7 @@ def _proposal(row: dict) -> Proposal:
         "trace_id": row["trace_id"],
         "cost_usd": None if cost is None else float(cost),
         "latency_ms": row["latency_ms"],
+        "rule": row["rule"],
     }
 
 
@@ -448,12 +454,14 @@ class PostgresStore:
             for t in tickets
         ]
 
-    def add_run(self, run_id: str, text: str, decision: Proposal) -> None:
+    def add_run(
+        self, run_id: str, text: str, requester: str, decision: Proposal
+    ) -> None:
         with self._conn() as conn:
             conn.execute(
                 "insert into tickets (id, text, requester, mode)"
                 " values (%s, %s, %s, 'assistant')",
-                [run_id, text, ASSISTANT_REQUESTER],
+                [run_id, text, requester],
             )
             _add_decision(conn, run_id, decision)
 

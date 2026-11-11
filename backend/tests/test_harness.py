@@ -3,7 +3,7 @@
 import pytest
 from fastapi.testclient import TestClient
 
-from agent import config, decision, graph
+from agent import config, decision, graph, rules
 from agent.tool_schemas import FIX_TOOLS
 from backend import harness, main
 from backend.tests.test_benchmark import run
@@ -111,3 +111,9 @@ def test_with_no_saved_run_there_are_no_examples(tmp_path, monkeypatch):
     monkeypatch.setattr(runner, "RUNS_DIR", tmp_path)
     assert harness.view()["examples"] == []
     assert harness.read("INC-VDA-0001") is None
+
+
+def test_every_rule_in_code_is_a_check_on_the_page():
+    checked = {item["code"] for item in harness.CHECKS}
+    for rule in rules.RULES.values():
+        assert f"{rule.__name__} in agent/rules.py" in checked

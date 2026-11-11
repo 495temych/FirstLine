@@ -46,6 +46,7 @@ DECISION_KEYS = (
     "error",
     "cost_usd",
     "invalid",
+    "rule",
 )
 LABEL_FILES = (
     "rules_answers.json",
@@ -142,8 +143,10 @@ def instructions_version() -> str:
 
 
 def tools_version() -> str:
+    """The tools, their risk tiers and the rules in code that act on the decision."""
     tools = [DECISION_TOOL, TOOLS, TOOL_POLICY]
-    return _hash(json.dumps(tools, sort_keys=True).encode())
+    rules_code = (config.ROOT / "agent" / "rules.py").read_bytes()
+    return _hash(json.dumps(tools, sort_keys=True).encode() + rules_code)
 
 
 def version() -> str:
@@ -169,10 +172,11 @@ def _unit_id(u: dict) -> str:
     return u["doc"] if u["section"] is None else f"{u['doc']}::{u['section']}"
 
 
-def _attempt(text: str) -> dict:
-    """Run one ticket. A failure counts as an escalation and doesn't stop the run."""
+def _attempt(text: str, requester: str) -> dict:
+    """Run one ticket, in Queue mode. A failure counts as an escalation."""
     try:
-        return {**run_triage(text, use_retrieval=True), "error": None}
+        result = run_triage(text, use_retrieval=True, requester=requester, mode="queue")
+        return {**result, "error": None}
     except Exception as exc:  # one bad ticket must never stop an evaluation
         return {
             "path": "ESCALATE",
@@ -182,6 +186,7 @@ def _attempt(text: str) -> dict:
             "tool_input": None,
             "usage": None,
             "response_time_sec": 0.0,
+            "rule": None,
             "error": f"{type(exc).__name__}: {exc}",
         }
 
@@ -201,6 +206,7 @@ def decision(result: dict) -> dict:
         "error": result["error"],
         "cost_usd": usage.get("cost_usd"),
         "invalid": result.get("reasoning") == UNREADABLE,
+        "rule": (result.get("rule") or {}).get("rule"),
     }
 
 
@@ -231,6 +237,7 @@ def score_ticket(ticket: dict, answer: dict, made: dict, model: str) -> dict:
         "time_sec": made["time_sec"],
         "error": made["error"],
         "invalid": bool(made.get("invalid")),
+        "rule": made.get("rule"),
     }
 
 
@@ -289,7 +296,7 @@ def _traced_attempt(ticket: dict, name: str, session: str) -> dict:
         tags=tags,
         metadata={"ticket": ticket["id"], "version": version()},
     ):
-        return _attempt(ticket["text"])
+        return _attempt(ticket["text"], ticket["requester"])
 
 
 def evaluate(name: str, tiny: bool = False, sampled: bool = False) -> dict:

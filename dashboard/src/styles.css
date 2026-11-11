@@ -2225,3 +2225,34 @@ button.link {
     grid-row: auto;
   }
 }
+
+/* Who is asking, and the rules that changed a decision */
+
+.intake select {
+  width: 100%;
+  font: inherit;
+  padding: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.requester-record {
+  color: var(--ink-soft);
+  margin: 0 0 0.75rem;
+}
+
+.notice.rule {
+  margin-top: 0.5rem;
+}
+
+.notice.rule p {
+  margin: 0.25rem 0;
+}
+
+.rule-list {
+  margin: 0;
+  padding-left: 1.1rem;
+}
+
+.rule-list li + li {
+  margin-top: 0.5rem;
+}
