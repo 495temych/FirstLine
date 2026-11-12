@@ -168,6 +168,12 @@ Each design decision so far, with its reason and its trade-off.
 - **Reason:** the loop is the sprint's biggest commit, and building it free before paying to measure it keeps each step small. Showing every step answers "why did it decide this?" on the page people use, not only in Langfuse.
 - **Trade-off:** a loop makes the Assistant slower, a few seconds instead of about one, which the checklist makes visible rather than hides. It looks like a chat before it can hold one: follow-up questions wait for Sprint 2's commit 12. The page reads the steps every second, as the Queue does, rather than streaming them, which is simpler and survives a reload, at up to a second's delay.
 
+## The Assistant runs the loop before 7b measures it
+
+- **Decision:** on 12 November 2026 the owner moved 7c before 7b. The Assistant runs the loop and shows each step as a live checklist, while the Queue and evaluations stay on one call, the measured default, until 7b compares the two.
+- **Reason:** the checklist is the clearest demonstration of what the agent does and why, and it costs nothing to build with the stub model. The Assistant is where a person watches one ticket, so it's where the steps are worth seeing.
+- **Trade-off:** the Assistant now runs a design nobody has measured against one call, and costs up to 7 model calls a ticket, capped at CHF 0.01. If 7b finds the loop doesn't earn its cost, the Assistant goes back to one call, and the checklist shows one call's stations.
+
 ## The loop as one node that calls itself
 
 - **Decision:** the loop is one `investigate` node, run once per model turn, that routes back to itself until the model decides or a limit stops it. The lookups it asks for run inside the node. The conversation and each step are in the graph's state, so each turn is a checkpoint.

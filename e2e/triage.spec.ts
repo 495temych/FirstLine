@@ -22,9 +22,16 @@ async function triage(page: Page, ticket: string, requester = "s.keller") {
   await page.getByRole("button", { name: "Triage this ticket" }).click();
 }
 
+/** The path the agent chose, as its reply names it. */
+const chosen = (page: Page) =>
+  page.getByRole("region", { name: "FirstLine's reply" }).locator(".path-name");
+
+const steps = (page: Page) =>
+  page.getByRole("list", { name: "The agent's steps" }).getByRole("listitem");
+
 test("a fix runs only after confirmation", async ({ page }) => {
   await triage(page, "fix my VPN");
-  await expect(page.getByText("Auto-fix")).toBeVisible();
+  await expect(chosen(page)).toHaveText("Auto-fix");
   await expect(page.getByText("Fix ran (simulated)")).toBeHidden();
   await page.getByRole("button", { name: "Run fix" }).click();
   await expect(page.getByText("Fix ran (simulated)")).toBeVisible();
@@ -65,7 +72,7 @@ test("an escalation waits for confirmation", async ({ page }) => {
 
 test("failed self-serve steps go to a ticket", async ({ page }) => {
   await triage(page, "steps for my dock");
-  await expect(page.getByText("Self-serve")).toBeVisible();
+  await expect(chosen(page)).toHaveText("Self-serve");
   await page.getByRole("button", { name: /It didn't/ }).click();
   await page
     .getByRole("button", { name: "Create ticket", exact: true })
@@ -82,6 +89,52 @@ test("self-serve steps can resolve a ticket", async ({ page }) => {
 test("an out-of-scope ticket takes no action", async ({ page }) => {
   await triage(page, "the weather");
   await expect(page.getByText(/no action was taken/)).toBeVisible();
+});
+
+test("the reply shows each step of the loop, then waits", async ({ page }) => {
+  await triage(page, "I'm locked out of my account", "s.keller");
+  const reply = page.getByRole("region", { name: "FirstLine's reply" });
+  await expect(reply.locator(".sender")).toContainText("Working");
+  const gate = page.getByRole("region", { name: "Waiting for you" });
+  await expect(gate).toBeVisible();
+  await expect(steps(page).locator(".check-label")).toHaveText([
+    "Search the knowledge base",
+    "Look up the requester",
+    "Run the check account-lockout-source-check",
+    "Decide",
+    "Apply the rules: SEC-04 changed it",
+  ]);
+  await expect(
+    gate.getByRole("button", { name: "Create ticket", exact: true }),
+  ).toBeVisible();
+  await page.reload();
+  await expect(steps(page)).toHaveCount(5);
+  await expect(gate).toBeVisible();
+});
+
+test("a step opens from the keyboard to show what it read", async ({
+  page,
+}) => {
+  await triage(page, "I'm locked out of my account", "s.keller");
+  const lookup = steps(page).filter({ hasText: "Look up the requester" });
+  await expect(lookup.getByText(/2 lockouts in 24 hours/)).toBeVisible();
+  await expect(lookup.getByText("lookup_requester")).toBeHidden();
+  await lookup.locator("summary").focus();
+  await page.keyboard.press("Enter");
+  await expect(lookup.getByText("lookup_requester")).toBeVisible();
+});
+
+test("a real example ticket comes with its requester", async ({ page }) => {
+  await page.goto("/");
+  await open(page, "Assistant");
+  const examples = page.getByRole("list", { name: "Real tickets" });
+  await examples.getByRole("button").first().click();
+  const text = await page.getByLabel("Describe the issue").inputValue();
+  expect(text.length).toBeGreaterThan(0);
+  const who = await page.getByLabel("Who is asking").inputValue();
+  await page.getByRole("button", { name: "Triage this ticket" }).click();
+  await expect(page.locator(".from-person .sender").first()).toContainText(who);
+  await expect(steps(page).first()).toBeVisible();
 });
 
 test("a gate survives a reload", async ({ page }) => {

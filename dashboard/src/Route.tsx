@@ -1,8 +1,7 @@
 import type { ReactNode } from "react";
 import Markdown from "react-markdown";
-import type { Gate, Run, Unit } from "./api";
+import type { Run, Unit } from "./api";
 import type { RuleOverride } from "./people";
-import { Action } from "./Action";
 import { pathLabels, plainText } from "./format";
 
 export function Station(
@@ -51,7 +50,7 @@ function UnitMatch({ unit }: Readonly<{ unit: Unit }>) {
   );
 }
 
-function Retrieval({ run }: Readonly<{ run: Run }>) {
+export function Retrieval({ run }: Readonly<{ run: Run }>) {
   if (run.retrieved.length === 0) {
     return (
       <p>
@@ -80,7 +79,7 @@ function proposedLabel(rule: RuleOverride) {
 }
 
 /** A rule in code changed what the agent proposed. */
-function RuleNotice({ rule }: Readonly<{ rule: RuleOverride }>) {
+export function RuleNotice({ rule }: Readonly<{ rule: RuleOverride }>) {
   return (
     <div className="notice rule" role="note">
       <p>
@@ -91,41 +90,5 @@ function RuleNotice({ rule }: Readonly<{ rule: RuleOverride }>) {
         it, in <code>{rule.code}</code>.
       </p>
     </div>
-  );
-}
-
-export function Route(
-  props: Readonly<{
-    run: Run;
-    busy: boolean;
-    onAnswer: (gate: Gate, approved: boolean) => void;
-  }>,
-) {
-  const { run } = props;
-  return (
-    <>
-      <p className="query">{run.query}</p>
-      <ol key={run.id} className={`route path-${run.path}`}>
-        <Station n={1} title="Retrieval">
-          <Retrieval run={run} />
-        </Station>
-        <Station n={2} title="Decision">
-          <p className="path-name">{pathLabels[run.path]}</p>
-          {run.rule && <RuleNotice rule={run.rule} />}
-        </Station>
-        <Station n={3} title="Agent reasoning">
-          <div className="prose">
-            {run.reasoning ? (
-              <Markdown>{run.reasoning}</Markdown>
-            ) : (
-              <p>No reasoning returned.</p>
-            )}
-          </div>
-        </Station>
-        <Station n={4} title="Action" gate={run.pending !== null}>
-          <Action run={run} busy={props.busy} onAnswer={props.onAnswer} />
-        </Station>
-      </ol>
-    </>
   );
 }

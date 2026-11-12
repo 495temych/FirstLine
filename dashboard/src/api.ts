@@ -1,4 +1,4 @@
-import type { Person, RuleOverride } from "./people";
+import type { Person } from "./people";
 import type { Benchmark } from "./benchmark";
 import type { Harness, HarnessTicket } from "./harnessData";
 export type Path =
@@ -17,45 +17,17 @@ export interface Unit {
   highlights: Highlight[];
 }
 
-export interface DraftTicket {
-  source: "escalate" | "self_serve" | "decline";
-  queue: string;
-  priority: string;
-  summary: string;
-  declined_tool?: string;
-  reason?: string;
-  diagnostic_summary?: string;
-}
-
-export type Pending =
-  | { kind: "confirm_fix"; tool_name: string; tool_input: object }
-  | { kind: "confirm_ticket"; ticket: DraftTicket }
-  | { kind: "self_serve" };
-
-export type Gate = Pending["kind"];
-
-export interface ToolResult {
-  detail: string;
-  timestamp: string;
-  ticket_number?: string;
-  queue?: string;
-}
-
-export interface Run {
-  id: string;
-  query: string;
-  use_retrieval: boolean;
-  retrieved: Unit[];
-  path: Path;
-  reasoning: string;
-  tool_name: string | null;
-  tool_input: Record<string, unknown> | null;
-  human_decision: { fix?: boolean; ticket?: boolean; resolved?: boolean };
-  ticket_draft: DraftTicket | null;
-  tool_result: ToolResult | null;
-  pending: Pending | null;
-  rule: RuleOverride | null;
-}
+export type {
+  DraftTicket,
+  Gate,
+  Pending,
+  Run,
+  RunStatus,
+  Step,
+  ToolResult,
+  TriageExample,
+} from "./run";
+import type { Gate, Run, TriageExample } from "./run";
 
 export interface Decisions {
   n: number;
@@ -515,12 +487,19 @@ function post<T>(url: string, body: object): Promise<T> {
 
 export const api = {
   health: () => request<{ api_key: boolean }>("/api/health"),
-  startTriage: (text: string, useRetrieval: boolean, requester: string) =>
+  startTriage: (
+    text: string,
+    useRetrieval: boolean,
+    requester: string,
+    ticketId?: string,
+  ) =>
     post<Run>("/api/triage", {
       text,
       use_retrieval: useRetrieval,
       requester,
+      ...(ticketId ? { ticket_id: ticketId } : {}),
     }),
+  examples: () => request<TriageExample[]>("/api/examples"),
   requesters: () => request<Person[]>("/api/requesters"),
   readRun: (id: string) => request<Run>(`/api/runs/${id}`),
   answerGate: (id: string, gate: Gate, approved: boolean) =>

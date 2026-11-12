@@ -1,5 +1,8 @@
 """The Queue's record. Each test runs against memory and a throwaway Postgres."""
 
+import threading
+import time
+
 import psycopg
 import pytest
 
@@ -212,3 +215,25 @@ def test_the_checkpoint_tables_are_closed_to_the_public_key(empty_postgres):
         ).fetchall()
     assert {name for name, _ in rows} == set(migrate.CHECKPOINT_TABLES)
     assert all(secured for _, secured in rows)
+
+
+def test_two_first_calls_at_once_build_one_value():
+    """Runs start in threads: two graphs would each keep their own paused runs."""
+    built = []
+
+    @record.once
+    def slow() -> object:
+        time.sleep(0.05)
+        built.append(object())
+        return built[-1]
+
+    got: list[object] = []
+    threads = [threading.Thread(target=lambda: got.append(slow())) for _ in range(4)]
+    for thread in threads:
+        thread.start()
+    for thread in threads:
+        thread.join()
+    assert len(built) == 1
+    assert all(value is built[0] for value in got)
+    slow.cache_clear()
+    assert slow() is not built[0]

@@ -14,8 +14,9 @@ board joins from `data/` by id, so no copy can drift.
 
 import os
 from collections import defaultdict
+from collections.abc import Callable
 from datetime import UTC, datetime
-from functools import cache
+from functools import update_wrapper
 from threading import Lock
 from typing import Protocol, TypedDict
 
@@ -486,7 +487,36 @@ def open_store() -> Store:
     return PostgresStore(url) if url else MemoryStore()
 
 
-@cache
+class Once[T]:
+    """Builds its value on first use and keeps it, like `functools.cache` for a
+    function of no arguments, but safe across threads. Two first calls at once would
+    otherwise build two, and a run saved in one would be missing from the other."""
+
+    def __init__(self, build: Callable[[], T]) -> None:
+        self._build = build
+        self._lock = Lock()
+        self._built: list[T] = []
+        update_wrapper(self, build)
+
+    def __call__(self) -> T:
+        with self._lock:
+            if not self._built:
+                self._built.append(self._build())
+            return self._built[0]
+
+    def built(self) -> bool:
+        return bool(self._built)
+
+    def cache_clear(self) -> None:
+        with self._lock:
+            self._built.clear()
+
+
+def once[T](build: Callable[[], T]) -> Once[T]:
+    return Once(build)
+
+
+@once
 def shared() -> Store:
     """The backend's one record, opened on first use."""
     return open_store()

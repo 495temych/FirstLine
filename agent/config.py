@@ -28,6 +28,9 @@ USD_TO_CHF = 0.80  # an assumption, for showing model cost in francs
 Design = Literal["one call", "loop"]
 DESIGNS: tuple[Design, ...] = get_args(Design)
 DEFAULT_DESIGN: Design = "one call"
+# The Assistant shows each step as it happens, so it runs the loop, before 7b measures
+# it (docs/DECISIONS.md). The Queue and evaluations use DESIGN.
+ASSISTANT_DESIGN: Design = "loop"
 # The loop's limits, per ticket. At either one it stops and escalates what it found.
 MAX_LOOKUPS = 6
 MAX_LOOP_CHF = 0.01

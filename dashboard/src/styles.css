@@ -440,6 +440,268 @@ textarea {
   flex: none;
 }
 
+/* The Assistant's thread: the request, the agent's steps on one line, then the gate */
+
+.thread {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.message .sender {
+  color: var(--ink-soft);
+  font-size: 0.875rem;
+  margin-bottom: 0.25rem;
+}
+
+.from-person {
+  justify-self: end;
+  max-width: min(36rem, 100%);
+  background: var(--wash);
+  border-radius: 10px 10px 2px 10px;
+  padding: 0.75rem 1rem;
+}
+
+.from-person .query {
+  margin: 0;
+  font-size: 1.125rem;
+}
+
+.from-agent .sender {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.from-agent .design {
+  color: var(--ink-soft);
+  font-weight: 400;
+  margin-left: 0.375rem;
+}
+
+.from-agent .decision {
+  margin-top: 1.25rem;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.knowledge summary {
+  cursor: pointer;
+  color: var(--ink-soft);
+}
+
+.knowledge[open] summary {
+  margin-bottom: 0.5rem;
+}
+
+/* The checklist is the route line: grey while the agent works, the path's colour once it decides. */
+
+.checklist {
+  --line: var(--rule);
+  list-style: none;
+  margin: 0.5rem 0 0;
+  padding: 0;
+}
+
+.checklist.path-SELF_SERVE {
+  --line: var(--self-serve);
+}
+
+.checklist.path-AUTO_FIX {
+  --line: var(--auto-fix);
+}
+
+.checklist.path-ESCALATE {
+  --line: var(--escalate);
+}
+
+.checklist.path-OUT_OF_SCOPE {
+  --line: var(--out-of-scope);
+}
+
+.checklist.path-NO_TOOLS {
+  --line: var(--no-tools);
+}
+
+.check {
+  position: relative;
+  padding: 0.3125rem 0 0.625rem 2rem;
+}
+
+.check::before {
+  content: "";
+  position: absolute;
+  left: 0.5rem;
+  top: 0.9rem;
+  bottom: -0.3rem;
+  width: 3px;
+  background: var(--line);
+}
+
+.check:last-child::before {
+  display: none;
+}
+
+.check .mark {
+  position: absolute;
+  left: 0;
+  top: 0.375rem;
+  width: 1.1875rem;
+  height: 1.1875rem;
+  border-radius: 50%;
+  background: var(--panel);
+  border: 3px solid var(--line);
+  z-index: 1;
+}
+
+.check.done .mark {
+  background: var(--line);
+  box-shadow: inset 0 0 0 3px var(--panel);
+}
+
+.check.pending .mark {
+  border: 2px dashed var(--ink-soft);
+}
+
+.check.pending .check-label {
+  color: var(--ink-soft);
+}
+
+.check.running .mark {
+  border-color: var(--rule);
+  border-top-color: var(--ink);
+  animation: turn 0.9s linear infinite;
+}
+
+.check.failed .mark {
+  border-color: var(--escalate);
+}
+
+.check.failed .mark::before,
+.check.failed .mark::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0.625rem;
+  height: 2px;
+  background: var(--escalate);
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.check.failed .mark::after {
+  transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+.check.rule .mark {
+  border-radius: 3px;
+  border-color: var(--ink);
+  background: var(--ink);
+}
+
+@keyframes turn {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .check.running .mark {
+    animation: none;
+    border-style: dotted;
+  }
+}
+
+.check-head,
+.check summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.25rem 0.75rem;
+}
+
+.check summary {
+  cursor: pointer;
+  list-style-position: outside;
+}
+
+.check-label {
+  font-weight: 500;
+}
+
+.check.running .check-label::after {
+  content: "…";
+}
+
+.check-spent {
+  margin-left: auto;
+  color: var(--ink-soft);
+  font-size: 0.875rem;
+  white-space: nowrap;
+}
+
+.check-result {
+  color: var(--ink-soft);
+  font-size: 0.9375rem;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+  max-width: 64ch;
+}
+
+.step-detail {
+  margin: 0.5rem 0 0;
+  padding: 0.625rem 0.75rem;
+  background: var(--paper);
+  border-radius: 4px;
+  display: grid;
+  gap: 0.25rem;
+  font-size: 0.875rem;
+}
+
+.step-detail > div {
+  display: grid;
+  grid-template-columns: 4.5rem minmax(0, 1fr);
+  gap: 0.5rem;
+}
+
+.step-detail dt {
+  color: var(--ink-soft);
+}
+
+.step-detail dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+/* A gate holds the run: the one amber thing in the thread. */
+
+.gate-card {
+  border: 3px solid var(--signal);
+  border-radius: 6px;
+  padding: 1rem 1.25rem;
+}
+
+.gate-title {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+
+.diamond {
+  width: 1.25rem;
+  height: 1.25rem;
+  background: var(--signal);
+  clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+}
+
+.outcome {
+  padding: 0 0 0 2rem;
+}
+
+.examples button {
+  color: var(--ink);
+}
+
 /* Action */
 
 .card {
@@ -763,6 +1025,14 @@ button.link {
 
   .station {
     padding-left: 2.75rem;
+  }
+
+  .gate-card {
+    padding: 0.875rem 1rem;
+  }
+
+  .outcome {
+    padding-left: 0;
   }
 
   .path-name {

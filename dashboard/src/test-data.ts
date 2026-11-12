@@ -7,6 +7,7 @@ import type {
   Run,
   Stats,
   Trace,
+  TriageExample,
 } from "./api";
 import type { Person } from "./people";
 
@@ -36,7 +37,44 @@ export const baseRun: Run = {
     tool_input: { username: "a.b" },
   },
   rule: null,
+  design: "loop",
+  steps: [
+    {
+      id: "s1",
+      turn: 1,
+      tool: "lookup_requester",
+      input: {},
+      result: "Finance, Zürich; 2 lockouts in 24 hours; device LT-SKELLER.",
+      ok: true,
+      time_sec: 1.1,
+      cost_chf: 0.0009,
+    },
+    {
+      id: "s2",
+      turn: 2,
+      tool: "record_decision",
+      input: { path: "AUTO_FIX" },
+      result: "AUTO_FIX",
+      ok: true,
+      time_sec: 1.2,
+      cost_chf: 0.0011,
+    },
+  ],
+  stopped: null,
+  requester: { id: "s.keller", department: "Finance", office: "Zürich" },
+  status: "waiting",
+  error: null,
+  next: ["confirm_fix"],
 };
+
+export const examples: TriageExample[] = [
+  {
+    id: "INC-ALP-0010",
+    title: "account locked after password change",
+    text: "account locked after password change\n\nI changed my password.",
+    requester: "m.huber",
+  },
+];
 
 export const requesters: Person[] = [
   {

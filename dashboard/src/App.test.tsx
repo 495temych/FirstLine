@@ -19,6 +19,7 @@ import {
   draft,
   emptyQueue,
   evaluations,
+  examples,
   requesters,
   result,
   stats,
@@ -47,6 +48,7 @@ beforeEach(() => {
     "/api/health": { status: "ok", api_key: true },
     "/api/triage": baseRun,
     "/api/requesters": requesters,
+    "/api/examples": examples,
     "/api/evaluations": evaluations,
     "/api/tickets": tickets,
     "/api/stats": stats,
@@ -241,6 +243,43 @@ it("shows when a rule changed the agent's decision", async () => {
   expect(note.textContent).toContain("Changed by a rule: SEC-04.");
   expect(note.textContent).toContain("Auto-fix, unlock_ad_account");
   expect(note.textContent).toContain("sec04 in agent/rules.py");
+});
+
+it("reads a working run every second until it waits at a gate", async () => {
+  replies["/api/runs/run1"] = baseRun;
+  await triage({
+    status: "running",
+    path: "",
+    pending: null,
+    steps: [],
+    next: ["investigate"],
+  });
+  expect(screen.getByText("Choose the next step")).toBeDefined();
+  expect(screen.queryByRole("button", { name: "Run fix" })).toBeNull();
+  expect(
+    await screen.findByRole("button", { name: "Run fix" }, { timeout: 3000 }),
+  ).toBeDefined();
+  expect(calls.some((c) => c.url === "/api/runs/run1")).toBe(true);
+});
+
+it("sends a real example with its requester and ticket id", async () => {
+  showAssistant();
+  fireEvent.click(
+    await screen.findByRole("button", {
+      name: "account locked after password change",
+    }),
+  );
+  const picker: HTMLSelectElement = screen.getByLabelText("Who is asking");
+  expect(picker.value).toBe("m.huber");
+  click("Triage this ticket");
+  await waitFor(() => {
+    expect(calls.find((c) => c.url === "/api/triage")?.body).toEqual({
+      text: "account locked after password change\n\nI changed my password.",
+      use_retrieval: true,
+      requester: "m.huber",
+      ticket_id: "INC-ALP-0010",
+    });
+  });
 });
 
 it("blocks triage and explains when the key is missing", async () => {

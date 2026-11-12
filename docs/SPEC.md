@@ -56,13 +56,14 @@ The Queue must behave like a production service:
 
 ## Mode 2: the Assistant
 
-An employee describes a problem in their own words. FirstLine answers in seconds, with one model call.
+An employee describes a problem in their own words, and FirstLine answers as a conversation, while they watch.
 
 1. It retrieves the relevant playbooks and policies.
-2. It chooses a path and explains it.
-3. The person confirms a fix, follows the steps, or confirms a ticket.
+2. It looks up what it needs before deciding: the requester's record, similar past tickets, a recorded check on the ticket, or a narrower search. It has a limit on lookups and on cost.
+3. Code applies the rules, and it chooses a path and explains it.
+4. The person confirms a fix, follows the steps, or confirms a ticket.
 
-The Assistant can't investigate. If the answer depends on a check it can't see, it escalates and says what's missing.
+Each of these is a step on a checklist under the agent's reply, filled in as it happens, with what it found, its time and its cost. The lookups read records and recorded checks only, and none of them changes anything. A check with no recorded result says so, and the agent escalates and says what's missing. How long a ticket takes, the median and 90th percentile, is measured once it runs on a real model.
 
 ## What our team needs to see
 
@@ -75,7 +76,8 @@ In the Queue:
 
 In the Assistant:
 
-- The request, with a few examples to try.
+- The request, with a few examples to try, including real tickets with their requester.
+- Each step the agent took, as it happens, with what it found and what it cost.
 - What the agent retrieved, with scores and the lines that matched.
 - The path, the reasoning and the proposed action, with a confirmation card before anything happens.
 - After a self-serve answer, a way to say it worked, or that it did not.

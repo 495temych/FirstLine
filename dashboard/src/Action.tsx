@@ -119,7 +119,7 @@ function TicketGate({
     <>
       <TicketCard ticket={run.pending.ticket} />
       <p className="held">
-        Waiting for you. Creating it notifies the on-call technician for{" "}
+        Creating it notifies the on-call technician for{" "}
         {run.pending.ticket.queue}.
       </p>
       <Choices
