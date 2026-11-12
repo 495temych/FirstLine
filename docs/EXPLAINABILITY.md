@@ -60,9 +60,9 @@ A decision links to its Langfuse trace. A score links to its saved run, and a to
 
 ## Visual language
 
-`docs/BRAND.md` is the fixed direction: the route metaphor, Familjen Grotesk and IBM Plex Mono, the paper, panel and ink colours, one colour per path, and signal amber for human gates only. Within it:
+`docs/BRAND.md` is the fixed direction: a work tool's frame of sidebar, page header and details panel, Instrument Sans and IBM Plex Mono, blue for what you can do, one colour per path, and gate amber for human gates only. Within it:
 
-- **One bold element per page.** On the overview that's the route schematic, and on retrieval it's the score distribution. Everything else stays quiet and tabular.
+- **One bold element per page.** In the Assistant that's the agent's steps, on Workflow the route schematic, and on Retrieval the score distribution. Everything else stays quiet and tabular.
 - **Schematic, not illustration.** Diagrams are inline SVG drawn from data, with lines, stations and labels, and no stock icons, mascots or gradients.
 - **Colour carries meaning, never decoration.** A path's colour means that path, and amber means a person decides. Nothing relies on colour alone: every coloured thing has a label or a shape too.
 - **Motion answers an action.** A station opens because it was clicked, and a bar grows because a query was typed. Nothing moves on its own, and `prefers-reduced-motion` turns the rest off.
