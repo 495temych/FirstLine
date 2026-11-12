@@ -87,6 +87,7 @@ def test_health_reports_the_key(client, monkeypatch):
         "status": "ok",
         "api_key": True,
         "model": models.label(config.model_name()),
+        "assistant_limit_chf": config.MAX_LOOP_CHF,
     }
     monkeypatch.delenv("ANTHROPIC_API_KEY")
     assert client.get("/api/health").json()["api_key"] is False
@@ -209,6 +210,10 @@ def test_the_assistant_keeps_each_loop_step_with_its_cost(client, monkeypatch):
     assert first["cost_chf"] == pytest.approx(first["cost_usd"] * config.USD_TO_CHF)
     assert decided["tool"] == "record_decision"
     assert run["status"] == "waiting"
+    spent = sum(step["cost_chf"] for step in run["steps"])
+    assert run["cost_chf"] == pytest.approx(spent)
+    assert run["response_time_sec"] >= 0
+    assert run["cause"]
 
 
 def test_an_example_reads_its_own_recorded_checks(client, monkeypatch):

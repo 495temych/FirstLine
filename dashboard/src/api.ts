@@ -486,7 +486,13 @@ function post<T>(url: string, body: object): Promise<T> {
 }
 
 export const api = {
-  health: () => request<{ api_key: boolean; model?: string }>("/api/health"),
+  health: () =>
+    request<{
+      api_key: boolean;
+      model?: string;
+      /** The most an Assistant run may spend looking things up. */
+      assistant_limit_chf?: number;
+    }>("/api/health"),
   startTriage: (
     text: string,
     useRetrieval: boolean,

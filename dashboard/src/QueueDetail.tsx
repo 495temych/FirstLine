@@ -181,7 +181,7 @@ function Outcome({ ticket }: Readonly<{ ticket: QueueTicket }>) {
   const review = ticket.review;
   if (!review) return null;
   return (
-    <div className="card">
+    <div className="draft">
       <h3>
         {
           {

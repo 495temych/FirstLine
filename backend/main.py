@@ -136,6 +136,9 @@ def _view_of(
         "id": run_id,
         **{name: values[name] for name in RUN_FIELDS},
         "steps": _steps(values),
+        "cause": values.get("cause", ""),
+        "response_time_sec": values.get("response_time_sec"),
+        "cost_chf": _chf((values.get("usage") or {}).get("cost_usd")),
         "requester": {
             key: requester.get(key) for key in ("id", "department", "office")
         },
@@ -197,6 +200,8 @@ def health() -> dict:
         "status": "ok",
         "api_key": bool(os.environ.get("ANTHROPIC_API_KEY")),
         "model": models.label(config.model_name()),
+        # The most an Assistant run may spend looking things up before it decides.
+        "assistant_limit_chf": config.MAX_LOOP_CHF,
     }
 
 

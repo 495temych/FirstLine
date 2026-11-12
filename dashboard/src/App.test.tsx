@@ -306,7 +306,9 @@ it("shows what was retrieved and why it matched", async () => {
   expect(
     screen.getByText("Reset the profile", { selector: ".highlights li" }),
   ).toBeDefined();
-  expect(screen.getByText("Auto-fix")).toBeDefined();
+  expect(
+    screen.getByText("Auto-fix", { selector: ".path-name" }),
+  ).toBeDefined();
 });
 
 it("waits at the fix gate and then shows the result", async () => {

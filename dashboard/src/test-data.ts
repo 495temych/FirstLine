@@ -65,6 +65,9 @@ export const baseRun: Run = {
   status: "waiting",
   error: null,
   next: ["confirm_fix"],
+  cause: "Stale VPN profile",
+  response_time_sec: 2.3,
+  cost_chf: 0.002,
 };
 
 export const examples: TriageExample[] = [

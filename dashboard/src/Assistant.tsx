@@ -3,6 +3,7 @@ import { api, type Gate, type Run } from "./api";
 import type { Person } from "./people";
 import { presets } from "./presets";
 import type { TriageExample as Example } from "./run";
+import { Details } from "./Details";
 import { Stats } from "./Stats";
 import { Thread } from "./Thread";
 import { useLoad } from "./useLoad";
@@ -59,31 +60,55 @@ function PersonPicker(
   );
 }
 
-function Examples(
-  props: Readonly<{ examples: Example[]; onPick: (example: Example) => void }>,
+/** Tickets to try: real development tickets with their requester, then short ones. */
+function Suggestions(
+  props: Readonly<{
+    examples: Example[] | undefined;
+    onPick: (example: Example) => void;
+    onPreset: (text: string) => void;
+  }>,
 ) {
   return (
-    <>
-      <h2>Real tickets</h2>
-      <p className="caption">
-        From the development set, with their requester. Their checks were
-        recorded, so the agent can read them.
-      </p>
-      <ul className="presets examples" aria-label="Real tickets">
-        {props.examples.map((example) => (
-          <li key={example.id}>
+    <div className="suggestions">
+      {props.examples && (
+        <>
+          <h2 id="real-tickets">Real tickets</h2>
+          <p className="caption">
+            From the development set, with their requester. Their checks were
+            recorded, so the agent can read them.
+          </p>
+          <ul className="chips" aria-label="Real tickets">
+            {props.examples.map((example) => (
+              <li key={example.id}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    props.onPick(example);
+                  }}
+                >
+                  {example.title}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
+      <h2>Short requests</h2>
+      <ul className="chips">
+        {presets.map((preset) => (
+          <li key={preset}>
             <button
               type="button"
               onClick={() => {
-                props.onPick(example);
+                props.onPreset(preset);
               }}
             >
-              {example.title}
+              {preset}
             </button>
           </li>
         ))}
       </ul>
-    </>
+    </div>
   );
 }
 
@@ -119,35 +144,127 @@ function remember(id: string | null) {
   window.history.replaceState(null, "", url);
 }
 
-/** The thread, or what to do before there is one. */
-function Result(
+interface ComposerProps {
+  people: Person[] | undefined;
+  requester: string;
+  onRequester: (id: string) => void;
+  text: string;
+  onText: (text: string) => void;
+  useRetrieval: boolean;
+  onRetrieval: (on: boolean) => void;
+  blocked: boolean;
+  limit: number | undefined;
+  onSubmit: (event: SyntheticEvent) => void;
+}
+
+/** The message box: the request, who asks, and the switch, beside the button. */
+function Composer(props: Readonly<ComposerProps>) {
+  return (
+    <form className="composer" onSubmit={props.onSubmit}>
+      <label htmlFor="ticket" className="sr-only">
+        Describe the issue
+      </label>
+      <textarea
+        id="ticket"
+        rows={3}
+        value={props.text}
+        placeholder="My VPN keeps disconnecting since the migration last month"
+        onChange={(event) => {
+          props.onText(event.target.value);
+        }}
+        onKeyDown={(event) => {
+          if (event.key === "Enter" && (event.metaKey || event.ctrlKey)) {
+            props.onSubmit(event);
+          }
+        }}
+      />
+      <div className="composer-bar">
+        {props.people && (
+          <PersonPicker
+            people={props.people}
+            value={props.requester}
+            onChange={props.onRequester}
+          />
+        )}
+        <label className="switch">
+          <input
+            type="checkbox"
+            role="switch"
+            checked={props.useRetrieval}
+            onChange={(event) => {
+              props.onRetrieval(event.target.checked);
+            }}
+          />
+          Use the knowledge base
+        </label>
+        <span className="composer-send">
+          {props.limit !== undefined && (
+            <span id="triage-cost" className="cost-note">
+              Calls the model, up to about CHF {props.limit.toFixed(2)}
+            </span>
+          )}
+          <button
+            type="submit"
+            className="primary"
+            aria-describedby={
+              props.limit === undefined ? undefined : "triage-cost"
+            }
+            disabled={props.blocked || !props.text.trim() || !props.people}
+          >
+            Triage this ticket
+          </button>
+        </span>
+      </div>
+    </form>
+  );
+}
+
+/** Above the thread: how to start, or how to start again, and what went wrong. */
+function ChatHead(
   props: Readonly<{
-    run: Run | undefined;
-    busy: boolean;
+    started: boolean;
+    working: boolean;
+    noKey: boolean;
     error: string | undefined;
-    onAnswer: (gate: Gate, approved: boolean) => void;
+    onStartOver: () => void;
   }>,
 ) {
-  const { run, busy, error } = props;
   return (
-    <section className="result" aria-label="Triage result" aria-busy={busy}>
-      {error && (
+    <>
+      {props.started ? (
+        <div className="chat-head">
+          <p>
+            One ticket, worked by FirstLine. A new message starts a new ticket.
+          </p>
+          <button
+            type="button"
+            onClick={props.onStartOver}
+            disabled={props.working}
+          >
+            New ticket
+          </button>
+        </div>
+      ) : (
+        <div className="chat-empty">
+          <h2>Describe an IT issue</h2>
+          <p>
+            FirstLine searches the playbooks, looks up what it needs and
+            proposes what to do. Nothing runs until a person confirms.
+          </p>
+        </div>
+      )}
+      {props.noKey && (
         <p className="notice alert" role="alert">
-          {error}
+          ANTHROPIC_API_KEY isn&apos;t set. Add it to .env and restart the
+          backend.
         </p>
       )}
-      {busy && !run && <p className="waiting">Starting triage</p>}
-      {run ? (
-        <Thread run={run} busy={busy} onAnswer={props.onAnswer} />
-      ) : (
-        !busy && (
-          <p className="waiting">
-            Pick an example or describe an issue. The agent&apos;s steps show
-            here as it takes them.
-          </p>
-        )
+      {props.error && (
+        <p className="notice alert" role="alert">
+          {props.error}
+        </p>
       )}
-    </section>
+    </>
   );
 }
 
@@ -194,12 +311,14 @@ export function Assistant() {
 
   function submit(event: SyntheticEvent) {
     event.preventDefault();
+    if (!text.trim() || busy || working) return;
     // An example's recorded checks belong to it only while it's unchanged.
     const example =
       picked?.text === text && picked.requester === requester
         ? picked.id
         : undefined;
     void act(() => api.startTriage(text, useRetrieval, requester, example));
+    setText("");
   }
 
   function pick(example: Example) {
@@ -212,73 +331,51 @@ export function Assistant() {
     if (run) void act(() => api.answerGate(run.id, gate, approved));
   }
 
+  function startOver() {
+    setRun(undefined);
+    setError(undefined);
+    remember(null);
+  }
+
   const noKey = health?.api_key === false;
+  const composer = (
+    <Composer
+      people={people}
+      requester={requester}
+      onRequester={setPerson}
+      text={text}
+      onText={setText}
+      useRetrieval={useRetrieval}
+      onRetrieval={setUseRetrieval}
+      blocked={busy || working || noKey}
+      limit={health?.assistant_limit_chf}
+      onSubmit={submit}
+    />
+  );
 
   return (
     <>
-      <div className="triage">
-        <section className="intake" aria-label="New ticket">
-          <form onSubmit={submit}>
-            {people && (
-              <PersonPicker
-                people={people}
-                value={requester}
-                onChange={setPerson}
-              />
-            )}
-            <label htmlFor="ticket">Describe the issue</label>
-            <textarea
-              id="ticket"
-              rows={4}
-              value={text}
-              placeholder="My VPN keeps disconnecting since the migration last month"
-              onChange={(event) => {
-                setText(event.target.value);
-              }}
-            />
-            <label className="switch">
-              <input
-                type="checkbox"
-                role="switch"
-                checked={useRetrieval}
-                onChange={(event) => {
-                  setUseRetrieval(event.target.checked);
-                }}
-              />
-              Use the knowledge base
-            </label>
-            <button
-              type="submit"
-              className="primary"
-              disabled={busy || working || noKey || !text.trim() || !people}
-            >
-              Triage this ticket
-            </button>
-          </form>
-          {noKey && (
-            <p className="notice alert" role="alert">
-              ANTHROPIC_API_KEY isn't set. Add it to .env and restart the
-              backend.
-            </p>
+      <div className={run ? "assistant has-run" : "assistant"}>
+        <section
+          className="chat"
+          aria-label="Conversation"
+          aria-busy={busy || working}
+        >
+          <ChatHead
+            started={Boolean(run)}
+            working={working}
+            noKey={noKey}
+            error={error}
+            onStartOver={startOver}
+          />
+          {busy && !run && <p className="waiting">Starting triage</p>}
+          {run && <Thread run={run} busy={busy} onAnswer={answer} />}
+          <div className="composer-dock">{composer}</div>
+          {!run && (
+            <Suggestions examples={examples} onPick={pick} onPreset={setText} />
           )}
-          {examples && <Examples examples={examples} onPick={pick} />}
-          <h2>Short requests</h2>
-          <ul className="presets">
-            {presets.map((preset) => (
-              <li key={preset}>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setText(preset);
-                  }}
-                >
-                  {preset}
-                </button>
-              </li>
-            ))}
-          </ul>
         </section>
-        <Result run={run} busy={busy} error={error} onAnswer={answer} />
+        {run && <Details run={run} model={health?.model} />}
       </div>
       <Stats refreshKey={run?.pending === null ? run.id : undefined} />
     </>

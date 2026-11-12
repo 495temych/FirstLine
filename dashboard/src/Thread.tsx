@@ -127,6 +127,9 @@ export function Thread(
         aria-busy={working}
       >
         <p className="sender">
+          <span className="agent-mark" aria-hidden="true">
+            FL
+          </span>
           FirstLine <span className="design">{working ? "Working" : how}</span>
         </p>
         <Checklist run={run} />

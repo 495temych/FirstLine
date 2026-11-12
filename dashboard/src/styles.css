@@ -365,33 +365,163 @@ main > *,
   }
 }
 
-/* Assistant: the ticket on the left, its route on the right */
+/* Assistant: the conversation in the middle, the ticket's details on the right */
 
-.triage {
+.assistant {
   display: grid;
-  grid-template-columns: minmax(280px, 380px) minmax(0, 1fr);
-  gap: 2rem;
+  gap: 1.5rem;
   align-items: start;
 }
 
-.intake form {
-  display: grid;
-  gap: 0.75rem;
+.assistant.has-run {
+  grid-template-columns: minmax(0, 1fr) 18rem;
 }
 
-.intake label[for="ticket"],
-main > label {
-  font-weight: 600;
+.chat {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1rem;
+  min-width: 0;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-panel);
+  padding: 1.25rem 1.5rem 0;
+}
+
+.assistant:not(.has-run) .chat {
+  max-width: 52rem;
+  width: 100%;
+  margin: 0 auto;
+  padding: 2.5rem 2.5rem 1.75rem;
+}
+
+.chat-empty {
+  display: grid;
+  gap: 0.375rem;
+}
+
+.chat-empty h2 {
+  font-size: 1.43rem;
+  letter-spacing: -0.01em;
+}
+
+.chat-empty p,
+.chat-head p {
+  color: var(--ink-2);
+  max-width: 40rem;
+}
+
+.chat-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  padding-bottom: 0.875rem;
+  border-bottom: 1px solid var(--line);
+  font-size: 0.93rem;
+}
+
+/* The message box stays at the bottom of the conversation, however long it gets. */
+.has-run .composer-dock {
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
+  margin: 0 -1.5rem;
+  padding: 0.75rem 1.5rem 1.25rem;
+  background: var(--surface);
+  border-top: 1px solid var(--line);
+  border-radius: 0 0 var(--radius-panel) var(--radius-panel);
+}
+
+.composer {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.5rem;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-panel);
+  background: var(--surface);
+  padding: 0.75rem 0.875rem 0.625rem;
+  transition:
+    border-color 150ms ease-out,
+    box-shadow 150ms ease-out;
+}
+
+.composer:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-tint);
+}
+
+.composer textarea {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  resize: none;
+  font-size: 1.07rem;
+  line-height: 1.45;
+}
+
+.composer textarea:focus-visible {
+  outline: none;
+}
+
+.composer-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+  font-size: 0.93rem;
+}
+
+.composer-bar label[for="requester"] {
+  color: var(--ink-3);
+}
+
+.composer-bar select {
+  width: auto;
+  min-width: 0;
+  flex: 0 1 auto;
+  max-width: min(24rem, 100%);
+  padding: 0.25rem 0.5rem;
+  border-color: var(--line);
+  background: var(--sunken);
+  font-size: 0.93rem;
+}
+
+.composer-send {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-left: auto;
+}
+
+.cost-note {
+  color: var(--ink-3);
+  font-size: 0.857rem;
+}
+
+.has-run .requester-record {
+  display: none;
+}
+
+.has-run .composer textarea {
+  height: 2.9rem;
+}
+
+.requester-record {
+  flex-basis: 100%;
+  color: var(--ink-3);
+  font-size: 0.857rem;
 }
 
 textarea,
 select {
   width: 100%;
   max-width: 100%;
-  border: 1px solid var(--ink-soft);
-  border-radius: 4px;
-  background: var(--panel);
-  padding: 0.625rem 0.75rem;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  background: var(--surface);
+  padding: 0.5rem 0.625rem;
 }
 
 select {
@@ -403,59 +533,196 @@ textarea {
 }
 
 .switch {
-  display: flex;
+  display: inline-flex;
   align-items: center;
+  gap: 0.4rem;
+  color: var(--ink-2);
+}
+
+.switch input {
+  accent-color: var(--accent);
+}
+
+.suggestions {
+  display: grid;
   gap: 0.5rem;
+  padding-top: 0.5rem;
 }
 
-.intake h2 {
-  margin: 1.75rem 0 0.5rem;
-  font-size: 1rem;
+.suggestions h2 {
+  font-size: 0.93rem;
+  color: var(--ink-2);
+  margin-top: 0.75rem;
 }
 
-.presets {
+.chips {
   list-style: none;
   margin: 0;
   padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
 }
 
-.presets li + li {
-  border-top: 1px solid var(--rule);
-}
-
-.presets button {
-  display: block;
-  width: 100%;
-  border: 0;
-  border-radius: 0;
-  padding: 0.5rem 0;
+.chips button {
+  max-width: 100%;
+  border-radius: 999px;
+  border-color: var(--line);
+  background: var(--surface);
+  padding: 0.3rem 0.75rem;
+  color: var(--ink-2);
+  font-weight: 400;
+  font-size: 0.93rem;
   text-align: left;
-  font-size: 0.9375rem;
-  line-height: 1.35;
-  color: var(--ink-soft);
 }
 
-.presets button:hover {
-  color: var(--ink);
-}
-
-.result {
-  background: var(--panel);
-  border-radius: 6px;
-  padding: 1.75rem 2rem;
-  min-height: 16rem;
+.chips button:hover:not(:disabled) {
+  border-color: var(--accent);
+  background: var(--accent-tint);
+  color: var(--accent);
 }
 
 .waiting {
-  color: var(--ink-soft);
+  color: var(--ink-2);
 }
 
-.query {
-  font-size: 1.375rem;
-  font-weight: 500;
-  line-height: 1.3;
-  max-width: 34em;
-  margin-bottom: 1.75rem;
+/* The ticket's facts, as a Jira issue keeps them beside its activity */
+.details {
+  position: sticky;
+  top: 4rem;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-panel);
+  padding: 1rem 1.125rem;
+}
+
+.details h2 {
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.details dl {
+  margin: 0;
+  display: grid;
+}
+
+.details dl > div {
+  display: grid;
+  grid-template-columns: 7.25rem minmax(0, 1fr);
+  gap: 0.75rem;
+  padding: 0.45rem 0;
+  border-top: 1px solid var(--line);
+  font-size: 0.93rem;
+}
+
+.details dt {
+  color: var(--ink-3);
+}
+
+.details dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.detail-sub {
+  display: block;
+  color: var(--ink-3);
+  font-size: 0.857rem;
+}
+
+.rule-name {
+  font-weight: 600;
+}
+
+/* A path or status, named in words on its tint */
+.lozenge {
+  display: inline-block;
+  border-radius: 4px;
+  padding: 0.05rem 0.45rem;
+  font-size: 0.857rem;
+  font-weight: 600;
+  line-height: 1.45;
+  white-space: nowrap;
+  background: var(--sunken);
+  color: var(--ink-2);
+}
+
+.lozenge.path-SELF_SERVE {
+  background: var(--self-serve-tint);
+  color: var(--self-serve);
+}
+
+.lozenge.path-AUTO_FIX {
+  background: var(--auto-fix-tint);
+  color: var(--auto-fix);
+}
+
+.lozenge.path-ESCALATE {
+  background: var(--escalate-tint);
+  color: var(--escalate);
+}
+
+.lozenge.path-OUT_OF_SCOPE {
+  background: var(--out-of-scope-tint);
+  color: var(--out-of-scope);
+}
+
+.lozenge.path-NO_TOOLS {
+  background: var(--no-tools-tint);
+  color: var(--no-tools);
+}
+
+.lozenge.status-running {
+  background: var(--accent-tint);
+  color: var(--accent);
+}
+
+.lozenge.status-waiting {
+  background: var(--gate-tint);
+  color: var(--gate-ink);
+}
+
+.lozenge.status-done {
+  background: var(--self-serve-tint);
+  color: var(--self-serve);
+}
+
+.lozenge.status-failed {
+  background: var(--danger-tint);
+  color: var(--danger);
+}
+
+@media (width <= 72rem) {
+  .assistant.has-run {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .details {
+    position: static;
+  }
+}
+
+@media (width <= 40rem) {
+  .chat,
+  .assistant:not(.has-run) .chat {
+    padding: 1.25rem 1rem 0;
+  }
+
+  .assistant:not(.has-run) .chat {
+    padding-bottom: 1.25rem;
+  }
+
+  .has-run .composer-dock {
+    position: static;
+    margin: 0 -1rem;
+    padding: 0.75rem 1rem 1rem;
+  }
+
+  .composer-send {
+    margin-left: 0;
+    width: 100%;
+    justify-content: space-between;
+  }
 }
 
 /* The route: a line with one station per step. A gate is a signal that holds the run. */
@@ -632,48 +899,78 @@ textarea {
 
 .thread {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 1.25rem;
 }
 
 .message .sender {
-  color: var(--ink-soft);
-  font-size: 0.875rem;
-  margin-bottom: 0.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--ink-3);
+  font-size: 0.857rem;
+  margin-bottom: 0.375rem;
 }
 
 .from-person {
   justify-self: end;
   max-width: min(36rem, 100%);
-  background: var(--wash);
-  border-radius: 10px 10px 2px 10px;
+  background: var(--sunken);
+  border-radius: 12px 12px 4px 12px;
   padding: 0.75rem 1rem;
 }
 
 .from-person .query {
   margin: 0;
-  font-size: 1.125rem;
+  font-size: 1.07rem;
+  font-weight: 500;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
 }
 
 .from-agent .sender {
   color: var(--ink);
+  font-size: 1rem;
   font-weight: 600;
 }
 
+.agent-mark {
+  display: grid;
+  place-items: center;
+  width: 1.6rem;
+  height: 1.6rem;
+  border-radius: 7px;
+  background: var(--ink);
+  color: var(--surface);
+  font-size: 0.7rem;
+  letter-spacing: 0.02em;
+}
+
 .from-agent .design {
-  color: var(--ink-soft);
+  color: var(--ink-3);
   font-weight: 400;
-  margin-left: 0.375rem;
+  font-size: 0.93rem;
 }
 
 .from-agent .decision {
-  margin-top: 1.25rem;
+  margin-top: 1rem;
   display: grid;
   gap: 0.75rem;
+  padding: 1rem 1.125rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-panel);
+}
+
+.from-agent .path-name {
+  font-size: 1.29rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
 }
 
 .knowledge summary {
   cursor: pointer;
-  color: var(--ink-soft);
+  color: var(--accent);
+  font-weight: 500;
 }
 
 .knowledge[open] summary {
@@ -683,45 +980,52 @@ textarea {
 /* The checklist is the route line: grey while the agent works, the path's colour once it decides. */
 
 .checklist {
-  --line: var(--rule);
+  --line: var(--line-strong);
+  --line-tint: var(--sunken);
   list-style: none;
-  margin: 0.5rem 0 0;
+  margin: 0.25rem 0 0;
   padding: 0;
 }
 
 .checklist.path-SELF_SERVE {
   --line: var(--self-serve);
+  --line-tint: var(--self-serve-tint);
 }
 
 .checklist.path-AUTO_FIX {
   --line: var(--auto-fix);
+  --line-tint: var(--auto-fix-tint);
 }
 
 .checklist.path-ESCALATE {
   --line: var(--escalate);
+  --line-tint: var(--escalate-tint);
 }
 
 .checklist.path-OUT_OF_SCOPE {
   --line: var(--out-of-scope);
+  --line-tint: var(--out-of-scope-tint);
 }
 
 .checklist.path-NO_TOOLS {
   --line: var(--no-tools);
+  --line-tint: var(--no-tools-tint);
 }
 
 .check {
   position: relative;
-  padding: 0.3125rem 0 0.625rem 2rem;
+  padding: 0.375rem 0 0.75rem 2.25rem;
 }
 
 .check::before {
   content: "";
   position: absolute;
-  left: 0.5rem;
-  top: 0.9rem;
-  bottom: -0.3rem;
-  width: 3px;
+  left: 0.6875rem;
+  top: 1.1rem;
+  bottom: -0.4rem;
+  width: 2px;
   background: var(--line);
+  transition: background-color 150ms ease-out;
 }
 
 .check:last-child::before {
@@ -731,36 +1035,52 @@ textarea {
 .check .mark {
   position: absolute;
   left: 0;
-  top: 0.375rem;
-  width: 1.1875rem;
-  height: 1.1875rem;
+  top: 0.3rem;
+  width: 1.5rem;
+  height: 1.5rem;
   border-radius: 50%;
-  background: var(--panel);
-  border: 3px solid var(--line);
+  background: var(--surface);
+  border: 2px solid var(--line);
   z-index: 1;
+  transition:
+    background-color 150ms ease-out,
+    border-color 150ms ease-out;
 }
 
+/* Done: filled with the line's colour, with a tick. */
 .check.done .mark {
   background: var(--line);
-  box-shadow: inset 0 0 0 3px var(--panel);
+}
+
+.check.done .mark::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 45%;
+  width: 0.4rem;
+  height: 0.7rem;
+  border: solid var(--surface);
+  border-width: 0 2px 2px 0;
+  transform: translate(-50%, -50%) rotate(45deg);
 }
 
 .check.pending .mark {
-  border: 2px dashed var(--ink-soft);
+  border: 2px dashed var(--line-strong);
 }
 
 .check.pending .check-label {
-  color: var(--ink-soft);
+  color: var(--ink-3);
 }
 
 .check.running .mark {
-  border-color: var(--rule);
-  border-top-color: var(--ink);
+  border-color: var(--accent-tint);
+  border-top-color: var(--accent);
   animation: turn 0.9s linear infinite;
 }
 
 .check.failed .mark {
-  border-color: var(--escalate);
+  border-color: var(--danger);
+  background: var(--danger-tint);
 }
 
 .check.failed .mark::before,
@@ -771,7 +1091,7 @@ textarea {
   top: 50%;
   width: 0.625rem;
   height: 2px;
-  background: var(--escalate);
+  background: var(--danger);
   transform: translate(-50%, -50%) rotate(45deg);
 }
 
@@ -779,10 +1099,15 @@ textarea {
   transform: translate(-50%, -50%) rotate(-45deg);
 }
 
+/* A rule that changed the decision: a square, in ink, on its own tint. */
 .check.rule .mark {
-  border-radius: 3px;
+  border-radius: 5px;
   border-color: var(--ink);
   background: var(--ink);
+}
+
+.check.rule .check-head {
+  font-weight: 600;
 }
 
 @keyframes turn {
@@ -795,6 +1120,7 @@ textarea {
   .check.running .mark {
     animation: none;
     border-style: dotted;
+    border-color: var(--accent);
   }
 }
 
@@ -808,11 +1134,32 @@ textarea {
 
 .check summary {
   cursor: pointer;
-  list-style-position: outside;
+  list-style: none;
+}
+
+.check summary::-webkit-details-marker {
+  display: none;
+}
+
+.check summary .check-label::after {
+  content: "";
+  display: inline-block;
+  width: 0.4rem;
+  height: 0.4rem;
+  margin-left: 0.5rem;
+  border: solid var(--ink-3);
+  border-width: 0 1.5px 1.5px 0;
+  transform: translateY(-0.15rem) rotate(45deg);
+  transition: transform 150ms ease-out;
+}
+
+.check details[open] summary .check-label::after {
+  transform: translateY(0.05rem) rotate(-135deg);
 }
 
 .check-label {
   font-weight: 500;
+  overflow-wrap: anywhere;
 }
 
 .check.running .check-label::after {
@@ -821,37 +1168,37 @@ textarea {
 
 .check-spent {
   margin-left: auto;
-  color: var(--ink-soft);
-  font-size: 0.875rem;
+  color: var(--ink-3);
+  font-size: 0.857rem;
   white-space: nowrap;
 }
 
 .check-result {
-  color: var(--ink-soft);
-  font-size: 0.9375rem;
-  line-height: 1.4;
+  color: var(--ink-2);
+  font-size: 0.93rem;
+  line-height: 1.45;
   overflow-wrap: anywhere;
   max-width: 64ch;
 }
 
 .step-detail {
-  margin: 0.5rem 0 0;
+  margin: 0.5rem 0;
   padding: 0.625rem 0.75rem;
-  background: var(--paper);
-  border-radius: 4px;
+  background: var(--sunken);
+  border-radius: var(--radius);
   display: grid;
   gap: 0.25rem;
-  font-size: 0.875rem;
+  font-size: 0.857rem;
 }
 
 .step-detail > div {
   display: grid;
-  grid-template-columns: 4.5rem minmax(0, 1fr);
+  grid-template-columns: 4rem minmax(0, 1fr);
   gap: 0.5rem;
 }
 
 .step-detail dt {
-  color: var(--ink-soft);
+  color: var(--ink-3);
 }
 
 .step-detail dd {
@@ -862,45 +1209,46 @@ textarea {
 /* A gate holds the run: the one amber thing in the thread. */
 
 .gate-card {
-  border: 3px solid var(--signal);
-  border-radius: 6px;
+  border: 1.5px solid var(--gate);
+  background: var(--gate-tint);
+  border-radius: var(--radius-panel);
   padding: 1rem 1.25rem;
 }
 
 .gate-title {
   display: flex;
   align-items: center;
-  gap: 0.625rem;
+  gap: 0.5rem;
+  color: var(--gate-ink);
   font-weight: 600;
   margin-bottom: 0.75rem;
 }
 
 .diamond {
-  width: 1.25rem;
-  height: 1.25rem;
-  background: var(--signal);
+  width: 1rem;
+  height: 1rem;
+  background: var(--gate);
   clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
 }
 
 .outcome {
-  padding: 0 0 0 2rem;
+  padding: 0.875rem 1.125rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-panel);
 }
 
-.examples button {
-  color: var(--ink);
-}
+/* Action: what a gate offers, and what ran */
 
-/* Action */
-
-.card {
-  background: var(--wash);
-  border-radius: 4px;
-  padding: 0.875rem 1rem;
+.draft {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 0.75rem 1rem;
   max-width: 44rem;
   margin-bottom: 0.75rem;
 }
 
-.card h3 {
+.draft h3 {
   margin-bottom: 0.25rem;
 }
 
@@ -926,7 +1274,7 @@ textarea {
 }
 
 .held {
-  font-weight: 600;
+  font-weight: 500;
   margin: 0.25rem 0 0.75rem;
 }
 
@@ -937,8 +1285,8 @@ textarea {
 }
 
 .notice {
-  background: var(--wash);
-  border-radius: 4px;
+  background: var(--sunken);
+  border-radius: var(--radius);
   padding: 0.75rem 1rem;
   max-width: 44rem;
 }

@@ -51,7 +51,7 @@ function Facts({ facts }: Readonly<{ facts: [string, string | undefined][] }>) {
 
 function ProposedFix({ run }: Readonly<{ run: Run }>) {
   return (
-    <div className="card">
+    <div className="draft">
       <h3>Proposed fix</h3>
       <code>{run.tool_name}</code>
       <Facts
@@ -74,7 +74,7 @@ function TicketCard({ ticket }: Readonly<{ ticket: DraftTicket }>) {
         ]
       : [["Summary", ticket.summary]];
   return (
-    <div className="card">
+    <div className="draft">
       <h3>Draft ServiceNow incident</h3>
       <Facts
         facts={[

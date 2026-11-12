@@ -28,6 +28,10 @@ async function triage(page: Page, ticket: string, requester = "s.keller") {
 const chosen = (page: Page) =>
   page.getByRole("region", { name: "FirstLine's reply" }).locator(".path-name");
 
+/** The card where a person decides. */
+const gate = (page: Page) =>
+  page.getByRole("region", { name: "Waiting for you" });
+
 const steps = (page: Page) =>
   page.getByRole("list", { name: "The agent's steps" }).getByRole("listitem");
 
@@ -54,20 +58,26 @@ test("the same lockout goes to security only for a repeat lockout", async ({
 }) => {
   await triage(page, "I'm locked out of my account", "s.keller");
   await expect(page.getByText("Changed by a rule: SEC-04.")).toBeVisible();
-  await expect(page.getByText("SEC-INCIDENT", { exact: true })).toBeVisible();
+  await expect(
+    gate(page).getByText("SEC-INCIDENT", { exact: true }),
+  ).toBeVisible();
   await expect(page.getByRole("button", { name: "Run fix" })).toBeHidden();
 
   await triage(page, "I'm locked out of my account", "m.huber");
   await expect(
     page.getByText("Changed by a rule: Sensitive fix."),
   ).toBeVisible();
-  await expect(page.getByText("DESK-SUPPORT", { exact: true })).toBeVisible();
+  await expect(
+    gate(page).getByText("DESK-SUPPORT", { exact: true }),
+  ).toBeVisible();
   await expect(page.getByRole("button", { name: "Run fix" })).toBeHidden();
 });
 
 test("an escalation waits for confirmation", async ({ page }) => {
   await triage(page, "lockout again");
-  await expect(page.getByText("SEC-INCIDENT", { exact: true })).toBeVisible();
+  await expect(
+    gate(page).getByText("SEC-INCIDENT", { exact: true }),
+  ).toBeVisible();
   await page.getByRole("button", { name: "Don't create ticket" }).click();
   await expect(page.getByText("No ticket created.")).toBeVisible();
 });

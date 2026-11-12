@@ -72,4 +72,9 @@ export interface Run {
   error: string | null;
   /** The graph's next node while the run works, such as "investigate". */
   next: string[];
+  /** The cause the model named, empty until it decides. */
+  cause: string;
+  response_time_sec: number | null;
+  /** What the run's model calls cost, in francs; null when the price is unknown. */
+  cost_chf: number | null;
 }
