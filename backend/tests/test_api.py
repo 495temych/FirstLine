@@ -10,7 +10,7 @@ import psycopg
 import pytest
 from fastapi.testclient import TestClient
 
-from agent import config, graph, records, tools
+from agent import config, graph, models, records, tools
 from agent.tests.fakes import (
     UNIT,
     FakeLLM,
@@ -83,7 +83,11 @@ def stub_triage(text, use_retrieval, **_):
 
 
 def test_health_reports_the_key(client, monkeypatch):
-    assert client.get("/api/health").json() == {"status": "ok", "api_key": True}
+    assert client.get("/api/health").json() == {
+        "status": "ok",
+        "api_key": True,
+        "model": models.label(config.model_name()),
+    }
     monkeypatch.delenv("ANTHROPIC_API_KEY")
     assert client.get("/api/health").json()["api_key"] is False
 

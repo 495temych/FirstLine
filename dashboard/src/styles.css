@@ -1,37 +1,71 @@
+/* The design system: every colour, face and size is a token here. See docs/BRAND.md. */
 :root {
   color-scheme: light;
-  --paper: #e9eef0;
-  --panel: #ffffff;
-  --ink: #12263a;
-  --ink-soft: #4a5d6c;
-  --rule: #cfd9de;
-  --band: #12263a;
-  --band-ink: #e9eef0;
-  --band-soft: #a9bcc8;
-  --signal: #f2b705;
-  --signal-ink: #12263a;
-  --self-serve: #1b7a4b;
-  --auto-fix: #2450b2;
-  --escalate: #b4470f;
-  --out-of-scope: #5b6875;
-  --no-tools: #6a3fb5;
-  --good-wash: #dff1e7;
-  --alert-wash: #fbe6dc;
-  --wash: #dde5e9;
-  --sans: "Familjen Grotesk", system-ui, sans-serif;
+  --canvas: #f6f7f9;
+  --surface: #ffffff;
+  --sunken: #eef1f5;
+  --line: #dfe2e7;
+  --line-strong: #c9ced6;
+  --ink: #172033;
+  --ink-2: #4b5568;
+  --ink-3: #6b7385;
+  --accent: #1d5bd8;
+  --accent-hover: #174bb3;
+  --accent-tint: #e8effc;
+  --on-accent: #ffffff;
+  --gate: #f2b705;
+  --gate-tint: #fff8db;
+  --gate-ink: #6b4e00;
+  --danger: #c9372c;
+  --danger-tint: #fdecea;
+  --self-serve: #1f7a4d;
+  --self-serve-tint: #e3f3ea;
+  --auto-fix: #0f6f7a;
+  --auto-fix-tint: #dff1f2;
+  --escalate: #b5480e;
+  --escalate-tint: #fbe9df;
+  --out-of-scope: #5e6878;
+  --out-of-scope-tint: #eceef1;
+  --no-tools: #6b4fbb;
+  --no-tools-tint: #eeeafa;
+  --radius: 6px;
+  --radius-panel: 10px;
+  --shadow-float: 0 12px 32px rgb(23 32 51 / 14%), 0 2px 6px rgb(23 32 51 / 8%);
+  --sidebar: 15rem;
+  --topbar: rgb(255 255 255 / 92%);
+  --sans: "Instrument Sans", system-ui, sans-serif;
   --mono: "IBM Plex Mono", ui-monospace, monospace;
+
+  /* The names the pages were first written with, kept as aliases. */
+  --paper: var(--canvas);
+  --panel: var(--surface);
+  --ink-soft: var(--ink-2);
+  --rule: var(--line);
+  --band: var(--ink);
+  --band-ink: var(--surface);
+  --band-soft: var(--line-strong);
+  --signal: var(--gate);
+  --signal-ink: var(--gate-ink);
+  --good-wash: var(--self-serve-tint);
+  --alert-wash: var(--escalate-tint);
+  --wash: var(--sunken);
 }
 
 * {
   box-sizing: border-box;
 }
 
+html {
+  font-size: 87.5%; /* 14 px, a work tool's density, still scaled by the reader's setting */
+}
+
 body {
   margin: 0;
-  background: var(--paper);
+  background: var(--canvas);
   color: var(--ink);
   font: 400 1rem/1.5 var(--sans);
   font-variant-numeric: tabular-nums;
+  -webkit-font-smoothing: antialiased;
 }
 
 h1,
@@ -41,8 +75,15 @@ p {
   margin: 0;
 }
 
+h1 {
+  font-size: 1.715rem;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
 h2 {
-  font-size: 1.125rem;
+  font-size: 1.143rem;
   font-weight: 600;
   line-height: 1.3;
 }
@@ -57,117 +98,215 @@ code {
   font-size: 0.875em;
 }
 
+a {
+  color: var(--accent);
+}
+
 :focus-visible {
-  outline: 3px solid var(--auto-fix);
+  outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
 
 button,
 select,
-textarea {
+textarea,
+input {
   font: inherit;
   color: inherit;
 }
 
 button {
   cursor: pointer;
-  border: 1px solid var(--ink-soft);
-  border-radius: 4px;
-  background: transparent;
-  padding: 0.5rem 0.875rem;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  background: var(--surface);
+  padding: 0.4rem 0.85rem;
+  font-weight: 500;
+  transition:
+    background-color 150ms ease-out,
+    border-color 150ms ease-out;
+}
+
+button:hover:not(:disabled) {
+  background: var(--sunken);
 }
 
 button:disabled {
   cursor: not-allowed;
-  opacity: 0.5;
+  opacity: 0.55;
 }
 
 button.primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--on-accent);
+  font-weight: 600;
+}
+
+button.primary:hover:not(:disabled) {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+}
+
+.icon {
+  width: 1.15rem;
+  height: 1.15rem;
+  flex: none;
+  fill: none;
+  stroke: currentcolor;
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* The frame: the sidebar, then the workspace with its top bar and page. */
+.app {
+  display: grid;
+  grid-template-columns: var(--sidebar) minmax(0, 1fr);
+  min-height: 100vh;
+}
+
+.sidebar {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding: 1rem 0.75rem;
+  background: var(--surface);
+  border-right: 1px solid var(--line);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0 0.5rem;
+  font-weight: 600;
+  font-size: 1.07rem;
+  line-height: 1.2;
+}
+
+.brand-mark {
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 8px;
   background: var(--ink);
-  border-color: var(--ink);
-  color: var(--paper);
-  font-weight: 600;
+  color: var(--surface);
+  font-size: 0.8rem;
+  letter-spacing: 0.02em;
 }
 
-.masthead {
-  background: var(--band);
-  color: var(--band-ink);
-  padding: 1.25rem 2rem 0;
+.brand-sub {
+  display: block;
+  color: var(--ink-3);
+  font-size: 0.857rem;
+  font-weight: 400;
+}
+
+.side-nav {
+  display: grid;
+  gap: 1rem;
+}
+
+.nav-group-name {
+  padding: 0 0.6rem 0.25rem;
+  color: var(--ink-3);
+  font-size: 0.857rem;
+  font-weight: 500;
+}
+
+.side-nav ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 1px;
+}
+
+.side-nav a {
   display: flex;
-  flex-wrap: wrap;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 0.75rem 2rem;
-}
-
-.masthead h1 {
-  font-size: 1.75rem;
-  font-weight: 700;
-  letter-spacing: -0.01em;
-  line-height: 1.1;
-}
-
-.masthead p {
-  color: var(--band-soft);
-  font-size: 0.9375rem;
-  padding-bottom: 0.875rem;
-}
-
-.masthead nav {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.25rem;
-}
-
-.masthead nav a {
-  border-radius: 4px 4px 0 0;
-  color: var(--band-soft);
-  padding: 0.625rem 1rem;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.4rem 0.6rem;
+  border-radius: var(--radius);
+  color: var(--ink-2);
   text-decoration: none;
+  font-weight: 500;
+  transition: background-color 150ms ease-out;
 }
 
-.masthead nav a:hover {
-  color: var(--band-ink);
-}
-
-.masthead nav a[aria-current="page"] {
-  background: var(--paper);
+.side-nav a:hover {
+  background: var(--sunken);
   color: var(--ink);
-  font-weight: 600;
 }
 
-/* The views of the open group, one row under the masthead */
-nav.views {
-  max-width: 1320px;
-  margin: 0 auto;
+.side-nav a[aria-current="page"] {
+  background: var(--accent-tint);
+  color: var(--accent);
+}
+
+.side-foot {
+  margin-top: auto;
+  padding: 0.6rem;
+  border-radius: var(--radius);
+  background: var(--sunken);
+  color: var(--ink-2);
+  font-size: 0.857rem;
+}
+
+.side-foot strong {
+  display: block;
+  color: var(--ink);
+  font-weight: 500;
+}
+
+.workspace {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 3rem;
   padding: 0 2rem;
+  background: var(--topbar);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--line);
+}
+
+.crumbs {
   display: flex;
-  flex-wrap: wrap;
-  gap: 0 0.25rem;
-  border-bottom: 1px solid var(--rule);
+  gap: 0.5rem;
+  color: var(--ink-3);
 }
 
-nav.views a {
-  color: var(--ink-soft);
-  padding: 0.625rem 0.875rem;
-  border-bottom: 2px solid transparent;
-  text-decoration: none;
-}
-
-nav.views a:hover {
+.crumbs [aria-current] {
   color: var(--ink);
+  font-weight: 500;
 }
 
-nav.views a[aria-current="page"] {
-  border-bottom-color: var(--ink);
-  color: var(--ink);
-  font-weight: 600;
+.menu-button {
+  display: none;
+  padding: 0.35rem;
+  border-color: transparent;
 }
 
 main {
+  width: 100%;
   max-width: 1320px;
   margin: 0 auto;
-  padding: 1.75rem 2rem 3rem;
+  padding: 1.5rem 2rem 3rem;
   display: grid;
   gap: 1rem;
 }
@@ -175,6 +314,55 @@ main {
 main > *,
 .triage > * {
   min-width: 0;
+}
+
+.page-head {
+  display: grid;
+  gap: 0.25rem;
+  padding-bottom: 0.5rem;
+}
+
+.page-head p {
+  color: var(--ink-2);
+  font-size: 1.07rem;
+  max-width: 48rem;
+}
+
+/* At phone width the sidebar folds into a menu over the page. */
+@media (width <= 56rem) {
+  .app {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .sidebar {
+    position: fixed;
+    inset: 0 auto 0 0;
+    z-index: 20;
+    width: min(18rem, 85vw);
+    box-shadow: var(--shadow-float);
+    transform: translateX(-105%);
+    visibility: hidden;
+    transition:
+      transform 150ms ease-out,
+      visibility 150ms;
+  }
+
+  .sidebar[data-open="true"] {
+    transform: none;
+    visibility: visible;
+  }
+
+  .menu-button {
+    display: inline-grid;
+  }
+
+  .topbar {
+    padding: 0 1rem;
+  }
+
+  main {
+    padding: 1.25rem 1rem 2.5rem;
+  }
 }
 
 /* Assistant: the ticket on the left, its route on the right */
@@ -339,7 +527,7 @@ textarea {
   border-radius: 50%;
   background: var(--panel);
   font-size: 0.8125rem;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .gate .stop {
@@ -363,7 +551,7 @@ textarea {
 .path-name {
   color: var(--line);
   font-size: 2.25rem;
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: -0.015em;
   line-height: 1.1;
 }
@@ -921,7 +1109,7 @@ button.link {
 .figures dd {
   margin: 0;
   font-size: 2rem;
-  font-weight: 700;
+  font-weight: 600;
   line-height: 1.2;
 }
 
@@ -1173,7 +1361,7 @@ button.link {
 
 .column-count {
   font-size: 1.25rem;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .column ol {
@@ -1498,7 +1686,7 @@ button.link {
 .how-goal h2 {
   max-width: 20em;
   font-size: clamp(1.625rem, 3.4vw, 2.5rem);
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: -0.02em;
   line-height: 1.12;
 }
@@ -2097,7 +2285,7 @@ button.link {
 
 /* The business case */
 .business .layers tbody tr:nth-last-child(3) {
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .chart .pays {

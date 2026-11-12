@@ -14,7 +14,7 @@ from langchain_core.runnables import RunnableConfig
 from langgraph.types import Command, StateSnapshot
 from pydantic import BaseModel, StringConstraints
 
-from agent import config, records, tracing
+from agent import config, models, records, tracing
 from agent.graph import GraphState, build_graph, initial_state
 from backend import (
     benchmark,
@@ -192,8 +192,12 @@ def latest_results(runs: list[dict]) -> dict[str, dict]:
 
 @app.get("/api/health", operation_id="health")
 def health() -> dict:
-    """Check that the backend is running and has a model key."""
-    return {"status": "ok", "api_key": bool(os.environ.get("ANTHROPIC_API_KEY"))}
+    """Check that the backend is running and has a model key, and name the model."""
+    return {
+        "status": "ok",
+        "api_key": bool(os.environ.get("ANTHROPIC_API_KEY")),
+        "model": models.label(config.model_name()),
+    }
 
 
 @cache

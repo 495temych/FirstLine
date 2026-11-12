@@ -7,11 +7,13 @@ test.beforeEach(async ({ page }) => {
   );
 });
 
-/** Opens a group, then one of its views, through their links. */
-async function open(page: Page, ...names: string[]) {
-  for (const name of names) {
-    await page.getByRole("link", { name, exact: true }).click();
+/** Opens a view through the sidebar, from the menu at phone width. */
+async function open(page: Page, name: string) {
+  const link = page.getByRole("link", { name, exact: true });
+  if (!(await link.isVisible())) {
+    await page.getByRole("button", { name: "Menu" }).click();
   }
+  await link.click();
 }
 
 async function triage(page: Page, ticket: string, requester = "s.keller") {
@@ -147,13 +149,13 @@ test("a gate survives a reload", async ({ page }) => {
 
 test("each group shows its views, and a saved evaluation", async ({ page }) => {
   await page.goto("/");
-  await open(page, "Is it worth it?");
+  await open(page, "Money");
   await expect(page.getByText(/nothing to project/)).toBeVisible();
   await open(page, "Models");
   await expect(
     page.getByText(/No model has a development run yet/),
   ).toBeVisible();
-  await open(page, "How it works", "Evaluations");
+  await open(page, "Evaluations");
   await expect(page.getByText("rules set (tiny)")).toBeVisible();
   await expect(page.getByLabel("Open an evaluation")).toBeVisible();
 });
@@ -171,7 +173,7 @@ test("a shared link opens its view, and back returns", async ({ page }) => {
 
 test("the tickets tab can be filtered", async ({ page }) => {
   await page.goto("/");
-  await open(page, "How it works", "Tickets");
+  await open(page, "Tickets");
   await expect(page.getByText("206 of 206 tickets")).toBeVisible();
   await page.getByRole("button", { name: "records" }).click();
   await expect(page.getByText("5 of 206 tickets")).toBeVisible();
@@ -222,7 +224,7 @@ test("the queue fits a phone", async ({ page }) => {
 
 test("how it works follows a ticket along its route", async ({ page }) => {
   await page.goto("/");
-  await open(page, "How it works");
+  await open(page, "Workflow");
   await expect(page.getByText(/correct first pass/).first()).toBeVisible();
   await page.getByLabel("Escalate").check();
   await page
@@ -239,7 +241,7 @@ test("how it works follows a ticket along its route", async ({ page }) => {
 test("how it works fits a phone", async ({ page }) => {
   await page.setViewportSize({ width: 375, height: 812 });
   await page.goto("/");
-  await open(page, "How it works");
+  await open(page, "Workflow");
   await expect(page.getByText(/correct first pass/).first()).toBeVisible();
   const overflow = await page.evaluate(
     () => document.documentElement.scrollWidth - window.innerWidth,
@@ -250,7 +252,7 @@ test("how it works fits a phone", async ({ page }) => {
 test("retrieval shows its scores and runs a search", async ({ page }) => {
   await page.setViewportSize({ width: 375, height: 812 });
   await page.goto("/");
-  await open(page, "How it works", "Retrieval");
+  await open(page, "Retrieval");
   await expect(
     page.getByText(/correctly finds none/, { exact: false }),
   ).toBeVisible();
@@ -270,7 +272,7 @@ test("retrieval shows its scores and runs a search", async ({ page }) => {
 test("the model benchmark fits a phone", async ({ page }) => {
   await page.setViewportSize({ width: 375, height: 812 });
   await page.goto("/");
-  await open(page, "Is it worth it?", "Models");
+  await open(page, "Models");
   await expect(
     page.getByText(/No model has a development run yet/),
   ).toBeVisible();
@@ -283,7 +285,7 @@ test("the model benchmark fits a phone", async ({ page }) => {
 test("the business case fits a phone", async ({ page }) => {
   await page.setViewportSize({ width: 375, height: 812 });
   await page.goto("/");
-  await open(page, "Is it worth it?");
+  await open(page, "Money");
   await expect(page.getByText(/nothing to project/)).toBeVisible();
   const overflow = await page.evaluate(
     () => document.documentElement.scrollWidth - window.innerWidth,
@@ -294,7 +296,7 @@ test("the business case fits a phone", async ({ page }) => {
 test("the harness draws one call and fits a phone", async ({ page }) => {
   await page.setViewportSize({ width: 375, height: 812 });
   await page.goto("/");
-  await open(page, "How it works", "Harness");
+  await open(page, "Harness");
   await expect(
     page.getByRole("complementary", { name: "The loop" }),
   ).toContainText("No loop in the default design.");
