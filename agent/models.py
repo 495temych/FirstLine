@@ -147,6 +147,13 @@ def tool_choice(name: str, tool: str) -> str:
     return tool if model is None or model.forced else "auto"
 
 
+def any_tool(name: str) -> str:
+    """Make the model call one of its tools each turn, or only offer them where no
+    provider can force a call. A turn with no call then counts as no decision."""
+    model = MODELS.get(name)
+    return "any" if model is None or model.forced else "auto"
+
+
 def price(name: str) -> tuple[float, float] | None:
     model = MODELS.get(name)
     return None if model is None else model.price

@@ -338,6 +338,7 @@ class Board:
                     use_retrieval=True,
                     requester=ticket["requester"]["id"],
                     mode="queue",
+                    ticket_id=ticket_id,
                 )
             elapsed = time.perf_counter() - started
         except Exception as exc:  # the batch carries on without this ticket

@@ -49,6 +49,31 @@ STATIONS: dict[str, dict] = {
         ),
         "code": "triage in agent/graph.py, the form in agent/decision.py",
     },
+    "investigate": {
+        "name": "Investigate, then decide",
+        "does": (
+            "The loop design, not yet the default: the model looks things up before "
+            "it decides. It can search the knowledge base again, read the "
+            "requester's record, find similar past tickets and read a recorded check "
+            "on this ticket, then fills in the same decision form. Each lookup is "
+            "kept, with its time and cost."
+        ),
+        "cannot": (
+            "Change anything, or read another ticket's checks. Code passes the "
+            "ticket and the requester, the remediation tools aren't offered, and it "
+            f"stops at {config.MAX_LOOKUPS} lookups or CHF {config.MAX_LOOP_CHF:.2f}."
+        ),
+        "code": "investigate in agent/graph.py, agent/loop.py and agent/lookups.py",
+    },
+    "at_limit": {
+        "name": "Stop at the limit",
+        "does": (
+            "When the loop reaches its limit before deciding, code writes a ticket "
+            "to the service desk with what the lookups found."
+        ),
+        "cannot": "Call the model again.",
+        "code": "at_limit in agent/graph.py, stop_decision in agent/loop.py",
+    },
     "enforce": {
         "name": "Apply the rules",
         "does": (

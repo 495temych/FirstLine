@@ -2,8 +2,9 @@
 
 `uv run -m evals` runs the rules set. `--set` picks another set, such as `dev` or
 `unseen_dev`. `--tiny` runs only the rules set's five trial tickets, and `--sample` a
-few tickets from each family of an imported practice set. Each run also scores the two
-yardsticks, for free. Results go to data/evals/runs/.
+few tickets from each family of an imported practice set. `--design loop` runs the
+loop of lookups instead of one call. Each run also scores the two yardsticks, for
+free. Results go to data/evals/runs/.
 
 A run states its estimated cost first. It stops above the spending cap unless
 `--max-chf` allows more, and it won't repeat a saved run unless `--again` is passed.
@@ -47,7 +48,10 @@ DECISION_KEYS = (
     "cost_usd",
     "invalid",
     "rule",
+    "steps",
+    "stopped",
 )
+LOOP_FILES = ("investigate.md", "loop.py", "lookups.py")
 LABEL_FILES = (
     "rules_answers.json",
     "rules_held_out_answers.json",
@@ -149,9 +153,20 @@ def tools_version() -> str:
     return _hash(json.dumps(tools, sort_keys=True).encode() + rules_code)
 
 
+def loop_version() -> str:
+    """The loop's own parts: its guide, its lookups and its limits."""
+    parts = [(config.ROOT / "agent" / name).read_bytes() for name in LOOP_FILES]
+    limits = f"{config.MAX_LOOKUPS}:{config.MAX_LOOP_CHF}".encode()
+    return _hash(b"".join(parts) + limits)
+
+
 def version() -> str:
-    """One short hash of what the model is given: the instructions and the tools."""
-    return _hash(f"{instructions_version()}{tools_version()}".encode())
+    """One short hash of what the model is given: the instructions and the tools, and
+    with the loop design, the loop too. One call's hash is as it always was."""
+    given = f"{instructions_version()}{tools_version()}"
+    if config.design() == "loop":
+        given += f"loop{loop_version()}"
+    return _hash(given.encode())
 
 
 def labels_version() -> str:
@@ -172,10 +187,16 @@ def _unit_id(u: dict) -> str:
     return u["doc"] if u["section"] is None else f"{u['doc']}::{u['section']}"
 
 
-def _attempt(text: str, requester: str) -> dict:
+def _attempt(text: str, requester: str, ticket_id: str) -> dict:
     """Run one ticket, in Queue mode. A failure counts as an escalation."""
     try:
-        result = run_triage(text, use_retrieval=True, requester=requester, mode="queue")
+        result = run_triage(
+            text,
+            use_retrieval=True,
+            requester=requester,
+            mode="queue",
+            ticket_id=ticket_id,
+        )
         return {**result, "error": None}
     except Exception as exc:  # one bad ticket must never stop an evaluation
         return {
@@ -187,6 +208,8 @@ def _attempt(text: str, requester: str) -> dict:
             "usage": None,
             "response_time_sec": 0.0,
             "rule": None,
+            "steps": [],
+            "stopped": None,
             "error": f"{type(exc).__name__}: {exc}",
         }
 
@@ -207,6 +230,8 @@ def decision(result: dict) -> dict:
         "cost_usd": usage.get("cost_usd"),
         "invalid": result.get("reasoning") == UNREADABLE,
         "rule": (result.get("rule") or {}).get("rule"),
+        "steps": result.get("steps") or [],
+        "stopped": result.get("stopped"),
     }
 
 
@@ -238,6 +263,8 @@ def score_ticket(ticket: dict, answer: dict, made: dict, model: str) -> dict:
         "error": made["error"],
         "invalid": bool(made.get("invalid")),
         "rule": made.get("rule"),
+        "steps": made.get("steps") or [],
+        "stopped": made.get("stopped"),
     }
 
 
@@ -266,11 +293,14 @@ def _assemble(
 ) -> dict:
     """A saved run. `kind` says whether it was tiny, a sample or re-scored."""
     now = datetime.now(UTC)
-    suffix = "".join(f"-{label}" for label, on in kind.items() if on)
+    design = kind.pop("design", "one call")
+    suffix = "-loop" if design == "loop" else ""
+    suffix += "".join(f"-{label}" for label, on in kind.items() if on)
     return {
         "id": f"{now:%Y%m%dT%H%M%S}-{name}{suffix}",
         "date": now.isoformat(timespec="seconds"),
         "set": name,
+        "design": design,
         "tiny": kind.get("tiny", False),
         "sample": kind.get("sample", False),
         "model": model,
@@ -296,7 +326,7 @@ def _traced_attempt(ticket: dict, name: str, session: str) -> dict:
         tags=tags,
         metadata={"ticket": ticket["id"], "version": version()},
     ):
-        return _attempt(ticket["text"], ticket["requester"])
+        return _attempt(ticket["text"], ticket["requester"], ticket["id"])
 
 
 def evaluate(name: str, tiny: bool = False, sampled: bool = False) -> dict:
@@ -314,7 +344,14 @@ def evaluate(name: str, tiny: bool = False, sampled: bool = False) -> dict:
         rows = list(pool.map(one, pairs))
     tracing.flush()
     return _assemble(
-        name, pairs, rows, model, current_versions(), tiny=tiny, sample=sampled
+        name,
+        pairs,
+        rows,
+        model,
+        current_versions(),
+        design=config.design(),
+        tiny=tiny,
+        sample=sampled,
     )
 
 
@@ -329,37 +366,59 @@ def rescore(run: dict) -> dict:
         for t, a in pairs
     ]
     versions = {key: run[key] for key in VERSION_KEYS}
-    kind = {"tiny": run["tiny"], "sample": run.get("sample", False), "rescored": True}
+    kind = {
+        "design": design_of(run),
+        "tiny": run["tiny"],
+        "sample": run.get("sample", False),
+        "rescored": True,
+    }
     new = _assemble(run["set"], pairs, rows, run["model"], versions, **kind)
     return {**new, "rescored_from": run.get("rescored_from", run["id"])}
 
 
 def to_rescore(ids: list[str], runs: list[dict]) -> list[dict]:
-    """The saved runs named, or with none named, the newest full run of each set."""
+    """The saved runs named, or with none named, the newest full run of each set in
+    each design."""
     if ids:
         by_id = {run["id"]: run for run in runs}
         missing = [i for i in ids if i not in by_id]
         if missing:
             raise KeyError(f"no saved run {', '.join(missing)}")
         return [by_id[i] for i in ids]
-    newest: dict[str, dict] = {}
+    newest: dict[tuple[str, str], dict] = {}
     for run in runs:
         if not run["tiny"] and not run.get("sample"):
-            newest.setdefault(run["set"], run)
+            newest.setdefault((run["set"], design_of(run)), run)
     return list(newest.values())
 
 
-def estimate_chf(model: str, tickets: int, runs: list[dict]) -> float | None:
-    """What a run should cost: the dearest saved run's rate, or a typical call."""
+def _one_call_chf(model: str, runs: list[dict]) -> float | None:
+    """One call's cost per ticket: the dearest saved one-call run, or a typical call."""
     rates = [
         run["summary"]["cost_per_ticket_chf"]
         for run in runs
-        if run["model"] == model and run["summary"].get("cost_per_ticket_chf")
+        if run["model"] == model
+        and design_of(run) == "one call"
+        and run["summary"].get("cost_per_ticket_chf")
     ]
     if rates:
-        return max(rates) * tickets
+        return max(rates)
     usd = config.cost_usd(model, *TYPICAL_TOKENS)
-    return None if usd is None else usd * scoring.USD_TO_CHF * tickets
+    return None if usd is None else usd * scoring.USD_TO_CHF
+
+
+def estimate_chf(
+    model: str, tickets: int, runs: list[dict], design: str = "one call"
+) -> float | None:
+    """What a run should cost. The loop is assumed to use its step limit: a model
+    turn for each lookup and one to decide, each at least one call's cost, up to the
+    loop's spending limit per ticket."""
+    rate = _one_call_chf(model, runs)
+    if rate is None:
+        return None
+    if design == "loop":
+        rate = min(rate * (config.MAX_LOOKUPS + 1), config.MAX_LOOP_CHF)
+    return rate * tickets
 
 
 def repeat_of(name: str, kind: dict, model: str, runs: list[dict]) -> dict | None:
@@ -367,7 +426,9 @@ def repeat_of(name: str, kind: dict, model: str, runs: list[dict]) -> dict | Non
     versions = current_versions()
     for run in runs:
         same_kind = (
-            run["tiny"] == kind["tiny"] and run.get("sample", False) == kind["sample"]
+            run["tiny"] == kind["tiny"]
+            and run.get("sample", False) == kind["sample"]
+            and design_of(run) == config.design()
         )
         if (
             run["set"] == name
@@ -392,14 +453,21 @@ def load_runs() -> list[dict]:
     return [run for run in runs if "yardsticks" in run]
 
 
+def design_of(run: dict) -> str:
+    """A run's design. Runs from before the loop were all one call."""
+    return run.get("design", "one call")
+
+
 def default_runs(*, full: bool = True) -> list[dict]:
-    """The default model's runs, newest first: what the product runs on. With `full`,
-    samples and tiny runs are left out. Other models' runs belong to the benchmark.
+    """The default model's runs in the current design, newest first: what the product
+    runs on. With `full`, samples and tiny runs are left out. Other models' runs belong
+    to the benchmark.
     """
     return [
         run
         for run in load_runs()
         if run.get("model") == config.model_name()
+        and design_of(run) == config.design()
         and not (full and (run.get("tiny") or run.get("sample")))
     ]
 
@@ -418,7 +486,8 @@ def _with_margin(summary: dict, measure: str) -> str:
 def print_report(run: dict) -> None:
     s = run["summary"]
     cost = s["cost_per_ticket_chf"]
-    print(f"{run['id']}  {run['model']}  version {run['version']}")
+    design = design_of(run)
+    print(f"{run['id']}  {run['model']}  {design}  version {run['version']}")
     if run.get("rescored_from"):
         print(f"re-scored from {run['rescored_from']}, with no model calls")
     print()
@@ -455,11 +524,11 @@ def _check_spend(parser: argparse.ArgumentParser, args: argparse.Namespace) -> N
     same = repeat_of(args.name, kind, model, runs)
     if same and not args.again:
         parser.error(
-            f"{same['id']} already ran these tickets with the same model, instructions,"
-            f" tools and knowledge base. Re-score it with --rescore {same['id']},"
-            " or pass --again to run it anyway."
+            f"{same['id']} already ran these tickets with the same design, model,"
+            " instructions, tools and knowledge base. Re-score it with"
+            f" --rescore {same['id']}, or pass --again to run it anyway."
         )
-    cost = estimate_chf(model, tickets, runs)
+    cost = estimate_chf(model, tickets, runs, config.design())
     cap = SPENDING_CAP_CHF if args.max_chf is None else args.max_chf
     if cost is None:
         if args.max_chf is None:
@@ -511,6 +580,11 @@ def main() -> None:
     )
     parser.add_argument("--save", action="store_true", help="keep the retrieval score")
     parser.add_argument(
+        "--design",
+        choices=config.DESIGNS,
+        help="how the agent works a ticket, instead of DESIGN or one call",
+    )
+    parser.add_argument(
         "--model",
         choices=sorted(MODELS),
         help="the model to evaluate, instead of MODEL_NAME or the default",
@@ -518,6 +592,8 @@ def main() -> None:
     args = parser.parse_args()
     if args.model:
         os.environ["MODEL_NAME"] = args.model
+    if args.design:
+        os.environ["DESIGN"] = args.design
     if args.retrieval:
         retrieval_score.main(args.split, args.save)
         return

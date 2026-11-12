@@ -244,7 +244,7 @@ test("the harness draws one call and fits a phone", async ({ page }) => {
   await open(page, "How it works", "Harness");
   await expect(
     page.getByRole("complementary", { name: "The loop" }),
-  ).toContainText("No loop yet.");
+  ).toContainText("No loop in the default design.");
   await expect(
     page.getByText("record_decision, which it must call"),
   ).toBeVisible();

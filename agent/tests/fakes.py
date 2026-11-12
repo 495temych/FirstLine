@@ -60,3 +60,62 @@ UNIT = {
     "score": 0.8,
     "highlights": [],
 }
+
+
+def call(name, **arguments):
+    """One tool call the model makes, as a block."""
+    return {"type": "tool_use", "name": name, "input": arguments}
+
+
+class ScriptedLLM:
+    """A model that plays one turn after another, repeating the last when it runs
+    out. It records the tools bound and the messages of each turn."""
+
+    def __init__(self, *turns, usage=None, broken=None):
+        self.turns = list(turns)
+        self.usage = usage
+        self.broken = broken or []
+        self.bound: list[list[str]] = []
+        self.choices: list = []
+        self.seen: list[list] = []
+        self._tools: list[str] = []
+        self._choice = None
+
+    def bind_tools(self, tools, tool_choice=None):
+        self._tools = [tool["name"] for tool in tools]
+        self._choice = tool_choice
+        return self
+
+    def invoke(self, messages):
+        number = len(self.seen)
+        self.bound.append(self._tools)
+        self.choices.append(self._choice)
+        self.seen.append(list(messages))
+        blocks = self.turns[min(number, len(self.turns) - 1)]
+        calls = [
+            {
+                "name": b["name"],
+                "args": b["input"],
+                "id": f"call-{number}-{i}",
+                "type": "tool_call",
+            }
+            for i, b in enumerate(blocks)
+            if b["type"] == "tool_use"
+        ]
+        invalid = [
+            {
+                "name": name,
+                "args": "{not json",
+                "id": f"bad-{number}-{i}",
+                "error": "bad",
+                "type": "invalid_tool_call",
+            }
+            for i, name in enumerate(self.broken if number == 0 else [])
+        ]
+        texts = [b for b in blocks if b["type"] == "text"]
+        return AIMessage(
+            content=texts or "",
+            tool_calls=calls,
+            invalid_tool_calls=invalid,
+            usage_metadata=self.usage,
+        )

@@ -64,3 +64,9 @@ def test_every_model_has_a_name_a_person_would_use():
     assert set(models.LABELS) == set(models.MODELS)
     assert models.label("gpt-6-luna") == "GPT-6 Luna"
     assert models.label("unknown") == "unknown"
+
+
+def test_the_loop_forces_some_call_where_the_provider_can():
+    assert models.any_tool("gpt-5-nano") == "any"
+    assert models.any_tool("claude-future") == "any"
+    assert models.any_tool("qwen/qwen3.7-flash") == "auto"

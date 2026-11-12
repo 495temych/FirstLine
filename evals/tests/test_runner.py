@@ -304,10 +304,11 @@ def test_the_model_flag_picks_the_model(stubbed, monkeypatch, capsys):
 
 def test_each_ticket_runs_in_queue_mode_with_its_requester(tmp_path, monkeypatch):
     monkeypatch.setattr(runner, "RUNS_DIR", tmp_path)
-    seen = []
+    seen, ids = [], []
 
-    def overridden(text, use_retrieval, requester=None, mode=None):
+    def overridden(text, use_retrieval, requester=None, mode=None, ticket_id=None):
         seen.append((requester, mode))
+        ids.append(ticket_id)
         rule = {"rule": "SEC-04", "reason": "r", "proposed": {}}
         return {**always_escalate(text, use_retrieval), "rule": rule}
 
@@ -317,6 +318,7 @@ def test_each_ticket_runs_in_queue_mode_with_its_requester(tmp_path, monkeypatch
     assert seen
     assert all(mode == "queue" for _, mode in seen)
     assert {r for r, _ in seen} == {t["requester"] for t in tickets.values()}
+    assert set(ids) == set(tickets)  # so the loop's checks read the right ticket
     assert {row["rule"] for row in run["tickets"]} == {"SEC-04"}
     assert run["summary"]["sec04_failures"] == 0
 
@@ -328,3 +330,73 @@ def test_the_rules_are_part_of_the_tools_version(tmp_path, monkeypatch):
     (tmp_path / "agent" / "rules.py").write_bytes(rules.read_bytes() + b"# changed")
     monkeypatch.setattr(runner.config, "ROOT", tmp_path)
     assert runner.tools_version() != before
+
+
+def test_the_design_is_part_of_the_version(monkeypatch):
+    monkeypatch.setenv("DESIGN", "one call")
+    one_call = runner.version()
+    assert one_call == runner._hash(
+        f"{runner.instructions_version()}{runner.tools_version()}".encode()
+    )  # unchanged, so saved one-call runs still match
+    monkeypatch.setenv("DESIGN", "loop")
+    assert runner.version() != one_call
+
+
+def test_the_design_flag_runs_the_loop_and_tells_the_runs_apart(
+    stubbed, monkeypatch, capsys
+):
+    monkeypatch.setenv("DESIGN", "")
+    command(monkeypatch, "--tiny")
+    capsys.readouterr()
+    command(monkeypatch, "--tiny", "--design", "loop")  # not a repeat of one call
+    out = capsys.readouterr().out
+    assert "-rules-loop-tiny" in out
+    assert "  loop  " in out
+    runs = runner.load_runs()
+    assert sorted(run["design"] for run in runs) == ["loop", "one call"]
+    with pytest.raises(SystemExit):
+        command(monkeypatch, "--tiny", "--design", "loop")
+    assert "same design" in capsys.readouterr().err
+
+
+def test_a_loop_estimate_assumes_the_step_limit():
+    runs = [
+        {"model": "m", "summary": {"cost_per_ticket_chf": 0.001}},
+        {"model": "m", "design": "loop", "summary": {"cost_per_ticket_chf": 0.5}},
+    ]
+    turns = runner.config.MAX_LOOKUPS + 1
+    assert runner.estimate_chf("m", 10, runs, "loop") == pytest.approx(
+        0.001 * turns * 10
+    )
+    assert runner.estimate_chf("m", 10, runs) == pytest.approx(0.01)
+    dear = [{"model": "m", "summary": {"cost_per_ticket_chf": 0.01}}]
+    capped = runner.estimate_chf("m", 10, dear, "loop")
+    assert capped == pytest.approx(runner.config.MAX_LOOP_CHF * 10)
+
+
+def test_a_loop_run_keeps_each_tickets_steps(stubbed, monkeypatch):
+    step = {"id": "s1", "tool": "lookup_requester", "ok": True, "result": "r"}
+
+    def looped(text, use_retrieval, **_):
+        return {
+            **always_escalate(text, use_retrieval),
+            "steps": [step],
+            "stopped": None,
+        }
+
+    monkeypatch.setattr(runner, "run_triage", looped)
+    run = runner.evaluate("rules", tiny=True)
+    assert run["tickets"][0]["steps"] == [step]
+    again = runner.rescore(run)
+    assert again["tickets"][0]["steps"] == [step]
+    assert again["design"] == run["design"]
+
+
+def test_loop_runs_stay_out_of_the_one_call_views(monkeypatch):
+    one = {"id": "b", "set": "dev", "tiny": False, "model": "m", "yardsticks": {}}
+    looped = {**one, "id": "a", "design": "loop"}
+    monkeypatch.setattr(runner, "load_runs", lambda: [looped, one])
+    monkeypatch.setenv("MODEL_NAME", "m")
+    monkeypatch.setenv("DESIGN", "one call")
+    assert [run["id"] for run in runner.default_runs()] == ["b"]
+    assert {r["id"] for r in runner.to_rescore([], [looped, one])} == {"a", "b"}

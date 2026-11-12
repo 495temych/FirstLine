@@ -124,7 +124,8 @@ function Loop({ data }: Readonly<{ data: HarnessData }>) {
   return (
     <aside className="call-loop" aria-label="The loop">
       <p>
-        <strong>No loop yet.</strong> {data.loop.calls} call per ticket.
+        <strong>No loop in the default design.</strong> {data.loop.calls} call
+        per ticket.
       </p>
       <p className="quiet">{data.loop.text}</p>
     </aside>

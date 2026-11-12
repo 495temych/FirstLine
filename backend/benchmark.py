@@ -34,12 +34,13 @@ RULE = (
 
 def newest_runs(name: str, runs: list[dict]) -> dict[str, dict]:
     """Each model's newest full run of a set, or its newest sample if it has no full
-    run. Tiny runs are left out.
+    run. Tiny runs are left out, and so are runs of the loop: the benchmark compares
+    models on one call.
     """
     full: dict[str, dict] = {}
     sampled: dict[str, dict] = {}
     for run in runs:
-        if run["set"] != name or run["tiny"]:
+        if run["set"] != name or run["tiny"] or runner.design_of(run) != "one call":
             continue
         (sampled if run.get("sample") else full).setdefault(run["model"], run)
     return {**{m: r for m, r in sampled.items() if m not in full}, **full}

@@ -1,5 +1,7 @@
 """Settings and paths."""
 
+import pytest
+
 from agent import config
 
 
@@ -30,3 +32,16 @@ def test_cost_uses_the_price_table():
 
 def test_a_model_with_no_price_has_no_cost():
     assert config.cost_usd("unpriced", 100, 100) is None
+
+
+def test_the_design_is_one_call_unless_set(monkeypatch):
+    monkeypatch.delenv("DESIGN", raising=False)
+    assert config.design() == "one call"
+    monkeypatch.setenv("DESIGN", "loop")
+    assert config.design() == "loop"
+
+
+def test_an_unknown_design_is_refused(monkeypatch):
+    monkeypatch.setenv("DESIGN", "swarm")
+    with pytest.raises(ValueError, match="DESIGN must be one of"):
+        config.design()

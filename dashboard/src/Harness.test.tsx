@@ -60,10 +60,12 @@ it("draws the call as stations, from search to the person who decides", async ()
   expect(screen.getByText(/16, listed under/)).toBeDefined();
 });
 
-it("says plainly there's no loop, and how the model is asked", async () => {
+it("says plainly the default has no loop, and how the model is asked", async () => {
   render(<Harness />);
   const loop = await screen.findByRole("complementary", { name: "The loop" });
-  expect(loop.textContent).toContain("No loop yet. 1 call per ticket.");
+  expect(loop.textContent).toContain(
+    "No loop in the default design. 1 call per ticket.",
+  );
   expect(
     screen.getByText(/through openrouter, pinned to alibaba/),
   ).toBeDefined();

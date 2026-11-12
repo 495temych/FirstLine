@@ -137,8 +137,9 @@ LOOP = (
     "The model answers in one pass: it's given the requester's record, but it can't"
     " look up a device, run a check or search again, so all it knows is what it was"
     " given."
-    " Sprint 1's commit 7 tests a loop with four read-only tools against this one call,"
-    " and keeps it only if it earns its extra cost."
+    " The loop, with four read-only lookups, is built and tested without a model, but"
+    " it isn't the default: commit 7b measures it against this one call, and keeps it"
+    " only if it earns its extra cost."
 )
 
 

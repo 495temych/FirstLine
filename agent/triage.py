@@ -27,17 +27,20 @@ def run_triage(
     use_retrieval: bool,
     requester: str | None = None,
     mode: Mode = "queue",
+    ticket_id: str | None = None,
 ) -> dict:
     """Run triage up to its first gate and return the decision, after the rules.
 
     `requester` is an AD username from the staff directory, and with None the model
-    sees no record. The Queue and the evaluations run in "queue" mode.
+    sees no record. The Queue and the evaluations run in "queue" mode. `ticket_id`
+    names an imported ticket, whose recorded checks the loop design may read.
     """
     config: RunnableConfig = {
         "configurable": {"thread_id": uuid4().hex},
         "callbacks": tracing.callbacks(),
     }
-    state = initial_state(query, use_retrieval, records.requester(requester), mode)
+    record = records.requester(requester)
+    state = initial_state(query, use_retrieval, record, mode, ticket_id)
     out = _graph().invoke(state, config)
     return {
         "retrieved": out["retrieved"],
@@ -50,6 +53,9 @@ def run_triage(
         "usage": out["usage"],
         "response_time_sec": out["response_time_sec"],
         "rule": out["rule"],
+        "design": out["design"],
+        "steps": out["steps"],
+        "stopped": out["stopped"],
         "requester": requester,
         "query": query,
     }

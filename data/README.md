@@ -29,6 +29,8 @@ The Tickets tab shows `rules`, `dev` and `unseen_dev`, which makes 206 tickets. 
 | `tickets/tickets.json` | Each imported ticket as it arrived: title, description, priority, SLA plan, environment, applications and requester | Yes |
 | `tickets/splits.json` | Which ticket belongs to which set | No |
 | `records/users.json` | Staff records, with invented devices, groups and lockouts | From commit 6 |
+| `tickets/checks.json` | Each imported ticket's recorded checks by playbook step: what was checked, what healthy looks like, what was seen and whether it passed. Built by `uv run -m evals.build_checks` | The loop, one check at a time on the ticket being worked |
+| `tickets/past_tickets.json` | The knowledge base split's tickets, with their root cause and first resolution step. Built by the same script | The loop, as similar incidents |
 | `kb/` | Playbooks, policies, queues and the company profile | Yes, through retrieval |
 | `evals/incidents.json` | What really happened: correspondence, diagnostics, root cause and resolution | Never |
 | `evals/causes.json` | The named causes, with what a good first pass does for each | Never |

@@ -3,6 +3,8 @@
 from collections import Counter
 from math import sqrt
 
+from agent import config
+
 SECURITY_QUEUE = "SEC-INCIDENT"
 AUTOMATED = {"AUTO_FIX", "SELF_SERVE"}
 
@@ -10,7 +12,7 @@ AUTOMATED = {"AUTO_FIX", "SELF_SERVE"}
 COST_SECURITY = 2000
 COST_WRONG = 120
 COST_MINOR = 60
-USD_TO_CHF = 0.80  # an assumption, for showing model cost in francs
+USD_TO_CHF = config.USD_TO_CHF
 Z_95 = 1.96  # for a 95% margin of error
 PATHS = ("SELF_SERVE", "AUTO_FIX", "ESCALATE", "OUT_OF_SCOPE")
 

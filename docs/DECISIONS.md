@@ -162,6 +162,36 @@ Each design decision so far, with its reason and its trade-off.
 - **Reason:** the comparison is what shows the method, and two designs show it as well as three. The loop is also what the Queue needs.
 - **Trade-off:** we dropped a fixed workflow, where code runs a family's checks before one call. In the knowledge base split every family has the same three checks, so that workflow might match the loop for less, and we won't know.
 
+## Commit 7 in three parts, and the Assistant as a conversation
+
+- **Decision:** on 11 November 2026 the owner split commit 7. 7a builds the loop and its tools with a stub model, 7b measures it against one call, and 7c turns the Assistant into a chat whose reply shows the agent's steps as a checklist. The Assistant runs whichever design 7b keeps, so `docs/SPEC.md`'s "one model call" for the Assistant changes in 7c, if the loop wins.
+- **Reason:** the loop is the sprint's biggest commit, and building it free before paying to measure it keeps each step small. Showing every step answers "why did it decide this?" on the page people use, not only in Langfuse.
+- **Trade-off:** a loop makes the Assistant slower, a few seconds instead of about one, which the checklist makes visible rather than hides. It looks like a chat before it can hold one: follow-up questions wait for Sprint 2's commit 12. The page reads the steps every second, as the Queue does, rather than streaming them, which is simpler and survives a reload, at up to a second's delay.
+
+## The loop as one node that calls itself
+
+- **Decision:** the loop is one `investigate` node, run once per model turn, that routes back to itself until the model decides or a limit stops it. The lookups it asks for run inside the node. The conversation and each step are in the graph's state, so each turn is a checkpoint.
+- **Reason:** a checkpoint per turn is what lets 7c's checklist show each step as it lands, by reading the run's state, and lets a crashed run resume at its last turn. Running the lookups in the same node keeps a turn's tokens and cost on its own steps.
+- **Trade-off:** a model call that fails and is retried runs that turn's lookups again. They only read, so it costs time, not correctness.
+
+## The last turn may only decide
+
+- **Decision:** after its 6th lookup, failed or not, the model gets one more turn with only `record_decision` offered. Lookups asked for past the limit in one turn aren't run, and say so. Code escalates to `DESK-SUPPORT` only when that last turn still doesn't decide, or when the run has spent CHF 0.01.
+- **Reason:** cutting the loop off right at the limit would throw away six lookups' worth of evidence that a decision could use. Counting failed calls means a model that keeps sending broken calls still stops.
+- **Trade-off:** the step limit is really 7 model turns, which the cost estimate assumes.
+
+## Code decides what each lookup reads
+
+- **Decision:** the model never names a ticket or a person. `run_check` reads the recorded checks of the ticket being worked, `lookup_requester` reads that ticket's requester, and an argument the schema doesn't have, such as a ticket id, is refused. Similar tickets come from a file of the knowledge base split's tickets only, `data/tickets/past_tickets.json`, with their root cause and first resolution step, searched by shared words.
+- **Reason:** a ticket's text is untrusted, so it mustn't be able to steer a tool to another ticket or a held-out answer. The knowledge base split is already the playbooks' raw material, so its outcomes add no answer the agent shouldn't have. A plain word search needs no new service before Qdrant holds incidents in Sprint 2.
+- **Trade-off:** checks are the technician's recorded results, not a live system, so a check the ticket's record lacks has no result, even where a real system would answer. Word overlap misses a similar ticket written in other words.
+
+## One call's version doesn't change
+
+- **Decision:** the loop's guide, lookups and limits join a run's version only for the loop design. A one-call run's version is computed as before, and runs record their design.
+- **Reason:** the repeat guard has to tell the two designs apart, but saved one-call runs shouldn't look stale because new code was added beside them.
+- **Trade-off:** a change to `agent/lookups.py` doesn't change a one-call version, which is right, since one call never runs it.
+
 ## Code writes the facts in a handover
 
 - **Decision:** code fills in what it knows, including checks and evidence from tool results. The model writes only the likely cause, what's ruled out and the next step, citing that evidence.

@@ -192,3 +192,9 @@ def test_the_yardsticks_come_from_a_full_run_not_a_newer_sample():
     classifier = next(e for e in entries if e["model"] == "classifier")
     assert classifier["n"] == 10
     assert classifier["source"] == "3"
+
+
+def test_the_benchmark_leaves_loop_runs_out():
+    one = {"set": "dev", "tiny": False, "model": "m", "id": "one"}
+    looped = {**one, "id": "loop", "design": "loop"}
+    assert benchmark.newest_runs("dev", [looped, one]) == {"m": one}

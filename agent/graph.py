@@ -3,7 +3,10 @@
 Flow (see README for the rendered diagram):
 
     START ─ use_retrieval? ─ off → no_tools → END
-                           └ on  → retrieve → triage → enforce ─ path:
+                           └ on  → retrieve ─ design? ─ one call → triage ─┐
+                                                       └ loop → investigate ⟲ ─┤
+                                                         (at a limit → at_limit)┘
+                                                                     → enforce ─ path:
         OUT_OF_SCOPE → log
         SELF_SERVE   → self_serve_wait
         AUTO_FIX     → confirm_fix
@@ -27,23 +30,31 @@ from typing import Literal
 import anthropic
 import openai
 from langchain_core.language_models import BaseChatModel
-from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
+from langchain_core.messages import (
+    AIMessage,
+    AnyMessage,
+    HumanMessage,
+    SystemMessage,
+    ToolMessage,
+)
+from langchain_core.runnables import Runnable
 from langgraph.graph import END, START, StateGraph
 from langgraph.types import RetryPolicy, interrupt
 from qdrant_client.http.exceptions import ResponseHandlingException
 from typing_extensions import TypedDict
 
-from agent import rules, tools
-from agent.config import model_name
+from agent import config, loop, rules, tools
+from agent.config import Design, model_name
 from agent.decision import (
     DECISION_TOOL,
     DECISION_TOOL_NAME,
     DEFAULT_PRIORITY,
     DEFAULT_QUEUE,
+    UNREADABLE,
     read_decision,
     tool_guide,
 )
-from agent.models import chat_model, tool_choice
+from agent.models import any_tool, chat_model, tool_choice
 from agent.retrieval import retrieve
 
 _PROMPT_FILE = Path(__file__).parent / "prompt.md"
@@ -76,12 +87,25 @@ class GraphState(TypedDict):
     usage: dict | None
     # Set when a rule in agent/rules.py changed the model's decision.
     rule: rules.Override | None
+    # The imported ticket being worked, whose recorded checks run_check reads.
+    ticket_id: str | None
+    design: Design
+    # The loop's conversation with the model, and each call it made.
+    messages: list[AnyMessage]
+    steps: list[loop.Step]
+    # Why the loop stopped before deciding: "lookups" or "cost", else None.
+    stopped: str | None
 
 
 def initial_state(
-    query: str, use_retrieval: bool, requester: dict | None, mode: rules.Mode
+    query: str,
+    use_retrieval: bool,
+    requester: dict | None,
+    mode: rules.Mode,
+    ticket_id: str | None = None,
 ) -> GraphState:
-    """Full input for a new run. Every field is set, so nothing is left to chance."""
+    """Full input for a new run. Every field is set, so nothing is left to chance.
+    The design is DESIGN's, or the default. `ticket_id` names an imported ticket."""
     return {
         "query": query,
         "use_retrieval": use_retrieval,
@@ -99,6 +123,11 @@ def initial_state(
         "response_time_sec": 0.0,
         "usage": None,
         "rule": None,
+        "ticket_id": ticket_id,
+        "design": config.design(),
+        "messages": [],
+        "steps": [],
+        "stopped": None,
     }
 
 
@@ -256,26 +285,25 @@ def _is_search_error(exc: BaseException) -> bool:
 _SEARCH_RETRY = RetryPolicy(max_attempts=3, retry_on=_is_search_error)
 
 
+def _opening(state: GraphState, extra: str = "") -> list[AnyMessage]:
+    """The instructions and the ticket, as the model's first two messages."""
+    instructions = _PROMPT_FILE.read_text()
+    if state["use_retrieval"]:
+        instructions += f"\n\n**Remediation tools**\n{tool_guide()}"
+    message = build_user_message(
+        state["query"], state["retrieved"], state["use_retrieval"], state["requester"]
+    )
+    return [SystemMessage(instructions + extra), HumanMessage(message)]
+
+
 def _call_model(state: GraphState) -> tuple[AIMessage, float]:
     llm = _get_llm()
-    instructions = _PROMPT_FILE.read_text()
     if state["use_retrieval"]:
         # Tools are withheld entirely when RAG is off, not just retrieval — the agent
         # must reason in plain text only and cannot propose or execute any action.
         choice = tool_choice(model_name(), DECISION_TOOL_NAME)
         llm = llm.bind_tools([DECISION_TOOL], tool_choice=choice)
-        instructions += f"\n\n**Remediation tools**\n{tool_guide()}"
-    messages = [
-        SystemMessage(instructions),
-        HumanMessage(
-            build_user_message(
-                state["query"],
-                state["retrieved"],
-                state["use_retrieval"],
-                state["requester"],
-            )
-        ),
-    ]
+    messages = _opening(state)
     t0 = time.perf_counter()
     msg = llm.invoke(messages)
     return msg, time.perf_counter() - t0
@@ -304,6 +332,143 @@ def triage(state: GraphState) -> dict:
         "response_time_sec": elapsed,
         "usage": usage_of(msg),
     }
+
+
+def _tool_calls(msg: AIMessage) -> list[dict]:
+    """Every call in a turn, with unreadable ones kept, so each fails as a step."""
+    broken = [
+        {"name": call.get("name") or "unknown", "args": None, "id": call.get("id")}
+        for call in msg.invalid_tool_calls
+    ]
+    return [dict(call) for call in msg.tool_calls] + broken
+
+
+def _turn_usage(msg: AIMessage, elapsed: float) -> dict:
+    """One model turn's time, tokens and cost, priced from the list when unreported."""
+    usage = usage_of(msg)
+    if usage["cost_usd"] is None:
+        usage["cost_usd"] = config.cost_usd(
+            model_name(), usage["input_tokens"], usage["output_tokens"]
+        )
+    return {"time_sec": elapsed, **usage}
+
+
+def _total(usage: dict | None, turn: dict) -> dict:
+    before = usage or {"input_tokens": 0, "output_tokens": 0, "cost_usd": 0.0}
+    cost = None
+    if before["cost_usd"] is not None and turn["cost_usd"] is not None:
+        cost = before["cost_usd"] + turn["cost_usd"]
+    return {
+        "input_tokens": before["input_tokens"] + turn["input_tokens"],
+        "output_tokens": before["output_tokens"] + turn["output_tokens"],
+        "cost_usd": cost,
+    }
+
+
+def _step(
+    number: int, turn: int, call: dict, outcome: tuple[bool, str], cost: dict
+) -> loop.Step:
+    ok, result = outcome
+    return {
+        "id": f"s{number}",
+        "turn": turn,
+        "tool": call["name"],
+        "input": call.get("args") or {},
+        "result": result,
+        "ok": ok,
+        "time_sec": cost["time_sec"],
+        "input_tokens": cost["input_tokens"],
+        "output_tokens": cost["output_tokens"],
+        "cost_usd": cost["cost_usd"],
+    }
+
+
+def _loop_model(left: int) -> Runnable:
+    """The model with the lookups and the decision, or only the decision once the
+    lookups are used up."""
+    if left > 0:
+        offered = [*loop.LOOKUP_TOOLS, DECISION_TOOL]
+        return _get_llm().bind_tools(offered, tool_choice=any_tool(model_name()))
+    choice = tool_choice(model_name(), DECISION_TOOL_NAME)
+    return _get_llm().bind_tools([DECISION_TOOL], tool_choice=choice)
+
+
+FREE = {"time_sec": 0.0, "input_tokens": 0, "output_tokens": 0, "cost_usd": 0.0}
+
+
+def _run_lookups(
+    state: GraphState, calls: list[dict], left: int, turn: int, cost: dict
+) -> tuple[list[loop.Step], list[AnyMessage]]:
+    """Run the turn's lookups, up to the limit, and the replies the model reads."""
+    steps, replies = list(state["steps"]), []
+    for index, call in enumerate(calls):
+        started = time.perf_counter()
+        if index < left:
+            ok, result, reply = loop.run_call(
+                call, state["ticket_id"], _requester_id(state)
+            )
+        else:
+            ok, result = False, f"Over the limit of {config.MAX_LOOKUPS} lookups."
+            reply = result
+        spent = cost if index == 0 else FREE
+        took = {**spent, "time_sec": spent["time_sec"] + time.perf_counter() - started}
+        steps.append(_step(len(steps) + 1, turn, call, (ok, result), took))
+        call_id = call.get("id") or f"call-{len(steps)}"
+        replies.append(ToolMessage(reply, tool_call_id=call_id))
+    return steps, replies
+
+
+def investigate(state: GraphState) -> dict:
+    """One turn of the loop: the model looks something up or decides.
+
+    The lookups it asks for run here, read-only, with the ticket and requester code
+    holds. After its last lookup the model may only decide. A turn with no call, or
+    an unreadable decision, goes to a person, as in one call.
+    """
+    left = config.MAX_LOOKUPS - loop.lookups_used(state["steps"])
+    messages = state["messages"] or _opening(state, "\n\n" + loop.guide())
+    t0 = time.perf_counter()
+    msg = _loop_model(left).invoke(messages)
+    cost = _turn_usage(msg, time.perf_counter() - t0)
+    turn = sum(isinstance(m, AIMessage) for m in messages) + 1
+    calls = _tool_calls(msg)
+    decision = next((c for c in calls if c["name"] == DECISION_TOOL_NAME), None)
+    update: dict = {
+        "usage": _total(state["usage"], cost),
+        "response_time_sec": state["response_time_sec"] + cost["time_sec"],
+    }
+    if decision is not None or not calls:
+        made = read_decision(decision["args"] if decision else None)
+        call = decision or {"name": DECISION_TOOL_NAME, "args": {}}
+        outcome = (made["reasoning"] != UNREADABLE, made["path"])
+        step = _step(len(state["steps"]) + 1, turn, call, outcome, cost)
+        return {
+            **update,
+            **made,
+            "steps": [*state["steps"], step],
+            "messages": [*messages, msg],
+        }
+    steps, replies = _run_lookups(state, calls, left, turn, cost)
+    stopped = None
+    if left <= 0:
+        stopped = "lookups"
+    elif loop.cost_chf(steps) >= config.MAX_LOOP_CHF:
+        stopped = "cost"
+    return {
+        **update,
+        "steps": steps,
+        "messages": [*messages, msg, *replies],
+        "stopped": stopped,
+    }
+
+
+def _requester_id(state: GraphState) -> str | None:
+    return (state["requester"] or {}).get("id")
+
+
+def at_limit(state: GraphState) -> dict:
+    """The loop stopped before deciding: escalate what it found, with no model call."""
+    return loop.stop_decision(state["steps"], state["stopped"] or "lookups")
 
 
 def enforce(state: GraphState) -> dict:
@@ -414,11 +579,22 @@ def create_ticket(state: GraphState) -> dict:
 DONE: Literal["__end__"] = "__end__"
 
 TriageRoute = Literal["__end__", "self_serve_wait", "confirm_fix", "confirm_ticket"]
+LoopRoute = Literal["enforce", "at_limit", "investigate"]
 
 
 # ── Routers (pure) ──────────────────────────────────────────────────────────────
 def route_start(state: GraphState) -> Literal["retrieve", "no_tools"]:
     return "retrieve" if state["use_retrieval"] else "no_tools"
+
+
+def route_design(state: GraphState) -> Literal["triage", "investigate"]:
+    return "investigate" if state["design"] == "loop" else "triage"
+
+
+def route_after_investigate(state: GraphState) -> LoopRoute:
+    if state["path"]:
+        return "enforce"
+    return "at_limit" if state["stopped"] else "investigate"
 
 
 def route_after_triage(state: GraphState) -> TriageRoute:
@@ -463,9 +639,13 @@ def build_graph(checkpointer):
 
     g.add_conditional_edges(START, route_start)
     g.add_edge("no_tools", END)
-    g.add_edge("retrieve", "triage")
+    g.add_node("investigate", investigate, retry_policy=_API_RETRY)
+    g.add_node("at_limit", at_limit)
     g.add_node("enforce", enforce)
+    g.add_conditional_edges("retrieve", route_design)
     g.add_edge("triage", "enforce")
+    g.add_conditional_edges("investigate", route_after_investigate)
+    g.add_edge("at_limit", "enforce")
     g.add_conditional_edges("enforce", route_after_triage)
     g.add_conditional_edges("confirm_fix", route_after_confirm_fix)
     g.add_conditional_edges("confirm_ticket", route_after_confirm_ticket)
