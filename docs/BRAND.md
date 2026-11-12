@@ -27,7 +27,7 @@ One light theme, whatever the system setting. Every colour is a token on `:root`
 | Canvas | `#F6F7F9` | Page background |
 | Surface | `#FFFFFF` | Sidebar, panels, cards and the top bar |
 | Sunken | `#EEF1F5` | The requester's message, code, inputs at rest |
-| Border | `#DFE2E7` | 1 px hairlines; `#C9CED6` for controls |
+| Border | `#DFE2E7` | 1 px hairlines; `#C9CED6` for controls, as `--border` and `--border-strong` |
 | Ink | `#172033` | Main text |
 | Ink secondary | `#4B5568` | Supporting text |
 | Ink muted | `#6B7385` | Labels, captions and metadata |

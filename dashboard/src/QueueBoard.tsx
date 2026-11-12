@@ -21,6 +21,14 @@ const verdictLabels: Record<Verdict, string> = {
 /** How many closed tickets show before the rest are asked for. */
 const CLOSED_SHOWN = 6;
 
+/** A person's initials, for their avatar. */
+function initials(name: string): string {
+  const parts = name.split(/\s+/).filter(Boolean);
+  const first = parts[0]?.[0] ?? "";
+  const last = parts.length > 1 ? (parts.at(-1)?.[0] ?? "") : "";
+  return (first + last).toUpperCase();
+}
+
 /** Closed tickets, the most recently decided first. */
 function byRecent(tickets: QueueTicket[]) {
   const at = (t: QueueTicket) => t.review?.at ?? "";
@@ -80,13 +88,20 @@ function Card(
           <code>{ticket.id}</code>
         </span>
         <strong className="card-title">{ticket.title}</strong>
-        <span className="quiet">{ticket.requester.name}</span>
         {decision && (
           <span className="card-decision">
-            <span className="path-tag">{pathLabels[decision.path]}</span>
+            <span className={`lozenge path-${decision.path}`}>
+              {pathLabels[decision.path]}
+            </span>
             {target && <code>{target}</code>}
           </span>
         )}
+        <span className="card-person">
+          <span className="avatar" aria-hidden="true">
+            {initials(ticket.requester.name)}
+          </span>
+          <span className="quiet">{ticket.requester.name}</span>
+        </span>
         <Footer ticket={ticket} />
       </button>
     </li>
