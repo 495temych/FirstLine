@@ -13,7 +13,7 @@ FirstLine looks like the work tool a service desk already knows: a sidebar to mo
 
 From Google Fonts:
 
-- **Interface**: Instrument Sans, at 13 px for body text and 12 px for details, with headings at 16, 20 and 24 px, weights 400, 500 and 600.
+- **Interface**: Instrument Sans, at 14 px for body text and 12 to 13 px for details, with headings at 16, 20 and 24 px, weights 400, 500 and 600.
 - **Tools, queues, ticket ids and code**: IBM Plex Mono.
 
 Numbers use tabular figures.
