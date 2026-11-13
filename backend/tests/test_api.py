@@ -231,6 +231,11 @@ def test_an_example_reads_its_own_recorded_checks(client, monkeypatch):
     }
     run = finished(client, client.post("/api/triage", json=body))
     assert run["steps"][0]["result"].startswith("fail: ")
+    handover = run["handover"]
+    assert handover["applications"]  # from the ticket being worked
+    assert handover["deadline"]
+    assert [c["step"] for c in handover["checks"]] == ["account-lockout-source-check"]
+    assert run["citations"] == {"kept": [], "dropped": []}
 
 
 def test_examples_are_development_tickets_only(client):

@@ -1,5 +1,6 @@
 import Markdown from "react-markdown";
 import type { Gate, Run } from "./api";
+import { Handover } from "./Handover";
 import { Action } from "./Action";
 import { pathLabels } from "./format";
 import { Retrieval, RuleNotice } from "./Route";
@@ -153,6 +154,9 @@ export function Thread(
             </p>
           )}
           <Action run={run} busy={props.busy} onAnswer={props.onAnswer} />
+          {run.handover && run.path === "ESCALATE" && (
+            <Handover data={run.handover} />
+          )}
         </section>
       )}
     </div>

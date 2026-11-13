@@ -40,6 +40,13 @@ function action(run: Run): ReactNode {
   return run.tool_name ? <code>{run.tool_name}</code> : <>None</>;
 }
 
+/** The steps the decision rests on, and any it cited that never ran. */
+function citedSteps(c: { kept: string[]; dropped: string[] }): string {
+  const kept = c.kept.length > 0 ? `Steps ${c.kept.join(", ")}` : "No step";
+  if (c.dropped.length === 0) return kept;
+  return `${kept}. Dropped ${c.dropped.join(", ")}, which never ran`;
+}
+
 /** The ticket's facts beside the conversation, as a Jira issue keeps them. */
 export function Details(
   props: Readonly<{ run: Run; model: string | undefined }>,
@@ -79,6 +86,7 @@ export function Details(
         <Row name="Lookups">
           {run.design === "loop" ? lookups : "None, it decides in one call"}
         </Row>
+        {run.citations && <Row name="Cited">{citedSteps(run.citations)}</Row>}
         <Row name="Time">
           {run.response_time_sec ? seconds(run.response_time_sec) : "n/a"}
         </Row>

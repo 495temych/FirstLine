@@ -74,7 +74,34 @@ export interface Run {
   next: string[];
   /** The cause the model named, empty until it decides. */
   cause: string;
+  /** What an escalation from the loop hands the receiving team. */
+  handover: Handover | null;
+  /** The loop's citations, checked: steps that ran, and steps that didn't. */
+  citations: { kept: string[]; dropped: string[] } | null;
   response_time_sec: number | null;
   /** What the run's model calls cost, in francs; null when the price is unknown. */
   cost_chf: number | null;
+}
+
+/** An escalation's handover. Code fills in every fact; the model writes only the
+ * cause, what it ruled out and the next step. */
+export interface Handover {
+  requester: {
+    id: string;
+    department: string | null;
+    office: string | null;
+  } | null;
+  device: { id: string; model: string | null } | null;
+  queue: string;
+  priority: string;
+  sla: string | null;
+  submitted_at: string | null;
+  deadline: string | null;
+  applications: string[];
+  checks: { step: string; id: string; result: string }[];
+  similar: string[];
+  unknown: string[];
+  cause: string;
+  ruled_out: string;
+  next_step: string;
 }

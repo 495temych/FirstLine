@@ -50,6 +50,7 @@ DECISION_KEYS = (
     "rule",
     "steps",
     "stopped",
+    "citations",
 )
 LOOP_FILES = ("investigate.md", "loop.py", "lookups.py")
 LABEL_FILES = (
@@ -210,6 +211,7 @@ def _attempt(text: str, requester: str, ticket_id: str) -> dict:
             "rule": None,
             "steps": [],
             "stopped": None,
+            "citations": None,
             "error": f"{type(exc).__name__}: {exc}",
         }
 
@@ -232,6 +234,7 @@ def decision(result: dict) -> dict:
         "rule": (result.get("rule") or {}).get("rule"),
         "steps": result.get("steps") or [],
         "stopped": result.get("stopped"),
+        "citations": result.get("citations"),
     }
 
 
@@ -265,6 +268,10 @@ def score_ticket(ticket: dict, answer: dict, made: dict, model: str) -> dict:
         "rule": made.get("rule"),
         "steps": made.get("steps") or [],
         "stopped": made.get("stopped"),
+        "citations": made.get("citations"),
+        "investigation": scoring.investigation(
+            answer, made.get("steps") or [], made.get("citations")
+        ),
     }
 
 

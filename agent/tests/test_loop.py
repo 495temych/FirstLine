@@ -11,7 +11,7 @@ from langgraph.types import Command
 from agent import config, lookups, loop, records, tools
 from agent import graph as g
 from agent.decision import DECISION_TOOL_NAME
-from agent.tests.fakes import UNIT, ScriptedLLM, call, escalate, fix, text
+from agent.tests.fakes import UNIT, ScriptedLLM, call, decision, escalate, fix, text
 
 TICKET = "INC-ALP-0001"  # an imported ticket, with recorded checks
 OTHER = "INC-PDQ-0001"
@@ -118,7 +118,9 @@ def test_a_check_reads_the_ticket_being_worked(run):
     assert step["result"].startswith("fail: ")
     reply = llm.seen[1][-1]
     assert isinstance(reply, ToolMessage)
-    assert json.loads(str(reply.content))["step"] == "account-lockout-source-check"
+    prefix, _, body = str(reply.content).partition(" {")
+    assert prefix == "Step s1."  # the model reads the id it can cite
+    assert json.loads("{" + body)["step"] == "account-lockout-source-check"
 
 
 def test_a_check_on_another_ticket_is_refused(run):
@@ -271,6 +273,7 @@ def test_a_stop_decision_lists_what_was_found():
         "tool": "run_check",
         "input": {"step": "vpn-client-check"},
         "result": "fail: old client",
+        "found": ["vpn-client-check"],
         "ok": True,
         "time_sec": 0.1,
         "input_tokens": 0,
@@ -290,3 +293,79 @@ def test_decision_records_tolerate_no_usage():
         ]
         is None
     )
+
+
+# ── Citations and the handover ──────────────────────────────────────────────────
+def test_a_citation_of_a_step_that_never_ran_is_dropped(run):
+    llm = ScriptedLLM(
+        [call("run_check", step="account-lockout-source-check")],
+        decision(
+            "ESCALATE",
+            queue="IAM-ACCESS",
+            evidence=["s1", "s7", "s1"],
+            ruled_out="A wrong password: the source check failed.",
+            next_step="Find the device that keeps the old password.",
+        ),
+    )
+    _, _, out, _ = run(llm, requester=user())
+    assert out["citations"] == {"kept": ["s1"], "dropped": ["s7"]}
+
+
+def test_a_failed_step_cant_be_cited(run):
+    llm = ScriptedLLM(
+        [call("run_check", step="x", ticket=OTHER)],
+        decision("ESCALATE", queue="IAM-ACCESS", evidence=["s1"]),
+    )
+    _, _, out, _ = run(llm)
+    assert out["citations"] == {"kept": [], "dropped": ["s1"]}
+
+
+def test_an_escalation_carries_a_handover_code_fills_in(run):
+    llm = ScriptedLLM(
+        [
+            call("run_check", step="account-lockout-source-check"),
+            call("run_check", step="not-a-check"),
+            call("find_similar_incidents", query="locked after reset"),
+        ],
+        decision(
+            "ESCALATE",
+            cause="Stale credentials on a phone",
+            queue="IAM-ACCESS",
+            priority="P2-High",
+            evidence=["s1"],
+            ruled_out="A wrong password.",
+            next_step="Find the device that keeps the old password.",
+        ),
+    )
+    _, _, out, _ = run(llm, requester=user())
+    h = out["handover"]
+    assert h["requester"]["id"] == "a.hussain"
+    assert h["device"]["id"] == "LT-X"
+    assert (h["queue"], h["priority"], h["sla"]) == (
+        "IAM-ACCESS",
+        "P2-High",
+        "4 business hours",
+    )
+    # Tuesday 18 November 2025, 09:00 in Zürich, plus 4 business hours.
+    assert h["submitted_at"].startswith("2025-11-18T08:00")
+    assert h["deadline"].startswith("2025-11-18T12:00")
+    assert h["applications"] == ["Password Reset Portal", "SSO Portal"]
+    assert [c["step"] for c in h["checks"]] == ["account-lockout-source-check"]
+    assert h["similar"]  # the incidents the search found, by id
+    assert any("not-a-check" in u for u in h["unknown"])
+    assert h["cause"] == "Stale credentials on a phone"
+    assert h["next_step"] == "Find the device that keeps the old password."
+
+
+def test_a_loop_that_stops_at_its_limit_still_hands_over(run):
+    llm = ScriptedLLM([call("lookup_requester")])
+    _, _, out, _ = run(llm, requester=user())
+    assert out["stopped"] == "lookups"
+    assert out["handover"]["queue"] == "DESK-SUPPORT"
+    assert any("cause" in u for u in out["handover"]["unknown"])
+
+
+def test_a_fix_has_no_handover(run):
+    llm = ScriptedLLM(fix("clear_credential_manager", username="a.hussain"))
+    _, _, out, _ = run(llm, requester=user())
+    assert out["handover"] is None

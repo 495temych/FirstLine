@@ -14,7 +14,7 @@ from typing import TypedDict
 from pydantic import BaseModel, Field, ValidationError
 
 from agent import config, lookups
-from agent.decision import DECISION_TOOL_NAME
+from agent.decision import DECISION_TOOL_NAME, Decision
 from agent.tool_schemas import ESCALATION_TOOL
 
 GUIDE_FILE = Path(__file__).parent / "investigate.md"
@@ -67,6 +67,34 @@ def _schema(model: type[BaseModel]) -> dict:
     schema = model.model_json_schema()
     schema.pop("title", None)
     return schema
+
+
+# ── The decision, as the loop records it ─────────────────────────────────────────
+class LoopDecision(Decision):
+    """One triage decision after investigating. Fill the fields in order."""
+
+    evidence: list[str] = Field(
+        default=[],
+        description=(
+            "The ids of the steps your decision rests on, such as s1 and s3, as each"
+            " lookup's reply names them. Cite only steps that ran."
+        ),
+    )
+    ruled_out: str = Field(
+        default="",
+        description="ESCALATE only: the causes your lookups ruled out, and how.",
+    )
+    next_step: str = Field(
+        default="",
+        description="ESCALATE only: the first thing the receiving team should do.",
+    )
+
+
+LOOP_DECISION_TOOL = {
+    "name": DECISION_TOOL_NAME,
+    "description": "Record your triage decision.",
+    "input_schema": LoopDecision.model_json_schema(),
+}
 
 
 LOOKUP_TOOLS = [
@@ -129,9 +157,21 @@ def brief(name: str, result: dict | list) -> str:
     )
 
 
+def found_ids(name: str, result: dict | list) -> list[str]:
+    """What a lookup found, by id: the playbooks or incidents a search returned, or
+    the check that has a recorded result."""
+    if isinstance(result, list):
+        key = "doc" if name == "search_kb" else "id"
+        return [str(item[key]) for item in result]
+    if name == "run_check" and result.get("found"):
+        return [str(result["step"])]
+    return []
+
+
 class Step(TypedDict):
     """One call the model made. The model turn that asked for it, its time, tokens
-    and cost, is counted on the first step of that turn, so the steps add up."""
+    and cost, is counted on the first step of that turn, so the steps add up.
+    `found` names what it found, by id, for the handover and the scores."""
 
     id: str
     turn: int
@@ -139,30 +179,58 @@ class Step(TypedDict):
     input: dict
     result: str
     ok: bool
+    found: list[str]
     time_sec: float
     input_tokens: int
     output_tokens: int
     cost_usd: float | None
 
 
-def run_call(
-    call: dict, ticket_id: str | None, requester_id: str | None
-) -> tuple[bool, str, str]:
-    """Run one call. Returns whether it worked, its short result and what the model
-    reads back. A failure is that step's, never the run's."""
+class Outcome(TypedDict):
+    """One call's outcome: whether it worked, its short result, what it found by id,
+    and what the model reads back."""
+
+    ok: bool
+    result: str
+    found: list[str]
+    reply: str
+
+
+def _failed(short: str, reply: str) -> Outcome:
+    return {"ok": False, "result": short, "found": [], "reply": reply}
+
+
+def run_call(call: dict, ticket_id: str | None, requester_id: str | None) -> Outcome:
+    """Run one call. A failure is that step's, never the run's."""
     try:
         result = run_lookup(
             call["name"], call.get("args") or {}, ticket_id, requester_id
         )
     except Refused as exc:
-        return False, _clip(f"Refused: {exc}"), f"Refused: {exc}"
+        return _failed(_clip(f"Refused: {exc}"), f"Refused: {exc}")
     except ValidationError as exc:
         reason = f"Unreadable arguments for {call['name']}: {exc.error_count()} errors."
-        return False, reason, reason
+        return _failed(reason, reason)
     except Exception as exc:  # a lookup that breaks fails its step, not the run
         reason = f"{call['name']} failed: {type(exc).__name__}."
-        return False, reason, reason
-    return True, brief(call["name"], result), json.dumps(result, ensure_ascii=False)
+        return _failed(reason, reason)
+    return {
+        "ok": True,
+        "result": brief(call["name"], result),
+        "found": found_ids(call["name"], result),
+        "reply": json.dumps(result, ensure_ascii=False),
+    }
+
+
+def cite(evidence: list[str], steps: list[Step]) -> dict:
+    """The model's citations, checked: a step id is kept if that lookup ran, and
+    dropped otherwise, so a decision never rests on a step that didn't happen."""
+    ran = {step["id"] for step in steps if is_lookup(step) and step["ok"]}
+    cited = list(dict.fromkeys(str(e).strip() for e in evidence))
+    return {
+        "kept": [e for e in cited if e in ran],
+        "dropped": [e for e in cited if e not in ran],
+    }
 
 
 def is_lookup(step: Step) -> bool:

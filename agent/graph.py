@@ -43,7 +43,7 @@ from langgraph.types import RetryPolicy, interrupt
 from qdrant_client.http.exceptions import ResponseHandlingException
 from typing_extensions import TypedDict
 
-from agent import config, loop, rules, tools
+from agent import config, handover, loop, rules, tools
 from agent.config import Design, model_name
 from agent.decision import (
     DECISION_TOOL,
@@ -95,6 +95,11 @@ class GraphState(TypedDict):
     steps: list[loop.Step]
     # Why the loop stopped before deciding: "lookups" or "cost", else None.
     stopped: str | None
+    # The loop's checked citations, {"kept": [...], "dropped": [...]}, its notes for
+    # the receiving team, and the handover code builds for an escalation.
+    citations: dict | None
+    notes: dict | None
+    handover: handover.Handover | None
 
 
 def initial_state(
@@ -128,6 +133,9 @@ def initial_state(
         "messages": [],
         "steps": [],
         "stopped": None,
+        "citations": None,
+        "notes": None,
+        "handover": None,
     }
 
 
@@ -366,16 +374,16 @@ def _total(usage: dict | None, turn: dict) -> dict:
 
 
 def _step(
-    number: int, turn: int, call: dict, outcome: tuple[bool, str], cost: dict
+    number: int, turn: int, call: dict, outcome: loop.Outcome, cost: dict
 ) -> loop.Step:
-    ok, result = outcome
     return {
         "id": f"s{number}",
         "turn": turn,
         "tool": call["name"],
         "input": call.get("args") or {},
-        "result": result,
-        "ok": ok,
+        "result": outcome["result"],
+        "ok": outcome["ok"],
+        "found": outcome["found"],
         "time_sec": cost["time_sec"],
         "input_tokens": cost["input_tokens"],
         "output_tokens": cost["output_tokens"],
@@ -387,10 +395,10 @@ def _loop_model(left: int) -> Runnable:
     """The model with the lookups and the decision, or only the decision once the
     lookups are used up."""
     if left > 0:
-        offered = [*loop.LOOKUP_TOOLS, DECISION_TOOL]
+        offered = [*loop.LOOKUP_TOOLS, loop.LOOP_DECISION_TOOL]
         return _get_llm().bind_tools(offered, tool_choice=any_tool(model_name()))
     choice = tool_choice(model_name(), DECISION_TOOL_NAME)
-    return _get_llm().bind_tools([DECISION_TOOL], tool_choice=choice)
+    return _get_llm().bind_tools([loop.LOOP_DECISION_TOOL], tool_choice=choice)
 
 
 FREE = {"time_sec": 0.0, "input_tokens": 0, "output_tokens": 0, "cost_usd": 0.0}
@@ -404,16 +412,17 @@ def _run_lookups(
     for index, call in enumerate(calls):
         started = time.perf_counter()
         if index < left:
-            ok, result, reply = loop.run_call(
-                call, state["ticket_id"], _requester_id(state)
-            )
+            outcome = loop.run_call(call, state["ticket_id"], _requester_id(state))
         else:
-            ok, result = False, f"Over the limit of {config.MAX_LOOKUPS} lookups."
-            reply = result
+            over = f"Over the limit of {config.MAX_LOOKUPS} lookups."
+            outcome = loop.Outcome(ok=False, result=over, found=[], reply=over)
         spent = cost if index == 0 else FREE
         took = {**spent, "time_sec": spent["time_sec"] + time.perf_counter() - started}
-        steps.append(_step(len(steps) + 1, turn, call, (ok, result), took))
+        step = _step(len(steps) + 1, turn, call, outcome, took)
+        steps.append(step)
         call_id = call.get("id") or f"call-{len(steps)}"
+        # The model reads each step's id, so it can cite the steps it relied on.
+        reply = f"Step {step['id']}. {outcome['reply']}"
         replies.append(ToolMessage(reply, tool_call_id=call_id))
     return steps, replies
 
@@ -438,15 +447,23 @@ def investigate(state: GraphState) -> dict:
         "response_time_sec": state["response_time_sec"] + cost["time_sec"],
     }
     if decision is not None or not calls:
-        made = read_decision(decision["args"] if decision else None)
+        made = read_decision(decision["args"] if decision else None, loop.LoopDecision)
+        extra = made.pop("extra", {})
         call = decision or {"name": DECISION_TOOL_NAME, "args": {}}
-        outcome = (made["reasoning"] != UNREADABLE, made["path"])
+        outcome: loop.Outcome = {
+            "ok": made["reasoning"] != UNREADABLE,
+            "result": made["path"],
+            "found": [],
+            "reply": "",
+        }
         step = _step(len(state["steps"]) + 1, turn, call, outcome, cost)
         return {
             **update,
             **made,
             "steps": [*state["steps"], step],
             "messages": [*messages, msg],
+            "citations": loop.cite(extra.get("evidence", []), state["steps"]),
+            "notes": {key: extra.get(key, "") for key in ("ruled_out", "next_step")},
         }
     steps, replies = _run_lookups(state, calls, left, turn, cost)
     stopped = None
@@ -481,7 +498,10 @@ def enforce(state: GraphState) -> dict:
     decision, override = rules.enforce(
         proposed, state["requester"], state["retrieved"], state["mode"]
     )
-    return {**decision, "rule": override}
+    update: dict = {**decision, "rule": override}
+    if state["design"] == "loop" and decision["path"] == "ESCALATE":
+        update["handover"] = handover.build(state, decision["tool_input"] or {})
+    return update
 
 
 def no_tools(state: GraphState) -> dict:

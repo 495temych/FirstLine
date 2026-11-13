@@ -8,7 +8,7 @@ import {
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import type { Benchmark } from "./benchmark";
 import { Models } from "./Models";
-import { benchmark } from "./test-benchmark";
+import { benchmark, loopView } from "./test-benchmark";
 
 let answer: Benchmark | number;
 
@@ -150,4 +150,34 @@ it("shows a failure", async () => {
   expect((await screen.findByRole("alert")).textContent).toBe(
     "The backend is down.",
   );
+});
+
+it("says how to make a loop run when there is none", async () => {
+  render(<Models />);
+  const section = await screen.findByRole("region", {
+    name: "Does investigating pay?",
+  });
+  expect(within(section).getByText(/--design loop/)).toBeDefined();
+});
+
+it("draws each model's loop beside its one call, with the rule's verdict", async () => {
+  answer = { ...benchmark, loop: loopView };
+  render(<Models />);
+  const section = await screen.findByRole("region", {
+    name: "Does investigating pay?",
+  });
+  expect(within(section).getByText("Gemini: keep the loop")).toBeDefined();
+  expect(
+    within(section).getByRole("img", {
+      name: /an arrow from one call to the loop/,
+    }),
+  ).toBeDefined();
+  const row = within(section).getByRole("row", { name: /Gemini/ });
+  expect(row.textContent).toContain("CHF 4.00 → CHF 6.00");
+  expect(row.textContent).toContain("30 of 40");
+  expect(row.textContent).toContain("96% of 50");
+  fireEvent.click(within(section).getByRole("button", { name: "Rules set" }));
+  expect(
+    within(section).getByText("No model has a loop run on this set yet."),
+  ).toBeDefined();
 });

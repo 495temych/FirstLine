@@ -56,6 +56,8 @@ def run_triage(
         "design": out["design"],
         "steps": out["steps"],
         "stopped": out["stopped"],
+        "citations": out.get("citations"),
+        "handover": out.get("handover"),
         "requester": requester,
         "query": query,
     }

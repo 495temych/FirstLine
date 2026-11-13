@@ -1,6 +1,7 @@
 import { useState } from "react";
 import {
   across,
+  linearTicks,
   perThousand,
   placeLabels,
   quietSide,
@@ -25,17 +26,6 @@ function logTicks(lo: number, hi: number) {
       const v = m * 10 ** p;
       if (v >= lo && v <= hi) out.push(v);
     }
-  }
-  return out;
-}
-
-function linearTicks(lo: number, hi: number) {
-  const raw = (hi - lo) / 5;
-  const power = 10 ** Math.floor(Math.log10(raw));
-  const step = [1, 2, 5, 10].map((m) => m * power).find((s) => s >= raw) ?? raw;
-  const out: number[] = [];
-  for (let v = Math.ceil(lo / step) * step; v <= hi + 1e-9; v += step) {
-    out.push(Math.round(v * 1000) / 1000);
   }
   return out;
 }

@@ -1,6 +1,21 @@
 import { francs } from "./format";
 
+/** How a run investigated, for the loop. */
+export interface Investigation {
+  tickets: number;
+  lookups_per_ticket: number | null;
+  required_checks: number;
+  required_run: number;
+  required_share: number | null;
+  needless_per_ticket: number | null;
+  citations: number;
+  citations_valid: number | null;
+  citations_dropped: number;
+}
+
 export interface BenchmarkEntry {
+  design?: "one call" | "loop";
+  investigation?: Investigation | null;
   model: string;
   label: string;
   kind: "model" | "yardstick";
@@ -40,6 +55,33 @@ export interface Benchmark {
   default: { model: string; label: string };
   insights: { question: string; answer: string }[];
   catch_rate: number;
+  loop: LoopView;
+}
+
+/** One model's loop run beside its own one call on the same tickets. */
+export interface LoopPair {
+  model: string;
+  label: string;
+  n: number;
+  one_call: BenchmarkEntry;
+  loop: BenchmarkEntry;
+}
+
+/** What the loop rule says for a model, test by test. */
+export interface LoopVerdict {
+  saves_more: boolean;
+  safe: boolean;
+  valid: boolean;
+  cheap: boolean;
+  keep: boolean;
+  gain_chf: number;
+  extra_cost_chf: number;
+}
+
+export interface LoopView {
+  rule: string;
+  sets: Record<BenchmarkSet, LoopPair[]>;
+  verdicts: Record<string, LoopVerdict>;
 }
 
 export type Axis = "cost" | "time";
@@ -166,4 +208,16 @@ export function quietSide(
     (best, o) => (covered(o) < covered(best) ? o : best),
     options[0],
   );
+}
+
+/** Round steps between two values, for an axis. */
+export function linearTicks(lo: number, hi: number) {
+  const raw = (hi - lo) / 5;
+  const power = 10 ** Math.floor(Math.log10(raw));
+  const step = [1, 2, 5, 10].map((m) => m * power).find((s) => s >= raw) ?? raw;
+  const out: number[] = [];
+  for (let v = Math.ceil(lo / step) * step; v <= hi + 1e-9; v += step) {
+    out.push(Math.round(v * 1000) / 1000);
+  }
+  return out;
 }

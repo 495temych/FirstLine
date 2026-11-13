@@ -188,6 +188,73 @@ def decisions(rows: list[dict]) -> dict:
     }
 
 
+# ── Investigation, for the loop ─────────────────────────────────────────────────
+LOOKUP_TOOLS = {"search_kb", "lookup_requester", "find_similar_incidents", "run_check"}
+NO_RESULT = "No recorded result"
+
+
+def _check_found(step: dict) -> bool:
+    """A check that came back with a recorded result. Runs saved before steps named
+    what they found are read from their short result."""
+    if "found" in step:
+        return bool(step["found"])
+    return step["ok"] and not step["result"].startswith(NO_RESULT)
+
+
+def investigation(
+    answer: dict, steps: list[dict], citations: dict | None
+) -> dict | None:
+    """How a ticket was investigated: lookups made, the labelled checks run, checks
+    that weren't needed, and citations that point at a step that ran. None for one
+    call, which looks nothing up. A set with no labelled checks, such as the rules
+    set, has no needless checks to count."""
+    if not steps:
+        return None
+    lookups = [s for s in steps if s["tool"] in LOOKUP_TOOLS]
+    ran = {
+        s["input"].get("step")
+        for s in lookups
+        if s["tool"] == "run_check" and _check_found(s)
+    }
+    labelled = "checks" in answer
+    required = set(answer.get("checks") or [])
+    cited = citations or {"kept": [], "dropped": []}
+    return {
+        "lookups": len(lookups),
+        "checks_run": sorted(c for c in ran if c),
+        "required": len(required),
+        "required_run": len(required & ran),
+        "needless": len(ran - required) if labelled else None,
+        "cited": len(cited["kept"]),
+        "dropped": len(cited["dropped"]),
+    }
+
+
+def investigation_summary(rows: list[dict]) -> dict | None:
+    """The investigation measures over a run, or None if nothing was looked up."""
+    found = [r["investigation"] for r in rows if r.get("investigation")]
+    if not found:
+        return None
+    required = sum(i["required"] for i in found)
+    labelled = [i["needless"] for i in found if i["needless"] is not None]
+    citations = sum(i["cited"] + i["dropped"] for i in found)
+    return {
+        "tickets": len(found),
+        "lookups_per_ticket": _average([i["lookups"] for i in found]),
+        "required_checks": required,
+        "required_run": sum(i["required_run"] for i in found),
+        "required_share": (
+            sum(i["required_run"] for i in found) / required if required else None
+        ),
+        "needless_per_ticket": _average(labelled),
+        "citations": citations,
+        "citations_valid": (
+            sum(i["cited"] for i in found) / citations if citations else None
+        ),
+        "citations_dropped": sum(i["dropped"] for i in found),
+    }
+
+
 def summarize(rows: list[dict]) -> dict:
     """The Scoreboard's measures for a list of scored tickets."""
     in_scope = [r for r in rows if r["path"] != "OUT_OF_SCOPE"]
@@ -207,6 +274,7 @@ def summarize(rows: list[dict]) -> dict:
         "balanced_accuracy": balanced_accuracy(rows),
         "failed": sum(r["error"] is not None for r in rows),
         "invalid": sum(r["error"] is not None or r.get("invalid", False) for r in rows),
+        "investigation": investigation_summary(rows),
     }
 
 

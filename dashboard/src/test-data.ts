@@ -66,6 +66,8 @@ export const baseRun: Run = {
   error: null,
   next: ["confirm_fix"],
   cause: "Stale VPN profile",
+  handover: null,
+  citations: null,
   response_time_sec: 2.3,
   cost_chf: 0.002,
 };

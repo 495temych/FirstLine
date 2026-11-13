@@ -9,6 +9,8 @@ import {
   type BenchmarkSet,
 } from "./benchmark";
 import { ModelChart } from "./ModelChart";
+import { LoopCompare } from "./LoopCompare";
+import { Pills } from "./Pills";
 import { useLoad } from "./useLoad";
 
 const setLabels: Record<BenchmarkSet, string> = {
@@ -24,34 +26,6 @@ const setQuestions: Record<BenchmarkSet, string> = {
   rules:
     "On short requests and policy traps, does each model keep to the rules?",
 };
-
-function Pills<T extends string>(
-  props: Readonly<{
-    legend: string;
-    options: readonly T[];
-    value: T;
-    label: (option: T) => string;
-    onChange: (value: T) => void;
-  }>,
-) {
-  return (
-    <fieldset className="pills">
-      <legend>{props.legend}</legend>
-      {props.options.map((option) => (
-        <button
-          key={option}
-          type="button"
-          aria-pressed={props.value === option}
-          onClick={() => {
-            props.onChange(option);
-          }}
-        >
-          {props.label(option)}
-        </button>
-      ))}
-    </fieldset>
-  );
-}
 
 function Lede({ data }: Readonly<{ data: Benchmark }>) {
   const dev = data.sets.dev.entries;
@@ -271,6 +245,7 @@ export function Models() {
           held-out sets run once, at the end.
         </p>
       </section>
+      <LoopCompare view={data.loop} />
     </div>
   );
 }

@@ -137,6 +137,8 @@ def _view_of(
         **{name: values[name] for name in RUN_FIELDS},
         "steps": _steps(values),
         "cause": values.get("cause", ""),
+        "handover": values.get("handover"),
+        "citations": values.get("citations"),
         "response_time_sec": values.get("response_time_sec"),
         "cost_chf": _chf((values.get("usage") or {}).get("cost_usd")),
         "requester": {

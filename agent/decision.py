@@ -105,16 +105,19 @@ def _reasoning(decision: Decision) -> str:
     return "\n\n".join(filter(None, [decision.rationale, "\n".join(steps)]))
 
 
-def read_decision(arguments: dict | None) -> dict:
-    """Turn the model's tool call into state. Anything unreadable goes to a person."""
+def read_decision(arguments: dict | None, schema: type[Decision] = Decision) -> dict:
+    """Turn the model's tool call into state. Anything unreadable goes to a person.
+    The loop passes its own schema, whose extra fields come back as `extra`."""
     try:
-        decision = Decision.model_validate(arguments or {})
+        decision = schema.model_validate(arguments or {})
     except ValidationError:
-        decision = Decision(rationale=UNREADABLE, cause="Unknown", path="ESCALATE")
+        decision = schema(rationale=UNREADABLE, cause="Unknown", path="ESCALATE")
+    extra = decision.model_dump(exclude=set(Decision.model_fields))
     return {
         **_action(decision),
         "reasoning": _reasoning(decision),
         "cause": decision.cause,
+        **({"extra": extra} if extra else {}),
     }
 
 

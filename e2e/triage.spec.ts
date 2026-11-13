@@ -78,6 +78,13 @@ test("an escalation waits for confirmation", async ({ page }) => {
   await expect(
     gate(page).getByText("SEC-INCIDENT", { exact: true }),
   ).toBeVisible();
+  const handover = gate(page).getByRole("region", {
+    name: "Handover to SEC-INCIDENT",
+  });
+  await expect(
+    handover.getByText("Find the device that sends the old password."),
+  ).toBeVisible();
+  await expect(handover.getByText(/Immediate/)).toBeVisible();
   await page.getByRole("button", { name: "Don't create ticket" }).click();
   await expect(page.getByText("No ticket created.")).toBeVisible();
 });

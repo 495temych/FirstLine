@@ -21,7 +21,7 @@ from agent.tests.fakes import (
     UNIT,
     FakeLLM,
     call,
-    escalate,
+    decision,
     fix,
     out_of_scope,
     steps,
@@ -31,8 +31,16 @@ from evals import retrieval_score, runner
 
 ANSWERS = {
     "fix": fix("reset_vpn_profile", "Reset the profile.", username="a.b"),
-    "lockout": escalate(
-        "SEC-INCIDENT", "Repeat lockout, a possible compromise.", "Repeat lockout"
+    "lockout": decision(
+        "ESCALATE",
+        "Repeat lockout, a possible compromise.",
+        cause="Repeat lockout",
+        queue="SEC-INCIDENT",
+        summary="Repeat lockout",
+        priority="P2-High",
+        evidence=["s1", "s2"],
+        ruled_out="A mistyped password: the lockouts come from another device.",
+        next_step="Find the device that sends the old password.",
     ),
     "locked out": fix(
         "unlock_ad_account", "A routine unlock.", username="current.user"

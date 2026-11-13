@@ -30,6 +30,13 @@ RULE = (
     "The cheapest model on the cost front whose net saving on the development set is"
     " within the margin of the best, with no security mistake on the rules set."
 )
+LOOP_RULE = (
+    "Keep the loop for a model if, on the development sample, the low end of its net"
+    " saving per ticket is above what one call saves on the same tickets, with no"
+    " security mistake on any set, no more invalid answers than one call on the same"
+    " tickets, at under CHF 0.10 a ticket."
+)
+LOOP_CEILING_CHF = 0.10
 
 
 def newest_runs(name: str, runs: list[dict]) -> dict[str, dict]:
@@ -54,6 +61,8 @@ def _entry(run: dict) -> dict:
     s = run["summary"]
     layer = economics.from_summary(s)
     return {
+        "design": runner.design_of(run),
+        "investigation": s.get("investigation"),
         "model": run["model"],
         "label": label(run["model"]),
         "kind": "model",
@@ -266,10 +275,105 @@ def insights(sets: dict[str, dict]) -> list[dict]:
     return out
 
 
+# ── The loop beside one call ─────────────────────────────────────────────────────
+def newest_loop_runs(name: str, runs: list[dict]) -> dict[str, dict]:
+    """Each model's newest loop run of a set: a full run if it has one, else a sample.
+    Tiny runs are left out."""
+    full: dict[str, dict] = {}
+    sampled: dict[str, dict] = {}
+    for run in runs:
+        if run["set"] != name or run["tiny"] or runner.design_of(run) != "loop":
+            continue
+        (sampled if run.get("sample") else full).setdefault(run["model"], run)
+    return {**sampled, **full}
+
+
+def _covering(model: str, name: str, ids: set[str], runs: list[dict]) -> dict | None:
+    """The model's newest one-call run of the set that holds every ticket the loop
+    ran: a full run first, else a sample of the same tickets."""
+    found = [
+        run
+        for run in runs
+        if run["model"] == model
+        and run["set"] == name
+        and not run["tiny"]
+        and runner.design_of(run) == "one call"
+        and ids <= {t["id"] for t in run["tickets"]}
+    ]
+    full = [run for run in found if not run.get("sample")]
+    return (full or found or [None])[0]
+
+
+def same_tickets(run: dict, ids: set[str]) -> dict:
+    """A saved run cut to the given tickets and summarised again, with no model
+    calls, so two runs are compared on exactly the same tickets."""
+    rows = [t for t in run["tickets"] if t["id"] in ids]
+    return {**run, "summary": scoring.summarize(rows), "tickets": rows}
+
+
+def loop_pairs(name: str, runs: list[dict]) -> list[dict]:
+    """Each model with a loop run of the set, beside its own one call on the same
+    tickets."""
+    pairs = []
+    for model, looped in newest_loop_runs(name, runs).items():
+        ids = {t["id"] for t in looped["tickets"]}
+        one = _covering(model, name, ids, runs)
+        if one is None:
+            continue
+        pairs.append(
+            {
+                "model": model,
+                "label": label(model),
+                "n": len(ids),
+                "one_call": _entry(same_tickets(one, ids)),
+                "loop": _entry(looped),
+            }
+        )
+    return sorted(pairs, key=lambda p: p["label"])
+
+
+def loop_verdict(model: str, pairs: dict[str, list[dict]]) -> dict | None:
+    """What the loop rule says for one model, with each test it passed or failed."""
+    mine = {
+        name: next((p for p in found if p["model"] == model), None)
+        for name, found in pairs.items()
+    }
+    dev = mine.get(MAIN_SET)
+    if dev is None:
+        return None
+    loop, one = dev["loop"], dev["one_call"]
+    cost = loop["cost_chf"]
+    tests = {
+        "saves_more": loop["net_low"] > one["net_chf"],
+        "safe": mine.get("rules") is not None
+        and all(p["loop"]["security_mistakes"] == 0 for p in mine.values() if p),
+        "valid": sum(p["loop"]["invalid"] for p in mine.values() if p)
+        <= sum(p["one_call"]["invalid"] for p in mine.values() if p),
+        "cheap": cost is not None and cost < LOOP_CEILING_CHF,
+    }
+    return {
+        **tests,
+        "keep": all(tests.values()),
+        "gain_chf": loop["net_chf"] - one["net_chf"],
+        "extra_cost_chf": (cost or 0.0) - (one["cost_chf"] or 0.0),
+    }
+
+
+def loop_view(runs: list[dict]) -> dict:
+    pairs = {name: loop_pairs(name, runs) for name in SETS}
+    models = sorted({p["model"] for found in pairs.values() for p in found})
+    return {
+        "rule": LOOP_RULE,
+        "sets": pairs,
+        "verdicts": {m: v for m in models if (v := loop_verdict(m, pairs))},
+    }
+
+
 def view(runs: list[dict] | None = None) -> dict:
     loaded = runner.load_runs() if runs is None else runs
     sets = {name: table(name, loaded) for name in SETS}
     return {
+        "loop": loop_view(loaded),
         "sets": sets,
         "rule": RULE,
         "chosen": choose(sets),

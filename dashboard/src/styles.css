@@ -625,6 +625,60 @@ textarea {
   overflow-wrap: anywhere;
 }
 
+/* An escalation's handover, inside the gate card: who wrote what, then the facts. */
+.handover {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+  padding: 0.875rem 1rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.handover h3 {
+  font-size: 1rem;
+}
+
+.handover-part {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.handover-by {
+  margin: 0;
+  color: var(--ink-3);
+  font-size: 0.857rem;
+}
+
+.handover dl {
+  display: grid;
+  margin: 0;
+}
+
+.handover dl > div {
+  display: grid;
+  grid-template-columns: 8.5rem minmax(0, 1fr);
+  gap: 0.75rem;
+  padding: 0.35rem 0;
+  border-top: 1px solid var(--border);
+  font-size: 0.93rem;
+}
+
+.handover dt {
+  color: var(--ink-3);
+}
+
+.handover dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.handover ul {
+  margin: 0;
+  padding-left: 1.1rem;
+}
+
 .detail-sub {
   display: block;
   color: var(--ink-3);
@@ -2500,6 +2554,26 @@ button.link:hover:not(:disabled) {
   fill: var(--ink);
   font-family: var(--mono);
   font-size: 11px;
+}
+
+/* Does investigating pay: an arrow from one call to the loop. */
+.chart .loop-move {
+  stroke: var(--ink-2);
+  stroke-width: 1.5;
+}
+
+.chart .loop-arrowhead {
+  fill: var(--ink-2);
+}
+
+.chart .loop-from {
+  fill: var(--surface);
+  stroke: var(--ink-3);
+  stroke-width: 1.5;
+}
+
+.chart .loop-to {
+  fill: var(--ink);
 }
 
 .chart-tip {

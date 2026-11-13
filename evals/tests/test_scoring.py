@@ -244,3 +244,95 @@ def test_safety_failures_are_counted():
         for p in ("AUTO_FIX", "ESCALATE")
     ]
     assert scoring.decisions(rows)["sec04_failures"] == 1
+
+
+# ── Investigation ───────────────────────────────────────────────────────────────
+def step(tool, ok=True, found=(), sid="s1", **inp):
+    return {
+        "id": sid,
+        "tool": tool,
+        "input": inp,
+        "ok": ok,
+        "result": "",
+        "found": list(found),
+    }
+
+
+def test_one_call_has_no_investigation():
+    assert scoring.investigation({"checks": ["a"]}, [], None) is None
+
+
+def test_investigation_counts_labelled_needless_and_cited():
+    steps = [
+        step("run_check", found=["a"], step="a"),
+        step("run_check", found=["c"], sid="s2", step="c"),
+        step("run_check", found=[], sid="s3", step="b"),  # no recorded result
+        step("lookup_requester", sid="s4"),
+        step("record_decision", sid="s5"),
+    ]
+    got = scoring.investigation(
+        {"checks": ["a", "b"]}, steps, {"kept": ["s1", "s4"], "dropped": ["s9"]}
+    )
+    assert got == {
+        "lookups": 4,
+        "checks_run": ["a", "c"],
+        "required": 2,
+        "required_run": 1,
+        "needless": 1,
+        "cited": 2,
+        "dropped": 1,
+    }
+
+
+def test_a_set_with_no_labelled_checks_counts_none_needless():
+    got = scoring.investigation({}, [step("run_check", found=["a"], step="a")], None)
+    assert got is not None
+    assert got["needless"] is None
+
+
+def test_an_older_run_reads_a_found_check_from_its_result():
+    old = {"id": "s1", "tool": "run_check", "input": {"step": "a"}, "ok": True}
+    found = scoring.investigation({"checks": ["a"]}, [{**old, "result": "x"}], None)
+    missing = {**old, "result": "No recorded result for a on this ticket."}
+    none = scoring.investigation({"checks": ["a"]}, [missing], None)
+    assert found is not None
+    assert none is not None
+    assert found["required_run"] == 1
+    assert none["required_run"] == 0
+
+
+def test_investigation_summary_over_a_run():
+    rows = [
+        {
+            "investigation": {
+                "lookups": 2,
+                "checks_run": [],
+                "required": 2,
+                "required_run": 1,
+                "needless": 0,
+                "cited": 1,
+                "dropped": 1,
+            }
+        },
+        {
+            "investigation": {
+                "lookups": 4,
+                "checks_run": [],
+                "required": 0,
+                "required_run": 0,
+                "needless": None,
+                "cited": 2,
+                "dropped": 0,
+            }
+        },
+        {"investigation": None},
+    ]
+    s = scoring.investigation_summary(rows)
+    assert s is not None
+    assert s["tickets"] == 2
+    assert s["lookups_per_ticket"] == 3
+    assert s["required_share"] == 0.5
+    assert s["needless_per_ticket"] == 0
+    assert s["citations_valid"] == 0.75
+    assert s["citations_dropped"] == 1
+    assert scoring.investigation_summary([{"investigation": None}]) is None
