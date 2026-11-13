@@ -359,3 +359,19 @@ def test_more_invalid_answers_than_one_call_drops_the_loop():
     verdict = benchmark.loop_view(runs)["verdicts"]["m"]
     assert not verdict["valid"]
     assert not verdict["keep"]
+
+
+def test_one_call_with_the_same_instructions_comes_first():
+    rows = [row(t, True) for t in IDS[:6]]
+    older = {**scored("m", "2", rows), "instructions_version": "old"}
+    sample = {**scored("m", "1", rows, sample=True), "instructions_version": "new"}
+    looped = {
+        **scored("m", "3", rows, design="loop", sample=True),
+        "instructions_version": "new",
+    }
+    (pair,) = benchmark.loop_pairs("dev", [looped, older, sample])
+    assert pair["one_call"]["source"] == "1"  # the sample, with the same instructions
+    assert pair["same_instructions"]
+    (pair,) = benchmark.loop_pairs("dev", [looped, older])
+    assert pair["one_call"]["source"] == "2"
+    assert not pair["same_instructions"]

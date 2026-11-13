@@ -63,6 +63,8 @@ export interface LoopPair {
   model: string;
   label: string;
   n: number;
+  /** False when one call's run had older instructions than the loop's. */
+  same_instructions: boolean;
   one_call: BenchmarkEntry;
   loop: BenchmarkEntry;
 }

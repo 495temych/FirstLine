@@ -1,0 +1,688 @@
+{
+  "id": "20261113T104904-unseen_dev-loop-sample",
+  "date": "2026-11-13T10:49:04+00:00",
+  "set": "unseen_dev",
+  "design": "loop",
+  "tiny": false,
+  "sample": true,
+  "model": "google/gemini-3.1-flash-lite",
+  "serving": {
+    "lab": "openrouter",
+    "provider": "google-vertex/eu",
+    "region": "EU",
+    "effort": "minimal"
+  },
+  "version": "9793fd20",
+  "instructions_version": "0dd4dc64",
+  "tools_version": "b3bcb127",
+  "kb_version": "916db54c",
+  "labels_version": "1c44a887",
+  "summary": {
+    "n": 6,
+    "path_accuracy": 1.0,
+    "path_margin": 0.19517151682653225,
+    "action_accuracy": 0.6666666666666666,
+    "action_margin": 0.3016211730496272,
+    "team_accuracy": 0.6666666666666666,
+    "team_margin": 0.3016211730496272,
+    "mistake_cost_chf": 120,
+    "sec04_failures": 0,
+    "kappa": 0.0,
+    "cause_accuracy": 0.0,
+    "retrieval_accuracy": 0.3333333333333333,
+    "automation_rate": 0.0,
+    "cost_per_ticket_usd": 0.0013561625,
+    "cost_per_ticket_chf": 0.00108493,
+    "time_per_ticket_sec": 1.4457698333620403,
+    "time_p50_sec": 1.4562082500196993,
+    "time_p90_sec": 1.6027789999498054,
+    "balanced_accuracy": 1.0,
+    "failed": 0,
+    "invalid": 0,
+    "investigation": {
+      "tickets": 6,
+      "lookups_per_ticket": 0.0,
+      "required_checks": 0,
+      "required_run": 0,
+      "required_share": null,
+      "needless_per_ticket": 0.0,
+      "citations": 0,
+      "citations_valid": null,
+      "citations_dropped": 0
+    }
+  },
+  "yardsticks": {
+    "most_common": {
+      "n": 6,
+      "path_accuracy": 1.0,
+      "path_margin": 0.19517151682653225,
+      "action_accuracy": 0.0,
+      "action_margin": 0.19517151682653225,
+      "team_accuracy": 0.0,
+      "team_margin": 0.19517151682653225,
+      "mistake_cost_chf": 360,
+      "sec04_failures": 0,
+      "kappa": 0.0
+    },
+    "classifier": {
+      "n": 6,
+      "path_accuracy": 1.0,
+      "path_margin": 0.19517151682653225,
+      "action_accuracy": 0.0,
+      "action_margin": 0.19517151682653225,
+      "team_accuracy": 0.0,
+      "team_margin": 0.19517151682653225,
+      "mistake_cost_chf": 360,
+      "sec04_failures": 0,
+      "kappa": 0.0
+    }
+  },
+  "confusion": {
+    "SELF_SERVE": {
+      "SELF_SERVE": 0,
+      "AUTO_FIX": 0,
+      "ESCALATE": 0,
+      "OUT_OF_SCOPE": 0
+    },
+    "AUTO_FIX": {
+      "SELF_SERVE": 0,
+      "AUTO_FIX": 0,
+      "ESCALATE": 0,
+      "OUT_OF_SCOPE": 0
+    },
+    "ESCALATE": {
+      "SELF_SERVE": 0,
+      "AUTO_FIX": 0,
+      "ESCALATE": 6,
+      "OUT_OF_SCOPE": 0
+    },
+    "OUT_OF_SCOPE": {
+      "SELF_SERVE": 0,
+      "AUTO_FIX": 0,
+      "ESCALATE": 0,
+      "OUT_OF_SCOPE": 0
+    }
+  },
+  "per_path": {
+    "SELF_SERVE": {
+      "precision": null,
+      "recall": null,
+      "n": 0
+    },
+    "AUTO_FIX": {
+      "precision": null,
+      "recall": null,
+      "n": 0
+    },
+    "ESCALATE": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "n": 6
+    },
+    "OUT_OF_SCOPE": {
+      "precision": null,
+      "recall": null,
+      "n": 0
+    }
+  },
+  "by_difficulty": {
+    "routine": {
+      "n": 6,
+      "path_accuracy": 1.0,
+      "path_margin": 0.19517151682653225,
+      "action_accuracy": 0.6666666666666666,
+      "action_margin": 0.3016211730496272,
+      "team_accuracy": 0.6666666666666666,
+      "team_margin": 0.3016211730496272,
+      "mistake_cost_chf": 120,
+      "sec04_failures": 0,
+      "kappa": 0.0,
+      "cause_accuracy": 0.0,
+      "retrieval_accuracy": 0.3333333333333333,
+      "automation_rate": 0.0,
+      "cost_per_ticket_usd": 0.0013561625,
+      "cost_per_ticket_chf": 0.00108493,
+      "time_per_ticket_sec": 1.4457698333620403,
+      "time_p50_sec": 1.4562082500196993,
+      "time_p90_sec": 1.6027789999498054,
+      "balanced_accuracy": 1.0,
+      "failed": 0,
+      "invalid": 0,
+      "investigation": {
+        "tickets": 6,
+        "lookups_per_ticket": 0.0,
+        "required_checks": 0,
+        "required_run": 0,
+        "required_share": null,
+        "needless_per_ticket": 0.0,
+        "citations": 0,
+        "citations_valid": null,
+        "citations_dropped": 0
+      }
+    }
+  },
+  "by_family": {
+    "API timeouts": {
+      "n": 3,
+      "path_accuracy": 1.0,
+      "path_margin": 0.28075304022450887,
+      "action_accuracy": 1.0,
+      "action_margin": 0.28075304022450887,
+      "team_accuracy": 1.0,
+      "team_margin": 0.28075304022450887,
+      "mistake_cost_chf": 0,
+      "sec04_failures": 0,
+      "kappa": 0.0,
+      "cause_accuracy": 0.0,
+      "retrieval_accuracy": 0.6666666666666666,
+      "automation_rate": 0.0,
+      "cost_per_ticket_usd": 0.0013130333333333333,
+      "cost_per_ticket_chf": 0.0010504266666666667,
+      "time_per_ticket_sec": 1.5220745000212144,
+      "time_p50_sec": 1.507236250094138,
+      "time_p90_sec": 1.6027789999498054,
+      "balanced_accuracy": 1.0,
+      "failed": 0,
+      "invalid": 0,
+      "investigation": {
+        "tickets": 3,
+        "lookups_per_ticket": 0.0,
+        "required_checks": 0,
+        "required_run": 0,
+        "required_share": null,
+        "needless_per_ticket": 0.0,
+        "citations": 0,
+        "citations_valid": null,
+        "citations_dropped": 0
+      }
+    },
+    "Certificate expiry": {
+      "n": 3,
+      "path_accuracy": 1.0,
+      "path_margin": 0.28075304022450887,
+      "action_accuracy": 0.3333333333333333,
+      "action_margin": 0.36542736479867577,
+      "team_accuracy": 0.3333333333333333,
+      "team_margin": 0.36542736479867577,
+      "mistake_cost_chf": 120,
+      "sec04_failures": 0,
+      "kappa": 0.0,
+      "cause_accuracy": 0.0,
+      "retrieval_accuracy": 0.0,
+      "automation_rate": 0.0,
+      "cost_per_ticket_usd": 0.0013992916666666667,
+      "cost_per_ticket_chf": 0.0011194333333333333,
+      "time_per_ticket_sec": 1.3694651667028666,
+      "time_p50_sec": 1.3612687080167234,
+      "time_p90_sec": 1.454602292040363,
+      "balanced_accuracy": 1.0,
+      "failed": 0,
+      "invalid": 0,
+      "investigation": {
+        "tickets": 3,
+        "lookups_per_ticket": 0.0,
+        "required_checks": 0,
+        "required_run": 0,
+        "required_share": null,
+        "needless_per_ticket": 0.0,
+        "citations": 0,
+        "citations_valid": null,
+        "citations_dropped": 0
+      }
+    }
+  },
+  "tickets": [
+    {
+      "id": "INC-AIT-0001",
+      "text": "Integration Gateway API timeouts causing delayed data sync\n\nDuring the overnight CustomerSync batch window (scheduled 01:00–04:00 PST), the Integration Gateway in us-west-2 began returning repeated 504 Gateway Timeout errors and API call durations exceeding 30 seconds when calling the downstream CRM API endpoint at api.customersync.corplabs.com. This was first reported by Priya Nair (Application Support lead, Portland office) after the Reporting Dashboard failed to refresh overnight customer records. Gateway logs on host INTGW-WEST-01.corplabs.internal showed a token refresh job failure (job ID: tknrot-20251201-0130) in the same time window, indicating the sync process was blocked by downstream authentication issues rather than a general platform outage. Approximately 14,200 customer records were delayed, impacting dependent reporting and sync workflows used by the finance reconciliation team.",
+      "requester": "priya.nair",
+      "difficulty": "routine",
+      "cause": "Unknown",
+      "expected_cause": "Expired API token",
+      "expected_paths": [
+        "ESCALATE"
+      ],
+      "expected_tools": [],
+      "expected_queues": [
+        "APP-SUPPORT"
+      ],
+      "expected_units": [],
+      "family": "API timeouts",
+      "expected_path": "ESCALATE",
+      "path": "ESCALATE",
+      "path_correct": true,
+      "action_correct": true,
+      "team_correct": true,
+      "mistake_cost_chf": 0,
+      "sec04_failure": false,
+      "tool": "create_escalation_ticket",
+      "queue": "APP-SUPPORT",
+      "retrieved": [
+        "escalation-queues",
+        "company-profile::Known organizational quirks"
+      ],
+      "cause_correct": false,
+      "retrieval_correct": false,
+      "input_tokens": 4234,
+      "output_tokens": 189,
+      "cost_usd": 0.0014762,
+      "time_sec": 1.6027789999498054,
+      "error": null,
+      "invalid": false,
+      "rule": null,
+      "steps": [
+        {
+          "id": "s1",
+          "turn": 1,
+          "tool": "record_decision",
+          "input": {
+            "summary": "Integration Gateway API (INTGW-WEST-01) failure causing batch sync timeouts due to a token refresh error.",
+            "path": "ESCALATE",
+            "priority": "P1-Critical",
+            "queue": "APP-SUPPORT",
+            "evidence": [],
+            "rationale": "The issue involves a service-side failure of the Integration Gateway's token rotation job and downstream API connectivity. This is an application-level infrastructure fault outside the scope of user-side troubleshooting, and the KB directs that tickets should be routed to the team owning the failing system (Integration Gateway/CRM services), which falls under APP-SUPPORT.",
+            "next_step": "Investigate the Integration Gateway token refresh job (tknrot-20251201-0130) and the downstream CRM API connectivity.",
+            "cause": "Unknown"
+          },
+          "result": "ESCALATE",
+          "ok": true,
+          "found": [],
+          "time_sec": 1.6027789999498054,
+          "input_tokens": 4234,
+          "output_tokens": 189,
+          "cost_usd": 0.0014762
+        }
+      ],
+      "stopped": null,
+      "citations": {
+        "kept": [],
+        "dropped": []
+      },
+      "investigation": {
+        "lookups": 0,
+        "checks_run": [],
+        "required": 0,
+        "required_run": 0,
+        "needless": 0,
+        "cited": 0,
+        "dropped": 0
+      }
+    },
+    {
+      "id": "INC-AIT-0018",
+      "text": "Nightly integration timeouts via Integration Gateway (03:00 UTC)\n\nNightly batch data sync jobs sent through the Integration Gateway to the downstream partner (Acme Data Services) are failing around 03:00 UTC in us-east-1. The gateway returns 504 Gateway Timeout for POST /sync during the scheduled run window, and monitoring shows a matching latency spike at the same time. This is delaying the partner data synchronization workflow for batch-sync-users. The issue was initially reported by Marcus Delgado (mdelgado@corplabs.com) from the Dallas integration operations team. Current telemetry is incomplete because request correlation IDs and token rotation history were not available in the original evidence. The affected API client ID is intg-client-batch-7741, and the integration service account username is svc_batchsync. Requests originate from host WORKSTATION-INTGOPS-MD (10.42.18.97).",
+      "requester": "mdelgado",
+      "difficulty": "routine",
+      "cause": "Unknown",
+      "expected_cause": "Downstream latency",
+      "expected_paths": [
+        "ESCALATE"
+      ],
+      "expected_tools": [],
+      "expected_queues": [
+        "APP-SUPPORT"
+      ],
+      "expected_units": [],
+      "family": "API timeouts",
+      "expected_path": "ESCALATE",
+      "path": "ESCALATE",
+      "path_correct": true,
+      "action_correct": true,
+      "team_correct": true,
+      "mistake_cost_chf": 0,
+      "sec04_failure": false,
+      "tool": "create_escalation_ticket",
+      "queue": "APP-SUPPORT",
+      "retrieved": [],
+      "cause_correct": false,
+      "retrieval_correct": true,
+      "input_tokens": 3590,
+      "output_tokens": 172,
+      "cost_usd": 0.00127105,
+      "time_sec": 1.507236250094138,
+      "error": null,
+      "invalid": false,
+      "rule": null,
+      "steps": [
+        {
+          "id": "s1",
+          "turn": 1,
+          "tool": "record_decision",
+          "input": {
+            "rationale": "The issue involves a service-level failure of the Integration Gateway causing 504 Gateway Timeouts for batch synchronization jobs. As this is an infrastructure-related integration issue involving a service account (svc_batchsync) and downstream connectivity to a partner, it falls outside the scope of standard desktop or device support. Additional investigation into the gateway logs, request correlation IDs, and token rotation status is required to identify the root cause.",
+            "cause": "Unknown",
+            "priority": "P2-High",
+            "summary": "Nightly integration batch sync jobs are failing with 504 Gateway Timeouts at 03:00 UTC, affecting the downstream sync with Acme Data Services.",
+            "path": "ESCALATE",
+            "queue": "APP-SUPPORT"
+          },
+          "result": "ESCALATE",
+          "ok": true,
+          "found": [],
+          "time_sec": 1.507236250094138,
+          "input_tokens": 3590,
+          "output_tokens": 172,
+          "cost_usd": 0.00127105
+        }
+      ],
+      "stopped": null,
+      "citations": {
+        "kept": [],
+        "dropped": []
+      },
+      "investigation": {
+        "lookups": 0,
+        "checks_run": [],
+        "required": 0,
+        "required_run": 0,
+        "needless": 0,
+        "cited": 0,
+        "dropped": 0
+      }
+    },
+    {
+      "id": "INC-AIT-0046",
+      "text": "Integration Gateway API timeouts causing PaymentSync failures\n\nPaymentSync backfill and scheduled synchronization jobs intermittently failed between 02:10 and 02:40 UTC on 2025-12-08 when the Integration Gateway (gateway-prod-east-07.payments.internal) timed out while calling the downstream payment API endpoint at https://api.payments.internal/v2/sync. This caused queued sync work on the paymentsync-worker pods in the us-east-1 Kubernetes cluster, delayed payment data updates for Finance Users, and repeated 504 timeout responses logged by the gateway. The issue was initially reported by Rajesh Menon (rmenon@corplabs.com) from the Arlington office after the PaymentSyncApp dashboard showed stalled jobs. Immediate recovery was observed after token rotation by ops engineer Lisa Cheng, but available validation evidence did not show token expiry, so the incident is best explained as downstream latency with token rotation treated as a coincidental or non-causal mitigation.",
+      "requester": "rmenon",
+      "difficulty": "routine",
+      "cause": "Unknown",
+      "expected_cause": "Downstream latency",
+      "expected_paths": [
+        "ESCALATE"
+      ],
+      "expected_tools": [],
+      "expected_queues": [
+        "APP-SUPPORT"
+      ],
+      "expected_units": [],
+      "family": "API timeouts",
+      "expected_path": "ESCALATE",
+      "path": "ESCALATE",
+      "path_correct": true,
+      "action_correct": true,
+      "team_correct": true,
+      "mistake_cost_chf": 0,
+      "sec04_failure": false,
+      "tool": "create_escalation_ticket",
+      "queue": "APP-SUPPORT",
+      "retrieved": [],
+      "cause_correct": false,
+      "retrieval_correct": true,
+      "input_tokens": 3596,
+      "output_tokens": 123,
+      "cost_usd": 0.00119185,
+      "time_sec": 1.4562082500196993,
+      "error": null,
+      "invalid": false,
+      "rule": null,
+      "steps": [
+        {
+          "id": "s1",
+          "turn": 1,
+          "tool": "record_decision",
+          "input": {
+            "priority": "P1-Critical",
+            "evidence": [],
+            "queue": "APP-SUPPORT",
+            "path": "ESCALATE",
+            "summary": "Investigation of PaymentSync failures and Integration Gateway 504 timeouts in production.",
+            "cause": "Unknown",
+            "rationale": "The reported issue involves infrastructure-level API timeouts and failures in the production PaymentSync service, which are outside the scope of desktop support. Since no internal KB articles exist to guide resolution for this specific backend service incident, escalation to the Application Support team is required."
+          },
+          "result": "ESCALATE",
+          "ok": true,
+          "found": [],
+          "time_sec": 1.4562082500196993,
+          "input_tokens": 3596,
+          "output_tokens": 123,
+          "cost_usd": 0.00119185
+        }
+      ],
+      "stopped": null,
+      "citations": {
+        "kept": [],
+        "dropped": []
+      },
+      "investigation": {
+        "lookups": 0,
+        "checks_run": [],
+        "required": 0,
+        "required_run": 0,
+        "needless": 0,
+        "cited": 0,
+        "dropped": 0
+      }
+    },
+    {
+      "id": "INC-CES-0002",
+      "text": "Expired TLS certificate on Internal Web Service behind Load Balancer\n\nInternal users and dependent services were trying to reach the svc-internal endpoint (svc-internal.corplabs.internal) over TLS through the load balancer LB-EAST-02, but clients began showing certificate warnings and rejecting the connection. The issue was first reported by Maria Chen (mchen@corplabs.com) from the Arlington office, who noticed that requests from her workstation WORKSTATION-PC-MC were returning NET::ERR_CERT_DATE_INVALID errors. The load balancer presented an expired certificate (CN=svc-internal.corplabs.internal, expired 2025-12-10T00:00:00Z) and an incomplete chain after the renewal window was missed, which blocked normal access to the internal web service and caused TLS handshake failures for internal integrations in us-east-1. Multiple teams including the payroll integration service (contact: David Ortiz, emp ID E-40291) confirmed downstream failures.",
+      "requester": "maria.chen",
+      "difficulty": "routine",
+      "cause": "Expired device certificate.",
+      "expected_cause": "Expired TLS certificate",
+      "expected_paths": [
+        "ESCALATE"
+      ],
+      "expected_tools": [],
+      "expected_queues": [
+        "APP-SUPPORT"
+      ],
+      "expected_units": [],
+      "family": "Certificate expiry",
+      "expected_path": "ESCALATE",
+      "path": "ESCALATE",
+      "path_correct": true,
+      "action_correct": false,
+      "team_correct": false,
+      "mistake_cost_chf": 60,
+      "sec04_failure": false,
+      "tool": "create_escalation_ticket",
+      "queue": "NET-VPN",
+      "retrieved": [
+        "vpn-access"
+      ],
+      "cause_correct": false,
+      "retrieval_correct": false,
+      "input_tokens": 4071,
+      "output_tokens": 205,
+      "cost_usd": 0.001457775,
+      "time_sec": 1.454602292040363,
+      "error": null,
+      "invalid": false,
+      "rule": null,
+      "steps": [
+        {
+          "id": "s1",
+          "turn": 1,
+          "tool": "record_decision",
+          "input": {
+            "summary": "Expired TLS certificate on load balancer LB-EAST-02 causing service-wide TLS handshake failures.",
+            "rationale": "The issue involves an expired TLS certificate on a load balancer (LB-EAST-02) affecting multiple internal services, which falls outside the scope of individual device-level troubleshooting or self-service tools. As multiple services and teams are impacted, this requires immediate infrastructure intervention by the NET-VPN team.",
+            "cause": "Expired device certificate.",
+            "path": "ESCALATE",
+            "ruled_out": "The retrieved KB article regarding VPN access is irrelevant as the issue is an infrastructure-side load balancer certificate expiration, not a user-side device certificate.",
+            "next_step": "Inspect the expiration status of the certificate on load balancer LB-EAST-02 and initiate a certificate renewal.",
+            "queue": "NET-VPN",
+            "evidence": [],
+            "priority": "P1-Critical"
+          },
+          "result": "ESCALATE",
+          "ok": true,
+          "found": [],
+          "time_sec": 1.454602292040363,
+          "input_tokens": 4071,
+          "output_tokens": 205,
+          "cost_usd": 0.001457775
+        }
+      ],
+      "stopped": null,
+      "citations": {
+        "kept": [],
+        "dropped": []
+      },
+      "investigation": {
+        "lookups": 0,
+        "checks_run": [],
+        "required": 0,
+        "required_run": 0,
+        "needless": 0,
+        "cited": 0,
+        "dropped": 0
+      }
+    },
+    {
+      "id": "INC-CES-0023",
+      "text": "Expired TLS certificate caused internal web service TLS outage\n\nUsers and internal integrations were trying to access the Internal Web Service at https://portal.internal.corplabs.com through the load balancer (LB-EAST-02.corplabs.internal), but browsers displayed NET::ERR_CERT_DATE_INVALID warnings and dependent API calls from services owned by the Platform Engineering team failed TLS negotiation. The issue was first reported by Maria Chen (emp ID E-40291) from the Denver office at approximately 02:05 UTC on 2025-12-17. The service became unavailable over TLS after the presented certificate (CN=portal.internal.corplabs.com, issued by CorpLabs Internal CA) passed its validity window on 2025-12-16T23:59:59Z, and the load balancer continued serving an outdated certificate chain containing an expired intermediate, blocking normal internal application access for all users in the us-east-1 environment.",
+      "requester": "maria.chen",
+      "difficulty": "routine",
+      "cause": "Unknown",
+      "expected_cause": "Expired TLS certificate",
+      "expected_paths": [
+        "ESCALATE"
+      ],
+      "expected_tools": [],
+      "expected_queues": [
+        "APP-SUPPORT"
+      ],
+      "expected_units": [],
+      "family": "Certificate expiry",
+      "expected_path": "ESCALATE",
+      "path": "ESCALATE",
+      "path_correct": true,
+      "action_correct": false,
+      "team_correct": false,
+      "mistake_cost_chf": 60,
+      "sec04_failure": false,
+      "tool": "create_escalation_ticket",
+      "queue": "NET-DNS",
+      "retrieved": [
+        "company-profile::Naming conventions"
+      ],
+      "cause_correct": false,
+      "retrieval_correct": false,
+      "input_tokens": 3711,
+      "output_tokens": 210,
+      "cost_usd": 0.001367025,
+      "time_sec": 1.2925245000515133,
+      "error": null,
+      "invalid": false,
+      "rule": null,
+      "steps": [
+        {
+          "id": "s1",
+          "turn": 1,
+          "tool": "record_decision",
+          "input": {
+            "cause": "Unknown",
+            "rationale": "The issue involves an expired TLS certificate on a core infrastructure component (load balancer LB-EAST-02) causing a widespread service outage in the us-east-1 environment. This requires intervention by the network infrastructure team to update the certificate chain, which is beyond the scope of desktop support.",
+            "queue": "NET-DNS",
+            "next_step": "Investigate the certificate renewal status for LB-EAST-02.corplabs.internal and perform a manual certificate update or trigger a re-issuance from the CorpLabs Internal CA.",
+            "summary": "Expired TLS certificate on load balancer LB-EAST-02 causing service outage for internal portal.",
+            "evidence": [],
+            "priority": "P1-Critical",
+            "path": "ESCALATE",
+            "ruled_out": "N/A - the issue is clearly infrastructure-side and requires administrative access to the load balancer/certificate management systems."
+          },
+          "result": "ESCALATE",
+          "ok": true,
+          "found": [],
+          "time_sec": 1.2925245000515133,
+          "input_tokens": 3711,
+          "output_tokens": 210,
+          "cost_usd": 0.001367025
+        }
+      ],
+      "stopped": null,
+      "citations": {
+        "kept": [],
+        "dropped": []
+      },
+      "investigation": {
+        "lookups": 0,
+        "checks_run": [],
+        "required": 0,
+        "required_run": 0,
+        "needless": 0,
+        "cited": 0,
+        "dropped": 0
+      }
+    },
+    {
+      "id": "INC-CES-0043",
+      "text": "Expired TLS certificate caused internal web service TLS outage\n\nInternal developers on the Platform Engineering team were trying to access the internal API at https://internal.example.corp/v2/services over HTTPS, but browsers began showing certificate warnings and automated clients (including CI/CD pipelines running on WORKSTATION-BUILD-MK) started failing TLS handshakes at approximately 07:15 UTC on 2025-12-20. The affected endpoint was internal.example.corp behind load balancer LB-EAST-02.infra.example.corp, which made the internal web service unreachable over TLS and blocked normal API calls for the entire Arlington development group. Monitoring did not alert before the outage — the certificate-management-service renewal job configured by r.navarro had not fired its 30-day pre-expiry notification. Renewal response was delayed until developer Priya Chandrasekaran (emp ID EMP-40821) reported the issue and the expired certificate being served by the load balancer was confirmed by the infrastructure team.",
+      "requester": "r.navarro",
+      "difficulty": "routine",
+      "cause": "Unknown",
+      "expected_cause": "Expired TLS certificate",
+      "expected_paths": [
+        "ESCALATE"
+      ],
+      "expected_tools": [],
+      "expected_queues": [
+        "APP-SUPPORT"
+      ],
+      "expected_units": [],
+      "family": "Certificate expiry",
+      "expected_path": "ESCALATE",
+      "path": "ESCALATE",
+      "path_correct": true,
+      "action_correct": true,
+      "team_correct": true,
+      "mistake_cost_chf": 0,
+      "sec04_failure": false,
+      "tool": "create_escalation_ticket",
+      "queue": "APP-SUPPORT",
+      "retrieved": [
+        "escalation-queues"
+      ],
+      "cause_correct": false,
+      "retrieval_correct": false,
+      "input_tokens": 4063,
+      "output_tokens": 155,
+      "cost_usd": 0.001373075,
+      "time_sec": 1.3612687080167234,
+      "error": null,
+      "invalid": false,
+      "rule": null,
+      "steps": [
+        {
+          "id": "s1",
+          "turn": 1,
+          "tool": "record_decision",
+          "input": {
+            "queue": "APP-SUPPORT",
+            "path": "ESCALATE",
+            "priority": "P1-Critical",
+            "summary": "Expired TLS certificate on load balancer LB-EAST-02 causing service outage for internal API.",
+            "cause": "Unknown",
+            "next_step": "Investigate the certificate renewal job configuration for internal.example.corp and verify the certificate status on load balancer LB-EAST-02.",
+            "rationale": "The issue involves an expired TLS certificate on an internal service load balancer, which falls under the responsibility of the team managing internal services and their certificates. Per the escalation-queues policy, this should be routed to APP-SUPPORT.",
+            "evidence": []
+          },
+          "result": "ESCALATE",
+          "ok": true,
+          "found": [],
+          "time_sec": 1.3612687080167234,
+          "input_tokens": 4063,
+          "output_tokens": 155,
+          "cost_usd": 0.001373075
+        }
+      ],
+      "stopped": null,
+      "citations": {
+        "kept": [],
+        "dropped": []
+      },
+      "investigation": {
+        "lookups": 0,
+        "checks_run": [],
+        "required": 0,
+        "required_run": 0,
+        "needless": 0,
+        "cited": 0,
+        "dropped": 0
+      }
+    }
+  ]
+}

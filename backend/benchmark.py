@@ -288,20 +288,25 @@ def newest_loop_runs(name: str, runs: list[dict]) -> dict[str, dict]:
     return {**sampled, **full}
 
 
-def _covering(model: str, name: str, ids: set[str], runs: list[dict]) -> dict | None:
+def _covering(looped: dict, runs: list[dict]) -> dict | None:
     """The model's newest one-call run of the set that holds every ticket the loop
-    ran: a full run first, else a sample of the same tickets."""
+    ran. One with the same instructions comes first, so only the design differs;
+    then a full run before a sample."""
+    ids = {t["id"] for t in looped["tickets"]}
     found = [
         run
         for run in runs
-        if run["model"] == model
-        and run["set"] == name
+        if run["model"] == looped["model"]
+        and run["set"] == looped["set"]
         and not run["tiny"]
         and runner.design_of(run) == "one call"
         and ids <= {t["id"] for t in run["tickets"]}
     ]
-    full = [run for run in found if not run.get("sample")]
-    return (full or found or [None])[0]
+    same = looped.get("instructions_version")
+    found.sort(
+        key=lambda r: (r.get("instructions_version") != same, bool(r.get("sample")))
+    )
+    return found[0] if found else None
 
 
 def same_tickets(run: dict, ids: set[str]) -> dict:
@@ -317,7 +322,7 @@ def loop_pairs(name: str, runs: list[dict]) -> list[dict]:
     pairs = []
     for model, looped in newest_loop_runs(name, runs).items():
         ids = {t["id"] for t in looped["tickets"]}
-        one = _covering(model, name, ids, runs)
+        one = _covering(looped, runs)
         if one is None:
             continue
         pairs.append(
@@ -325,6 +330,8 @@ def loop_pairs(name: str, runs: list[dict]) -> list[dict]:
                 "model": model,
                 "label": label(model),
                 "n": len(ids),
+                "same_instructions": one.get("instructions_version")
+                == looped.get("instructions_version"),
                 "one_call": _entry(same_tickets(one, ids)),
                 "loop": _entry(looped),
             }

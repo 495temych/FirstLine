@@ -1,0 +1,3714 @@
+{
+  "id": "20261113T104849-dev-loop-sample",
+  "date": "2026-11-13T10:48:49+00:00",
+  "set": "dev",
+  "design": "loop",
+  "tiny": false,
+  "sample": true,
+  "model": "google/gemini-3.1-flash-lite",
+  "serving": {
+    "lab": "openrouter",
+    "provider": "google-vertex/eu",
+    "region": "EU",
+    "effort": "minimal"
+  },
+  "version": "9793fd20",
+  "instructions_version": "0dd4dc64",
+  "tools_version": "b3bcb127",
+  "kb_version": "916db54c",
+  "labels_version": "1c44a887",
+  "summary": {
+    "n": 36,
+    "path_accuracy": 0.75,
+    "path_margin": 0.1366022192198902,
+    "action_accuracy": 0.75,
+    "action_margin": 0.1366022192198902,
+    "team_accuracy": 0.7857142857142857,
+    "team_margin": 0.14663312689042227,
+    "mistake_cost_chf": 2960,
+    "sec04_failures": 1,
+    "kappa": 0.37811900191938574,
+    "cause_accuracy": 0.25,
+    "retrieval_accuracy": 1.0,
+    "automation_rate": 0.25,
+    "cost_per_ticket_usd": 0.001592215625,
+    "cost_per_ticket_chf": 0.0012737725,
+    "time_per_ticket_sec": 1.8352904281798854,
+    "time_p50_sec": 1.4400739170378074,
+    "time_p90_sec": 2.8418565839529037,
+    "balanced_accuracy": 0.7635327635327634,
+    "failed": 0,
+    "invalid": 0,
+    "investigation": {
+      "tickets": 36,
+      "lookups_per_ticket": 0.3611111111111111,
+      "required_checks": 39,
+      "required_run": 5,
+      "required_share": 0.1282051282051282,
+      "needless_per_ticket": 0.1111111111111111,
+      "citations": 14,
+      "citations_valid": 0.42857142857142855,
+      "citations_dropped": 8
+    }
+  },
+  "yardsticks": {
+    "most_common": {
+      "n": 36,
+      "path_accuracy": 0.7777777777777778,
+      "path_margin": 0.13184413426509745,
+      "action_accuracy": 0.16666666666666666,
+      "action_margin": 0.12010387053055112,
+      "team_accuracy": 0.21428571428571427,
+      "team_margin": 0.14663312689042227,
+      "mistake_cost_chf": 2280,
+      "sec04_failures": 0,
+      "kappa": 0.0
+    },
+    "classifier": {
+      "n": 36,
+      "path_accuracy": 0.9722222222222222,
+      "path_margin": 0.06839002852736915,
+      "action_accuracy": 0.9444444444444444,
+      "action_margin": 0.08304003865452264,
+      "team_accuracy": 0.7857142857142857,
+      "team_margin": 0.14663312689042227,
+      "mistake_cost_chf": 180,
+      "sec04_failures": 0,
+      "kappa": 0.944700460829493
+    }
+  },
+  "confusion": {
+    "SELF_SERVE": {
+      "SELF_SERVE": 1,
+      "AUTO_FIX": 0,
+      "ESCALATE": 0,
+      "OUT_OF_SCOPE": 0
+    },
+    "AUTO_FIX": {
+      "SELF_SERVE": 0,
+      "AUTO_FIX": 4,
+      "ESCALATE": 5,
+      "OUT_OF_SCOPE": 0
+    },
+    "ESCALATE": {
+      "SELF_SERVE": 0,
+      "AUTO_FIX": 4,
+      "ESCALATE": 22,
+      "OUT_OF_SCOPE": 0
+    },
+    "OUT_OF_SCOPE": {
+      "SELF_SERVE": 0,
+      "AUTO_FIX": 0,
+      "ESCALATE": 0,
+      "OUT_OF_SCOPE": 0
+    }
+  },
+  "per_path": {
+    "SELF_SERVE": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "n": 1
+    },
+    "AUTO_FIX": {
+      "precision": 0.5,
+      "recall": 0.4444444444444444,
+      "n": 9
+    },
+    "ESCALATE": {
+      "precision": 0.8148148148148148,
+      "recall": 0.8461538461538461,
+      "n": 26
+    },
+    "OUT_OF_SCOPE": {
+      "precision": null,
+      "recall": null,
+      "n": 0
+    }
+  },
+  "by_difficulty": {
+    "routine": {
+      "n": 36,
+      "path_accuracy": 0.75,
+      "path_margin": 0.1366022192198902,
+      "action_accuracy": 0.75,
+      "action_margin": 0.1366022192198902,
+      "team_accuracy": 0.7857142857142857,
+      "team_margin": 0.14663312689042227,
+      "mistake_cost_chf": 2960,
+      "sec04_failures": 1,
+      "kappa": 0.37811900191938574,
+      "cause_accuracy": 0.25,
+      "retrieval_accuracy": 1.0,
+      "automation_rate": 0.25,
+      "cost_per_ticket_usd": 0.001592215625,
+      "cost_per_ticket_chf": 0.0012737725,
+      "time_per_ticket_sec": 1.8352904281798854,
+      "time_p50_sec": 1.4400739170378074,
+      "time_p90_sec": 2.8418565839529037,
+      "balanced_accuracy": 0.7635327635327634,
+      "failed": 0,
+      "invalid": 0,
+      "investigation": {
+        "tickets": 36,
+        "lookups_per_ticket": 0.3611111111111111,
+        "required_checks": 39,
+        "required_run": 5,
+        "required_share": 0.1282051282051282,
+        "needless_per_ticket": 0.1111111111111111,
+        "citations": 14,
+        "citations_valid": 0.42857142857142855,
+        "citations_dropped": 8
+      }
+    }
+  },
+  "by_family": {
+    "Account lockout and password": {
+      "n": 3,
+      "path_accuracy": 0.6666666666666666,
+      "path_margin": 0.36542736479867577,
+      "action_accuracy": 0.6666666666666666,
+      "action_margin": 0.36542736479867577,
+      "team_accuracy": 0.6666666666666666,
+      "team_margin": 0.36542736479867577,
+      "mistake_cost_chf": 2000,
+      "sec04_failures": 1,
+      "kappa": 0.0,
+      "cause_accuracy": 0.6666666666666666,
+      "retrieval_accuracy": 1.0,
+      "automation_rate": 0.3333333333333333,
+      "cost_per_ticket_usd": 0.0017562783333333334,
+      "cost_per_ticket_chf": 0.0014050226666666669,
+      "time_per_ticket_sec": 3.32014538863829,
+      "time_p50_sec": 2.7356151250423864,
+      "time_p90_sec": 5.056936041917652,
+      "balanced_accuracy": 0.6666666666666666,
+      "failed": 0,
+      "invalid": 0,
+      "investigation": {
+        "tickets": 3,
+        "lookups_per_ticket": 1.0,
+        "required_checks": 6,
+        "required_run": 0,
+        "required_share": 0.0,
+        "needless_per_ticket": 0.0,
+        "citations": 2,
+        "citations_valid": 1.0,
+        "citations_dropped": 0
+      }
+    },
+    "DNS": {
+      "n": 3,
+      "path_accuracy": 1.0,
+      "path_margin": 0.28075304022450887,
+      "action_accuracy": 1.0,
+      "action_margin": 0.28075304022450887,
+      "team_accuracy": 1.0,
+      "team_margin": 0.28075304022450887,
+      "mistake_cost_chf": 0,
+      "sec04_failures": 0,
+      "kappa": 0.0,
+      "cause_accuracy": 0.0,
+      "retrieval_accuracy": 1.0,
+      "automation_rate": 0.0,
+      "cost_per_ticket_usd": 0.0014511749999999999,
+      "cost_per_ticket_chf": 0.0011609399999999998,
+      "time_per_ticket_sec": 1.3914941389812157,
+      "time_p50_sec": 1.4132550000213087,
+      "time_p90_sec": 1.6127864579902962,
+      "balanced_accuracy": 1.0,
+      "failed": 0,
+      "invalid": 0,
+      "investigation": {
+        "tickets": 3,
+        "lookups_per_ticket": 0.0,
+        "required_checks": 3,
+        "required_run": 0,
+        "required_share": 0.0,
+        "needless_per_ticket": 0.0,
+        "citations": 0,
+        "citations_valid": null,
+        "citations_dropped": 0
+      }
+    },
+    "Device compliance": {
+      "n": 3,
+      "path_accuracy": 0.6666666666666666,
+      "path_margin": 0.36542736479867577,
+      "action_accuracy": 0.6666666666666666,
+      "action_margin": 0.36542736479867577,
+      "team_accuracy": 0.0,
+      "team_margin": 0.39672835426305353,
+      "mistake_cost_chf": 120,
+      "sec04_failures": 0,
+      "kappa": 0.0,
+      "cause_accuracy": 0.0,
+      "retrieval_accuracy": 1.0,
+      "automation_rate": 0.6666666666666666,
+      "cost_per_ticket_usd": 0.0015032049999999999,
+      "cost_per_ticket_chf": 0.001202564,
+      "time_per_ticket_sec": 1.701936319315185,
+      "time_p50_sec": 1.513433791929856,
+      "time_p90_sec": 2.5871387909865007,
+      "balanced_accuracy": 0.6666666666666666,
+      "failed": 0,
+      "invalid": 0,
+      "investigation": {
+        "tickets": 3,
+        "lookups_per_ticket": 0.3333333333333333,
+        "required_checks": 3,
+        "required_run": 0,
+        "required_share": 0.0,
+        "needless_per_ticket": 0.3333333333333333,
+        "citations": 1,
+        "citations_valid": 0.0,
+        "citations_dropped": 1
+      }
+    },
+    "Disk encryption": {
+      "n": 3,
+      "path_accuracy": 1.0,
+      "path_margin": 0.28075304022450887,
+      "action_accuracy": 1.0,
+      "action_margin": 0.28075304022450887,
+      "team_accuracy": 1.0,
+      "team_margin": 0.28075304022450887,
+      "mistake_cost_chf": 0,
+      "sec04_failures": 0,
+      "kappa": 0.0,
+      "cause_accuracy": 0.0,
+      "retrieval_accuracy": 1.0,
+      "automation_rate": 0.0,
+      "cost_per_ticket_usd": 0.0016786458333333334,
+      "cost_per_ticket_chf": 0.0013429166666666667,
+      "time_per_ticket_sec": 2.852484069609394,
+      "time_p50_sec": 2.8418565839529037,
+      "time_p90_sec": 3.6841191250132397,
+      "balanced_accuracy": 1.0,
+      "failed": 0,
+      "invalid": 0,
+      "investigation": {
+        "tickets": 3,
+        "lookups_per_ticket": 0.6666666666666666,
+        "required_checks": 3,
+        "required_run": 2,
+        "required_share": 0.6666666666666666,
+        "needless_per_ticket": 0.0,
+        "citations": 2,
+        "citations_valid": 0.0,
+        "citations_dropped": 2
+      }
+    },
+    "Laptop performance": {
+      "n": 3,
+      "path_accuracy": 0.3333333333333333,
+      "path_margin": 0.36542736479867577,
+      "action_accuracy": 0.3333333333333333,
+      "action_margin": 0.36542736479867577,
+      "team_accuracy": 0.3333333333333333,
+      "team_margin": 0.36542736479867577,
+      "mistake_cost_chf": 240,
+      "sec04_failures": 0,
+      "kappa": 0.0,
+      "cause_accuracy": 0.0,
+      "retrieval_accuracy": 1.0,
+      "automation_rate": 0.6666666666666666,
+      "cost_per_ticket_usd": 0.0014299541666666666,
+      "cost_per_ticket_chf": 0.0011439633333333334,
+      "time_per_ticket_sec": 2.384787430637516,
+      "time_p50_sec": 1.2005847080145031,
+      "time_p90_sec": 4.975903374957852,
+      "balanced_accuracy": 0.3333333333333333,
+      "failed": 0,
+      "invalid": 0,
+      "investigation": {
+        "tickets": 3,
+        "lookups_per_ticket": 0.3333333333333333,
+        "required_checks": 3,
+        "required_run": 0,
+        "required_share": 0.0,
+        "needless_per_ticket": 0.3333333333333333,
+        "citations": 1,
+        "citations_valid": 1.0,
+        "citations_dropped": 0
+      }
+    },
+    "Outlook sync": {
+      "n": 3,
+      "path_accuracy": 1.0,
+      "path_margin": 0.28075304022450887,
+      "action_accuracy": 1.0,
+      "action_margin": 0.28075304022450887,
+      "team_accuracy": 0.6666666666666666,
+      "team_margin": 0.36542736479867577,
+      "mistake_cost_chf": 0,
+      "sec04_failures": 0,
+      "kappa": 1.0,
+      "cause_accuracy": 0.6666666666666666,
+      "retrieval_accuracy": 1.0,
+      "automation_rate": 0.3333333333333333,
+      "cost_per_ticket_usd": 0.0016365066666666666,
+      "cost_per_ticket_chf": 0.0013092053333333333,
+      "time_per_ticket_sec": 1.7947420139874641,
+      "time_p50_sec": 1.741819667047821,
+      "time_p90_sec": 2.2021022079279646,
+      "balanced_accuracy": 1.0,
+      "failed": 0,
+      "invalid": 0,
+      "investigation": {
+        "tickets": 3,
+        "lookups_per_ticket": 1.0,
+        "required_checks": 3,
+        "required_run": 0,
+        "required_share": 0.0,
+        "needless_per_ticket": 0.6666666666666666,
+        "citations": 3,
+        "citations_valid": 0.6666666666666666,
+        "citations_dropped": 1
+      }
+    },
+    "Printing": {
+      "n": 3,
+      "path_accuracy": 0.3333333333333333,
+      "path_margin": 0.36542736479867577,
+      "action_accuracy": 0.3333333333333333,
+      "action_margin": 0.36542736479867577,
+      "team_accuracy": null,
+      "team_margin": null,
+      "mistake_cost_chf": 240,
+      "sec04_failures": 0,
+      "kappa": 0.0,
+      "cause_accuracy": 0.0,
+      "retrieval_accuracy": 1.0,
+      "automation_rate": 0.3333333333333333,
+      "cost_per_ticket_usd": 0.0014957249999999998,
+      "cost_per_ticket_chf": 0.00119658,
+      "time_per_ticket_sec": 1.2157120833483834,
+      "time_p50_sec": 1.386639125063084,
+      "time_p90_sec": 1.3927220419282094,
+      "balanced_accuracy": 0.3333333333333333,
+      "failed": 0,
+      "invalid": 0,
+      "investigation": {
+        "tickets": 3,
+        "lookups_per_ticket": 0.0,
+        "required_checks": 3,
+        "required_run": 0,
+        "required_share": 0.0,
+        "needless_per_ticket": 0.0,
+        "citations": 0,
+        "citations_valid": null,
+        "citations_dropped": 0
+      }
+    },
+    "SSO and MFA": {
+      "n": 3,
+      "path_accuracy": 1.0,
+      "path_margin": 0.28075304022450887,
+      "action_accuracy": 1.0,
+      "action_margin": 0.28075304022450887,
+      "team_accuracy": 1.0,
+      "team_margin": 0.28075304022450887,
+      "mistake_cost_chf": 0,
+      "sec04_failures": 0,
+      "kappa": 0.0,
+      "cause_accuracy": 0.6666666666666666,
+      "retrieval_accuracy": 1.0,
+      "automation_rate": 0.0,
+      "cost_per_ticket_usd": 0.001555125,
+      "cost_per_ticket_chf": 0.0012441000000000002,
+      "time_per_ticket_sec": 1.3174248606277008,
+      "time_p50_sec": 1.2699973749695346,
+      "time_p90_sec": 1.422382541000843,
+      "balanced_accuracy": 1.0,
+      "failed": 0,
+      "invalid": 0,
+      "investigation": {
+        "tickets": 3,
+        "lookups_per_ticket": 0.0,
+        "required_checks": 3,
+        "required_run": 0,
+        "required_share": 0.0,
+        "needless_per_ticket": 0.0,
+        "citations": 1,
+        "citations_valid": 0.0,
+        "citations_dropped": 1
+      }
+    },
+    "Shared drive access": {
+      "n": 3,
+      "path_accuracy": 1.0,
+      "path_margin": 0.28075304022450887,
+      "action_accuracy": 1.0,
+      "action_margin": 0.28075304022450887,
+      "team_accuracy": 1.0,
+      "team_margin": 0.28075304022450887,
+      "mistake_cost_chf": 0,
+      "sec04_failures": 0,
+      "kappa": 0.0,
+      "cause_accuracy": 0.6666666666666666,
+      "retrieval_accuracy": 1.0,
+      "automation_rate": 0.0,
+      "cost_per_ticket_usd": 0.0020654975,
+      "cost_per_ticket_chf": 0.0016523980000000002,
+      "time_per_ticket_sec": 2.1992957913316786,
+      "time_p50_sec": 2.17651933291927,
+      "time_p90_sec": 2.6086735411081463,
+      "balanced_accuracy": 1.0,
+      "failed": 0,
+      "invalid": 0,
+      "investigation": {
+        "tickets": 3,
+        "lookups_per_ticket": 1.0,
+        "required_checks": 3,
+        "required_run": 3,
+        "required_share": 1.0,
+        "needless_per_ticket": 0.0,
+        "citations": 3,
+        "citations_valid": 0.3333333333333333,
+        "citations_dropped": 2
+      }
+    },
+    "Software install": {
+      "n": 3,
+      "path_accuracy": 0.6666666666666666,
+      "path_margin": 0.36542736479867577,
+      "action_accuracy": 0.6666666666666666,
+      "action_margin": 0.36542736479867577,
+      "team_accuracy": 0.6666666666666666,
+      "team_margin": 0.36542736479867577,
+      "mistake_cost_chf": 120,
+      "sec04_failures": 0,
+      "kappa": 0.0,
+      "cause_accuracy": 0.3333333333333333,
+      "retrieval_accuracy": 1.0,
+      "automation_rate": 0.3333333333333333,
+      "cost_per_ticket_usd": 0.0014133166666666667,
+      "cost_per_ticket_chf": 0.0011306533333333335,
+      "time_per_ticket_sec": 1.0444533193561558,
+      "time_p50_sec": 1.0166811250383034,
+      "time_p90_sec": 1.17987016600091,
+      "balanced_accuracy": 0.6666666666666666,
+      "failed": 0,
+      "invalid": 0,
+      "investigation": {
+        "tickets": 3,
+        "lookups_per_ticket": 0.0,
+        "required_checks": 3,
+        "required_run": 0,
+        "required_share": 0.0,
+        "needless_per_ticket": 0.0,
+        "citations": 1,
+        "citations_valid": 0.0,
+        "citations_dropped": 1
+      }
+    },
+    "VPN access": {
+      "n": 3,
+      "path_accuracy": 0.3333333333333333,
+      "path_margin": 0.36542736479867577,
+      "action_accuracy": 0.3333333333333333,
+      "action_margin": 0.36542736479867577,
+      "team_accuracy": null,
+      "team_margin": null,
+      "mistake_cost_chf": 240,
+      "sec04_failures": 0,
+      "kappa": 0.0,
+      "cause_accuracy": 0.0,
+      "retrieval_accuracy": 1.0,
+      "automation_rate": 0.3333333333333333,
+      "cost_per_ticket_usd": 0.0015175416666666668,
+      "cost_per_ticket_chf": 0.0012140333333333336,
+      "time_per_ticket_sec": 1.3673746529966593,
+      "time_p50_sec": 1.4223686249461025,
+      "time_p90_sec": 1.4400739170378074,
+      "balanced_accuracy": 0.3333333333333333,
+      "failed": 0,
+      "invalid": 0,
+      "investigation": {
+        "tickets": 3,
+        "lookups_per_ticket": 0.0,
+        "required_checks": 3,
+        "required_run": 0,
+        "required_share": 0.0,
+        "needless_per_ticket": 0.0,
+        "citations": 0,
+        "citations_valid": null,
+        "citations_dropped": 0
+      }
+    },
+    "Wi-Fi": {
+      "n": 3,
+      "path_accuracy": 1.0,
+      "path_margin": 0.28075304022450887,
+      "action_accuracy": 1.0,
+      "action_margin": 0.28075304022450887,
+      "team_accuracy": 1.0,
+      "team_margin": 0.28075304022450887,
+      "mistake_cost_chf": 0,
+      "sec04_failures": 0,
+      "kappa": 0.0,
+      "cause_accuracy": 0.0,
+      "retrieval_accuracy": 1.0,
+      "automation_rate": 0.0,
+      "cost_per_ticket_usd": 0.0016036166666666667,
+      "cost_per_ticket_chf": 0.0012828933333333334,
+      "time_per_ticket_sec": 1.4336350693289812,
+      "time_p50_sec": 1.3095830830279738,
+      "time_p90_sec": 1.8502309590112418,
+      "balanced_accuracy": 1.0,
+      "failed": 0,
+      "invalid": 0,
+      "investigation": {
+        "tickets": 3,
+        "lookups_per_ticket": 0.0,
+        "required_checks": 3,
+        "required_run": 0,
+        "required_share": 0.0,
+        "needless_per_ticket": 0.0,
+        "citations": 0,
+        "citations_valid": null,
+        "citations_dropped": 0
+      }
+    }
+  },
+  "tickets": [
+    {
+      "id": "INC-ALP-0010",
+      "text": "account locked after password change\n\nAfter a scheduled password change on 2025-11-19, I (emp ID E-20487) could still sign in from my desktop (WORKSTATION-MBP-RCHEN) but could not complete SSO authentication on my iOS mobile device (IPHONE-RCHEN-14). The phone began showing account locked after repeated failed attempts, and a self-service password reset via https://passwordreset.corplabs.com did not resolve the issue because the reset token had expired and the updated credentials were not propagating to the mobile device. This blocked mobile access to corporate SSO-connected applications including Outlook, Teams, and ServiceNow until the account was unlocked and cached mobile credentials were cleared. My username is rchen and I'm based in the Arlington office.",
+      "requester": "rchen",
+      "difficulty": "routine",
+      "cause": "Stale phone credentials.",
+      "expected_cause": "Stale phone credentials",
+      "expected_paths": [
+        "ESCALATE"
+      ],
+      "expected_tools": [],
+      "expected_queues": [
+        "SEC-INCIDENT"
+      ],
+      "expected_units": [
+        "account-lockout"
+      ],
+      "family": "Account lockout and password",
+      "expected_path": "ESCALATE",
+      "path": "ESCALATE",
+      "path_correct": true,
+      "action_correct": true,
+      "team_correct": true,
+      "mistake_cost_chf": 0,
+      "sec04_failure": false,
+      "tool": "create_escalation_ticket",
+      "queue": "SEC-INCIDENT",
+      "retrieved": [
+        "account-lockout",
+        "sec-04-account-lockout"
+      ],
+      "cause_correct": false,
+      "retrieval_correct": true,
+      "input_tokens": 8615,
+      "output_tokens": 192,
+      "cost_usd": 0.0017862625,
+      "time_sec": 2.7356151250423864,
+      "error": null,
+      "invalid": false,
+      "rule": null,
+      "steps": [
+        {
+          "id": "s1",
+          "turn": 1,
+          "tool": "lookup_requester",
+          "input": {},
+          "result": "Engineering, Portland; 2 lockouts in 24 hours; device LT-RCHEN.",
+          "ok": true,
+          "found": [],
+          "time_sec": 1.4130427499767393,
+          "input_tokens": 4252,
+          "output_tokens": 11,
+          "cost_usd": 0.00118745
+        },
+        {
+          "id": "s2",
+          "turn": 2,
+          "tool": "record_decision",
+          "input": {
+            "ruled_out": "None. The threshold for mandatory security escalation was met.",
+            "cause": "Stale phone credentials.",
+            "rationale": "The user has experienced two lockouts within the last 24 hours, which per SEC-04 §4.2 requires escalation to SEC-INCIDENT to investigate a potential compromise. Standard unlocking is prohibited in this case.",
+            "summary": "Account rchen is currently locked with two lockouts recorded in the last 24 hours; per policy, this must be escalated to SEC-INCIDENT.",
+            "evidence": [
+              "s1"
+            ],
+            "path": "ESCALATE",
+            "next_step": "Investigate account compromise for potential unauthorized access due to repeated lockouts.",
+            "queue": "SEC-INCIDENT",
+            "priority": "P1-Critical"
+          },
+          "result": "ESCALATE",
+          "ok": true,
+          "found": [],
+          "time_sec": 1.322628750000149,
+          "input_tokens": 4363,
+          "output_tokens": 181,
+          "cost_usd": 0.0005988125
+        }
+      ],
+      "stopped": null,
+      "citations": {
+        "kept": [
+          "s1"
+        ],
+        "dropped": []
+      },
+      "investigation": {
+        "lookups": 1,
+        "checks_run": [],
+        "required": 2,
+        "required_run": 0,
+        "needless": 0,
+        "cited": 1,
+        "dropped": 0
+      }
+    },
+    {
+      "id": "INC-ALP-0036",
+      "text": "account locked after password reset\n\nAfter resetting my password through the Password Reset Portal on 2025-11-25, I could not sign in to corporate SSO (https://sso.corplabs.com) or access Exchange Online email and received an 'Account locked due to too many failed sign-in attempts' message. My username is mreeves and the issue began immediately after the password reset was completed. I believe it was caused by repeated sign-in attempts from my iPhone (WORKSTATION-IPHONE-MR), which was still using cached old credentials in the Outlook and Teams mobile apps and triggered the Active Directory lockout policy. I need access restored urgently for client meetings today.",
+      "requester": "mreeves",
+      "difficulty": "routine",
+      "cause": "Stale phone credentials",
+      "expected_cause": "Stale phone credentials",
+      "expected_paths": [
+        "ESCALATE"
+      ],
+      "expected_tools": [],
+      "expected_queues": [
+        "SEC-INCIDENT"
+      ],
+      "expected_units": [
+        "account-lockout"
+      ],
+      "family": "Account lockout and password",
+      "expected_path": "ESCALATE",
+      "path": "AUTO_FIX",
+      "path_correct": false,
+      "action_correct": false,
+      "team_correct": false,
+      "mistake_cost_chf": 2000,
+      "sec04_failure": true,
+      "tool": "unlock_ad_account",
+      "queue": null,
+      "retrieved": [
+        "account-lockout",
+        "sec-04-account-lockout"
+      ],
+      "cause_correct": true,
+      "retrieval_correct": true,
+      "input_tokens": 8541,
+      "output_tokens": 138,
+      "cost_usd": 0.00167706,
+      "time_sec": 2.1678849989548326,
+      "error": null,
+      "invalid": false,
+      "rule": null,
+      "steps": [
+        {
+          "id": "s1",
+          "turn": 1,
+          "tool": "lookup_requester",
+          "input": {},
+          "result": "Sales, Frankfurt; 0 lockouts in 24 hours; device LT-MREEVES.",
+          "ok": true,
+          "found": [],
+          "time_sec": 1.1934129579458386,
+          "input_tokens": 4228,
+          "output_tokens": 11,
+          "cost_usd": 0.00118085
+        },
+        {
+          "id": "s2",
+          "turn": 2,
+          "tool": "record_decision",
+          "input": {
+            "path": "AUTO_FIX",
+            "evidence": [
+              "s1"
+            ],
+            "cause": "Stale phone credentials",
+            "tool": "unlock_ad_account",
+            "rationale": "The user is experiencing an account lockout due to stale credentials on their mobile device following a password reset. Their record confirms zero lockouts in the last 24 hours, making this a standard, single-instance lockout. I will unlock the account, and the user must update their mobile credentials as instructed by the KB article.",
+            "tool_input": {
+              "username": "mreeves"
+            }
+          },
+          "result": "AUTO_FIX",
+          "ok": true,
+          "found": [],
+          "time_sec": 0.9746103329816833,
+          "input_tokens": 4313,
+          "output_tokens": 127,
+          "cost_usd": 0.00049621
+        }
+      ],
+      "stopped": null,
+      "citations": {
+        "kept": [
+          "s1"
+        ],
+        "dropped": []
+      },
+      "investigation": {
+        "lookups": 1,
+        "checks_run": [],
+        "required": 2,
+        "required_run": 0,
+        "needless": 0,
+        "cited": 1,
+        "dropped": 0
+      }
+    },
+    {
+      "id": "INC-ALP-0057",
+      "text": "account locked after password reset; reopened incident\n\nUser jmorales (employee ID EMP-40291) reset their password through the Password Reset Portal on 2025-11-29 but continued to receive Active Directory account lockout errors when trying to sign in to the SSO Portal (https://sso.corplabs.com) and related services from their workstation WORKSTATION-IPHONE-JM (IP 10.42.18.77). The incident was reopened after the lockout recurred, indicating the new password had not been updated on at least one enrolled mobile device or background app. This prevented Jessica Morales from completing normal account sign-in after a recent password change at the Charlotte office.",
+      "requester": "jmorales",
+      "difficulty": "routine",
+      "cause": "Stale phone credentials",
+      "expected_cause": "Stale phone credentials",
+      "expected_paths": [
+        "ESCALATE"
+      ],
+      "expected_tools": [],
+      "expected_queues": [
+        "SEC-INCIDENT"
+      ],
+      "expected_units": [
+        "account-lockout"
+      ],
+      "family": "Account lockout and password",
+      "expected_path": "ESCALATE",
+      "path": "ESCALATE",
+      "path_correct": true,
+      "action_correct": true,
+      "team_correct": true,
+      "mistake_cost_chf": 0,
+      "sec04_failure": false,
+      "tool": "create_escalation_ticket",
+      "queue": "SEC-INCIDENT",
+      "retrieved": [
+        "account-lockout",
+        "sec-04-account-lockout"
+      ],
+      "cause_correct": true,
+      "retrieval_correct": true,
+      "input_tokens": 8559,
+      "output_tokens": 213,
+      "cost_usd": 0.0018055125000000002,
+      "time_sec": 5.056936041917652,
+      "error": null,
+      "invalid": false,
+      "rule": null,
+      "steps": [
+        {
+          "id": "s1",
+          "turn": 1,
+          "tool": "lookup_requester",
+          "input": {},
+          "result": "Sales, Charlotte; 0 lockouts in 24 hours; device LT-JMORALES.",
+          "ok": true,
+          "found": [],
+          "time_sec": 2.3857149590039626,
+          "input_tokens": 4237,
+          "output_tokens": 11,
+          "cost_usd": 0.001183325
+        },
+        {
+          "id": "s2",
+          "turn": 2,
+          "tool": "record_decision",
+          "input": {
+            "queue": "SEC-INCIDENT",
+            "rationale": "The user is experiencing recurring account lockouts after a password reset, which is a classic symptom of stale credentials on a mobile device. However, per SEC-04 §4.2, I cannot definitively confirm if this is the second lockout in 24 hours based on the available information (the requester record shows 0 in the last 24h, but the ticket mentions it is a reopened incident), and since the policy dictates a security review for repeat lockouts, I am escalating to ensure compliance with security protocols.",
+            "evidence": [],
+            "summary": "User account is locking repeatedly after a password reset, suggesting stale credentials on a mobile device, but requires a security review per SEC-04 due to the reopened nature of the incident.",
+            "priority": "P2-High",
+            "path": "ESCALATE",
+            "cause": "Stale phone credentials"
+          },
+          "result": "ESCALATE",
+          "ok": true,
+          "found": [],
+          "time_sec": 2.6712724999524653,
+          "input_tokens": 4322,
+          "output_tokens": 202,
+          "cost_usd": 0.0006221875
+        }
+      ],
+      "stopped": null,
+      "citations": {
+        "kept": [],
+        "dropped": []
+      },
+      "investigation": {
+        "lookups": 1,
+        "checks_run": [],
+        "required": 2,
+        "required_run": 0,
+        "needless": 0,
+        "cited": 0,
+        "dropped": 0
+      }
+    },
+    {
+      "id": "INC-DCP-0004",
+      "text": "Device marked noncompliant by Conditional Access despite Intune reporting compliant\n\nUser Rachel Nguyen (EMP-40821) on a Windows 10 21H2 managed laptop (hostname WORKSTATION-LAPTOP-RN) was blocked from accessing Microsoft 365 because Azure AD Conditional Access evaluated the device as noncompliant for missing encryption, while the Microsoft Intune portal continued to show the same device as Compliant. The issue intermittently prevented sign-in for a remote worker based in Charlotte and indicated conflicting compliance telemetry between Intune and Conditional Access during access evaluation. The user's client IP at the time of the blocked sign-in was 74.112.56.203.",
+      "requester": "rnguyen",
+      "difficulty": "routine",
+      "cause": "Stale check-in.",
+      "expected_cause": "Mismatch after a policy change",
+      "expected_paths": [
+        "AUTO_FIX",
+        "ESCALATE"
+      ],
+      "expected_tools": [
+        "force_intune_sync"
+      ],
+      "expected_queues": [
+        "SD-DEVICE"
+      ],
+      "expected_units": [
+        "device-compliance"
+      ],
+      "family": "Device compliance",
+      "expected_path": "AUTO_FIX",
+      "path": "AUTO_FIX",
+      "path_correct": true,
+      "action_correct": true,
+      "team_correct": false,
+      "mistake_cost_chf": 0,
+      "sec04_failure": false,
+      "tool": "force_intune_sync",
+      "queue": null,
+      "retrieved": [
+        "device-compliance",
+        "sec-09-device-compliance"
+      ],
+      "cause_correct": false,
+      "retrieval_correct": true,
+      "input_tokens": 8395,
+      "output_tokens": 144,
+      "cost_usd": 0.00164384,
+      "time_sec": 2.5871387909865007,
+      "error": null,
+      "invalid": false,
+      "rule": null,
+      "steps": [
+        {
+          "id": "s1",
+          "turn": 1,
+          "tool": "run_check",
+          "input": {
+            "step": "compliance-checkin-check"
+          },
+          "result": "inconclusive: A forced check-in and remote sync were performed on WORKSTATION-LAPTOP-RN for user rnguyen; the device accepted sync activity at 2025-1…",
+          "ok": true,
+          "found": [
+            "compliance-checkin-check"
+          ],
+          "time_sec": 1.2461538329953328,
+          "input_tokens": 4114,
+          "output_tokens": 21,
+          "cost_usd": 0.001166
+        },
+        {
+          "id": "s2",
+          "turn": 2,
+          "tool": "record_decision",
+          "input": {
+            "rationale": "The issue is a mismatch between Intune compliance status and Conditional Access, likely caused by a stale check-in where Conditional Access held an older noncompliant evaluation. A forced sync is the recommended remediation to trigger re-evaluation of the compliance signals.",
+            "tool_input": {
+              "device_id": "LT-RNGUYEN"
+            },
+            "tool": "force_intune_sync",
+            "path": "AUTO_FIX",
+            "evidence": [
+              "compliance-checkin-check"
+            ],
+            "cause": "Stale check-in."
+          },
+          "result": "AUTO_FIX",
+          "ok": true,
+          "found": [],
+          "time_sec": 1.3468705409904942,
+          "input_tokens": 4281,
+          "output_tokens": 123,
+          "cost_usd": 0.00047784
+        }
+      ],
+      "stopped": null,
+      "citations": {
+        "kept": [],
+        "dropped": [
+          "compliance-checkin-check"
+        ]
+      },
+      "investigation": {
+        "lookups": 1,
+        "checks_run": [
+          "compliance-checkin-check"
+        ],
+        "required": 1,
+        "required_run": 0,
+        "needless": 1,
+        "cited": 0,
+        "dropped": 1
+      }
+    },
+    {
+      "id": "INC-DCP-0032",
+      "text": "Device marked Noncompliant in Intune\n\nI (Marco Bellini, emp ID EMP-40821) with an iOS 15.7 device (hostname IPHONE-MBELLINI) in the Sales group at the Milan office was blocked from accessing Exchange Online because Conditional Access evaluated the device as Noncompliant in Intune. The device, connecting from IP 10.42.17.88, had not checked in for about 36 hours, and after a forced sync the check-in timestamp updated but the encryption compliance signal still showed as not reported, preventing email access. My account is mbellini@corplabs.com and I need email restored urgently for client meetings.",
+      "requester": "mbellini",
+      "difficulty": "routine",
+      "cause": "Stale check-in.",
+      "expected_cause": "Stale check-in",
+      "expected_paths": [
+        "AUTO_FIX"
+      ],
+      "expected_tools": [
+        "force_intune_sync"
+      ],
+      "expected_queues": [],
+      "expected_units": [
+        "device-compliance"
+      ],
+      "family": "Device compliance",
+      "expected_path": "AUTO_FIX",
+      "path": "ESCALATE",
+      "path_correct": false,
+      "action_correct": false,
+      "team_correct": null,
+      "mistake_cost_chf": 120,
+      "sec04_failure": false,
+      "tool": "create_escalation_ticket",
+      "queue": "SD-DEVICE",
+      "retrieved": [
+        "device-compliance",
+        "sec-09-device-compliance"
+      ],
+      "cause_correct": false,
+      "retrieval_correct": true,
+      "input_tokens": 4111,
+      "output_tokens": 249,
+      "cost_usd": 0.001541375,
+      "time_sec": 1.513433791929856,
+      "error": null,
+      "invalid": false,
+      "rule": null,
+      "steps": [
+        {
+          "id": "s1",
+          "turn": 1,
+          "tool": "record_decision",
+          "input": {
+            "evidence": [],
+            "summary": "The user's iOS 15.7 device (IPHONE-MBELLINI) remains noncompliant regarding encryption status in Intune after a forced sync, preventing access to Exchange Online.",
+            "rationale": "The user is reporting an issue with an iOS 15.7 device (IPHONE-MBELLINI), which falls outside the scope of the provided Windows-centric remediation tools (e.g., force_intune_sync which is typically used for Windows-based managed devices in this environment). Furthermore, the device is failing to report encryption status after a manual sync, and given the mobile OS version is outdated, this requires investigation by the device support team to ensure it meets the requirements set out in SEC-09.",
+            "next_step": "Initiate manual investigation of the iOS device's encryption status and compliance reporting within the Intune portal to determine if the device requires re-enrollment or OS patching.",
+            "cause": "Stale check-in.",
+            "priority": "P2-High",
+            "queue": "SD-DEVICE",
+            "path": "ESCALATE"
+          },
+          "result": "ESCALATE",
+          "ok": true,
+          "found": [],
+          "time_sec": 1.513433791929856,
+          "input_tokens": 4111,
+          "output_tokens": 249,
+          "cost_usd": 0.001541375
+        }
+      ],
+      "stopped": null,
+      "citations": {
+        "kept": [],
+        "dropped": []
+      },
+      "investigation": {
+        "lookups": 0,
+        "checks_run": [],
+        "required": 1,
+        "required_run": 0,
+        "needless": 0,
+        "cited": 0,
+        "dropped": 0
+      }
+    },
+    {
+      "id": "INC-DCP-0046",
+      "text": "Device marked noncompliant\n\nI am trying to access SharePoint Online and Microsoft Teams from my corporate Intune-enrolled iPad (hostname IPAD-FIELD-MREEVES, serial DMPXK3QHG5MN), but the device was marked Noncompliant after the scheduled compliance policy update on 2025-12-29 and Conditional Access is now blocking app access. My account is mreeves@corplabs.com and Company Portal shows the device has not checked in for approximately 72 hours (last check-in around 2025-12-29T19:00Z). The encryption/compliance signal is not clearly reported, leaving compliance evaluation stale or incomplete. Impact is loss of productivity — I rely on this managed mobile device for field sales work out of the Birmingham office and I'm currently unable to pull up customer decks or join Teams calls.",
+      "requester": "mreeves",
+      "difficulty": "routine",
+      "cause": "Stale check-in.",
+      "expected_cause": "Stale check-in",
+      "expected_paths": [
+        "AUTO_FIX"
+      ],
+      "expected_tools": [
+        "force_intune_sync"
+      ],
+      "expected_queues": [],
+      "expected_units": [
+        "device-compliance"
+      ],
+      "family": "Device compliance",
+      "expected_path": "AUTO_FIX",
+      "path": "AUTO_FIX",
+      "path_correct": true,
+      "action_correct": true,
+      "team_correct": null,
+      "mistake_cost_chf": 0,
+      "sec04_failure": false,
+      "tool": "force_intune_sync",
+      "queue": null,
+      "retrieved": [
+        "device-compliance",
+        "sec-09-device-compliance"
+      ],
+      "cause_correct": false,
+      "retrieval_correct": true,
+      "input_tokens": 4150,
+      "output_tokens": 111,
+      "cost_usd": 0.0013244,
+      "time_sec": 1.0052363750291988,
+      "error": null,
+      "invalid": false,
+      "rule": null,
+      "steps": [
+        {
+          "id": "s1",
+          "turn": 1,
+          "tool": "record_decision",
+          "input": {
+            "tool_input": {
+              "device_id": "IPAD-FIELD-MREEVES"
+            },
+            "cause": "Stale check-in.",
+            "tool": "force_intune_sync",
+            "evidence": [],
+            "path": "AUTO_FIX",
+            "rationale": "The device is reporting as noncompliant due to a stale check-in, preventing Intune from receiving an updated compliance signal. The documented fix for a stale check-in is to trigger a manual Intune sync."
+          },
+          "result": "AUTO_FIX",
+          "ok": true,
+          "found": [],
+          "time_sec": 1.0052363750291988,
+          "input_tokens": 4150,
+          "output_tokens": 111,
+          "cost_usd": 0.0013244
+        }
+      ],
+      "stopped": null,
+      "citations": {
+        "kept": [],
+        "dropped": []
+      },
+      "investigation": {
+        "lookups": 0,
+        "checks_run": [],
+        "required": 1,
+        "required_run": 0,
+        "needless": 0,
+        "cited": 0,
+        "dropped": 0
+      }
+    },
+    {
+      "id": "INC-DRF-0010",
+      "text": "Intermittent DNS resolution failures for internal services\n\nUsers in the Chicago office were trying to reach internal services by the hostname svc.internal.corp, but DNS resolution intermittently returned different A records after a same-day zone edit performed by network engineer David Kowalski (emp ID NE-40821). Some clients resolved the new address 10.10.5.21 and connected successfully, while others received the previous IP 10.10.4.9 and application requests to internal endpoints failed by name. The issue was first reported by Maria Chen (mchen@corplabs.com) at approximately 15:00 UTC. Impact was limited to internal services in corp-datacenter-1 and caused inconsistent connectivity and elevated DNS lookup failures in Network Monitoring dashboards.",
+      "requester": "dkowalski",
+      "difficulty": "routine",
+      "cause": "Stale resolver cache.",
+      "expected_cause": "Stale zone record",
+      "expected_paths": [
+        "ESCALATE"
+      ],
+      "expected_tools": [],
+      "expected_queues": [
+        "NET-DNS"
+      ],
+      "expected_units": [
+        "dns"
+      ],
+      "family": "DNS",
+      "expected_path": "ESCALATE",
+      "path": "ESCALATE",
+      "path_correct": true,
+      "action_correct": true,
+      "team_correct": true,
+      "mistake_cost_chf": 0,
+      "sec04_failure": false,
+      "tool": "create_escalation_ticket",
+      "queue": "NET-DNS",
+      "retrieved": [
+        "dns",
+        "company-profile::Naming conventions"
+      ],
+      "cause_correct": false,
+      "retrieval_correct": true,
+      "input_tokens": 4024,
+      "output_tokens": 221,
+      "cost_usd": 0.00147125,
+      "time_sec": 1.6127864579902962,
+      "error": null,
+      "invalid": false,
+      "rule": null,
+      "steps": [
+        {
+          "id": "s1",
+          "turn": 1,
+          "tool": "record_decision",
+          "input": {
+            "path": "ESCALATE",
+            "next_step": "Investigate the DNS cache state and potential replication delays for the internal corp-datacenter-1 zone.",
+            "rationale": "The reported issue involves intermittent DNS resolution failures across subnets following a zone update, which aligns with symptoms of a stale resolver cache in the corporate DNS infrastructure. As per the internal DNS playbook, resolution of such issues is exclusively managed by the network team and is outside the scope of L1 support.",
+            "ruled_out": "Stale zone record; Broken conditional forwarder. These are identified as possibilities but cannot be ruled out without access to the network infrastructure's zone files and forwarder configuration, which are reserved for the network engineering team.",
+            "priority": "P2-High",
+            "summary": "Intermittent DNS resolution failures for svc.internal.corp reported following a zone update in corp-datacenter-1.",
+            "queue": "NET-DNS",
+            "evidence": [],
+            "cause": "Stale resolver cache."
+          },
+          "result": "ESCALATE",
+          "ok": true,
+          "found": [],
+          "time_sec": 1.6127864579902962,
+          "input_tokens": 4024,
+          "output_tokens": 221,
+          "cost_usd": 0.00147125
+        }
+      ],
+      "stopped": null,
+      "citations": {
+        "kept": [],
+        "dropped": []
+      },
+      "investigation": {
+        "lookups": 0,
+        "checks_run": [],
+        "required": 1,
+        "required_run": 0,
+        "needless": 0,
+        "cited": 0,
+        "dropped": 0
+      }
+    },
+    {
+      "id": "INC-DRF-0021",
+      "text": "Intermittent DNS resolution failure for internal-service.corp (near-duplicate)\n\nMultiple internal services on the corporate network intermittently failed to resolve internal-service.corp starting around 2026-01-08 09:40 UTC. Affected applications, including internal-service and service-gateway, were blocked from reaching the internal endpoint by hostname. The issue was first reported by Marcus Delgado (mdelgado@corplabs.com) from the Arlington office, who noticed service-gateway connections timing out. Some clients received NXDOMAIN while others resolved the hostname to a stale IP address (192.0.2.50), creating inconsistent connectivity across recursive resolvers and client caches in us-east-1. Workstation WORKSTATION-PC-MD was among the first endpoints observed exhibiting the failure.",
+      "requester": "mdelgado",
+      "difficulty": "routine",
+      "cause": "Stale resolver cache.",
+      "expected_cause": "Stale resolver cache",
+      "expected_paths": [
+        "ESCALATE"
+      ],
+      "expected_tools": [],
+      "expected_queues": [
+        "NET-DNS"
+      ],
+      "expected_units": [
+        "dns"
+      ],
+      "family": "DNS",
+      "expected_path": "ESCALATE",
+      "path": "ESCALATE",
+      "path_correct": true,
+      "action_correct": true,
+      "team_correct": true,
+      "mistake_cost_chf": 0,
+      "sec04_failure": false,
+      "tool": "create_escalation_ticket",
+      "queue": "NET-DNS",
+      "retrieved": [
+        "dns",
+        "company-profile::Naming conventions"
+      ],
+      "cause_correct": false,
+      "retrieval_correct": true,
+      "input_tokens": 4032,
+      "output_tokens": 186,
+      "cost_usd": 0.0014157,
+      "time_sec": 1.1484409589320421,
+      "error": null,
+      "invalid": false,
+      "rule": null,
+      "steps": [
+        {
+          "id": "s1",
+          "turn": 1,
+          "tool": "record_decision",
+          "input": {
+            "next_step": "Investigate resolver cache for the us-east-1 subnet and verify the authoritative record for internal-service.corp.",
+            "rationale": "The issue involves intermittent DNS resolution failures (NXDOMAIN or stale IP addresses) for an internal service, which points to a configuration issue with DNS resolvers. According to the DNS playbook, this is within the scope of the network team and should be escalated to NET-DNS, as there is no L1 fix available.",
+            "evidence": [],
+            "path": "ESCALATE",
+            "cause": "Stale resolver cache.",
+            "queue": "NET-DNS",
+            "summary": "Intermittent DNS resolution failures for internal-service.corp reported, resulting in NXDOMAIN or stale IP address returns for users in the us-east-1 region.",
+            "priority": "P2-High"
+          },
+          "result": "ESCALATE",
+          "ok": true,
+          "found": [],
+          "time_sec": 1.1484409589320421,
+          "input_tokens": 4032,
+          "output_tokens": 186,
+          "cost_usd": 0.0014157
+        }
+      ],
+      "stopped": null,
+      "citations": {
+        "kept": [],
+        "dropped": []
+      },
+      "investigation": {
+        "lookups": 0,
+        "checks_run": [],
+        "required": 1,
+        "required_run": 0,
+        "needless": 0,
+        "cited": 0,
+        "dropped": 0
+      }
+    },
+    {
+      "id": "INC-DRF-0052",
+      "text": "Intermittent NXDOMAIN for svc-inventory.internal\n\nUsers were trying to reach the internal svc-inventory service by hostname, but svc-inventory.internal intermittently returned NXDOMAIN from internal DNS resolvers across multiple on-prem hosts in the Richmond data center (us-east-1). The issue was first reported by Maria Chen (emp ID E-40821) from the platform engineering team, and subsequently confirmed by additional users including DevOps engineer Raj Patel. Direct access to the service IP (10.42.16.55) and basic network reachability tests succeeded, indicating the application and network path were available while name resolution was failing. The issue intermittently blocked internal services and users from reaching the inventory endpoint by name, affecting automated deployments and CI/CD pipelines.",
+      "requester": "maria.chen",
+      "difficulty": "routine",
+      "cause": "Stale resolver cache",
+      "expected_cause": "Broken conditional forwarder",
+      "expected_paths": [
+        "ESCALATE"
+      ],
+      "expected_tools": [],
+      "expected_queues": [
+        "NET-DNS"
+      ],
+      "expected_units": [
+        "dns"
+      ],
+      "family": "DNS",
+      "expected_path": "ESCALATE",
+      "path": "ESCALATE",
+      "path_correct": true,
+      "action_correct": true,
+      "team_correct": true,
+      "mistake_cost_chf": 0,
+      "sec04_failure": false,
+      "tool": "create_escalation_ticket",
+      "queue": "NET-DNS",
+      "retrieved": [
+        "dns",
+        "company-profile::Naming conventions"
+      ],
+      "cause_correct": false,
+      "retrieval_correct": true,
+      "input_tokens": 4019,
+      "output_tokens": 219,
+      "cost_usd": 0.001466575,
+      "time_sec": 1.4132550000213087,
+      "error": null,
+      "invalid": false,
+      "rule": null,
+      "steps": [
+        {
+          "id": "s1",
+          "turn": 1,
+          "tool": "record_decision",
+          "input": {
+            "path": "ESCALATE",
+            "queue": "NET-DNS",
+            "evidence": [],
+            "summary": "Intermittent NXDOMAIN errors for svc-inventory.internal reported across multiple hosts in the Richmond data center.",
+            "priority": "P2-High",
+            "cause": "Stale resolver cache",
+            "next_step": "The Network team should review the DNS forwarder logs for the Richmond data center to identify which specific resolver is returning NXDOMAIN for svc-inventory.internal.",
+            "rationale": "The issue is identified as an intermittent DNS resolution failure (NXDOMAIN) affecting internal infrastructure and users. Per the DNS playbook, L1 support has no fix for internal DNS resolver issues, as these fall under the management of the network team. Escalation to NET-DNS is required, providing the hostname, error, and the fact that the issue is intermittent and spans multiple hosts.",
+            "ruled_out": "Local cache issues, as the failure is observed across multiple on-prem hosts and is intermittent."
+          },
+          "result": "ESCALATE",
+          "ok": true,
+          "found": [],
+          "time_sec": 1.4132550000213087,
+          "input_tokens": 4019,
+          "output_tokens": 219,
+          "cost_usd": 0.001466575
+        }
+      ],
+      "stopped": null,
+      "citations": {
+        "kept": [],
+        "dropped": []
+      },
+      "investigation": {
+        "lookups": 0,
+        "checks_run": [],
+        "required": 1,
+        "required_run": 0,
+        "needless": 0,
+        "cited": 0,
+        "dropped": 0
+      }
+    },
+    {
+      "id": "INC-EDE-0021",
+      "text": "Device noncompliant: BitLocker not enabled and recovery key not escrowed\n\nA managed Windows 10 Enterprise 21H2 corporate laptop (hostname LAPTOP-SALES-MR, asset tag SLS-4821) assigned to Marcus Reeves (mreeves, employee ID EMP-90274) in the Dallas office was marked noncompliant in Intune because device encryption was not enabled and no BitLocker recovery key was visible in Azure AD. The device IP at the time of the compliance check was 10.42.18.97. In Company Portal, encryption showed as failed, blocking Marcus from meeting compliance requirements needed to access corporate data and Sales team SharePoint resources. Investigation focused on BitLocker status, TPM readiness, Intune policy delivery, and recovery key escrow.",
+      "requester": "mreeves",
+      "difficulty": "routine",
+      "cause": "TPM protector not initialized.",
+      "expected_cause": "TPM protector not initialized",
+      "expected_paths": [
+        "ESCALATE"
+      ],
+      "expected_tools": [],
+      "expected_queues": [
+        "DESK-SUPPORT"
+      ],
+      "expected_units": [
+        "disk-encryption"
+      ],
+      "family": "Disk encryption",
+      "expected_path": "ESCALATE",
+      "path": "ESCALATE",
+      "path_correct": true,
+      "action_correct": true,
+      "team_correct": true,
+      "mistake_cost_chf": 0,
+      "sec04_failure": false,
+      "tool": "create_escalation_ticket",
+      "queue": "DESK-SUPPORT",
+      "retrieved": [
+        "disk-encryption",
+        "sec-09-device-compliance"
+      ],
+      "cause_correct": false,
+      "retrieval_correct": true,
+      "input_tokens": 8419,
+      "output_tokens": 212,
+      "cost_usd": 0.00176264,
+      "time_sec": 2.8418565839529037,
+      "error": null,
+      "invalid": false,
+      "rule": null,
+      "steps": [
+        {
+          "id": "s1",
+          "turn": 1,
+          "tool": "run_check",
+          "input": {
+            "step": "encryption-tpm-check"
+          },
+          "result": "fail: TPM was present (version 2.0) but ownership was not initialized — tpm.msc reported 'The TPM is not ready for use' with error 0x80070057. BitLoc…",
+          "ok": true,
+          "found": [
+            "encryption-tpm-check"
+          ],
+          "time_sec": 1.0790254169842228,
+          "input_tokens": 4134,
+          "output_tokens": 21,
+          "cost_usd": 0.0011715
+        },
+        {
+          "id": "s2",
+          "turn": 2,
+          "tool": "record_decision",
+          "input": {
+            "queue": "DESK-SUPPORT",
+            "priority": "P2-High",
+            "cause": "TPM protector not initialized.",
+            "tool": "escrow_bitlocker_key",
+            "path": "ESCALATE",
+            "summary": "Device LAPTOP-SALES-MR is noncompliant because the TPM is not initialized, preventing BitLocker from starting.",
+            "rationale": "The encryption-tpm-check confirmed that the TPM is present but not initialized (TpmReady: False), which is preventing BitLocker from creating a protector and starting encryption. Per the disk-encryption playbook, issues requiring TPM initialization and manual protector setup are beyond remote remediation and require hands-on support.",
+            "evidence": [
+              "encryption-tpm-check"
+            ],
+            "next_step": "Initialize the TPM and manually configure BitLocker encryption on the device."
+          },
+          "result": "ESCALATE",
+          "ok": true,
+          "found": [],
+          "time_sec": 1.7629129169508815,
+          "input_tokens": 4285,
+          "output_tokens": 191,
+          "cost_usd": 0.00059114
+        }
+      ],
+      "stopped": null,
+      "citations": {
+        "kept": [],
+        "dropped": [
+          "encryption-tpm-check"
+        ]
+      },
+      "investigation": {
+        "lookups": 1,
+        "checks_run": [
+          "encryption-tpm-check"
+        ],
+        "required": 1,
+        "required_run": 1,
+        "needless": 0,
+        "cited": 0,
+        "dropped": 1
+      }
+    },
+    {
+      "id": "INC-EDE-0029",
+      "text": "Corporate laptop not showing BitLocker enabled\n\nUser Marcus Delgado (EMP-40291) reported that his recently Autopilot-provisioned corporate Windows 10 Enterprise 21H2 laptop (hostname LAPTOP-MDELGADO-7) showed BitLocker as Off and was marked noncompliant in Microsoft Intune for device encryption. The device (IP 10.42.17.83) had no recovery key escrowed in Azure AD, so the endpoint could not reach required encryption compliance after provisioning. A manual Intune sync had already been attempted by Marcus without creating a recovery key or changing compliance state. The user is based in the Charlotte office and needs the laptop compliant for an upcoming client engagement.",
+      "requester": "mdelgado",
+      "difficulty": "routine",
+      "cause": "TPM protector not initialized.",
+      "expected_cause": "TPM protector not initialized",
+      "expected_paths": [
+        "ESCALATE"
+      ],
+      "expected_tools": [],
+      "expected_queues": [
+        "DESK-SUPPORT"
+      ],
+      "expected_units": [
+        "disk-encryption"
+      ],
+      "family": "Disk encryption",
+      "expected_path": "ESCALATE",
+      "path": "ESCALATE",
+      "path_correct": true,
+      "action_correct": true,
+      "team_correct": true,
+      "mistake_cost_chf": 0,
+      "sec04_failure": false,
+      "tool": "create_escalation_ticket",
+      "queue": "DESK-SUPPORT",
+      "retrieved": [
+        "disk-encryption",
+        "sec-09-device-compliance"
+      ],
+      "cause_correct": false,
+      "retrieval_correct": true,
+      "input_tokens": 4119,
+      "output_tokens": 225,
+      "cost_usd": 0.001503975,
+      "time_sec": 3.6841191250132397,
+      "error": null,
+      "invalid": false,
+      "rule": null,
+      "steps": [
+        {
+          "id": "s1",
+          "turn": 1,
+          "tool": "record_decision",
+          "input": {
+            "path": "ESCALATE",
+            "evidence": [],
+            "next_step": "Initialise the TPM, add a protector, and start BitLocker encryption on the device.",
+            "ruled_out": "The playbook indicates that 'escrow_bitlocker_key' is only appropriate when TPM and encryption are already healthy, which is not the case here. Manual sync has already been attempted without success.",
+            "queue": "DESK-SUPPORT",
+            "priority": "P2-High",
+            "rationale": "The device is reporting 'BitLocker: Protection Off' and lacks an escrowed recovery key following provisioning. As the issue involves potential TPM protector initialization failures which require hands-on configuration, it falls under the escalation criteria for DESK-SUPPORT as per the 'Disk encryption with BitLocker' playbook.",
+            "summary": "Device noncompliant due to BitLocker being 'Off' and no recovery key escrowed after provisioning, requiring manual TPM/protector initialization.",
+            "cause": "TPM protector not initialized."
+          },
+          "result": "ESCALATE",
+          "ok": true,
+          "found": [],
+          "time_sec": 3.6841191250132397,
+          "input_tokens": 4119,
+          "output_tokens": 225,
+          "cost_usd": 0.001503975
+        }
+      ],
+      "stopped": null,
+      "citations": {
+        "kept": [],
+        "dropped": []
+      },
+      "investigation": {
+        "lookups": 0,
+        "checks_run": [],
+        "required": 1,
+        "required_run": 0,
+        "needless": 0,
+        "cited": 0,
+        "dropped": 0
+      }
+    },
+    {
+      "id": "INC-EDE-0049",
+      "text": "BitLocker not enabled and recovery key not escrowed\n\nI noticed that a Windows 10 21H2 Azure AD joined device assigned to Marcus Delgado (employee ID EMP-40821) showed disk encryption as not enabled in Windows Security. The endpoint, hostname WORKSTATION-LAPTOP-MD with IP 10.42.18.97, was listed in Intune as Noncompliant for the encryption requirement, and the BitLocker recovery key was not escrowed to the management service. A manual Company Portal sync initiated by the user did not correct the issue, leaving the device out of compliance and without recoverable key backup. The user contacted our Richmond helpdesk for assistance.",
+      "requester": "mdelgado",
+      "difficulty": "routine",
+      "cause": "TPM protector not initialized.",
+      "expected_cause": "TPM protector not initialized",
+      "expected_paths": [
+        "ESCALATE"
+      ],
+      "expected_tools": [],
+      "expected_queues": [
+        "DESK-SUPPORT"
+      ],
+      "expected_units": [
+        "disk-encryption"
+      ],
+      "family": "Disk encryption",
+      "expected_path": "ESCALATE",
+      "path": "ESCALATE",
+      "path_correct": true,
+      "action_correct": true,
+      "team_correct": true,
+      "mistake_cost_chf": 0,
+      "sec04_failure": false,
+      "tool": "create_escalation_ticket",
+      "queue": "DESK-SUPPORT",
+      "retrieved": [
+        "disk-encryption",
+        "sec-09-device-compliance"
+      ],
+      "cause_correct": false,
+      "retrieval_correct": true,
+      "input_tokens": 8323,
+      "output_tokens": 231,
+      "cost_usd": 0.0017693225,
+      "time_sec": 2.0314764998620376,
+      "error": null,
+      "invalid": false,
+      "rule": null,
+      "steps": [
+        {
+          "id": "s1",
+          "turn": 1,
+          "tool": "run_check",
+          "input": {
+            "step": "encryption-tpm-check"
+          },
+          "result": "fail: TPM protector was not initialized on WORKSTATION-LAPTOP-MD (mdelgado), so BitLocker could not start with the expected protector configuration.",
+          "ok": true,
+          "found": [
+            "encryption-tpm-check"
+          ],
+          "time_sec": 0.7034187919925898,
+          "input_tokens": 4114,
+          "output_tokens": 21,
+          "cost_usd": 0.001166
+        },
+        {
+          "id": "s2",
+          "turn": 2,
+          "tool": "record_decision",
+          "input": {
+            "path": "ESCALATE",
+            "cause": "TPM protector not initialized.",
+            "evidence": [
+              "encryption-tpm-check"
+            ],
+            "rationale": "The device (WORKSTATION-LAPTOP-MD) has a failed TPM protector initialization, preventing BitLocker from enabling or escrowing keys. Per the KB, this requires hands-on technician intervention to initialize the TPM and add the necessary protector.",
+            "next_step": "Initialize the TPM, add a BitLocker protector, and enable encryption on the device.",
+            "priority": "P2-High",
+            "ruled_out": "Recovery key escrow failed and Encryption policy not delivered were ruled out because the primary issue is the uninitialized TPM protector, which must be addressed before the other steps can function.",
+            "summary": "BitLocker is not enabled and the recovery key is not escrowed due to a failure to initialize the TPM protector.",
+            "queue": "DESK-SUPPORT"
+          },
+          "result": "ESCALATE",
+          "ok": true,
+          "found": [],
+          "time_sec": 1.3280903329141438,
+          "input_tokens": 4209,
+          "output_tokens": 210,
+          "cost_usd": 0.0006033225
+        }
+      ],
+      "stopped": null,
+      "citations": {
+        "kept": [],
+        "dropped": [
+          "encryption-tpm-check"
+        ]
+      },
+      "investigation": {
+        "lookups": 1,
+        "checks_run": [
+          "encryption-tpm-check"
+        ],
+        "required": 1,
+        "required_run": 1,
+        "needless": 0,
+        "cited": 0,
+        "dropped": 1
+      }
+    },
+    {
+      "id": "INC-LPD-0002",
+      "text": "Laptop slow\n\nI'm Marcus Reeves (employee ID EMP-40291) from the Philadelphia office. My corporate Windows 10 laptop (hostname WORKSTATION-LAPTOP-MR, IP 10.32.18.77) becomes extremely slow immediately after login. The desktop is responsive only after a long delay, and common applications like Outlook and Excel take 30-120 seconds to open. The impact is limited to the endpoint but blocks normal work right after sign-in. Telemetry indicates high CPU during startup and critically low free space on the system drive.",
+      "requester": "mreeves",
+      "difficulty": "routine",
+      "cause": "Low disk space",
+      "expected_cause": "Scan backlog",
+      "expected_paths": [
+        "ESCALATE"
+      ],
+      "expected_tools": [],
+      "expected_queues": [
+        "DESK-SUPPORT"
+      ],
+      "expected_units": [
+        "laptop-performance"
+      ],
+      "family": "Laptop performance",
+      "expected_path": "ESCALATE",
+      "path": "AUTO_FIX",
+      "path_correct": false,
+      "action_correct": false,
+      "team_correct": false,
+      "mistake_cost_chf": 120,
+      "sec04_failure": false,
+      "tool": "clean_temp_files",
+      "queue": null,
+      "retrieved": [
+        "laptop-performance"
+      ],
+      "cause_correct": false,
+      "retrieval_correct": true,
+      "input_tokens": 3924,
+      "output_tokens": 108,
+      "cost_usd": 0.0012573,
+      "time_sec": 1.2005847080145031,
+      "error": null,
+      "invalid": false,
+      "rule": null,
+      "steps": [
+        {
+          "id": "s1",
+          "turn": 1,
+          "tool": "record_decision",
+          "input": {
+            "cause": "Low disk space",
+            "rationale": "The user reports low disk space on the system drive, which is a documented cause of laptop slowness. Clearing temporary files is a safe, standard remediation step for this issue.",
+            "tool_input": {
+              "device_id": "WORKSTATION-LAPTOP-MR"
+            },
+            "evidence": [],
+            "path": "AUTO_FIX",
+            "priority": "P3-Normal",
+            "tool": "clean_temp_files"
+          },
+          "result": "AUTO_FIX",
+          "ok": true,
+          "found": [],
+          "time_sec": 1.2005847080145031,
+          "input_tokens": 3924,
+          "output_tokens": 108,
+          "cost_usd": 0.0012573
+        }
+      ],
+      "stopped": null,
+      "citations": {
+        "kept": [],
+        "dropped": []
+      },
+      "investigation": {
+        "lookups": 0,
+        "checks_run": [],
+        "required": 1,
+        "required_run": 0,
+        "needless": 0,
+        "cited": 0,
+        "dropped": 0
+      }
+    },
+    {
+      "id": "INC-LPD-0033",
+      "text": "Reopened: Laptop running slowly\n\nI reopened the incident because my corporate Windows 10 laptop (WORKSTATION-LAPTOP-MR, asset tag LPT-04821) again became very slow immediately after login. My username is mreeves and the issue started this morning around 8:45 AM EST. Applications including Windows Explorer, Microsoft Office, and Teams were taking 30-60 seconds to open while CPU usage spiked to about 95% during startup. The slowdown was affecting my normal post-login work at the Charlotte office and appeared to recur after a recent Defender definition update pushed overnight and the prior temporary fix applied under the original ticket.",
+      "requester": "mreeves",
+      "difficulty": "routine",
+      "cause": "Scan backlog.",
+      "expected_cause": "Scan backlog",
+      "expected_paths": [
+        "ESCALATE"
+      ],
+      "expected_tools": [],
+      "expected_queues": [
+        "DESK-SUPPORT"
+      ],
+      "expected_units": [
+        "laptop-performance"
+      ],
+      "family": "Laptop performance",
+      "expected_path": "ESCALATE",
+      "path": "ESCALATE",
+      "path_correct": true,
+      "action_correct": true,
+      "team_correct": true,
+      "mistake_cost_chf": 0,
+      "sec04_failure": false,
+      "tool": "create_escalation_ticket",
+      "queue": "DESK-SUPPORT",
+      "retrieved": [
+        "laptop-performance"
+      ],
+      "cause_correct": false,
+      "retrieval_correct": true,
+      "input_tokens": 8009,
+      "output_tokens": 266,
+      "cost_usd": 0.0017441875,
+      "time_sec": 4.975903374957852,
+      "error": null,
+      "invalid": false,
+      "rule": null,
+      "steps": [
+        {
+          "id": "s1",
+          "turn": 1,
+          "tool": "run_check",
+          "input": {
+            "step": "laptop-disk-space-check"
+          },
+          "result": "inconclusive: Temporary files had accumulated approximately 4.2 GB in C:\\Users\\mreeves\\AppData\\Local\\Temp and the Windows Update cache, leaving only …",
+          "ok": true,
+          "found": [
+            "laptop-disk-space-check"
+          ],
+          "time_sec": 0.8079806260066107,
+          "input_tokens": 3938,
+          "output_tokens": 22,
+          "cost_usd": 0.00111925
+        },
+        {
+          "id": "s2",
+          "turn": 2,
+          "tool": "record_decision",
+          "input": {
+            "path": "ESCALATE",
+            "cause": "Scan backlog.",
+            "ruled_out": "Low disk space was confirmed as a contributing factor but ruled out as the primary cause of the 95% CPU spike. Aging hardware was ruled out as the device is 1 year old with acceptable battery health.",
+            "evidence": [
+              "s1"
+            ],
+            "priority": "P3-Normal",
+            "next_step": "Review Defender scan logs and recent update history to determine why a definitions update is triggering a persistent CPU spike.",
+            "queue": "DESK-SUPPORT",
+            "rationale": "The user reports high CPU usage (95%) immediately following login, consistent with a scan backlog following a Defender definition update. Although low disk space is a contributing factor, the primary cause of the performance spike is the scan process. Since the issue persisted despite a prior fix, escalation to DESK-SUPPORT is required to investigate the underlying scan policy.",
+            "summary": "Escalating because the high CPU usage (95%) and performance degradation have persisted after a recent Defender update, suggesting a need for deeper investigation into the scan policy."
+          },
+          "result": "ESCALATE",
+          "ok": true,
+          "found": [],
+          "time_sec": 4.168086832971312,
+          "input_tokens": 4071,
+          "output_tokens": 244,
+          "cost_usd": 0.0006249375
+        }
+      ],
+      "stopped": null,
+      "citations": {
+        "kept": [
+          "s1"
+        ],
+        "dropped": []
+      },
+      "investigation": {
+        "lookups": 1,
+        "checks_run": [
+          "laptop-disk-space-check"
+        ],
+        "required": 1,
+        "required_run": 0,
+        "needless": 1,
+        "cited": 1,
+        "dropped": 0
+      }
+    },
+    {
+      "id": "INC-LPD-0049",
+      "text": "Laptop slow after login\n\nUser reports their Windows 10 laptop (hostname WORKSTATION-LAPTOP-MR, asset tag EP-PC-04821) became very slow immediately after morning login at approximately 08:15 EST. Applications including Windows Explorer, Microsoft Edge, and Microsoft Office were taking roughly 20-40 seconds to open, CPU utilization was spiking to 85-95%, and the system fan was running loudly. The user, Marcus Reeves (employee ID EMP-20947), is based in the Charlotte office and relies on the laptop for daily Sales operations. The slowdown affected normal work after sign-in, and available disk space was low at about 12% on the 256 GB SSD, worsening startup and application launch performance.",
+      "requester": "mreeves",
+      "difficulty": "routine",
+      "cause": "Low disk space",
+      "expected_cause": "Scan backlog",
+      "expected_paths": [
+        "ESCALATE"
+      ],
+      "expected_tools": [],
+      "expected_queues": [
+        "DESK-SUPPORT"
+      ],
+      "expected_units": [
+        "laptop-performance"
+      ],
+      "family": "Laptop performance",
+      "expected_path": "ESCALATE",
+      "path": "AUTO_FIX",
+      "path_correct": false,
+      "action_correct": false,
+      "team_correct": false,
+      "mistake_cost_chf": 120,
+      "sec04_failure": false,
+      "tool": "clean_temp_files",
+      "queue": null,
+      "retrieved": [
+        "laptop-performance"
+      ],
+      "cause_correct": false,
+      "retrieval_correct": true,
+      "input_tokens": 3965,
+      "output_tokens": 120,
+      "cost_usd": 0.001288375,
+      "time_sec": 0.9778742089401931,
+      "error": null,
+      "invalid": false,
+      "rule": null,
+      "steps": [
+        {
+          "id": "s1",
+          "turn": 1,
+          "tool": "record_decision",
+          "input": {
+            "path": "AUTO_FIX",
+            "evidence": [],
+            "tool_input": {
+              "device_id": "WORKSTATION-LAPTOP-MR"
+            },
+            "rationale": "The user's laptop is experiencing performance issues, and the device has 12% free disk space on a 256 GB SSD, which the KB identifies as a cause for poor performance. Clearing temporary files is a standard first step to alleviate pressure on the drive.",
+            "cause": "Low disk space",
+            "tool": "clean_temp_files"
+          },
+          "result": "AUTO_FIX",
+          "ok": true,
+          "found": [],
+          "time_sec": 0.9778742089401931,
+          "input_tokens": 3965,
+          "output_tokens": 120,
+          "cost_usd": 0.001288375
+        }
+      ],
+      "stopped": null,
+      "citations": {
+        "kept": [],
+        "dropped": []
+      },
+      "investigation": {
+        "lookups": 0,
+        "checks_run": [],
+        "required": 1,
+        "required_run": 0,
+        "needless": 0,
+        "cited": 0,
+        "dropped": 0
+      }
+    },
+    {
+      "id": "INC-OES-0001",
+      "text": "Outlook desktop stopped syncing Exchange Online mailbox\n\nMy name is Elena Marchetti (employee ID EMP-40291) and I was trying to use Outlook Desktop on Windows 10 with my Exchange Online mailbox (elena.marchetti@corplabs.com) on my workstation WORKSTATION-DELL-EM at the Milan office. After a recent Office 365 update, the desktop client stopped syncing email and calendar data. Outlook showed a disconnected state, inbox and calendar items were not updating, and send/receive did not retrieve new messages, blocking normal mailbox use until the local profile connection was repaired.",
+      "requester": "elena.marchetti",
+      "difficulty": "routine",
+      "cause": "Stale desktop profile",
+      "expected_cause": "Stale desktop profile",
+      "expected_paths": [
+        "SELF_SERVE",
+        "ESCALATE"
+      ],
+      "expected_tools": [],
+      "expected_queues": [
+        "APP-M365"
+      ],
+      "expected_units": [
+        "outlook"
+      ],
+      "family": "Outlook sync",
+      "expected_path": "SELF_SERVE",
+      "path": "SELF_SERVE",
+      "path_correct": true,
+      "action_correct": true,
+      "team_correct": false,
+      "mistake_cost_chf": 0,
+      "sec04_failure": false,
+      "tool": null,
+      "queue": null,
+      "retrieved": [
+        "outlook"
+      ],
+      "cause_correct": true,
+      "retrieval_correct": true,
+      "input_tokens": 8080,
+      "output_tokens": 163,
+      "cost_usd": 0.00159698,
+      "time_sec": 1.741819667047821,
+      "error": null,
+      "invalid": false,
+      "rule": null,
+      "steps": [
+        {
+          "id": "s1",
+          "turn": 1,
+          "tool": "lookup_requester",
+          "input": {},
+          "result": "Sales, Munich; 0 lockouts in 24 hours; device LT-ELENAMARCHETTI.",
+          "ok": true,
+          "found": [],
+          "time_sec": 0.6712898330297321,
+          "input_tokens": 3995,
+          "output_tokens": 11,
+          "cost_usd": 0.001116775
+        },
+        {
+          "id": "s2",
+          "turn": 2,
+          "tool": "record_decision",
+          "input": {
+            "steps": [
+              "Close Outlook.",
+              "Open Control Panel and search for 'Mail'.",
+              "Click 'Show Profiles'.",
+              "Click 'Add' to create a new profile.",
+              "Follow the prompts to add your email account and then set the new profile as the default.",
+              "Restart Outlook."
+            ],
+            "path": "SELF_SERVE",
+            "rationale": "The user is experiencing a 'Disconnected' state in Outlook, which is a known symptom of a stale desktop profile according to the KB. Creating a new Outlook profile is the documented self-service fix for this issue.",
+            "evidence": [
+              "s0"
+            ],
+            "cause": "Stale desktop profile"
+          },
+          "result": "SELF_SERVE",
+          "ok": true,
+          "found": [],
+          "time_sec": 1.07063204201404,
+          "input_tokens": 4085,
+          "output_tokens": 152,
+          "cost_usd": 0.000480205
+        }
+      ],
+      "stopped": null,
+      "citations": {
+        "kept": [],
+        "dropped": [
+          "s0"
+        ]
+      },
+      "investigation": {
+        "lookups": 1,
+        "checks_run": [],
+        "required": 1,
+        "required_run": 0,
+        "needless": 0,
+        "cited": 0,
+        "dropped": 1
+      }
+    },
+    {
+      "id": "INC-OES-0026",
+      "text": "Outlook and mobile email not syncing\n\nI was trying to access current mailbox content in Outlook on a Windows 10 workstation (WORKSTATION-OUTLOOK-MR) and on an iOS 15 mobile device, but Outlook displayed a disconnected state and new email stopped syncing across devices after a recent MDM policy update pushed on 2026-02-14. Mail delivery and folder updates were delayed in Exchange Online for the mailbox of Marcus Reeves (mreeves@corplabs.com, employee ID EMP-40291), preventing normal email access. The user is based in the Frankfurt office within the Sales group and reported the issue from IP 10.47.83.112.",
+      "requester": "mreeves",
+      "difficulty": "routine",
+      "cause": "Noncompliant phone.",
+      "expected_cause": "Stale desktop profile",
+      "expected_paths": [
+        "SELF_SERVE",
+        "ESCALATE"
+      ],
+      "expected_tools": [],
+      "expected_queues": [
+        "APP-M365"
+      ],
+      "expected_units": [
+        "outlook"
+      ],
+      "family": "Outlook sync",
+      "expected_path": "ESCALATE",
+      "path": "ESCALATE",
+      "path_correct": true,
+      "action_correct": true,
+      "team_correct": true,
+      "mistake_cost_chf": 0,
+      "sec04_failure": false,
+      "tool": "create_escalation_ticket",
+      "queue": "APP-M365",
+      "retrieved": [
+        "outlook"
+      ],
+      "cause_correct": false,
+      "retrieval_correct": true,
+      "input_tokens": 8269,
+      "output_tokens": 284,
+      "cost_usd": 0.001847615,
+      "time_sec": 2.2021022079279646,
+      "error": null,
+      "invalid": false,
+      "rule": null,
+      "steps": [
+        {
+          "id": "s1",
+          "turn": 1,
+          "tool": "run_check",
+          "input": {
+            "step": "outlook-connection-state-check"
+          },
+          "result": "fail: Outlook showed a disconnected state on WORKSTATION-OUTLOOK-MR and Exchange Online logs indicated repeated intermittent mailbox disconnects for …",
+          "ok": true,
+          "found": [
+            "outlook-connection-state-check"
+          ],
+          "time_sec": 0.780293041956611,
+          "input_tokens": 4014,
+          "output_tokens": 44,
+          "cost_usd": 0.00117645
+        },
+        {
+          "id": "s2",
+          "turn": 1,
+          "tool": "run_check",
+          "input": {
+            "step": "outlook-mobile-partnership-check"
+          },
+          "result": "fail: The device registered to Marcus Reeves (EMP-40291) was marked non-compliant because it still referenced deprecated MDM compliance policy CP-EME…",
+          "ok": true,
+          "found": [
+            "outlook-mobile-partnership-check"
+          ],
+          "time_sec": 4.9999915063381195e-05,
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "cost_usd": 0.0
+        },
+        {
+          "id": "s3",
+          "turn": 2,
+          "tool": "record_decision",
+          "input": {
+            "path": "ESCALATE",
+            "summary": "User reports Outlook and mobile mail sync failure following an MDM policy update; the device is currently non-compliant due to a deprecated policy assignment.",
+            "queue": "APP-M365",
+            "cause": "Noncompliant phone.",
+            "rationale": "The mailbox is experiencing intermittent disconnects on desktop, and the mobile device is reported as non-compliant due to a deprecated MDM policy (CP-EMEA-2025-DEPRECATED). Since the issue involves both desktop and mobile sync failures following an MDM policy update and requires intervention on the compliance policy assignment, it is beyond standard desktop support.",
+            "ruled_out": "Stale mobile partnership (it is non-compliant due to policy), Stale desktop profile (the root cause is a wider MDM/Exchange sync issue stemming from the non-compliant device policy).",
+            "evidence": [
+              "s1",
+              "s2"
+            ],
+            "priority": "P2-High",
+            "next_step": "Verify MDM compliance policy assignment and refresh the mobile partnership profile."
+          },
+          "result": "ESCALATE",
+          "ok": true,
+          "found": [],
+          "time_sec": 1.4219882079632953,
+          "input_tokens": 4255,
+          "output_tokens": 240,
+          "cost_usd": 0.000671165
+        }
+      ],
+      "stopped": null,
+      "citations": {
+        "kept": [
+          "s1",
+          "s2"
+        ],
+        "dropped": []
+      },
+      "investigation": {
+        "lookups": 2,
+        "checks_run": [
+          "outlook-connection-state-check",
+          "outlook-mobile-partnership-check"
+        ],
+        "required": 1,
+        "required_run": 0,
+        "needless": 2,
+        "cited": 2,
+        "dropped": 0
+      }
+    },
+    {
+      "id": "INC-OES-0051",
+      "text": "Outlook mail not syncing\n\nMultiple users in the Sales group at the Charlotte office were unable to receive new email in Outlook on desktop and mobile for approximately 90 minutes starting around 21:00 UTC. Outlook on affected Windows 10 desktops (including WORKSTATION-LAPTOP-MR used by Marcus Rivera and WORKSTATION-DESKTOP-KP used by Karen Phelps) showed a \"Disconnected\" state, and mobile clients displayed stale mailbox content. Users could not reliably read current mail or confirm recent messages, impacting normal sales communication and time-sensitive deal correspondence. Exchange Online service health dashboard (https://admin.microsoft.com) appeared normal, indicating the issue was localized to affected Outlook profiles and device sync state rather than a tenant-wide outage. Initial report submitted by Marcus Rivera (mrivera@corplabs.com, EMP-40287).",
+      "requester": "mrivera",
+      "difficulty": "routine",
+      "cause": "Stale desktop profile",
+      "expected_cause": "Stale desktop profile",
+      "expected_paths": [
+        "SELF_SERVE",
+        "ESCALATE"
+      ],
+      "expected_tools": [],
+      "expected_queues": [
+        "APP-M365"
+      ],
+      "expected_units": [
+        "outlook"
+      ],
+      "family": "Outlook sync",
+      "expected_path": "ESCALATE",
+      "path": "ESCALATE",
+      "path_correct": true,
+      "action_correct": true,
+      "team_correct": true,
+      "mistake_cost_chf": 0,
+      "sec04_failure": false,
+      "tool": "create_escalation_ticket",
+      "queue": "APP-M365",
+      "retrieved": [
+        "outlook",
+        "company-profile::Known organizational quirks"
+      ],
+      "cause_correct": true,
+      "retrieval_correct": true,
+      "input_tokens": 4229,
+      "output_tokens": 183,
+      "cost_usd": 0.001464925,
+      "time_sec": 1.440304166986607,
+      "error": null,
+      "invalid": false,
+      "rule": null,
+      "steps": [
+        {
+          "id": "s1",
+          "turn": 1,
+          "tool": "record_decision",
+          "input": {
+            "next_step": "Investigate the status of the M365 environment for the Sales group in Charlotte to rule out a targeted service issue.",
+            "rationale": "The issue affected multiple users in a specific office (Charlotte) and across multiple platforms simultaneously, which deviates from the single-user profiles addressed by the available tools. Per the 'Outlook and mailbox sync' playbook, when several mailboxes fail at once, the issue should be escalated to APP-M365.",
+            "cause": "Stale desktop profile",
+            "evidence": [],
+            "queue": "APP-M365",
+            "summary": "Multiple users in the Sales group at the Charlotte office experienced simultaneous Outlook sync failures, indicating a potential group-level or regional service issue.",
+            "priority": "P2-High",
+            "path": "ESCALATE"
+          },
+          "result": "ESCALATE",
+          "ok": true,
+          "found": [],
+          "time_sec": 1.440304166986607,
+          "input_tokens": 4229,
+          "output_tokens": 183,
+          "cost_usd": 0.001464925
+        }
+      ],
+      "stopped": null,
+      "citations": {
+        "kept": [],
+        "dropped": []
+      },
+      "investigation": {
+        "lookups": 0,
+        "checks_run": [],
+        "required": 1,
+        "required_run": 0,
+        "needless": 0,
+        "cited": 0,
+        "dropped": 0
+      }
+    },
+    {
+      "id": "INC-PDQ-0003",
+      "text": "Print jobs stuck on Print Server PDQ-Print01\n\nMultiple users in the Sales and HR departments were trying to print to shared department printers through print server PDQ-Print01, but jobs remained stuck in a spooling state and the queue reported that the printer driver was unavailable. The issue was first reported by Maria Gonzalez (emp ID E20481) at the Phoenix office around 06:15 UTC, who noticed her documents to the HR-Floor2-Queue were not printing. Restarting the Print Spooler service briefly released some jobs, but the queue quickly blocked again with the same driver unavailable error. The issue affected Sales and HR printing workflows on the Windows Server 2019 print server PDQ-Print01, preventing normal document output from department queues including \\\\PDQ-Print01\\Sales-Main and \\\\PDQ-Print01\\HR-Floor2-Queue.",
+      "requester": "kmarsh",
+      "difficulty": "routine",
+      "cause": "Corrupt driver package.",
+      "expected_cause": "Corrupt driver package",
+      "expected_paths": [
+        "AUTO_FIX"
+      ],
+      "expected_tools": [
+        "reinstall_print_driver"
+      ],
+      "expected_queues": [],
+      "expected_units": [
+        "printing"
+      ],
+      "family": "Printing",
+      "expected_path": "AUTO_FIX",
+      "path": "ESCALATE",
+      "path_correct": false,
+      "action_correct": false,
+      "team_correct": null,
+      "mistake_cost_chf": 120,
+      "sec04_failure": false,
+      "tool": "create_escalation_ticket",
+      "queue": "SD-PRINT",
+      "retrieved": [
+        "printing",
+        "escalation-queues"
+      ],
+      "cause_correct": false,
+      "retrieval_correct": true,
+      "input_tokens": 4441,
+      "output_tokens": 196,
+      "cost_usd": 0.001544675,
+      "time_sec": 1.3927220419282094,
+      "error": null,
+      "invalid": false,
+      "rule": null,
+      "steps": [
+        {
+          "id": "s1",
+          "turn": 1,
+          "tool": "record_decision",
+          "input": {
+            "queue": "SD-PRINT",
+            "rationale": "The issue is confirmed as 'Driver unavailable' across multiple queues on the print server PDQ-Print01, which is a server-side infrastructure issue. Per the printing KB, 'Driver unavailable' across a queue requires a driver reinstallation, but the provided tools are limited to PS-PRINT01, whereas the affected server is PDQ-Print01. Escalating to SD-PRINT as they own print server queues and drivers.",
+            "path": "ESCALATE",
+            "priority": "P2-High",
+            "summary": "Multiple print queues on server PDQ-Print01 are reporting 'Driver unavailable' errors, affecting Sales and HR departments.",
+            "evidence": [],
+            "cause": "Corrupt driver package.",
+            "next_step": "Investigate and resolve the driver corruption on PDQ-Print01."
+          },
+          "result": "ESCALATE",
+          "ok": true,
+          "found": [],
+          "time_sec": 1.3927220419282094,
+          "input_tokens": 4441,
+          "output_tokens": 196,
+          "cost_usd": 0.001544675
+        }
+      ],
+      "stopped": null,
+      "citations": {
+        "kept": [],
+        "dropped": []
+      },
+      "investigation": {
+        "lookups": 0,
+        "checks_run": [],
+        "required": 1,
+        "required_run": 0,
+        "needless": 0,
+        "cited": 0,
+        "dropped": 0
+      }
+    },
+    {
+      "id": "INC-PDQ-0034",
+      "text": "Print jobs stuck on Print Server\n\nMultiple Finance users in the Philadelphia office were trying to print standard office documents (invoices, reports) to the shared Office_Printer_1 queue on print-srv-01.corp.internal after a recent HP Universal Print Driver v5 deployment pushed on 2026-02-27. Submitted jobs from users including Rachel Nguyen (EMP-40821) and David Kowalski remained stuck in the queue and showed a 'driver unavailable' status, preventing the team from completing end-of-month printing. The issue affected the shared print server queue rather than a single workstation and began immediately after the driver package change was applied by the Workplace Services team.",
+      "requester": "rnguyen",
+      "difficulty": "routine",
+      "cause": "Corrupt driver package.",
+      "expected_cause": "Corrupt driver package",
+      "expected_paths": [
+        "AUTO_FIX"
+      ],
+      "expected_tools": [
+        "reinstall_print_driver"
+      ],
+      "expected_queues": [],
+      "expected_units": [
+        "printing"
+      ],
+      "family": "Printing",
+      "expected_path": "AUTO_FIX",
+      "path": "AUTO_FIX",
+      "path_correct": true,
+      "action_correct": true,
+      "team_correct": null,
+      "mistake_cost_chf": 0,
+      "sec04_failure": false,
+      "tool": "reinstall_print_driver",
+      "queue": "Office_Printer_1",
+      "retrieved": [
+        "printing",
+        "escalation-queues"
+      ],
+      "cause_correct": false,
+      "retrieval_correct": true,
+      "input_tokens": 4396,
+      "output_tokens": 109,
+      "cost_usd": 0.00138875,
+      "time_sec": 0.8677750830538571,
+      "error": null,
+      "invalid": false,
+      "rule": null,
+      "steps": [
+        {
+          "id": "s1",
+          "turn": 1,
+          "tool": "record_decision",
+          "input": {
+            "cause": "Corrupt driver package.",
+            "rationale": "The 'driver unavailable' error across a shared print queue following a recent driver deployment indicates a corrupt driver package, as specified in the printing playbook. Reinstalling the print driver is the appropriate action to resolve this queue-wide failure.",
+            "evidence": [],
+            "path": "AUTO_FIX",
+            "tool_input": {
+              "queue": "Office_Printer_1"
+            },
+            "tool": "reinstall_print_driver"
+          },
+          "result": "AUTO_FIX",
+          "ok": true,
+          "found": [],
+          "time_sec": 0.8677750830538571,
+          "input_tokens": 4396,
+          "output_tokens": 109,
+          "cost_usd": 0.00138875
+        }
+      ],
+      "stopped": null,
+      "citations": {
+        "kept": [],
+        "dropped": []
+      },
+      "investigation": {
+        "lookups": 0,
+        "checks_run": [],
+        "required": 1,
+        "required_run": 0,
+        "needless": 0,
+        "cited": 0,
+        "dropped": 0
+      }
+    },
+    {
+      "id": "INC-PDQ-0056",
+      "text": "Print jobs stuck on Floor3-Color queue after prior resolution\n\nUsers on Engineering Floor 3 in the Austin campus were trying to print color documents through the shared Floor3-Color queue on PrintServer-PRD (10.40.3.15), but jobs remained queued since the prior day and the queue showed 'Driver unavailable'. The issue was initially reported by Maria Gonzalez (mgonzalez, EMP-40821) and confirmed by several other engineers on the floor. Printing was blocked after the incident was previously closed under INC-PDQ-0049, indicating a recurring server-side queue or driver issue affecting shared printing from multiple workstations including WORKSTATION-MG-ENG3 and WORKSTATION-DL-ENG3.",
+      "requester": "mgonzalez",
+      "difficulty": "routine",
+      "cause": "Corrupt driver package.",
+      "expected_cause": "Corrupt driver package",
+      "expected_paths": [
+        "AUTO_FIX"
+      ],
+      "expected_tools": [
+        "reinstall_print_driver"
+      ],
+      "expected_queues": [],
+      "expected_units": [
+        "printing"
+      ],
+      "family": "Printing",
+      "expected_path": "AUTO_FIX",
+      "path": "ESCALATE",
+      "path_correct": false,
+      "action_correct": false,
+      "team_correct": null,
+      "mistake_cost_chf": 120,
+      "sec04_failure": false,
+      "tool": "create_escalation_ticket",
+      "queue": "SD-PRINT",
+      "retrieved": [
+        "printing",
+        "escalation-queues"
+      ],
+      "cause_correct": false,
+      "retrieval_correct": true,
+      "input_tokens": 4408,
+      "output_tokens": 207,
+      "cost_usd": 0.00155375,
+      "time_sec": 1.386639125063084,
+      "error": null,
+      "invalid": false,
+      "rule": null,
+      "steps": [
+        {
+          "id": "s1",
+          "turn": 1,
+          "tool": "record_decision",
+          "input": {
+            "cause": "Corrupt driver package.",
+            "path": "ESCALATE",
+            "next_step": "Investigate server-side print driver stability and queue consistency on the Floor3-Color queue, as this is a recurring issue affecting multiple users.",
+            "rationale": "The issue involves a 'Driver unavailable' error across a shared print queue, which is a recurring problem that previously required resolution (INC-PDQ-0049). Per the printing KB, this indicates a Corrupt driver package. Because this is a recurrent server-side infrastructure issue affecting multiple users and potentially requires deeper investigation than a standard driver reinstall, it is being escalated to the team that owns the print server queues.",
+            "summary": "Recurring 'Driver unavailable' error on Floor3-Color print queue across multiple workstations, indicating a persistent server-side driver issue.",
+            "evidence": [],
+            "queue": "SD-PRINT",
+            "priority": "P2-High"
+          },
+          "result": "ESCALATE",
+          "ok": true,
+          "found": [],
+          "time_sec": 1.386639125063084,
+          "input_tokens": 4408,
+          "output_tokens": 207,
+          "cost_usd": 0.00155375
+        }
+      ],
+      "stopped": null,
+      "citations": {
+        "kept": [],
+        "dropped": []
+      },
+      "investigation": {
+        "lookups": 0,
+        "checks_run": [],
+        "required": 1,
+        "required_run": 0,
+        "needless": 0,
+        "cited": 0,
+        "dropped": 0
+      }
+    },
+    {
+      "id": "INC-SDA-0001",
+      "text": "Access denied to Finance shared drive for user jane.doe\n\nI (jane.doe@corp.local, employee ID EMP-40821) was trying to open the Finance shared drive on \\\\fs01\\Finance from my mapped network drive (F:) on my workstation WORKSTATION-PC-JD at the Chicago office, but received Access Denied (0x5) and a credentials prompt instead of opening the folder. My IP at the time was 10.42.17.85. The issue prevented access to Finance department files needed for normal work, including quarterly close documents. Investigation indicated the problem was limited to my account rather than a share-wide outage. I contacted my manager, Robert Chen (robert.chen@corp.local), who confirmed other Finance team members could still access the share without issues.",
+      "requester": "jane.doe",
+      "difficulty": "routine",
+      "cause": "Missing group membership",
+      "expected_cause": "Missing group membership",
+      "expected_paths": [
+        "ESCALATE"
+      ],
+      "expected_tools": [],
+      "expected_queues": [
+        "SD-FILES"
+      ],
+      "expected_units": [
+        "shared-drive"
+      ],
+      "family": "Shared drive access",
+      "expected_path": "ESCALATE",
+      "path": "ESCALATE",
+      "path_correct": true,
+      "action_correct": true,
+      "team_correct": true,
+      "mistake_cost_chf": 0,
+      "sec04_failure": false,
+      "tool": "create_escalation_ticket",
+      "queue": "SD-FILES",
+      "retrieved": [
+        "shared-drive",
+        "sec-11-access-requests"
+      ],
+      "cause_correct": true,
+      "retrieval_correct": true,
+      "input_tokens": 8515,
+      "output_tokens": 163,
+      "cost_usd": 0.0026105750000000004,
+      "time_sec": 2.6086735411081463,
+      "error": null,
+      "invalid": false,
+      "rule": null,
+      "steps": [
+        {
+          "id": "s1",
+          "turn": 1,
+          "tool": "run_check",
+          "input": {
+            "step": "shared-drive-group-check"
+          },
+          "result": "fail: User jane.doe (jane.doe@corp.local) was not a member of FINANCE_READ, which is the security group granting read access to the Finance share on …",
+          "ok": true,
+          "found": [
+            "shared-drive-group-check"
+          ],
+          "time_sec": 0.7955996249802411,
+          "input_tokens": 4195,
+          "output_tokens": 22,
+          "cost_usd": 0.001189925
+        },
+        {
+          "id": "s2",
+          "turn": 2,
+          "tool": "record_decision",
+          "input": {
+            "rationale": "The user is missing the required FINANCE_READ AD group membership to access the Finance shared drive. While the manager, Robert Chen, has provided approval for access in the ticket, adding a user to an AD security group must be handled by the SD-FILES team to ensure proper permissions management.",
+            "summary": "User lacks required FINANCE_READ group membership; manager approval is confirmed on the ticket.",
+            "evidence": [
+              "shared-drive-group-check"
+            ],
+            "queue": "SD-FILES",
+            "path": "ESCALATE",
+            "cause": "Missing group membership",
+            "priority": "P3-Normal"
+          },
+          "result": "ESCALATE",
+          "ok": true,
+          "found": [],
+          "time_sec": 1.813254791079089,
+          "input_tokens": 4320,
+          "output_tokens": 141,
+          "cost_usd": 0.00142065
+        }
+      ],
+      "stopped": null,
+      "citations": {
+        "kept": [],
+        "dropped": [
+          "shared-drive-group-check"
+        ]
+      },
+      "investigation": {
+        "lookups": 1,
+        "checks_run": [
+          "shared-drive-group-check"
+        ],
+        "required": 1,
+        "required_run": 1,
+        "needless": 0,
+        "cited": 0,
+        "dropped": 1
+      }
+    },
+    {
+      "id": "INC-SDA-0025",
+      "text": "Finance user denied access to Shared Drive \\Finance\n\nFinance — I was trying to open the department shared folder at \\\\SharedDrive\\\\Finance from Windows Explorer on my Windows 10 workstation (WORKSTATION-FIN-TR, IP 10.42.17.88). The mapped drive repeatedly prompted for credentials and then returned \"Access is denied (Error 5),\" preventing access to Finance files needed for normal department work. I had already logged out, remapped the drive, and cleared saved Windows credentials without resolving the issue. My username is treeves and I'm based in the Arlington office. Please contact me at ext. 4127 if needed.",
+      "requester": "treeves",
+      "difficulty": "routine",
+      "cause": "Missing group membership.",
+      "expected_cause": "Missing group membership",
+      "expected_paths": [
+        "ESCALATE"
+      ],
+      "expected_tools": [],
+      "expected_queues": [
+        "SD-FILES"
+      ],
+      "expected_units": [
+        "shared-drive"
+      ],
+      "family": "Shared drive access",
+      "expected_path": "ESCALATE",
+      "path": "ESCALATE",
+      "path_correct": true,
+      "action_correct": true,
+      "team_correct": true,
+      "mistake_cost_chf": 0,
+      "sec04_failure": false,
+      "tool": "create_escalation_ticket",
+      "queue": "SD-FILES",
+      "retrieved": [
+        "shared-drive",
+        "sec-11-access-requests"
+      ],
+      "cause_correct": false,
+      "retrieval_correct": true,
+      "input_tokens": 8406,
+      "output_tokens": 266,
+      "cost_usd": 0.0018489075,
+      "time_sec": 2.17651933291927,
+      "error": null,
+      "invalid": false,
+      "rule": null,
+      "steps": [
+        {
+          "id": "s1",
+          "turn": 1,
+          "tool": "run_check",
+          "input": {
+            "step": "shared-drive-group-check"
+          },
+          "result": "fail: File server ACL required FINANCE_RW membership, and the affected user treeves was not present in that AD security group.",
+          "ok": true,
+          "found": [
+            "shared-drive-group-check"
+          ],
+          "time_sec": 0.7302121669054031,
+          "input_tokens": 4159,
+          "output_tokens": 22,
+          "cost_usd": 0.001180025
+        },
+        {
+          "id": "s2",
+          "turn": 2,
+          "tool": "record_decision",
+          "input": {
+            "evidence": [
+              "shared-drive-group-check"
+            ],
+            "queue": "SD-FILES",
+            "ruled_out": "Stale credentials were ruled out as the user confirmed they already cleared credentials without success. Old drive mapping was ruled out as the primary cause is the identified missing group membership. Folder permissions and maintenance are unlikely given the specific group requirement failure.",
+            "rationale": "The user is missing the required FINANCE_RW group membership for access to the \\\\SharedDrive\\\\Finance folder. According to SEC-11, access requests require approval from the data owner or manager before adding the user to the group, which cannot be fulfilled here as that approval is missing.",
+            "summary": "User treeves requires access to \\\\SharedDrive\\\\Finance but lacks the necessary FINANCE_RW group membership; approval is required per SEC-11.",
+            "cause": "Missing group membership.",
+            "priority": "P3-Normal",
+            "path": "ESCALATE",
+            "next_step": "Obtain approval from the Finance department data owner or the user's manager, then add the user to the FINANCE_RW AD group."
+          },
+          "result": "ESCALATE",
+          "ok": true,
+          "found": [],
+          "time_sec": 1.4463666660012677,
+          "input_tokens": 4247,
+          "output_tokens": 244,
+          "cost_usd": 0.0006688825
+        }
+      ],
+      "stopped": null,
+      "citations": {
+        "kept": [],
+        "dropped": [
+          "shared-drive-group-check"
+        ]
+      },
+      "investigation": {
+        "lookups": 1,
+        "checks_run": [
+          "shared-drive-group-check"
+        ],
+        "required": 1,
+        "required_run": 1,
+        "needless": 0,
+        "cited": 0,
+        "dropped": 1
+      }
+    },
+    {
+      "id": "INC-SDA-0050",
+      "text": "denied access to Finance shared drive\n\nI was trying to open the Finance shared drive folder from both a mapped drive (F:) and the UNC path \\\\fileserver.corp\\\\Finance on my Windows 10 workstation WORKSTATION-PC-LM. Access prompted for credentials and then returned 'Access Denied,' preventing me from opening the department folder after a recent team change from Marketing to Finance and a password reset. My employee ID is EMP-40821 and my username is lmorales. Please help — I need access to prepare quarterly reports.",
+      "requester": "lmorales",
+      "difficulty": "routine",
+      "cause": "Missing group membership",
+      "expected_cause": "Missing group membership",
+      "expected_paths": [
+        "ESCALATE"
+      ],
+      "expected_tools": [],
+      "expected_queues": [
+        "SD-FILES"
+      ],
+      "expected_units": [
+        "shared-drive"
+      ],
+      "family": "Shared drive access",
+      "expected_path": "ESCALATE",
+      "path": "ESCALATE",
+      "path_correct": true,
+      "action_correct": true,
+      "team_correct": true,
+      "mistake_cost_chf": 0,
+      "sec04_failure": false,
+      "tool": "create_escalation_ticket",
+      "queue": "SD-FILES",
+      "retrieved": [
+        "shared-drive",
+        "sec-11-access-requests"
+      ],
+      "cause_correct": true,
+      "retrieval_correct": true,
+      "input_tokens": 8396,
+      "output_tokens": 200,
+      "cost_usd": 0.00173701,
+      "time_sec": 1.8126944999676198,
+      "error": null,
+      "invalid": false,
+      "rule": null,
+      "steps": [
+        {
+          "id": "s1",
+          "turn": 1,
+          "tool": "run_check",
+          "input": {
+            "step": "shared-drive-group-check"
+          },
+          "result": "fail: User lmorales had recently changed teams from Marketing to Finance and was not a member of Finance_Dept_Readers, which is required for access t…",
+          "ok": true,
+          "found": [
+            "shared-drive-group-check"
+          ],
+          "time_sec": 0.7079339999472722,
+          "input_tokens": 4134,
+          "output_tokens": 22,
+          "cost_usd": 0.00117315
+        },
+        {
+          "id": "s2",
+          "turn": 2,
+          "tool": "record_decision",
+          "input": {
+            "next_step": "Verify with the department manager or data owner that access is approved, then add lmorales to the Finance_Dept_Readers group.",
+            "summary": "User lmorales requires access to the Finance shared drive following a department change but lacks the necessary 'Finance_Dept_Readers' group membership.",
+            "rationale": "The user recently changed departments and lacks the required 'Finance_Dept_Readers' AD group membership to access the Finance shared drive. Per policy SEC-11, access requests must be approved by the data owner or manager, which is not currently present on the ticket.",
+            "cause": "Missing group membership",
+            "priority": "P3-Normal",
+            "queue": "SD-FILES",
+            "path": "ESCALATE",
+            "evidence": [
+              "s1"
+            ]
+          },
+          "result": "ESCALATE",
+          "ok": true,
+          "found": [],
+          "time_sec": 1.1049740409944206,
+          "input_tokens": 4262,
+          "output_tokens": 178,
+          "cost_usd": 0.00056386
+        }
+      ],
+      "stopped": null,
+      "citations": {
+        "kept": [
+          "s1"
+        ],
+        "dropped": []
+      },
+      "investigation": {
+        "lookups": 1,
+        "checks_run": [
+          "shared-drive-group-check"
+        ],
+        "required": 1,
+        "required_run": 1,
+        "needless": 0,
+        "cited": 1,
+        "dropped": 0
+      }
+    },
+    {
+      "id": "INC-SIB-0001",
+      "text": "Software Center installation blocked for FinanceApp (entitlement missing) — resolved\n\nI (Rachel Nguyen, emp ID EMP-40291) on my corporate Windows 10 21H2 laptop WORKSTATION-RNGUY-FIN (IP 10.42.17.83) in the Finance group at the Charlotte office was trying to install FinanceApp v4.2.1 from Software Center, but the application was missing from the catalog or blocked by an entitlement/policy message ('Entitlement check failed: user/device not authorized to install this application') when installation was attempted. Restarting Software Center, signing out of my account rng-finance@corplabs.com and back in, forcing policy sync via the Configuration Manager client actions tab, and clearing the local cache under C:\\Windows\\ccmcache did not restore visibility or allow installation, blocking access to the required business application needed for quarterly close.",
+      "requester": "rnguyen",
+      "difficulty": "routine",
+      "cause": "Missing entitlement",
+      "expected_cause": "Missing entitlement",
+      "expected_paths": [
+        "ESCALATE"
+      ],
+      "expected_tools": [],
+      "expected_queues": [
+        "IAM-ACCESS"
+      ],
+      "expected_units": [
+        "software-install"
+      ],
+      "family": "Software install",
+      "expected_path": "ESCALATE",
+      "path": "ESCALATE",
+      "path_correct": true,
+      "action_correct": true,
+      "team_correct": true,
+      "mistake_cost_chf": 0,
+      "sec04_failure": false,
+      "tool": "create_escalation_ticket",
+      "queue": "IAM-ACCESS",
+      "retrieved": [
+        "software-install",
+        "sec-07-software-and-admin-rights"
+      ],
+      "cause_correct": true,
+      "retrieval_correct": true,
+      "input_tokens": 4249,
+      "output_tokens": 146,
+      "cost_usd": 0.001409375,
+      "time_sec": 1.0166811250383034,
+      "error": null,
+      "invalid": false,
+      "rule": null,
+      "steps": [
+        {
+          "id": "s1",
+          "turn": 1,
+          "tool": "record_decision",
+          "input": {
+            "path": "ESCALATE",
+            "evidence": [],
+            "rationale": "The user is receiving an 'Entitlement check failed' error when attempting to install FinanceApp. Per the 'software-install' playbook, a missing entitlement indicates the user is not in the required security group and must be referred to the IAM-ACCESS team.",
+            "next_step": "Verify the user's entitlement status and add them to the appropriate security group for FinanceApp.",
+            "queue": "IAM-ACCESS",
+            "priority": "P3-Normal",
+            "cause": "Missing entitlement",
+            "summary": "User cannot install FinanceApp due to an entitlement check failure."
+          },
+          "result": "ESCALATE",
+          "ok": true,
+          "found": [],
+          "time_sec": 1.0166811250383034,
+          "input_tokens": 4249,
+          "output_tokens": 146,
+          "cost_usd": 0.001409375
+        }
+      ],
+      "stopped": null,
+      "citations": {
+        "kept": [],
+        "dropped": []
+      },
+      "investigation": {
+        "lookups": 0,
+        "checks_run": [],
+        "required": 1,
+        "required_run": 0,
+        "needless": 0,
+        "cited": 0,
+        "dropped": 0
+      }
+    },
+    {
+      "id": "INC-SIB-0021",
+      "text": "Installation blocked: VPNClientPro via Software Center\n\nI was trying to install VPNClientPro from Software Center on my managed Windows 10 21H2 device (WORKSTATION-FIN-RCHEN), but the install failed with policy check error 0x87D13B3. Endpoint Protection had quarantined the installer, and the application was also not appearing for other Finance users in our Portland office, indicating both a security block and possible entitlement or policy targeting visibility issue. I need the VPN client installed urgently to access corporate resources for quarter-end reporting. My employee ID is E-50274 and my username is rchen. Please contact me at rachel.chen@corplabs.com or ext 503-555-4182 if you need remote access to my machine (IP 10.42.17.89).",
+      "requester": "rchen",
+      "difficulty": "routine",
+      "cause": "Endpoint protection block.",
+      "expected_cause": "Endpoint protection block",
+      "expected_paths": [
+        "ESCALATE"
+      ],
+      "expected_tools": [],
+      "expected_queues": [
+        "SEC-POLICY"
+      ],
+      "expected_units": [
+        "software-install"
+      ],
+      "family": "Software install",
+      "expected_path": "ESCALATE",
+      "path": "ESCALATE",
+      "path_correct": true,
+      "action_correct": true,
+      "team_correct": true,
+      "mistake_cost_chf": 0,
+      "sec04_failure": false,
+      "tool": "create_escalation_ticket",
+      "queue": "SEC-POLICY",
+      "retrieved": [
+        "software-install",
+        "sec-07-software-and-admin-rights"
+      ],
+      "cause_correct": false,
+      "retrieval_correct": true,
+      "input_tokens": 4238,
+      "output_tokens": 190,
+      "cost_usd": 0.00147895,
+      "time_sec": 1.17987016600091,
+      "error": null,
+      "invalid": false,
+      "rule": null,
+      "steps": [
+        {
+          "id": "s1",
+          "turn": 1,
+          "tool": "record_decision",
+          "input": {
+            "path": "ESCALATE",
+            "next_step": "Review the blocked installer hash/publisher against the current allowlist and determine if an exception is warranted for this business-critical software.",
+            "queue": "SEC-POLICY",
+            "priority": "P2-High",
+            "summary": "Installation of VPNClientPro is blocked by Endpoint Protection (Error 0x87D13B3), requiring security team review of the block.",
+            "rationale": "The user reported an installation failure with a specific policy check error (0x87D13B3) and explicitly identified that Endpoint Protection quarantined the installer. Per the 'software-install' playbook and policy SEC-07, endpoint protection blocks cannot be worked around and must be escalated to the SEC-POLICY team for review.",
+            "cause": "Endpoint protection block.",
+            "evidence": []
+          },
+          "result": "ESCALATE",
+          "ok": true,
+          "found": [],
+          "time_sec": 1.17987016600091,
+          "input_tokens": 4238,
+          "output_tokens": 190,
+          "cost_usd": 0.00147895
+        }
+      ],
+      "stopped": null,
+      "citations": {
+        "kept": [],
+        "dropped": []
+      },
+      "investigation": {
+        "lookups": 0,
+        "checks_run": [],
+        "required": 1,
+        "required_run": 0,
+        "needless": 0,
+        "cited": 0,
+        "dropped": 0
+      }
+    },
+    {
+      "id": "INC-SIB-0056",
+      "text": "Software Center installation blocked by entitlement check\n\nI was trying to install SAP Concur Expense (v10.2.4) from Software Center on my Windows 10 managed PC (hostname WORKSTATION-DELL-MR), but the application was not visible in the Software Center catalog and installation attempts were blocked with error 0x80246002 and an entitlement-related policy check failure. My username is mreeves and my employee ID is EMP-40821. Recent Intune sync activity was present on the device (IP 10.47.83.112), but device inventory appeared stale and did not reflect my Finance entitlement group membership, preventing the deployment policy from targeting the device correctly. I need this application urgently for month-end expense reporting at the Portland office.",
+      "requester": "mreeves",
+      "difficulty": "routine",
+      "cause": "Stale device inventory.",
+      "expected_cause": "Missing entitlement",
+      "expected_paths": [
+        "ESCALATE"
+      ],
+      "expected_tools": [],
+      "expected_queues": [
+        "IAM-ACCESS"
+      ],
+      "expected_units": [
+        "software-install"
+      ],
+      "family": "Software install",
+      "expected_path": "ESCALATE",
+      "path": "AUTO_FIX",
+      "path_correct": false,
+      "action_correct": false,
+      "team_correct": false,
+      "mistake_cost_chf": 120,
+      "sec04_failure": false,
+      "tool": "force_intune_sync",
+      "queue": null,
+      "retrieved": [
+        "software-install",
+        "sec-07-software-and-admin-rights"
+      ],
+      "cause_correct": false,
+      "retrieval_correct": true,
+      "input_tokens": 4225,
+      "output_tokens": 115,
+      "cost_usd": 0.001351625,
+      "time_sec": 0.9368086670292541,
+      "error": null,
+      "invalid": false,
+      "rule": null,
+      "steps": [
+        {
+          "id": "s1",
+          "turn": 1,
+          "tool": "record_decision",
+          "input": {
+            "cause": "Stale device inventory.",
+            "tool": "force_intune_sync",
+            "path": "AUTO_FIX",
+            "rationale": "The user reported the application was not visible and the device inventory appeared stale, which is preventing the correct deployment policy from targeting the device. Per the software-install playbook, the fix for stale inventory is to perform an Intune sync.",
+            "evidence": [
+              "s0"
+            ],
+            "tool_input": {
+              "device_id": "LT-MREEVES"
+            }
+          },
+          "result": "AUTO_FIX",
+          "ok": true,
+          "found": [],
+          "time_sec": 0.9368086670292541,
+          "input_tokens": 4225,
+          "output_tokens": 115,
+          "cost_usd": 0.001351625
+        }
+      ],
+      "stopped": null,
+      "citations": {
+        "kept": [],
+        "dropped": [
+          "s0"
+        ]
+      },
+      "investigation": {
+        "lookups": 0,
+        "checks_run": [],
+        "required": 1,
+        "required_run": 0,
+        "needless": 0,
+        "cited": 0,
+        "dropped": 1
+      }
+    },
+    {
+      "id": "INC-SML-0003",
+      "text": "Users experience MFA prompt loop during SSO (Okta/Azure AD)\n\nMultiple external contractor users were trying to sign in through the SSO Portal (https://sso.corplabs.com) to access Salesforce and Office365, but after completing Okta MFA they were returned to the MFA challenge again instead of reaching the application landing page. The issue was first reported by Priya Nair (pnair@corplabs.com) and primarily affected users in the recently synced Azure AD contractor group 'CG-External-East'. Okta showed repeated MFA challenges with no successful session creation for accounts including rdelgado, kchan, and mwilliams, and Azure AD sign-in activity indicated missing group claims in the token, blocking app access for an estimated 12 users in the Arlington office after the recent group sync change on 2026-03-31.",
+      "requester": "priya.nair",
+      "difficulty": "routine",
+      "cause": "Policy or group mismatch",
+      "expected_cause": "Policy or group mismatch",
+      "expected_paths": [
+        "ESCALATE"
+      ],
+      "expected_tools": [],
+      "expected_queues": [
+        "IAM-ACCESS"
+      ],
+      "expected_units": [
+        "sso-mfa"
+      ],
+      "family": "SSO and MFA",
+      "expected_path": "ESCALATE",
+      "path": "ESCALATE",
+      "path_correct": true,
+      "action_correct": true,
+      "team_correct": true,
+      "mistake_cost_chf": 0,
+      "sec04_failure": false,
+      "tool": "create_escalation_ticket",
+      "queue": "IAM-ACCESS",
+      "retrieved": [
+        "sso-mfa",
+        "company-profile::Core systems"
+      ],
+      "cause_correct": true,
+      "retrieval_correct": true,
+      "input_tokens": 4454,
+      "output_tokens": 189,
+      "cost_usd": 0.0015367,
+      "time_sec": 1.259894665912725,
+      "error": null,
+      "invalid": false,
+      "rule": null,
+      "steps": [
+        {
+          "id": "s1",
+          "turn": 1,
+          "tool": "record_decision",
+          "input": {
+            "evidence": [],
+            "summary": "Multiple contractor users are experiencing MFA loops and access denials due to missing group claims in Azure AD following a sync change on 2026-03-31.",
+            "path": "ESCALATE",
+            "queue": "IAM-ACCESS",
+            "priority": "P1-Critical",
+            "cause": "Policy or group mismatch",
+            "next_step": "Investigate the recent Azure AD group sync configuration to address missing group claims for the 'CG-External-East' contractor group.",
+            "rationale": "The issue is a known system-wide authentication failure following a recent group sync change. Per the 'sso-mfa' playbook, group or policy mismatches must be sent to the IAM-ACCESS team. As this affects multiple users and prevents access to core applications, it is escalated as a priority incident."
+          },
+          "result": "ESCALATE",
+          "ok": true,
+          "found": [],
+          "time_sec": 1.259894665912725,
+          "input_tokens": 4454,
+          "output_tokens": 189,
+          "cost_usd": 0.0015367
+        }
+      ],
+      "stopped": null,
+      "citations": {
+        "kept": [],
+        "dropped": []
+      },
+      "investigation": {
+        "lookups": 0,
+        "checks_run": [],
+        "required": 1,
+        "required_run": 0,
+        "needless": 0,
+        "cited": 0,
+        "dropped": 0
+      }
+    },
+    {
+      "id": "INC-SML-0038",
+      "text": "Okta MFA prompt loop prevents SSO access\n\nMultiple users in the Engineering-SaaS group were trying to access SaaS applications through the SSO Portal using Okta MFA, but after attempting MFA they were returned to the challenge flow instead of reaching the application landing page. Browser investigation showed repeated AUTH-401 responses and factor enrollment failures. The issue was first reported by Rachel Nguyen (rng0042@corplabs.com, EMP-90421) connecting from 10.47.22.88 on WORKSTATION-LAPTOP-RN at the Portland office, and blocked affected users from completing SSO sign-in to their SaaS apps in us-west-2.",
+      "requester": "rnguyen",
+      "difficulty": "routine",
+      "cause": "Policy or group mismatch.",
+      "expected_cause": "Stale MFA enrollment",
+      "expected_paths": [
+        "ESCALATE"
+      ],
+      "expected_tools": [],
+      "expected_queues": [
+        "IAM-ACCESS"
+      ],
+      "expected_units": [
+        "sso-mfa"
+      ],
+      "family": "SSO and MFA",
+      "expected_path": "ESCALATE",
+      "path": "ESCALATE",
+      "path_correct": true,
+      "action_correct": true,
+      "team_correct": true,
+      "mistake_cost_chf": 0,
+      "sec04_failure": false,
+      "tool": "create_escalation_ticket",
+      "queue": "IAM-ACCESS",
+      "retrieved": [
+        "sso-mfa",
+        "company-profile::Core systems"
+      ],
+      "cause_correct": false,
+      "retrieval_correct": true,
+      "input_tokens": 4415,
+      "output_tokens": 197,
+      "cost_usd": 0.001539175,
+      "time_sec": 1.2699973749695346,
+      "error": null,
+      "invalid": false,
+      "rule": null,
+      "steps": [
+        {
+          "id": "s1",
+          "turn": 1,
+          "tool": "record_decision",
+          "input": {
+            "next_step": "Investigate recent identity synchronization or policy changes impacting the Engineering-SaaS group and the SSO authentication flow for affected users in the US-West-2 region.",
+            "summary": "Multiple users in the Engineering-SaaS group are unable to complete SSO sign-in due to MFA prompt loops and 401 errors.",
+            "evidence": [],
+            "cause": "Policy or group mismatch.",
+            "path": "ESCALATE",
+            "priority": "P1-Critical",
+            "rationale": "The issue is a widespread authentication failure involving multiple users experiencing MFA prompt loops and 401 errors, which per the 'sso-mfa' playbook requires escalation to IAM-ACCESS. The symptoms match a policy or group mismatch or a systemic sync issue, as individual-level troubleshooting for stale factors is insufficient for a multi-user incident.",
+            "queue": "IAM-ACCESS"
+          },
+          "result": "ESCALATE",
+          "ok": true,
+          "found": [],
+          "time_sec": 1.2699973749695346,
+          "input_tokens": 4415,
+          "output_tokens": 197,
+          "cost_usd": 0.001539175
+        }
+      ],
+      "stopped": null,
+      "citations": {
+        "kept": [],
+        "dropped": []
+      },
+      "investigation": {
+        "lookups": 0,
+        "checks_run": [],
+        "required": 1,
+        "required_run": 0,
+        "needless": 0,
+        "cited": 0,
+        "dropped": 0
+      }
+    },
+    {
+      "id": "INC-SML-0053",
+      "text": "unable to complete SSO login\n\nI was trying to sign in to multiple SaaS applications through the company SSO Portal from a Windows 10 web browser at our Charlotte office using Okta Verify on a personal mobile device (IPHONE-MREEVES). After entering my credentials (username: mreeves@corplabs.com), I received repeated MFA prompts and the authentication flow never completed, preventing access to Salesforce and Concur needed through SSO. My employee ID is EMP-40821 and I need these apps for client meetings this week.",
+      "requester": "mreeves",
+      "difficulty": "routine",
+      "cause": "Stale MFA enrollment",
+      "expected_cause": "Stale MFA enrollment",
+      "expected_paths": [
+        "ESCALATE"
+      ],
+      "expected_tools": [],
+      "expected_queues": [
+        "IAM-ACCESS"
+      ],
+      "expected_units": [
+        "sso-mfa"
+      ],
+      "family": "SSO and MFA",
+      "expected_path": "ESCALATE",
+      "path": "ESCALATE",
+      "path_correct": true,
+      "action_correct": true,
+      "team_correct": true,
+      "mistake_cost_chf": 0,
+      "sec04_failure": false,
+      "tool": "create_escalation_ticket",
+      "queue": "IAM-ACCESS",
+      "retrieved": [
+        "sso-mfa",
+        "company-profile::Core systems"
+      ],
+      "cause_correct": true,
+      "retrieval_correct": true,
+      "input_tokens": 4382,
+      "output_tokens": 233,
+      "cost_usd": 0.0015895,
+      "time_sec": 1.422382541000843,
+      "error": null,
+      "invalid": false,
+      "rule": null,
+      "steps": [
+        {
+          "id": "s1",
+          "turn": 1,
+          "tool": "record_decision",
+          "input": {
+            "next_step": "Review the user's Okta MFA factor status and enrollment logs to check for staleness or duplication.",
+            "evidence": [
+              "s1"
+            ],
+            "ruled_out": "Clock drift was ruled out as the primary cause for the MFA loop (as the loop occurs after credential entry and the user is reporting a persistent loop rather than code failure), but identity-level issues cannot be remediated at this tier.",
+            "rationale": "The user is experiencing an MFA loop during the SSO authentication process. Per the 'sso-mfa' playbook, L1 support is unable to reset MFA factors or modify identity policies. As the issue involves potential stale MFA enrollment or a policy/group mismatch, it must be escalated to the IAM-ACCESS team for investigation.",
+            "priority": "P2-High",
+            "cause": "Stale MFA enrollment",
+            "queue": "IAM-ACCESS",
+            "summary": "User mreeves is unable to complete SSO authentication due to an MFA prompt loop when accessing Salesforce and Concur.",
+            "path": "ESCALATE"
+          },
+          "result": "ESCALATE",
+          "ok": true,
+          "found": [],
+          "time_sec": 1.422382541000843,
+          "input_tokens": 4382,
+          "output_tokens": 233,
+          "cost_usd": 0.0015895
+        }
+      ],
+      "stopped": null,
+      "citations": {
+        "kept": [],
+        "dropped": [
+          "s1"
+        ]
+      },
+      "investigation": {
+        "lookups": 0,
+        "checks_run": [],
+        "required": 1,
+        "required_run": 0,
+        "needless": 0,
+        "cited": 0,
+        "dropped": 1
+      }
+    },
+    {
+      "id": "INC-VDA-0001",
+      "text": "GlobalProtect VPN disconnects immediately\n\nMultiple users on managed Windows 10 21H2 laptops in the Frankfurt office were trying to connect to the corporate network through GlobalProtect while working remotely. Specifically, users including Rachel Whitmore (EMP-40218) and Darren Okafor (EMP-40225) from the Sales and Marketing group reported that after approving the Okta MFA prompt, the VPN tunnel established briefly for about 10-20 seconds and then disconnected, which prevented access to internal applications including the intranet, Confluence, and Salesforce during the short connected window. The issue was reproducible across several login attempts on devices such as WORKSTATION-LAPTOP-RW (10.47.12.88) and WORKSTATION-LAPTOP-DO (10.47.12.91), and aligned with certificate validation failures in the VPN client logs. Ticket submitted by rwhitmore@corplabs.com.",
+      "requester": "rwhitmore",
+      "difficulty": "routine",
+      "cause": "Expired device certificate.",
+      "expected_cause": "Expired device certificate",
+      "expected_paths": [
+        "AUTO_FIX"
+      ],
+      "expected_tools": [
+        "reset_vpn_profile"
+      ],
+      "expected_queues": [],
+      "expected_units": [
+        "vpn-access"
+      ],
+      "family": "VPN access",
+      "expected_path": "AUTO_FIX",
+      "path": "ESCALATE",
+      "path_correct": false,
+      "action_correct": false,
+      "team_correct": null,
+      "mistake_cost_chf": 120,
+      "sec04_failure": false,
+      "tool": "create_escalation_ticket",
+      "queue": "NET-VPN",
+      "retrieved": [
+        "vpn-access",
+        "company-profile::Core systems"
+      ],
+      "cause_correct": false,
+      "retrieval_correct": true,
+      "input_tokens": 4488,
+      "output_tokens": 202,
+      "cost_usd": 0.0015675,
+      "time_sec": 1.4223686249461025,
+      "error": null,
+      "invalid": false,
+      "rule": null,
+      "steps": [
+        {
+          "id": "s1",
+          "turn": 1,
+          "tool": "record_decision",
+          "input": {
+            "queue": "NET-VPN",
+            "evidence": [],
+            "path": "ESCALATE",
+            "summary": "Multiple users in Frankfurt are experiencing immediate GlobalProtect VPN disconnects following successful MFA, likely due to a widespread certificate validation issue.",
+            "cause": "Expired device certificate.",
+            "priority": "P2-High",
+            "ruled_out": "The issue was not resolved via individual profile reset because it is occurring across multiple users and devices, indicating an infrastructure-level issue.",
+            "next_step": "Investigate potential regional certificate rotation or gateway configuration issues in the Frankfurt office.",
+            "rationale": "Multiple users in the Frankfurt office are experiencing identical VPN drops following successful MFA, which is characteristic of a widespread certificate validation failure rather than a single user's stale profile. Per the vpn-access playbook, issues affecting many devices simultaneously must be escalated to NET-VPN with high priority to investigate potential certificate rotation problems."
+          },
+          "result": "ESCALATE",
+          "ok": true,
+          "found": [],
+          "time_sec": 1.4223686249461025,
+          "input_tokens": 4488,
+          "output_tokens": 202,
+          "cost_usd": 0.0015675
+        }
+      ],
+      "stopped": null,
+      "citations": {
+        "kept": [],
+        "dropped": []
+      },
+      "investigation": {
+        "lookups": 0,
+        "checks_run": [],
+        "required": 1,
+        "required_run": 0,
+        "needless": 0,
+        "cited": 0,
+        "dropped": 0
+      }
+    },
+    {
+      "id": "INC-VDA-0021",
+      "text": "GlobalProtect VPN disconnects immediately\n\nA subset of remote users on managed Windows 10 laptops in the Charlotte office could complete Okta MFA for GlobalProtect, but the VPN tunnel disconnected within about 10 seconds after approval. The issue was initially reported by Maria Gonzalez (mgonzalez, EMP-40218) and confirmed by two other members of the RemoteWorkers group. While the disconnect occurred, internal applications such as SalesPortal and the HR Intranet were unreachable from their endpoints. The issue began after the recent certificate rotation window on 2026-04-12 and blocked normal remote access to internal resources.",
+      "requester": "mgonzalez",
+      "difficulty": "routine",
+      "cause": "Expired device certificate.",
+      "expected_cause": "Expired device certificate",
+      "expected_paths": [
+        "AUTO_FIX"
+      ],
+      "expected_tools": [
+        "reset_vpn_profile"
+      ],
+      "expected_queues": [],
+      "expected_units": [
+        "vpn-access"
+      ],
+      "family": "VPN access",
+      "expected_path": "AUTO_FIX",
+      "path": "ESCALATE",
+      "path_correct": false,
+      "action_correct": false,
+      "team_correct": null,
+      "mistake_cost_chf": 120,
+      "sec04_failure": false,
+      "tool": "create_escalation_ticket",
+      "queue": "NET-VPN",
+      "retrieved": [
+        "vpn-access",
+        "company-profile::Core systems"
+      ],
+      "cause_correct": false,
+      "retrieval_correct": true,
+      "input_tokens": 4416,
+      "output_tokens": 216,
+      "cost_usd": 0.0015708,
+      "time_sec": 1.4400739170378074,
+      "error": null,
+      "invalid": false,
+      "rule": null,
+      "steps": [
+        {
+          "id": "s1",
+          "turn": 1,
+          "tool": "record_decision",
+          "input": {
+            "path": "ESCALATE",
+            "queue": "NET-VPN",
+            "evidence": [],
+            "cause": "Expired device certificate.",
+            "summary": "GlobalProtect VPN drops after MFA for multiple users following the 2026-04-12 certificate rotation.",
+            "priority": "P2-High",
+            "ruled_out": "Single device certificate expiration has been ruled out as the primary cause due to the multi-user nature of the reported issue.",
+            "next_step": "Investigate certificate rotation logs for the impacted regional gateway to confirm if the 2026-04-12 rotation caused a widespread mismatch.",
+            "rationale": "The user is experiencing a known symptom (VPN drops after MFA) following a certificate rotation window. As the issue is impacting multiple users simultaneously, per the 'vpn-access' playbook, this indicates a potential wider certificate or gateway configuration issue rather than a single-device failure, requiring escalation to the NET-VPN team."
+          },
+          "result": "ESCALATE",
+          "ok": true,
+          "found": [],
+          "time_sec": 1.4400739170378074,
+          "input_tokens": 4416,
+          "output_tokens": 216,
+          "cost_usd": 0.0015708
+        }
+      ],
+      "stopped": null,
+      "citations": {
+        "kept": [],
+        "dropped": []
+      },
+      "investigation": {
+        "lookups": 0,
+        "checks_run": [],
+        "required": 1,
+        "required_run": 0,
+        "needless": 0,
+        "cited": 0,
+        "dropped": 0
+      }
+    },
+    {
+      "id": "INC-VDA-0041",
+      "text": "GlobalProtect disconnects immediately\n\nI was trying to connect to the corporate GlobalProtect VPN from my managed Windows 10 laptop (WORKSTATION-LAPTOP-MR) while working remotely from Charlotte. After approving the Okta MFA prompt under my account mreeves@corplabs.com, the VPN session established only briefly and then disconnected within seconds, leaving internal applications such as the intranet, file share, and internal CRM unreachable. The issue was isolated to the endpoint's device certificate validation during post-authentication tunnel setup. My employee ID is E-40291 for reference.",
+      "requester": "mreeves",
+      "difficulty": "routine",
+      "cause": "Expired device certificate.",
+      "expected_cause": "Expired device certificate",
+      "expected_paths": [
+        "AUTO_FIX"
+      ],
+      "expected_tools": [
+        "reset_vpn_profile"
+      ],
+      "expected_queues": [],
+      "expected_units": [
+        "vpn-access"
+      ],
+      "family": "VPN access",
+      "expected_path": "AUTO_FIX",
+      "path": "AUTO_FIX",
+      "path_correct": true,
+      "action_correct": true,
+      "team_correct": null,
+      "mistake_cost_chf": 0,
+      "sec04_failure": false,
+      "tool": "reset_vpn_profile",
+      "queue": null,
+      "retrieved": [
+        "vpn-access",
+        "company-profile::Core systems"
+      ],
+      "cause_correct": false,
+      "retrieval_correct": true,
+      "input_tokens": 4405,
+      "output_tokens": 123,
+      "cost_usd": 0.001414325,
+      "time_sec": 1.239681417006068,
+      "error": null,
+      "invalid": false,
+      "rule": null,
+      "steps": [
+        {
+          "id": "s1",
+          "turn": 1,
+          "tool": "record_decision",
+          "input": {
+            "tool": "reset_vpn_profile",
+            "cause": "Expired device certificate.",
+            "path": "AUTO_FIX",
+            "tool_input": {
+              "username": "mreeves"
+            },
+            "evidence": [],
+            "rationale": "The user reports immediate VPN disconnection after successful MFA, which is characteristic of a stale or expired device certificate according to the 'vpn-access' playbook. The playbook identifies 'Expired device certificate' as the most common cause for this specific behavior and explicitly recommends using the reset_vpn_profile tool to regenerate the certificate and profile."
+          },
+          "result": "AUTO_FIX",
+          "ok": true,
+          "found": [],
+          "time_sec": 1.239681417006068,
+          "input_tokens": 4405,
+          "output_tokens": 123,
+          "cost_usd": 0.001414325
+        }
+      ],
+      "stopped": null,
+      "citations": {
+        "kept": [],
+        "dropped": []
+      },
+      "investigation": {
+        "lookups": 0,
+        "checks_run": [],
+        "required": 1,
+        "required_run": 0,
+        "needless": 0,
+        "cited": 0,
+        "dropped": 0
+      }
+    },
+    {
+      "id": "INC-WCI-0002",
+      "text": "Intermittent disconnects from Corporate Wi-Fi\n\nMultiple Sales users on Windows 10 laptops in the Portland office were trying to connect to the Corporate Wi-Fi (SSID: CorpNet-Secure), but devices intermittently disconnected and then failed to complete 802.1X reauthentication after a certificate rotation on the wireless environment. The issue was first reported by Rachel Nguyen (EMP-40218) and subsequently confirmed by at least six other Sales team members. Affected laptops could join the SSID but were rejected by NAC or received no IP address, leaving users without network access for normal work. The issue began around 06:15 PDT after the controller certificate change on WLC-WEST-01; renewing the controller certificate restored service for some devices, but others still required endpoint profile remediation and policy validation. Ticket escalated by team lead Marcus Dellinger.",
+      "requester": "rnguyen",
+      "difficulty": "routine",
+      "cause": "Expired server certificate.",
+      "expected_cause": "Expired server certificate",
+      "expected_paths": [
+        "ESCALATE"
+      ],
+      "expected_tools": [],
+      "expected_queues": [
+        "NET-WIFI"
+      ],
+      "expected_units": [
+        "wifi"
+      ],
+      "family": "Wi-Fi",
+      "expected_path": "ESCALATE",
+      "path": "ESCALATE",
+      "path_correct": true,
+      "action_correct": true,
+      "team_correct": true,
+      "mistake_cost_chf": 0,
+      "sec04_failure": false,
+      "tool": "create_escalation_ticket",
+      "queue": "NET-WIFI",
+      "retrieved": [
+        "wifi",
+        "company-profile::Core systems"
+      ],
+      "cause_correct": false,
+      "retrieval_correct": true,
+      "input_tokens": 4492,
+      "output_tokens": 233,
+      "cost_usd": 0.00161975,
+      "time_sec": 1.3095830830279738,
+      "error": null,
+      "invalid": false,
+      "rule": null,
+      "steps": [
+        {
+          "id": "s1",
+          "turn": 1,
+          "tool": "record_decision",
+          "input": {
+            "next_step": "Investigate the certificate status on WLC-WEST-01 and ensure the RADIUS/controller certificates are correctly propagated to the affected endpoint profiles.",
+            "ruled_out": "The issue is not a local device driver issue (ThinkPad T14 driver is 2026-06) or a single-user profile issue, as it is affecting multiple users across the team.",
+            "evidence": [],
+            "cause": "Expired server certificate.",
+            "rationale": "Multiple users are affected following a certificate rotation on the wireless controller, which aligns with the 'Expired server certificate' known cause in the playbook. As the issue affects multiple users and involves controller/RADIUS infrastructure, it falls under the purview of the network team per the 'When to escalate' instructions.",
+            "queue": "NET-WIFI",
+            "path": "ESCALATE",
+            "priority": "P2-High",
+            "summary": "Multiple Sales users experiencing 802.1X authentication failures following controller certificate rotation; requires investigation of controller and NAC policy alignment."
+          },
+          "result": "ESCALATE",
+          "ok": true,
+          "found": [],
+          "time_sec": 1.3095830830279738,
+          "input_tokens": 4492,
+          "output_tokens": 233,
+          "cost_usd": 0.00161975
+        }
+      ],
+      "stopped": null,
+      "citations": {
+        "kept": [],
+        "dropped": []
+      },
+      "investigation": {
+        "lookups": 0,
+        "checks_run": [],
+        "required": 1,
+        "required_run": 0,
+        "needless": 0,
+        "cited": 0,
+        "dropped": 0
+      }
+    },
+    {
+      "id": "INC-WCI-0036",
+      "text": "Cannot connect to Corporate Wi-Fi on laptop — authentication failing\n\nUsers in the Charlotte office (Building C, 3rd floor) were trying to connect company-managed Windows 10 laptops to Corporate-WiFi, but the devices could only see the SSID and then repeatedly failed during 802.1X authentication with \"Unable to authenticate\" behavior and no network access after joining. Wired Ethernet and the guest SSID still worked, indicating the issue was limited to the corporate wireless authentication path. The problem began the same morning around 08:30 ET and affected multiple nearby users including Rachel Simmons (r.simmons, EMP-40821) and Derek Huang (d.huang), blocking normal corporate network access for Sales staff on laptops. Initial report submitted by Rachel Simmons via phone at ext. 704-555-3192.",
+      "requester": "rsimmons",
+      "difficulty": "routine",
+      "cause": "Expired server certificate.",
+      "expected_cause": "Expired server certificate",
+      "expected_paths": [
+        "ESCALATE"
+      ],
+      "expected_tools": [],
+      "expected_queues": [
+        "NET-WIFI"
+      ],
+      "expected_units": [
+        "wifi"
+      ],
+      "family": "Wi-Fi",
+      "expected_path": "ESCALATE",
+      "path": "ESCALATE",
+      "path_correct": true,
+      "action_correct": true,
+      "team_correct": true,
+      "mistake_cost_chf": 0,
+      "sec04_failure": false,
+      "tool": "create_escalation_ticket",
+      "queue": "NET-WIFI",
+      "retrieved": [
+        "wifi",
+        "company-profile::Core systems"
+      ],
+      "cause_correct": false,
+      "retrieval_correct": true,
+      "input_tokens": 4491,
+      "output_tokens": 174,
+      "cost_usd": 0.001522125,
+      "time_sec": 1.1410911659477279,
+      "error": null,
+      "invalid": false,
+      "rule": null,
+      "steps": [
+        {
+          "id": "s1",
+          "turn": 1,
+          "tool": "record_decision",
+          "input": {
+            "path": "ESCALATE",
+            "queue": "NET-WIFI",
+            "priority": "P2-High",
+            "evidence": [],
+            "rationale": "Multiple users in the same location are experiencing 802.1X authentication failures simultaneously, which strongly suggests a systemic infrastructure issue rather than a device-specific problem. As indicated in the KB, this points to a RADIUS or controller issue (e.g., an expired server certificate) rather than a client-side configuration, requiring investigation by the network team.",
+            "summary": "Multiple users experiencing 802.1X authentication failure on Corporate-WiFi, suggesting a systemic network issue.",
+            "next_step": "Review RADIUS and wireless controller logs for authentication failures.",
+            "cause": "Expired server certificate."
+          },
+          "result": "ESCALATE",
+          "ok": true,
+          "found": [],
+          "time_sec": 1.1410911659477279,
+          "input_tokens": 4491,
+          "output_tokens": 174,
+          "cost_usd": 0.001522125
+        }
+      ],
+      "stopped": null,
+      "citations": {
+        "kept": [],
+        "dropped": []
+      },
+      "investigation": {
+        "lookups": 0,
+        "checks_run": [],
+        "required": 1,
+        "required_run": 0,
+        "needless": 0,
+        "cited": 0,
+        "dropped": 0
+      }
+    },
+    {
+      "id": "INC-WCI-0057",
+      "text": "Users unable to authenticate to Corporate Wi‑Fi\n\nMultiple Engineering users in the Frankfurt office (EMEA Building 3) were trying to connect managed Windows 10 and macOS 12 laptops to the Corporate Wi-Fi SSID (CorpNet-Secure), but 802.1X authentication failed and devices received no usable network access after joining. The issue was first reported by Elena Vasquez (emp ID ENG-4821) at approximately 08:15 local time and quickly confirmed by several teammates on the same floor. Affected devices included hostnames such as LAPTOP-EVASQUEZ and LAPTOP-MKORNER. The issue impacted access to internal resources during the morning and persisted for a subset of laptops after the initial controller-side fix because those endpoints retained bad cached wireless profiles.",
+      "requester": "evasquez",
+      "difficulty": "routine",
+      "cause": "Stale profile on one device",
+      "expected_cause": "Expired server certificate",
+      "expected_paths": [
+        "ESCALATE"
+      ],
+      "expected_tools": [],
+      "expected_queues": [
+        "NET-WIFI"
+      ],
+      "expected_units": [
+        "wifi"
+      ],
+      "family": "Wi-Fi",
+      "expected_path": "ESCALATE",
+      "path": "ESCALATE",
+      "path_correct": true,
+      "action_correct": true,
+      "team_correct": true,
+      "mistake_cost_chf": 0,
+      "sec04_failure": false,
+      "tool": "create_escalation_ticket",
+      "queue": "NET-WIFI",
+      "retrieved": [
+        "wifi",
+        "company-profile::Core systems"
+      ],
+      "cause_correct": false,
+      "retrieval_correct": true,
+      "input_tokens": 4479,
+      "output_tokens": 265,
+      "cost_usd": 0.001668975,
+      "time_sec": 1.8502309590112418,
+      "error": null,
+      "invalid": false,
+      "rule": null,
+      "steps": [
+        {
+          "id": "s1",
+          "turn": 1,
+          "tool": "record_decision",
+          "input": {
+            "evidence": [],
+            "ruled_out": "Old Intel driver; Expired server certificate; Network access policy mismatch. The query specifies multiple users are impacted by stale profiles after an initial controller-side fix, suggesting a broader network configuration or persistence issue rather than a single device driver issue.",
+            "cause": "Stale profile on one device",
+            "next_step": "Advise the user to manually trigger a policy sync or reconnect to the network if a profile push is required, as the issue is widespread and involves stale profiles on multiple endpoints.",
+            "rationale": "The issue affects multiple users in the Frankfurt office and involves failures at the 802.1X authentication level, which requires investigation by the network team. While some devices were identified as having stale profiles following a controller-side fix, a collective Wi-Fi authentication failure of this scale falls under the purview of NET-WIFI per the provided documentation.",
+            "queue": "NET-WIFI",
+            "summary": "Multiple Engineering users in Frankfurt unable to authenticate to Corporate Wi-Fi via 802.1X, persisting as stale profiles on endpoints despite a controller-side fix.",
+            "priority": "P2-High",
+            "path": "ESCALATE"
+          },
+          "result": "ESCALATE",
+          "ok": true,
+          "found": [],
+          "time_sec": 1.8502309590112418,
+          "input_tokens": 4479,
+          "output_tokens": 265,
+          "cost_usd": 0.001668975
+        }
+      ],
+      "stopped": null,
+      "citations": {
+        "kept": [],
+        "dropped": []
+      },
+      "investigation": {
+        "lookups": 0,
+        "checks_run": [],
+        "required": 1,
+        "required_run": 0,
+        "needless": 0,
+        "cited": 0,
+        "dropped": 0
+      }
+    }
+  ]
+}

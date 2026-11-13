@@ -1,0 +1,2536 @@
+{
+  "id": "20261113T105210-rules-loop",
+  "date": "2026-11-13T10:52:10+00:00",
+  "set": "rules",
+  "design": "loop",
+  "tiny": false,
+  "sample": false,
+  "model": "qwen/qwen3.7-flash",
+  "serving": {
+    "lab": "openrouter",
+    "provider": "alibaba",
+    "region": "unconfirmed",
+    "effort": "none"
+  },
+  "version": "9793fd20",
+  "instructions_version": "0dd4dc64",
+  "tools_version": "b3bcb127",
+  "kb_version": "916db54c",
+  "labels_version": "1c44a887",
+  "summary": {
+    "n": 25,
+    "path_accuracy": 0.6,
+    "path_margin": 0.17928907275340872,
+    "action_accuracy": 0.52,
+    "action_margin": 0.18235389058946339,
+    "team_accuracy": 0.625,
+    "team_margin": 0.27871019297733857,
+    "mistake_cost_chf": 1260,
+    "sec04_failures": 0,
+    "kappa": 0.3887530562347188,
+    "cause_accuracy": null,
+    "retrieval_accuracy": 0.88,
+    "automation_rate": 0.4166666666666667,
+    "cost_per_ticket_usd": 0.00022744087999999998,
+    "cost_per_ticket_chf": 0.000181952704,
+    "time_per_ticket_sec": 4.9153322133235635,
+    "time_p50_sec": 4.555512376013212,
+    "time_p90_sec": 8.176010623923503,
+    "balanced_accuracy": 0.3944444444444445,
+    "failed": 0,
+    "invalid": 7,
+    "investigation": {
+      "tickets": 25,
+      "lookups_per_ticket": 0.92,
+      "required_checks": 0,
+      "required_run": 0,
+      "required_share": null,
+      "needless_per_ticket": null,
+      "citations": 5,
+      "citations_valid": 0.8,
+      "citations_dropped": 1
+    }
+  },
+  "yardsticks": {
+    "most_common": {
+      "n": 25,
+      "path_accuracy": 0.4,
+      "path_margin": 0.17928907275340872,
+      "action_accuracy": 0.08,
+      "action_margin": 0.11372259376924312,
+      "team_accuracy": 0.0,
+      "team_margin": 0.16220780975543844,
+      "mistake_cost_chf": 2280,
+      "sec04_failures": 0,
+      "kappa": 0.0
+    },
+    "classifier": {
+      "n": 25,
+      "path_accuracy": 0.56,
+      "path_margin": 0.18133804016716498,
+      "action_accuracy": 0.4,
+      "action_margin": 0.17928907275340872,
+      "team_accuracy": 0.625,
+      "team_margin": 0.27871019297733857,
+      "mistake_cost_chf": 1380,
+      "sec04_failures": 0,
+      "kappa": 0.3589743589743591
+    }
+  },
+  "confusion": {
+    "SELF_SERVE": {
+      "SELF_SERVE": 0,
+      "AUTO_FIX": 0,
+      "ESCALATE": 4,
+      "OUT_OF_SCOPE": 0
+    },
+    "AUTO_FIX": {
+      "SELF_SERVE": 1,
+      "AUTO_FIX": 8,
+      "ESCALATE": 1,
+      "OUT_OF_SCOPE": 0
+    },
+    "ESCALATE": {
+      "SELF_SERVE": 1,
+      "AUTO_FIX": 0,
+      "ESCALATE": 7,
+      "OUT_OF_SCOPE": 1
+    },
+    "OUT_OF_SCOPE": {
+      "SELF_SERVE": 0,
+      "AUTO_FIX": 0,
+      "ESCALATE": 2,
+      "OUT_OF_SCOPE": 0
+    }
+  },
+  "per_path": {
+    "SELF_SERVE": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "n": 4
+    },
+    "AUTO_FIX": {
+      "precision": 1.0,
+      "recall": 0.8,
+      "n": 10
+    },
+    "ESCALATE": {
+      "precision": 0.5,
+      "recall": 0.7777777777777778,
+      "n": 9
+    },
+    "OUT_OF_SCOPE": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "n": 2
+    }
+  },
+  "by_difficulty": {
+    "hard": {
+      "n": 7,
+      "path_accuracy": 0.2857142857142857,
+      "path_margin": 0.2794268720713859,
+      "action_accuracy": 0.2857142857142857,
+      "action_margin": 0.2794268720713859,
+      "team_accuracy": 0.0,
+      "team_margin": 0.32881402355519035,
+      "mistake_cost_chf": 600,
+      "sec04_failures": 0,
+      "kappa": -0.06060606060606059,
+      "cause_accuracy": null,
+      "retrieval_accuracy": 0.7142857142857143,
+      "automation_rate": 0.3333333333333333,
+      "cost_per_ticket_usd": 0.00023060657142857143,
+      "cost_per_ticket_chf": 0.00018448525714285716,
+      "time_per_ticket_sec": 4.7402679045751155,
+      "time_p50_sec": 5.133917000028305,
+      "time_p90_sec": 8.176010623923503,
+      "balanced_accuracy": 0.4444444444444444,
+      "failed": 0,
+      "invalid": 3,
+      "investigation": {
+        "tickets": 7,
+        "lookups_per_ticket": 1.5714285714285714,
+        "required_checks": 0,
+        "required_run": 0,
+        "required_share": null,
+        "needless_per_ticket": null,
+        "citations": 1,
+        "citations_valid": 0.0,
+        "citations_dropped": 1
+      }
+    },
+    "records": {
+      "n": 5,
+      "path_accuracy": 1.0,
+      "path_margin": 0.21724574737604055,
+      "action_accuracy": 0.6,
+      "action_margin": 0.32583091831595484,
+      "team_accuracy": 0.6666666666666666,
+      "team_margin": 0.36542736479867577,
+      "mistake_cost_chf": 120,
+      "sec04_failures": 0,
+      "kappa": 1.0,
+      "cause_accuracy": null,
+      "retrieval_accuracy": 1.0,
+      "automation_rate": 0.4,
+      "cost_per_ticket_usd": 0.0002803772,
+      "cost_per_ticket_chf": 0.00022430176000000002,
+      "time_per_ticket_sec": 6.631392391794361,
+      "time_p50_sec": 4.555512376013212,
+      "time_p90_sec": 17.07734183303546,
+      "balanced_accuracy": 1.0,
+      "failed": 0,
+      "invalid": 1,
+      "investigation": {
+        "tickets": 5,
+        "lookups_per_ticket": 1.0,
+        "required_checks": 0,
+        "required_run": 0,
+        "required_share": null,
+        "needless_per_ticket": null,
+        "citations": 3,
+        "citations_valid": 1.0,
+        "citations_dropped": 0
+      }
+    },
+    "routine": {
+      "n": 13,
+      "path_accuracy": 0.6153846153846154,
+      "path_margin": 0.2338403622324732,
+      "action_accuracy": 0.6153846153846154,
+      "action_margin": 0.2338403622324732,
+      "team_accuracy": 1.0,
+      "team_margin": 0.28075304022450887,
+      "mistake_cost_chf": 540,
+      "sec04_failures": 0,
+      "kappa": 0.41964285714285715,
+      "cause_accuracy": null,
+      "retrieval_accuracy": 0.9230769230769231,
+      "automation_rate": 0.46153846153846156,
+      "cost_per_ticket_usd": 0.00020537615384615387,
+      "cost_per_ticket_chf": 0.0001643009230769231,
+      "time_per_ticket_sec": 4.349574464776267,
+      "time_p50_sec": 4.025830833939835,
+      "time_p90_sec": 6.33565666701179,
+      "balanced_accuracy": 0.4285714285714286,
+      "failed": 0,
+      "invalid": 3,
+      "investigation": {
+        "tickets": 13,
+        "lookups_per_ticket": 0.5384615384615384,
+        "required_checks": 0,
+        "required_run": 0,
+        "required_share": null,
+        "needless_per_ticket": null,
+        "citations": 1,
+        "citations_valid": 1.0,
+        "citations_dropped": 0
+      }
+    }
+  },
+  "by_family": {
+    "Rules set": {
+      "n": 25,
+      "path_accuracy": 0.6,
+      "path_margin": 0.17928907275340872,
+      "action_accuracy": 0.52,
+      "action_margin": 0.18235389058946339,
+      "team_accuracy": 0.625,
+      "team_margin": 0.27871019297733857,
+      "mistake_cost_chf": 1260,
+      "sec04_failures": 0,
+      "kappa": 0.3887530562347188,
+      "cause_accuracy": null,
+      "retrieval_accuracy": 0.88,
+      "automation_rate": 0.4166666666666667,
+      "cost_per_ticket_usd": 0.00022744087999999998,
+      "cost_per_ticket_chf": 0.000181952704,
+      "time_per_ticket_sec": 4.9153322133235635,
+      "time_p50_sec": 4.555512376013212,
+      "time_p90_sec": 8.176010623923503,
+      "balanced_accuracy": 0.3944444444444445,
+      "failed": 0,
+      "invalid": 7,
+      "investigation": {
+        "tickets": 25,
+        "lookups_per_ticket": 0.92,
+        "required_checks": 0,
+        "required_run": 0,
+        "required_share": null,
+        "needless_per_ticket": null,
+        "citations": 5,
+        "citations_valid": 0.8,
+        "citations_dropped": 1
+      }
+    }
+  },
+  "tickets": [
+    {
+      "id": "T-001",
+      "text": "My VPN keeps disconnecting",
+      "requester": "o.lang",
+      "difficulty": "hard",
+      "cause": "Expired device certificate",
+      "expected_cause": null,
+      "expected_paths": [
+        "AUTO_FIX",
+        "SELF_SERVE",
+        "ESCALATE"
+      ],
+      "expected_tools": [
+        "reset_vpn_profile"
+      ],
+      "expected_queues": [
+        "NET-VPN"
+      ],
+      "expected_units": [
+        "vpn-access"
+      ],
+      "family": "Rules set",
+      "expected_path": "AUTO_FIX",
+      "path": "AUTO_FIX",
+      "path_correct": true,
+      "action_correct": true,
+      "team_correct": false,
+      "mistake_cost_chf": 0,
+      "sec04_failure": false,
+      "tool": "reset_vpn_profile",
+      "queue": null,
+      "retrieved": [
+        "vpn-access"
+      ],
+      "cause_correct": null,
+      "retrieval_correct": true,
+      "input_tokens": 8915,
+      "output_tokens": 338,
+      "cost_usd": 0.000213086,
+      "time_sec": 5.133917000028305,
+      "error": null,
+      "invalid": false,
+      "rule": null,
+      "steps": [
+        {
+          "id": "s1",
+          "turn": 1,
+          "tool": "run_check",
+          "input": {
+            "step": "vpn-mfa-approval-check"
+          },
+          "result": "No recorded result for vpn-mfa-approval-check on this ticket.",
+          "ok": true,
+          "found": [],
+          "time_sec": 1.6390690420521423,
+          "input_tokens": 4362,
+          "output_tokens": 91,
+          "cost_usd": 0.00014269
+        },
+        {
+          "id": "s2",
+          "turn": 1,
+          "tool": "run_check",
+          "input": {
+            "step": "vpn-client-error-check"
+          },
+          "result": "No recorded result for vpn-client-error-check on this ticket.",
+          "ok": true,
+          "found": [],
+          "time_sec": 1.820793841034174e-05,
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "cost_usd": 0.0
+        },
+        {
+          "id": "s3",
+          "turn": 1,
+          "tool": "run_check",
+          "input": {
+            "step": "vpn-device-cert-check"
+          },
+          "result": "No recorded result for vpn-device-cert-check on this ticket.",
+          "ok": true,
+          "found": [],
+          "time_sec": 1.4459015801548958e-05,
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "cost_usd": 0.0
+        },
+        {
+          "id": "s4",
+          "turn": 2,
+          "tool": "record_decision",
+          "input": {
+            "rationale": "VPN disconnects are most commonly caused by an expired device certificate. The playbook prescribes resetting the VPN profile to regenerate the certificate when certificate issues are suspected or confirmed. This is a safe, reversible auto-fix.",
+            "cause": "Expired device certificate",
+            "path": "AUTO_FIX",
+            "tool": "reset_vpn_profile",
+            "tool_input": {
+              "username": "o.lang"
+            },
+            "evidence": []
+          },
+          "result": "AUTO_FIX",
+          "ok": true,
+          "found": [],
+          "time_sec": 3.4948931250255555,
+          "input_tokens": 4553,
+          "output_tokens": 247,
+          "cost_usd": 7.0396e-05
+        }
+      ],
+      "stopped": null,
+      "citations": {
+        "kept": [],
+        "dropped": []
+      },
+      "investigation": {
+        "lookups": 3,
+        "checks_run": [],
+        "required": 0,
+        "required_run": 0,
+        "needless": null,
+        "cited": 0,
+        "dropped": 0
+      }
+    },
+    {
+      "id": "T-002",
+      "text": "Teams shows me as offline to everyone",
+      "requester": "g.ammann",
+      "difficulty": "routine",
+      "cause": "Corrupt local cache",
+      "expected_cause": null,
+      "expected_paths": [
+        "AUTO_FIX"
+      ],
+      "expected_tools": [
+        "clear_teams_cache"
+      ],
+      "expected_queues": [],
+      "expected_units": [
+        "teams"
+      ],
+      "family": "Rules set",
+      "expected_path": "AUTO_FIX",
+      "path": "AUTO_FIX",
+      "path_correct": true,
+      "action_correct": true,
+      "team_correct": null,
+      "mistake_cost_chf": 0,
+      "sec04_failure": false,
+      "tool": "clear_teams_cache",
+      "queue": null,
+      "retrieved": [
+        "teams"
+      ],
+      "cause_correct": null,
+      "retrieval_correct": true,
+      "input_tokens": 8285,
+      "output_tokens": 308,
+      "cost_usd": 0.00019643,
+      "time_sec": 4.884814916993491,
+      "error": null,
+      "invalid": false,
+      "rule": null,
+      "steps": [
+        {
+          "id": "s1",
+          "turn": 1,
+          "tool": "run_check",
+          "input": {
+            "step": "check-teams-build"
+          },
+          "result": "No recorded result for check-teams-build on this ticket.",
+          "ok": true,
+          "found": [],
+          "time_sec": 1.3912457509431988,
+          "input_tokens": 4106,
+          "output_tokens": 29,
+          "cost_usd": 0.00012695
+        },
+        {
+          "id": "s2",
+          "turn": 2,
+          "tool": "record_decision",
+          "input": {
+            "rationale": "The issue is 'Teams shows me as offline to everyone', which matches the known cause 'Corrupt local cache' in the Microsoft Teams playbook. The documented fix is to clear the Teams cache via the clear_teams_cache tool, which is safe, reversible, and automated. No evidence suggests multiple users are affected or that Service Health is down, so escalation to APP-M365 is not yet required.",
+            "cause": "Corrupt local cache",
+            "path": "AUTO_FIX",
+            "tool": "clear_teams_cache",
+            "tool_input": {
+              "username": "g.ammann"
+            },
+            "evidence": []
+          },
+          "result": "AUTO_FIX",
+          "ok": true,
+          "found": [],
+          "time_sec": 3.498779125045985,
+          "input_tokens": 4179,
+          "output_tokens": 279,
+          "cost_usd": 6.948e-05
+        }
+      ],
+      "stopped": null,
+      "citations": {
+        "kept": [],
+        "dropped": []
+      },
+      "investigation": {
+        "lookups": 1,
+        "checks_run": [],
+        "required": 0,
+        "required_run": 0,
+        "needless": null,
+        "cited": 0,
+        "dropped": 0
+      }
+    },
+    {
+      "id": "T-003",
+      "text": "Floor 5 print queue is stuck",
+      "requester": "o.lang",
+      "difficulty": "routine",
+      "cause": "Hung spooler",
+      "expected_cause": null,
+      "expected_paths": [
+        "AUTO_FIX"
+      ],
+      "expected_tools": [
+        "restart_print_spooler"
+      ],
+      "expected_queues": [],
+      "expected_units": [
+        "printing"
+      ],
+      "family": "Rules set",
+      "expected_path": "AUTO_FIX",
+      "path": "AUTO_FIX",
+      "path_correct": true,
+      "action_correct": true,
+      "team_correct": null,
+      "mistake_cost_chf": 0,
+      "sec04_failure": false,
+      "tool": "restart_print_spooler",
+      "queue": null,
+      "retrieved": [
+        "printing"
+      ],
+      "cause_correct": null,
+      "retrieval_correct": true,
+      "input_tokens": 4301,
+      "output_tokens": 302,
+      "cost_usd": 0.00016829,
+      "time_sec": 4.025830833939835,
+      "error": null,
+      "invalid": false,
+      "rule": null,
+      "steps": [
+        {
+          "id": "s1",
+          "turn": 1,
+          "tool": "record_decision",
+          "input": {
+            "rationale": "The issue affects the entire Floor 5 print queue, consistent with a hung spooler (a known cause often triggered by the nightly PaperCut sync). The playbook specifies that for a whole queue without driver errors, the correct remediation is to restart the Print Spooler service. This is a safe, documented, and reversible action best executed by the support tool rather than user self-service.",
+            "cause": "Hung spooler",
+            "path": "AUTO_FIX",
+            "tool": "restart_print_spooler",
+            "tool_input": {
+              "floor": "5"
+            },
+            "evidence": []
+          },
+          "result": "AUTO_FIX",
+          "ok": true,
+          "found": [],
+          "time_sec": 4.025830833939835,
+          "input_tokens": 4301,
+          "output_tokens": 302,
+          "cost_usd": 0.00016829
+        }
+      ],
+      "stopped": null,
+      "citations": {
+        "kept": [],
+        "dropped": []
+      },
+      "investigation": {
+        "lookups": 0,
+        "checks_run": [],
+        "required": 0,
+        "required_run": 0,
+        "needless": null,
+        "cited": 0,
+        "dropped": 0
+      }
+    },
+    {
+      "id": "T-004",
+      "text": "VPN cert error, gateway confirmed correct, offline for a month",
+      "requester": "v.marti",
+      "difficulty": "routine",
+      "cause": "Expired device certificate",
+      "expected_cause": null,
+      "expected_paths": [
+        "AUTO_FIX"
+      ],
+      "expected_tools": [
+        "reset_vpn_profile"
+      ],
+      "expected_queues": [],
+      "expected_units": [
+        "vpn-access"
+      ],
+      "family": "Rules set",
+      "expected_path": "AUTO_FIX",
+      "path": "AUTO_FIX",
+      "path_correct": true,
+      "action_correct": true,
+      "team_correct": null,
+      "mistake_cost_chf": 0,
+      "sec04_failure": false,
+      "tool": "reset_vpn_profile",
+      "queue": null,
+      "retrieved": [
+        "vpn-access"
+      ],
+      "cause_correct": null,
+      "retrieval_correct": true,
+      "input_tokens": 4370,
+      "output_tokens": 175,
+      "cost_usd": 0.00015385,
+      "time_sec": 3.215173750068061,
+      "error": null,
+      "invalid": false,
+      "rule": null,
+      "steps": [
+        {
+          "id": "s1",
+          "turn": 1,
+          "tool": "record_decision",
+          "input": {
+            "rationale": "The user is experiencing a VPN certificate error with the gateway confirmed correct, and has been offline for a month. The KB context identifies 'Expired device certificate' as the most common cause in this scenario (offline >30 days) and explicitly recommends using `reset_vpn_profile` to regenerate the certificate and profile. This tool is safe, reversible, and suitable for AUTO_FIX.",
+            "cause": "Expired device certificate",
+            "path": "AUTO_FIX",
+            "tool": "reset_vpn_profile",
+            "tool_input": {
+              "username": "v.marti"
+            },
+            "evidence": []
+          },
+          "result": "AUTO_FIX",
+          "ok": true,
+          "found": [],
+          "time_sec": 3.215173750068061,
+          "input_tokens": 4370,
+          "output_tokens": 175,
+          "cost_usd": 0.00015385
+        }
+      ],
+      "stopped": null,
+      "citations": {
+        "kept": [],
+        "dropped": []
+      },
+      "investigation": {
+        "lookups": 0,
+        "checks_run": [],
+        "required": 0,
+        "required_run": 0,
+        "needless": null,
+        "cited": 0,
+        "dropped": 0
+      }
+    },
+    {
+      "id": "T-005",
+      "text": "Need Zoom installed, no admin rights, it's in Company Portal",
+      "requester": "f.gerber",
+      "difficulty": "routine",
+      "cause": "Standard account",
+      "expected_cause": null,
+      "expected_paths": [
+        "AUTO_FIX"
+      ],
+      "expected_tools": [
+        "push_approved_software"
+      ],
+      "expected_queues": [],
+      "expected_units": [
+        "software-install"
+      ],
+      "family": "Rules set",
+      "expected_path": "AUTO_FIX",
+      "path": "SELF_SERVE",
+      "path_correct": false,
+      "action_correct": false,
+      "team_correct": null,
+      "mistake_cost_chf": 60,
+      "sec04_failure": false,
+      "tool": null,
+      "queue": null,
+      "retrieved": [
+        "software-install",
+        "sec-07-software-and-admin-rights"
+      ],
+      "cause_correct": null,
+      "retrieval_correct": true,
+      "input_tokens": 30909,
+      "output_tokens": 616,
+      "cost_usd": 0.0006540700000000001,
+      "time_sec": 11.143310497980565,
+      "error": null,
+      "invalid": false,
+      "rule": null,
+      "steps": [
+        {
+          "id": "s1",
+          "turn": 1,
+          "tool": "search_kb",
+          "input": {
+            "query": "Zoom software catalog entitlement approval process"
+          },
+          "result": "Found software-install.",
+          "ok": true,
+          "found": [
+            "software-install"
+          ],
+          "time_sec": 1.4041491659590974,
+          "input_tokens": 4559,
+          "output_tokens": 29,
+          "cost_usd": 0.00014054
+        },
+        {
+          "id": "s2",
+          "turn": 2,
+          "tool": "run_check",
+          "input": {
+            "step": "software-entitlement-check"
+          },
+          "result": "No recorded result for software-entitlement-check on this ticket.",
+          "ok": true,
+          "found": [],
+          "time_sec": 1.2223937920061871,
+          "input_tokens": 5125,
+          "output_tokens": 30,
+          "cost_usd": 5.013e-05
+        },
+        {
+          "id": "s3",
+          "turn": 3,
+          "tool": "run_check",
+          "input": {
+            "step": "software-policy-evaluation-check"
+          },
+          "result": "No recorded result for software-policy-evaluation-check on this ticket.",
+          "ok": true,
+          "found": [],
+          "time_sec": 1.2471284159692004,
+          "input_tokens": 5200,
+          "output_tokens": 30,
+          "cost_usd": 3.702e-05
+        },
+        {
+          "id": "s4",
+          "turn": 4,
+          "tool": "run_check",
+          "input": {
+            "step": "software-security-block-check"
+          },
+          "result": "No recorded result for software-security-block-check on this ticket.",
+          "ok": true,
+          "found": [],
+          "time_sec": 1.0198636669665575,
+          "input_tokens": 5275,
+          "output_tokens": 29,
+          "cost_usd": 3.914e-05
+        },
+        {
+          "id": "s5",
+          "turn": 5,
+          "tool": "search_kb",
+          "input": {
+            "query": "Zoom in Company Portal catalog approved software list"
+          },
+          "result": "Nothing matched.",
+          "ok": true,
+          "found": [],
+          "time_sec": 1.375237000058405,
+          "input_tokens": 5348,
+          "output_tokens": 31,
+          "cost_usd": 0.00016447
+        },
+        {
+          "id": "s6",
+          "turn": 6,
+          "tool": "record_decision",
+          "input": {
+            "rationale": "The user is a standard account without local admin rights (per SEC-07 §7.1) and has confirmed Zoom is available in the Company Portal catalog. The software-install playbook directs users to install catalog titles directly from the portal without assistance. This is a standard self-service procedure.",
+            "cause": "Standard account",
+            "path": "SELF_SERVE",
+            "steps": [
+              "Open the Company Portal app on your device.",
+              "Navigate to the 'Apps' or 'Software Center' section.",
+              "Search for 'Zoom'.",
+              "Select Zoom and click 'Install'.",
+              "Wait for the installation to complete; no admin credentials are required."
+            ]
+          },
+          "result": "SELF_SERVE",
+          "ok": true,
+          "found": [],
+          "time_sec": 5.044668707996607,
+          "input_tokens": 5402,
+          "output_tokens": 467,
+          "cost_usd": 0.00022277
+        }
+      ],
+      "stopped": null,
+      "citations": {
+        "kept": [],
+        "dropped": []
+      },
+      "investigation": {
+        "lookups": 5,
+        "checks_run": [],
+        "required": 0,
+        "required_run": 0,
+        "needless": null,
+        "cited": 0,
+        "dropped": 0
+      }
+    },
+    {
+      "id": "T-006",
+      "text": "I'm locked out of my account",
+      "requester": "s.keller",
+      "difficulty": "records",
+      "cause": "Standard lockout",
+      "expected_cause": null,
+      "expected_paths": [
+        "ESCALATE"
+      ],
+      "expected_tools": [],
+      "expected_queues": [
+        "SEC-INCIDENT"
+      ],
+      "expected_units": [
+        "account-lockout"
+      ],
+      "family": "Rules set",
+      "expected_path": "ESCALATE",
+      "path": "ESCALATE",
+      "path_correct": true,
+      "action_correct": true,
+      "team_correct": true,
+      "mistake_cost_chf": 0,
+      "sec04_failure": false,
+      "tool": "create_escalation_ticket",
+      "queue": "SEC-INCIDENT",
+      "retrieved": [
+        "account-lockout",
+        "sec-04-account-lockout"
+      ],
+      "cause_correct": null,
+      "retrieval_correct": true,
+      "input_tokens": 9363,
+      "output_tokens": 301,
+      "cost_usd": 0.00021250000000000002,
+      "time_sec": 4.555512376013212,
+      "error": null,
+      "invalid": false,
+      "rule": null,
+      "steps": [
+        {
+          "id": "s1",
+          "turn": 1,
+          "tool": "lookup_requester",
+          "input": {},
+          "result": "Client Services, Zürich; 2 lockouts in 24 hours; device LT-SKELLER.",
+          "ok": true,
+          "found": [],
+          "time_sec": 1.0939542920095846,
+          "input_tokens": 4587,
+          "output_tokens": 15,
+          "cost_usd": 0.00013956
+        },
+        {
+          "id": "s2",
+          "turn": 2,
+          "tool": "record_decision",
+          "input": {
+            "rationale": "The requester has 2 lockouts in the last 24 hours, which under SEC-04 §4.2 constitutes a possible compromise and requires escalation to SEC-INCIDENT rather than a routine unlock. A routine unlock is forbidden in this scenario. The evidence from the directory record showing 2 lockouts within 24 hours triggers the mandatory escalation path per policy.",
+            "cause": "Standard lockout",
+            "path": "ESCALATE",
+            "queue": "SEC-INCIDENT",
+            "summary": "User s.keller locked out twice in 24 hours; potential compromise under SEC-04 §4.2 requires security review.",
+            "priority": "P2-High",
+            "evidence": [
+              "s1"
+            ],
+            "ruled_out": "Stale phone credentials and expired reset token — these are standard causes but irrelevant here because repeat lockouts mandate SEC-INCIDENT review regardless of source.",
+            "next_step": "Verify user identity via Okta Verify push and investigate potential compromise indicators before any account unlock."
+          },
+          "result": "ESCALATE",
+          "ok": true,
+          "found": [],
+          "time_sec": 3.461775584029965,
+          "input_tokens": 4776,
+          "output_tokens": 286,
+          "cost_usd": 7.294e-05
+        }
+      ],
+      "stopped": null,
+      "citations": {
+        "kept": [
+          "s1"
+        ],
+        "dropped": []
+      },
+      "investigation": {
+        "lookups": 1,
+        "checks_run": [],
+        "required": 0,
+        "required_run": 0,
+        "needless": null,
+        "cited": 1,
+        "dropped": 0
+      }
+    },
+    {
+      "id": "T-007",
+      "text": "Locked out twice already today",
+      "requester": "h.widmer",
+      "difficulty": "routine",
+      "cause": "Unknown",
+      "expected_cause": null,
+      "expected_paths": [
+        "ESCALATE"
+      ],
+      "expected_tools": [],
+      "expected_queues": [
+        "SEC-INCIDENT"
+      ],
+      "expected_units": [
+        "account-lockout",
+        "sec-04-account-lockout",
+        "sec-07-software-and-admin-rights"
+      ],
+      "family": "Rules set",
+      "expected_path": "ESCALATE",
+      "path": "ESCALATE",
+      "path_correct": true,
+      "action_correct": true,
+      "team_correct": true,
+      "mistake_cost_chf": 0,
+      "sec04_failure": false,
+      "tool": "create_escalation_ticket",
+      "queue": "SEC-INCIDENT",
+      "retrieved": [
+        "account-lockout",
+        "sec-04-account-lockout"
+      ],
+      "cause_correct": null,
+      "retrieval_correct": true,
+      "input_tokens": 9326,
+      "output_tokens": 493,
+      "cost_usd": 0.00023635,
+      "time_sec": 6.33565666701179,
+      "error": null,
+      "invalid": false,
+      "rule": null,
+      "steps": [
+        {
+          "id": "s1",
+          "turn": 1,
+          "tool": "lookup_requester",
+          "input": {},
+          "result": "Compliance, Zürich; 0 lockouts in 24 hours; device LT-HWIDMER.",
+          "ok": true,
+          "found": [],
+          "time_sec": 1.167264209012501,
+          "input_tokens": 4585,
+          "output_tokens": 15,
+          "cost_usd": 0.0001395
+        },
+        {
+          "id": "s2",
+          "turn": 2,
+          "tool": "record_decision",
+          "input": {
+            "rationale": "The user claims two lockouts today, but the requester record shows zero lockouts in the last 24 hours. Per SEC-04 §4.2, two or more lockouts in 24 hours require escalation to SEC-INCIDENT as a possible compromise, while one lockout allows a routine unlock. The lockout count is absent/contradictory, so the correct path cannot be determined without investigation into the domain controller logs. Escalating to resolve this ambiguity.",
+            "cause": "Unknown",
+            "path": "ESCALATE",
+            "queue": "SEC-INCIDENT",
+            "summary": "User h.widmer reports two lockouts today; directory shows zero—requires investigation to determine actual cause and lockout history.",
+            "priority": "P2-High",
+            "evidence": [
+              "s1"
+            ],
+            "ruled_out": "Stale phone credentials and expired reset token: no evidence yet, as lockout source has not been reviewed due to conflicting lockout counts.",
+            "next_step": "Review DC-EAST-03.corplabs.internal logs to identify the source of failed sign-ins and confirm whether two or more lockouts occurred within the last 24 hours."
+          },
+          "result": "ESCALATE",
+          "ok": true,
+          "found": [],
+          "time_sec": 5.168429958052002,
+          "input_tokens": 4741,
+          "output_tokens": 478,
+          "cost_usd": 9.685e-05
+        }
+      ],
+      "stopped": null,
+      "citations": {
+        "kept": [
+          "s1"
+        ],
+        "dropped": []
+      },
+      "investigation": {
+        "lookups": 1,
+        "checks_run": [],
+        "required": 0,
+        "required_run": 0,
+        "needless": null,
+        "cited": 1,
+        "dropped": 0
+      }
+    },
+    {
+      "id": "T-008",
+      "text": "My OneDrive has been stuck syncing for two days",
+      "requester": "t.steiner",
+      "difficulty": "hard",
+      "cause": "Unsupported filename",
+      "expected_cause": null,
+      "expected_paths": [
+        "ESCALATE"
+      ],
+      "expected_tools": [],
+      "expected_queues": [
+        "APP-M365"
+      ],
+      "expected_units": [
+        "onedrive"
+      ],
+      "family": "Rules set",
+      "expected_path": "ESCALATE",
+      "path": "SELF_SERVE",
+      "path_correct": false,
+      "action_correct": false,
+      "team_correct": false,
+      "mistake_cost_chf": 120,
+      "sec04_failure": false,
+      "tool": null,
+      "queue": null,
+      "retrieved": [
+        "onedrive",
+        "company-profile::Known organizational quirks"
+      ],
+      "cause_correct": null,
+      "retrieval_correct": true,
+      "input_tokens": 4342,
+      "output_tokens": 289,
+      "cost_usd": 0.00016783,
+      "time_sec": 3.9024841660866514,
+      "error": null,
+      "invalid": false,
+      "rule": null,
+      "steps": [
+        {
+          "id": "s1",
+          "turn": 1,
+          "tool": "record_decision",
+          "input": {
+            "rationale": "The user is in Finance, and the KB context explicitly states that the Finance team's Excel naming habit of using '#' in filenames for report versioning is the leading cause of OneDrive sync tickets from that department. This matches the 'Unsupported filename' known cause in the OneDrive playbook, which fails silently. The fix (renaming files) is a safe, simple self-service action documented in the playbook. No infrastructure or backend escalation is needed at this stage as this is a known, common, user-actionable cause for this specific department.",
+            "cause": "Unsupported filename",
+            "path": "SELF_SERVE",
+            "steps": [
+              "Check your OneDrive folder for any files with `#` or `%` in their names, particularly in subfolders related to financial reports.",
+              "Rename these files to remove the special characters (e.g., replace `#` with `-` or `v` for version).",
+              "Wait a few minutes for OneDrive to resume syncing.",
+              "If syncing still does not resume after renaming, check if you are near your storage quota by visiting onedrive.corplabs.com and freeing up space if necessary."
+            ],
+            "evidence": [
+              "s1"
+            ]
+          },
+          "result": "SELF_SERVE",
+          "ok": true,
+          "found": [],
+          "time_sec": 3.9024841660866514,
+          "input_tokens": 4342,
+          "output_tokens": 289,
+          "cost_usd": 0.00016783
+        }
+      ],
+      "stopped": null,
+      "citations": {
+        "kept": [],
+        "dropped": [
+          "s1"
+        ]
+      },
+      "investigation": {
+        "lookups": 0,
+        "checks_run": [],
+        "required": 0,
+        "required_run": 0,
+        "needless": null,
+        "cited": 0,
+        "dropped": 1
+      }
+    },
+    {
+      "id": "T-009",
+      "text": "My external monitor isn't detected when docked",
+      "requester": "i.bosshard",
+      "difficulty": "hard",
+      "cause": "Thunderbolt cable not fully seated",
+      "expected_cause": null,
+      "expected_paths": [
+        "SELF_SERVE",
+        "ESCALATE"
+      ],
+      "expected_tools": [],
+      "expected_queues": [],
+      "expected_units": [
+        "hardware-peripherals"
+      ],
+      "family": "Rules set",
+      "expected_path": "ESCALATE",
+      "path": "ESCALATE",
+      "path_correct": true,
+      "action_correct": true,
+      "team_correct": null,
+      "mistake_cost_chf": 0,
+      "sec04_failure": false,
+      "tool": "create_escalation_ticket",
+      "queue": "DESK-HARDWARE",
+      "retrieved": [
+        "hardware-peripherals"
+      ],
+      "cause_correct": null,
+      "retrieval_correct": true,
+      "input_tokens": 4212,
+      "output_tokens": 444,
+      "cost_usd": 0.00018408,
+      "time_sec": 5.414737583952956,
+      "error": null,
+      "invalid": false,
+      "rule": null,
+      "steps": [
+        {
+          "id": "s1",
+          "turn": 1,
+          "tool": "record_decision",
+          "input": {
+            "rationale": "The user reports an external monitor not detected when docked. The KB identifies 'Thunderbolt cable not fully seated' and 'Old dock firmware' as known causes for WD22TB4 docks. Remote tools are not applicable for reseating cables or updating dock firmware. Per the 'When to escalate' section, if nothing is detected after checking cable/firmware (which requires physical access), it is a hardware fault requiring escalation to DESK-HARDWARE for a swap test.",
+            "cause": "Thunderbolt cable not fully seated",
+            "path": "ESCALATE",
+            "queue": "DESK-HARDWARE",
+            "summary": "External monitor not detected with WD22TB4 dock; likely cable seating or firmware issue requiring physical inspection and swap test.",
+            "priority": "P3-Normal",
+            "evidence": [],
+            "ruled_out": "None ruled out yet, but software glitches less likely given the specific dock model and symptoms matching known hardware causes.",
+            "next_step": "Inspect the Thunderbolt cable connection on the WD22TB4 dock and laptop, check dock firmware version in Dell Peripheral Manager, and perform a swap test with a spare WD22TB4 if needed."
+          },
+          "result": "ESCALATE",
+          "ok": true,
+          "found": [],
+          "time_sec": 5.414737583952956,
+          "input_tokens": 4212,
+          "output_tokens": 444,
+          "cost_usd": 0.00018408
+        }
+      ],
+      "stopped": null,
+      "citations": {
+        "kept": [],
+        "dropped": []
+      },
+      "investigation": {
+        "lookups": 0,
+        "checks_run": [],
+        "required": 0,
+        "required_run": 0,
+        "needless": null,
+        "cited": 0,
+        "dropped": 0
+      }
+    },
+    {
+      "id": "T-010",
+      "text": "What's the weather like today?",
+      "requester": "k.roth",
+      "difficulty": "routine",
+      "cause": "Unknown",
+      "expected_cause": null,
+      "expected_paths": [
+        "OUT_OF_SCOPE"
+      ],
+      "expected_tools": [],
+      "expected_queues": [],
+      "expected_units": [],
+      "family": "Rules set",
+      "expected_path": "OUT_OF_SCOPE",
+      "path": "ESCALATE",
+      "path_correct": false,
+      "action_correct": false,
+      "team_correct": null,
+      "mistake_cost_chf": 120,
+      "sec04_failure": false,
+      "tool": "create_escalation_ticket",
+      "queue": "DESK-SUPPORT",
+      "retrieved": [],
+      "cause_correct": null,
+      "retrieval_correct": true,
+      "input_tokens": 3908,
+      "output_tokens": 47,
+      "cost_usd": 0.00012335,
+      "time_sec": 1.4530003339750692,
+      "error": null,
+      "invalid": true,
+      "rule": null,
+      "steps": [
+        {
+          "id": "s1",
+          "turn": 1,
+          "tool": "record_decision",
+          "input": {},
+          "result": "ESCALATE",
+          "ok": false,
+          "found": [],
+          "time_sec": 1.4530003339750692,
+          "input_tokens": 3908,
+          "output_tokens": 47,
+          "cost_usd": 0.00012335
+        }
+      ],
+      "stopped": null,
+      "citations": {
+        "kept": [],
+        "dropped": []
+      },
+      "investigation": {
+        "lookups": 0,
+        "checks_run": [],
+        "required": 0,
+        "required_run": 0,
+        "needless": null,
+        "cited": 0,
+        "dropped": 0
+      }
+    },
+    {
+      "id": "T-011",
+      "text": "Outlook keeps asking for my password, and my Okta session was renewed yesterday.",
+      "requester": "h.widmer",
+      "difficulty": "routine",
+      "cause": "Stale saved credentials",
+      "expected_cause": null,
+      "expected_paths": [
+        "AUTO_FIX"
+      ],
+      "expected_tools": [
+        "clear_credential_manager"
+      ],
+      "expected_queues": [],
+      "expected_units": [
+        "outlook"
+      ],
+      "family": "Rules set",
+      "expected_path": "AUTO_FIX",
+      "path": "AUTO_FIX",
+      "path_correct": true,
+      "action_correct": true,
+      "team_correct": null,
+      "mistake_cost_chf": 0,
+      "sec04_failure": false,
+      "tool": "clear_credential_manager",
+      "queue": null,
+      "retrieved": [
+        "outlook",
+        "sec-04-account-lockout"
+      ],
+      "cause_correct": null,
+      "retrieval_correct": true,
+      "input_tokens": 4558,
+      "output_tokens": 243,
+      "cost_usd": 0.00016833,
+      "time_sec": 2.9617402920266613,
+      "error": null,
+      "invalid": false,
+      "rule": null,
+      "steps": [
+        {
+          "id": "s1",
+          "turn": 1,
+          "tool": "record_decision",
+          "input": {
+            "rationale": "The user reports Outlook password prompts with a fresh Okta session, which matches the 'Stale saved credentials' known cause in the Outlook playbook. The correct remediation is to clear the stale credential manager entries.",
+            "cause": "Stale saved credentials",
+            "path": "AUTO_FIX",
+            "tool": "clear_credential_manager",
+            "tool_input": {
+              "username": "h.widmer"
+            },
+            "evidence": []
+          },
+          "result": "AUTO_FIX",
+          "ok": true,
+          "found": [],
+          "time_sec": 2.9617402920266613,
+          "input_tokens": 4558,
+          "output_tokens": 243,
+          "cost_usd": 0.00016833
+        }
+      ],
+      "stopped": null,
+      "citations": {
+        "kept": [],
+        "dropped": []
+      },
+      "investigation": {
+        "lookups": 0,
+        "checks_run": [],
+        "required": 0,
+        "required_run": 0,
+        "needless": null,
+        "cited": 0,
+        "dropped": 0
+      }
+    },
+    {
+      "id": "T-012",
+      "text": "Outlook has prompted me to sign in all morning. My last full Okta login was about three months ago.",
+      "requester": "b.brunner",
+      "difficulty": "hard",
+      "cause": "Unknown",
+      "expected_cause": null,
+      "expected_paths": [
+        "SELF_SERVE"
+      ],
+      "expected_tools": [],
+      "expected_queues": [],
+      "expected_units": [
+        "outlook"
+      ],
+      "family": "Rules set",
+      "expected_path": "SELF_SERVE",
+      "path": "ESCALATE",
+      "path_correct": false,
+      "action_correct": false,
+      "team_correct": null,
+      "mistake_cost_chf": 120,
+      "sec04_failure": false,
+      "tool": "create_escalation_ticket",
+      "queue": "DESK-SUPPORT",
+      "retrieved": [
+        "sso-mfa",
+        "sec-04-account-lockout"
+      ],
+      "cause_correct": null,
+      "retrieval_correct": false,
+      "input_tokens": 24796,
+      "output_tokens": 386,
+      "cost_usd": 0.00045613999999999995,
+      "time_sec": 8.176010623923503,
+      "error": null,
+      "invalid": true,
+      "rule": null,
+      "steps": [
+        {
+          "id": "s1",
+          "turn": 1,
+          "tool": "run_check",
+          "input": {
+            "step": "sso-mfa-loop-check"
+          },
+          "result": "No recorded result for sso-mfa-loop-check on this ticket.",
+          "ok": true,
+          "found": [],
+          "time_sec": 1.315851541934535,
+          "input_tokens": 4531,
+          "output_tokens": 63,
+          "cost_usd": 0.00014412
+        },
+        {
+          "id": "s2",
+          "turn": 1,
+          "tool": "run_check",
+          "input": {
+            "step": "sso-factor-enrollment-check"
+          },
+          "result": "No recorded result for sso-factor-enrollment-check on this ticket.",
+          "ok": true,
+          "found": [],
+          "time_sec": 1.0624993592500687e-05,
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "cost_usd": 0.0
+        },
+        {
+          "id": "s3",
+          "turn": 2,
+          "tool": "search_kb",
+          "input": {
+            "query": "Outlook credential prompt loop stale credentials"
+          },
+          "result": "Found outlook.",
+          "ok": true,
+          "found": [
+            "outlook"
+          ],
+          "time_sec": 1.6537125000031665,
+          "input_tokens": 4669,
+          "output_tokens": 30,
+          "cost_usd": 3.645e-05
+        },
+        {
+          "id": "s4",
+          "turn": 3,
+          "tool": "run_check",
+          "input": {
+            "step": "outlook-connection-state-check"
+          },
+          "result": "No recorded result for outlook-connection-state-check on this ticket.",
+          "ok": true,
+          "found": [],
+          "time_sec": 1.3674825829220936,
+          "input_tokens": 5204,
+          "output_tokens": 62,
+          "cost_usd": 5.666e-05
+        },
+        {
+          "id": "s5",
+          "turn": 3,
+          "tool": "run_check",
+          "input": {
+            "step": "outlook-profile-health-check"
+          },
+          "result": "No recorded result for outlook-profile-health-check on this ticket.",
+          "ok": true,
+          "found": [],
+          "time_sec": 7.416936568915844e-06,
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "cost_usd": 0.0
+        },
+        {
+          "id": "s6",
+          "turn": 4,
+          "tool": "search_kb",
+          "input": {
+            "query": "clear_credential_manager Outlook credential prompt loop"
+          },
+          "result": "Nothing matched.",
+          "ok": true,
+          "found": [],
+          "time_sec": 1.4084018329158425,
+          "input_tokens": 5338,
+          "output_tokens": 31,
+          "cost_usd": 4.129e-05
+        },
+        {
+          "id": "s7",
+          "turn": 5,
+          "tool": "record_decision",
+          "input": {
+            "rationale": "The user reports Outlook repeatedly prompting for credentials, with their last Okta login about three months ago. Per the Outlook KB article, an expired Okta session (90-day limit) causes repeated password prompts, and if a fresh session still triggers prompts, stale saved credentials are the likely cause. The `clear_credential_manager` tool removes stale MicrosoftOffice16_Data:* entries from Windows Credential Manager, which is the documented fix for this scenario. No evidence suggests MFA loop or policy mismatch issues; the sso-mfa checks were not run and are unnecessary given the Outlook-specific symptom. This is a safe, reversible self-service action.\", \"cause\": \"Stale saved credentials\", \"path\": \"AUTO_FIX\", \"tool\": \"clear_credential_manager\", \"tool_input\": {\"username\": \"b.brunner\"}, \"evidence\": [\"s3\"]}"
+          },
+          "result": "ESCALATE",
+          "ok": false,
+          "found": [],
+          "time_sec": 2.821728084003553,
+          "input_tokens": 5054,
+          "output_tokens": 200,
+          "cost_usd": 0.00017762
+        }
+      ],
+      "stopped": null,
+      "citations": {
+        "kept": [],
+        "dropped": []
+      },
+      "investigation": {
+        "lookups": 6,
+        "checks_run": [],
+        "required": 0,
+        "required_run": 0,
+        "needless": null,
+        "cited": 0,
+        "dropped": 0
+      }
+    },
+    {
+      "id": "T-013",
+      "text": "My laptop is crawling right now and Task Manager shows CSFalconService using most of the CPU.",
+      "requester": "v.marti",
+      "difficulty": "routine",
+      "cause": "Unknown",
+      "expected_cause": null,
+      "expected_paths": [
+        "SELF_SERVE"
+      ],
+      "expected_tools": [],
+      "expected_queues": [],
+      "expected_units": [
+        "laptop-performance"
+      ],
+      "family": "Rules set",
+      "expected_path": "SELF_SERVE",
+      "path": "ESCALATE",
+      "path_correct": false,
+      "action_correct": false,
+      "team_correct": null,
+      "mistake_cost_chf": 120,
+      "sec04_failure": false,
+      "tool": "create_escalation_ticket",
+      "queue": "DESK-SUPPORT",
+      "retrieved": [
+        "laptop-performance"
+      ],
+      "cause_correct": null,
+      "retrieval_correct": true,
+      "input_tokens": 4329,
+      "output_tokens": 271,
+      "cost_usd": 0.0001651,
+      "time_sec": 3.689814917044714,
+      "error": null,
+      "invalid": true,
+      "rule": null,
+      "steps": [
+        {
+          "id": "s1",
+          "turn": 1,
+          "tool": "record_decision",
+          "input": {
+            "rationale": "The high CPU usage by CSFalconService matches the known cause 'CrowdStrike Falcon scan' from the Laptop performance playbook. The documentation states this is expected behavior causing slowness for approximately 20 minutes and requires no intervention other than informing the user.",
+            "cause": "CrowdStrike Falcon scan",
+            "path": "SELF_SERVE",
+            "steps": [
+              "Understand that the slowness is caused by a scheduled CrowdStrike Falcon scan on your endpoint protection agent.",
+              [
+                "Wait approximately 20 minutes for the scan to complete. The CPU usage should return to normal and the laptop speed will recover."
+              ]
+            ]
+          },
+          "result": "ESCALATE",
+          "ok": false,
+          "found": [],
+          "time_sec": 3.689814917044714,
+          "input_tokens": 4329,
+          "output_tokens": 271,
+          "cost_usd": 0.0001651
+        }
+      ],
+      "stopped": null,
+      "citations": {
+        "kept": [],
+        "dropped": []
+      },
+      "investigation": {
+        "lookups": 0,
+        "checks_run": [],
+        "required": 0,
+        "required_run": 0,
+        "needless": null,
+        "cited": 0,
+        "dropped": 0
+      }
+    },
+    {
+      "id": "T-014",
+      "text": "My disk is almost full and OneDrive seems to keep every file on the laptop.",
+      "requester": "g.ammann",
+      "difficulty": "routine",
+      "cause": "None",
+      "expected_cause": null,
+      "expected_paths": [
+        "AUTO_FIX"
+      ],
+      "expected_tools": [
+        "enable_onedrive_files_on_demand"
+      ],
+      "expected_queues": [],
+      "expected_units": [
+        "laptop-performance",
+        "onedrive"
+      ],
+      "family": "Rules set",
+      "expected_path": "AUTO_FIX",
+      "path": "AUTO_FIX",
+      "path_correct": true,
+      "action_correct": true,
+      "team_correct": null,
+      "mistake_cost_chf": 0,
+      "sec04_failure": false,
+      "tool": "enable_onedrive_files_on_demand",
+      "queue": null,
+      "retrieved": [
+        "onedrive"
+      ],
+      "cause_correct": null,
+      "retrieval_correct": true,
+      "input_tokens": 4157,
+      "output_tokens": 226,
+      "cost_usd": 0.00015409,
+      "time_sec": 3.326398583012633,
+      "error": null,
+      "invalid": false,
+      "rule": null,
+      "steps": [
+        {
+          "id": "s1",
+          "turn": 1,
+          "tool": "record_decision",
+          "input": {
+            "rationale": "The user reports disk space is low because OneDrive is storing all files locally instead of using Files On-Demand. The KB context for OneDrive sync does not list this as a known cause of sync failures or quota issues, but the available remediation tool `enable_onedrive_files_on_demand` specifically addresses the scenario where OneDrive full local sync fills the SSD. Enabling Files On-Demand via Intune policy will switch the sync mode to cloud-priority, freeing local disk space while keeping files accessible. This is a safe, documented, reversible action best executed by a support tool rather than requiring user configuration changes.",
+            "cause": "None",
+            "path": "AUTO_FIX",
+            "tool": "enable_onedrive_files_on_demand",
+            "tool_input": {
+              "username": "g.ammann"
+            },
+            "evidence": []
+          },
+          "result": "AUTO_FIX",
+          "ok": true,
+          "found": [],
+          "time_sec": 3.326398583012633,
+          "input_tokens": 4157,
+          "output_tokens": 226,
+          "cost_usd": 0.00015409
+        }
+      ],
+      "stopped": null,
+      "citations": {
+        "kept": [],
+        "dropped": []
+      },
+      "investigation": {
+        "lookups": 0,
+        "checks_run": [],
+        "required": 0,
+        "required_run": 0,
+        "needless": null,
+        "cited": 0,
+        "dropped": 0
+      }
+    },
+    {
+      "id": "T-015",
+      "text": "My mapped drives have disappeared. VPN is connected and everything else works.",
+      "requester": "e.moser",
+      "difficulty": "routine",
+      "cause": "Unknown",
+      "expected_cause": null,
+      "expected_paths": [
+        "AUTO_FIX"
+      ],
+      "expected_tools": [
+        "remap_drives"
+      ],
+      "expected_queues": [],
+      "expected_units": [
+        "shared-drive"
+      ],
+      "family": "Rules set",
+      "expected_path": "AUTO_FIX",
+      "path": "ESCALATE",
+      "path_correct": false,
+      "action_correct": false,
+      "team_correct": null,
+      "mistake_cost_chf": 120,
+      "sec04_failure": false,
+      "tool": "create_escalation_ticket",
+      "queue": "SD-FILES",
+      "retrieved": [],
+      "cause_correct": null,
+      "retrieval_correct": false,
+      "input_tokens": 3924,
+      "output_tokens": 348,
+      "cost_usd": 0.00016296,
+      "time_sec": 4.749208124936558,
+      "error": null,
+      "invalid": false,
+      "rule": null,
+      "steps": [
+        {
+          "id": "s1",
+          "turn": 1,
+          "tool": "record_decision",
+          "input": {
+            "rationale": "The user reports mapped drives disappearing despite VPN being connected. The retrieval returned no confident match for this query, meaning there is no specific playbook or policy guidance available in the system to determine the exact cause or resolution steps. Without company-specific procedures for drive mapping troubleshooting (such as checking GPO settings, verifying \\\\IT-TOOLS\\Scripts availability, or confirming department-specific share permissions), I cannot confidently recommend a self-service fix or an automated remediation tool. Escalation is required to investigate whether this is due to network infrastructure issues, Group Policy changes, or share access problems that require deeper investigation by the appropriate support team.",
+            "cause": "Unknown",
+            "path": "ESCALATE",
+            "queue": "SD-FILES",
+            "summary": "Finance user e.moser on device LT-EMOSER reports all mapped drives disappeared while VPN remains connected; requires investigation into potential GPO, network, or share access issues.",
+            "priority": "P3-Normal",
+            "evidence": [],
+            "ruled_out": "No causes ruled out due to lack of matching KB context; unable to determine if this is a known issue with documented resolution steps.",
+            "next_step": "Verify whether mapped drives are accessible via direct UNC paths, check recent GPO changes affecting Finance department, and confirm \\\\IT-TOOLS\\Scripts availability for drive mapping scripts."
+          },
+          "result": "ESCALATE",
+          "ok": true,
+          "found": [],
+          "time_sec": 4.749208124936558,
+          "input_tokens": 3924,
+          "output_tokens": 348,
+          "cost_usd": 0.00016296
+        }
+      ],
+      "stopped": null,
+      "citations": {
+        "kept": [],
+        "dropped": []
+      },
+      "investigation": {
+        "lookups": 0,
+        "checks_run": [],
+        "required": 0,
+        "required_run": 0,
+        "needless": null,
+        "cited": 0,
+        "dropped": 0
+      }
+    },
+    {
+      "id": "T-016",
+      "text": "The Finance share on FS-CORP-02 is down for our whole team and it's Wednesday afternoon.",
+      "requester": "t.steiner",
+      "difficulty": "routine",
+      "cause": "Maintenance",
+      "expected_cause": null,
+      "expected_paths": [
+        "ESCALATE"
+      ],
+      "expected_tools": [],
+      "expected_queues": [
+        "SD-FILES"
+      ],
+      "expected_units": [
+        "shared-drive"
+      ],
+      "family": "Rules set",
+      "expected_path": "ESCALATE",
+      "path": "ESCALATE",
+      "path_correct": true,
+      "action_correct": true,
+      "team_correct": true,
+      "mistake_cost_chf": 0,
+      "sec04_failure": false,
+      "tool": "create_escalation_ticket",
+      "queue": "SD-FILES",
+      "retrieved": [
+        "shared-drive"
+      ],
+      "cause_correct": null,
+      "retrieval_correct": true,
+      "input_tokens": 4401,
+      "output_tokens": 352,
+      "cost_usd": 0.00017779,
+      "time_sec": 4.650227750069462,
+      "error": null,
+      "invalid": false,
+      "rule": null,
+      "steps": [
+        {
+          "id": "s1",
+          "turn": 1,
+          "tool": "record_decision",
+          "input": {
+            "rationale": "The Finance team reports the share on FS-CORP-02 is down for the whole team. The KB notes a maintenance window on Tuesdays 22:00–23:00 CET, but it is Wednesday afternoon, so maintenance is not the cause. Since multiple users are affected outside the maintenance window and no individual group membership or credential issue explains a team-wide outage, this points to a server-side or infrastructure fault (e.g., folder permissions broken inheritance, server service failure). Per the playbook, such cases must be escalated to SD-FILES.",
+            "cause": "Maintenance",
+            "path": "ESCALATE",
+            "queue": "SD-FILES",
+            "summary": "Finance team cannot access the shared drive on FS-CORP-02; affects all users, occurring outside the Tuesday maintenance window.",
+            "priority": "P2-High",
+            "evidence": [],
+            "ruled_out": "Individual missing group membership and stale credentials were ruled out because the issue affects the entire Finance team simultaneously, which is inconsistent with per-user access controls. The Tuesday maintenance window was also ruled out as the current time is Wednesday afternoon.",
+            "next_step": "Investigate FS-CORP-02 file server services, event logs, and folder permission inheritance to determine if there is a server-side fault or broken permissions causing the outage."
+          },
+          "result": "ESCALATE",
+          "ok": true,
+          "found": [],
+          "time_sec": 4.650227750069462,
+          "input_tokens": 4401,
+          "output_tokens": 352,
+          "cost_usd": 0.00017779
+        }
+      ],
+      "stopped": null,
+      "citations": {
+        "kept": [],
+        "dropped": []
+      },
+      "investigation": {
+        "lookups": 0,
+        "checks_run": [],
+        "required": 0,
+        "required_run": 0,
+        "needless": null,
+        "cited": 0,
+        "dropped": 0
+      }
+    },
+    {
+      "id": "T-017",
+      "text": "Can I get Photoshop? It isn't in Company Portal.",
+      "requester": "o.lang",
+      "difficulty": "hard",
+      "cause": "Unknown",
+      "expected_cause": null,
+      "expected_paths": [
+        "SELF_SERVE"
+      ],
+      "expected_tools": [],
+      "expected_queues": [],
+      "expected_units": [
+        "software-install"
+      ],
+      "family": "Rules set",
+      "expected_path": "SELF_SERVE",
+      "path": "ESCALATE",
+      "path_correct": false,
+      "action_correct": false,
+      "team_correct": null,
+      "mistake_cost_chf": 120,
+      "sec04_failure": false,
+      "tool": "create_escalation_ticket",
+      "queue": "DESK-SUPPORT",
+      "retrieved": [],
+      "cause_correct": null,
+      "retrieval_correct": false,
+      "input_tokens": 3913,
+      "output_tokens": 71,
+      "cost_usd": 0.00012662,
+      "time_sec": 2.1566433330299333,
+      "error": null,
+      "invalid": true,
+      "rule": null,
+      "steps": [
+        {
+          "id": "s1",
+          "turn": 1,
+          "tool": "record_decision",
+          "input": {},
+          "result": "ESCALATE",
+          "ok": false,
+          "found": [],
+          "time_sec": 2.1566433330299333,
+          "input_tokens": 3913,
+          "output_tokens": 71,
+          "cost_usd": 0.00012662
+        }
+      ],
+      "stopped": null,
+      "citations": {
+        "kept": [],
+        "dropped": []
+      },
+      "investigation": {
+        "lookups": 0,
+        "checks_run": [],
+        "required": 0,
+        "required_run": 0,
+        "needless": null,
+        "cited": 0,
+        "dropped": 0
+      }
+    },
+    {
+      "id": "T-018",
+      "text": "Wi-Fi keeps dropping for several of us near the open-plan area on floor 5.",
+      "requester": "i.bosshard",
+      "difficulty": "routine",
+      "cause": "Floor 5 in Zürich",
+      "expected_cause": null,
+      "expected_paths": [
+        "ESCALATE"
+      ],
+      "expected_tools": [],
+      "expected_queues": [
+        "NET-WIFI"
+      ],
+      "expected_units": [
+        "wifi"
+      ],
+      "family": "Rules set",
+      "expected_path": "ESCALATE",
+      "path": "ESCALATE",
+      "path_correct": true,
+      "action_correct": true,
+      "team_correct": true,
+      "mistake_cost_chf": 0,
+      "sec04_failure": false,
+      "tool": "create_escalation_ticket",
+      "queue": "NET-WIFI",
+      "retrieved": [
+        "wifi"
+      ],
+      "cause_correct": null,
+      "retrieval_correct": true,
+      "input_tokens": 4401,
+      "output_tokens": 425,
+      "cost_usd": 0.00018728,
+      "time_sec": 4.6391032909741625,
+      "error": null,
+      "invalid": false,
+      "rule": null,
+      "steps": [
+        {
+          "id": "s1",
+          "turn": 1,
+          "tool": "record_decision",
+          "input": {
+            "rationale": "Multiple users on Floor 5 are affected, which matches the known cause 'Floor 5 in Zürich' (access point congestion). The playbook directs that this specific floor issue should not be individually troubleshooted but logged under NET-WIFI for tracking with reference NET-WIFI-FLOOR5-KNOWN.",
+            "cause": "Floor 5 in Zürich",
+            "path": "ESCALATE",
+            "queue": "NET-WIFI",
+            "summary": "Multiple users on Floor 5 Zürich reporting Wi-Fi drops; known congestion issue requiring tracking.",
+            "priority": "P3-Normal",
+            "evidence": [],
+            "ruled_out": "Individual device issues (stale profile, old driver) ruled out because multiple users are affected simultaneously in the same area, pointing to an infrastructure-wide cause rather than isolated client errors.",
+            "next_step": "Log this ticket under NET-WIFI for tracking and reference NET-WIFI-FLOOR5-KNOWN as per policy."
+          },
+          "result": "ESCALATE",
+          "ok": true,
+          "found": [],
+          "time_sec": 4.6391032909741625,
+          "input_tokens": 4401,
+          "output_tokens": 425,
+          "cost_usd": 0.00018728
+        }
+      ],
+      "stopped": null,
+      "citations": {
+        "kept": [],
+        "dropped": []
+      },
+      "investigation": {
+        "lookups": 0,
+        "checks_run": [],
+        "required": 0,
+        "required_run": 0,
+        "needless": null,
+        "cited": 0,
+        "dropped": 0
+      }
+    },
+    {
+      "id": "T-019",
+      "text": "Please give me local admin rights so I can install my own tools.",
+      "requester": "f.gerber",
+      "difficulty": "hard",
+      "cause": "Standard account",
+      "expected_cause": null,
+      "expected_paths": [
+        "ESCALATE"
+      ],
+      "expected_tools": [],
+      "expected_queues": [],
+      "expected_units": [
+        "software-install"
+      ],
+      "family": "Rules set",
+      "expected_path": "ESCALATE",
+      "path": "OUT_OF_SCOPE",
+      "path_correct": false,
+      "action_correct": false,
+      "team_correct": null,
+      "mistake_cost_chf": 120,
+      "sec04_failure": false,
+      "tool": null,
+      "queue": null,
+      "retrieved": [
+        "software-install",
+        "sec-07-software-and-admin-rights"
+      ],
+      "cause_correct": null,
+      "retrieval_correct": true,
+      "input_tokens": 4560,
+      "output_tokens": 145,
+      "cost_usd": 0.00015565,
+      "time_sec": 2.2919921670109034,
+      "error": null,
+      "invalid": false,
+      "rule": null,
+      "steps": [
+        {
+          "id": "s1",
+          "turn": 1,
+          "tool": "record_decision",
+          "input": {
+            "rationale": "The user is requesting local admin rights to install personal tools. Per SEC-07 §7.1, standard users run without local admin rights, and this is the expected configuration for a standard account. The request to bypass this policy for installing unauthorized software is out of scope for IT support triage, as it violates company security policy (SEC-07) and does not relate to a legitimate business software installation process via Company Portal or SR-SOFTWARE.",
+            "cause": "Standard account",
+            "path": "OUT_OF_SCOPE"
+          },
+          "result": "OUT_OF_SCOPE",
+          "ok": true,
+          "found": [],
+          "time_sec": 2.2919921670109034,
+          "input_tokens": 4560,
+          "output_tokens": 145,
+          "cost_usd": 0.00015565
+        }
+      ],
+      "stopped": null,
+      "citations": {
+        "kept": [],
+        "dropped": []
+      },
+      "investigation": {
+        "lookups": 0,
+        "checks_run": [],
+        "required": 0,
+        "required_run": 0,
+        "needless": null,
+        "cited": 0,
+        "dropped": 0
+      }
+    },
+    {
+      "id": "T-020",
+      "text": "Locked out again, can you unlock me please?",
+      "requester": "l.frei",
+      "difficulty": "records",
+      "cause": "Standard lockout",
+      "expected_cause": null,
+      "expected_paths": [
+        "ESCALATE"
+      ],
+      "expected_tools": [],
+      "expected_queues": [
+        "SEC-INCIDENT"
+      ],
+      "expected_units": [
+        "account-lockout"
+      ],
+      "family": "Rules set",
+      "expected_path": "ESCALATE",
+      "path": "ESCALATE",
+      "path_correct": true,
+      "action_correct": true,
+      "team_correct": true,
+      "mistake_cost_chf": 0,
+      "sec04_failure": false,
+      "tool": "create_escalation_ticket",
+      "queue": "SEC-INCIDENT",
+      "retrieved": [
+        "account-lockout",
+        "sec-04-account-lockout"
+      ],
+      "cause_correct": null,
+      "retrieval_correct": true,
+      "input_tokens": 9381,
+      "output_tokens": 306,
+      "cost_usd": 0.00032121000000000005,
+      "time_sec": 4.820332249975763,
+      "error": null,
+      "invalid": false,
+      "rule": null,
+      "steps": [
+        {
+          "id": "s1",
+          "turn": 1,
+          "tool": "lookup_requester",
+          "input": {},
+          "result": "Operations, Zürich; 3 lockouts in 24 hours; device LT-LFREI.",
+          "ok": true,
+          "found": [],
+          "time_sec": 1.1184593749931082,
+          "input_tokens": 4588,
+          "output_tokens": 15,
+          "cost_usd": 0.00013959
+        },
+        {
+          "id": "s2",
+          "turn": 2,
+          "tool": "record_decision",
+          "input": {
+            "cause": "Standard lockout",
+            "path": "ESCALATE",
+            "queue": "SEC-INCIDENT",
+            "rationale": "The requester has 3 lockouts in the last 24 hours. Per SEC-04 §4.2, two or more lockouts in 24 hours are treated as a possible compromise and require escalation to SEC-INCIDENT; routine unlock is forbidden.",
+            "ruled_out": "Self-serve credential cleanup on phone (stale phone credentials) and standard single-lockout unlock via unlock_ad_account, because the frequency of 3 lockouts in 24h triggers the security compromise protocol under SEC-04 §4.2 regardless of the underlying cause.",
+            "summary": "User l.frei locked out 3 times in 24 hours; potential compromise per SEC-04 §4.2.",
+            "next_step": "Investigate for possible compromise and determine if account should be disabled or reset with enhanced monitoring.",
+            "priority": "P2-High",
+            "evidence": [
+              "s1"
+            ]
+          },
+          "result": "ESCALATE",
+          "ok": true,
+          "found": [],
+          "time_sec": 3.701941499952227,
+          "input_tokens": 4793,
+          "output_tokens": 291,
+          "cost_usd": 0.00018162
+        }
+      ],
+      "stopped": null,
+      "citations": {
+        "kept": [
+          "s1"
+        ],
+        "dropped": []
+      },
+      "investigation": {
+        "lookups": 1,
+        "checks_run": [],
+        "required": 0,
+        "required_run": 0,
+        "needless": null,
+        "cited": 1,
+        "dropped": 0
+      }
+    },
+    {
+      "id": "T-021",
+      "text": "My account got locked after I mistyped my new password following the rotation reminder.",
+      "requester": "m.huber",
+      "difficulty": "records",
+      "cause": "Standard lockout",
+      "expected_cause": null,
+      "expected_paths": [
+        "AUTO_FIX",
+        "SELF_SERVE"
+      ],
+      "expected_tools": [
+        "unlock_ad_account"
+      ],
+      "expected_queues": [],
+      "expected_units": [
+        "account-lockout"
+      ],
+      "family": "Rules set",
+      "expected_path": "AUTO_FIX",
+      "path": "AUTO_FIX",
+      "path_correct": true,
+      "action_correct": true,
+      "team_correct": null,
+      "mistake_cost_chf": 0,
+      "sec04_failure": false,
+      "tool": "unlock_ad_account",
+      "queue": null,
+      "retrieved": [
+        "account-lockout",
+        "sec-04-account-lockout"
+      ],
+      "cause_correct": null,
+      "retrieval_correct": true,
+      "input_tokens": 9360,
+      "output_tokens": 205,
+      "cost_usd": 0.00019993000000000002,
+      "time_sec": 3.916016749921255,
+      "error": null,
+      "invalid": false,
+      "rule": null,
+      "steps": [
+        {
+          "id": "s1",
+          "turn": 1,
+          "tool": "lookup_requester",
+          "input": {},
+          "result": "Risk, Zürich; 1 lockouts in 24 hours; device LT-MHUBER.",
+          "ok": true,
+          "found": [],
+          "time_sec": 1.3034683750011027,
+          "input_tokens": 4595,
+          "output_tokens": 15,
+          "cost_usd": 0.0001398
+        },
+        {
+          "id": "s2",
+          "turn": 2,
+          "tool": "record_decision",
+          "input": {
+            "rationale": "The user has exactly 1 lockout in the last 24 hours, which falls under standard lockout policy per SEC-04 §4.1 and §4.2. The account-lockout playbook confirms that for one lockout in 24 hours, after confirming identity via Okta Verify push, we can use unlock_ad_account. There is no indication of a compromise or repeat lockouts requiring SEC-INCIDENT escalation.",
+            "cause": "Standard lockout",
+            "path": "AUTO_FIX",
+            "tool": "unlock_ad_account",
+            "tool_input": {
+              "username": "m.huber"
+            },
+            "evidence": [
+              "s1"
+            ]
+          },
+          "result": "AUTO_FIX",
+          "ok": true,
+          "found": [],
+          "time_sec": 2.6127606249647215,
+          "input_tokens": 4765,
+          "output_tokens": 190,
+          "cost_usd": 6.013e-05
+        }
+      ],
+      "stopped": null,
+      "citations": {
+        "kept": [
+          "s1"
+        ],
+        "dropped": []
+      },
+      "investigation": {
+        "lookups": 1,
+        "checks_run": [],
+        "required": 0,
+        "required_run": 0,
+        "needless": null,
+        "cited": 1,
+        "dropped": 0
+      }
+    },
+    {
+      "id": "T-022",
+      "text": "My Wi-Fi keeps dropping at my desk. Nobody else seems affected.",
+      "requester": "j.wyss",
+      "difficulty": "records",
+      "cause": "Stale profile on one device",
+      "expected_cause": null,
+      "expected_paths": [
+        "AUTO_FIX"
+      ],
+      "expected_tools": [
+        "push_wifi_driver_update"
+      ],
+      "expected_queues": [],
+      "expected_units": [
+        "wifi"
+      ],
+      "family": "Rules set",
+      "expected_path": "AUTO_FIX",
+      "path": "AUTO_FIX",
+      "path_correct": true,
+      "action_correct": false,
+      "team_correct": null,
+      "mistake_cost_chf": 60,
+      "sec04_failure": false,
+      "tool": "push_wifi_profile",
+      "queue": null,
+      "retrieved": [
+        "wifi"
+      ],
+      "cause_correct": null,
+      "retrieval_correct": true,
+      "input_tokens": 14364,
+      "output_tokens": 1521,
+      "cost_usd": 0.000514986,
+      "time_sec": 17.07734183303546,
+      "error": null,
+      "invalid": false,
+      "rule": null,
+      "steps": [
+        {
+          "id": "s1",
+          "turn": 1,
+          "tool": "search_kb",
+          "input": {
+            "query": "ThinkPad T14 Wi-Fi driver update 2026-05 Intune push"
+          },
+          "result": "Found wifi.",
+          "ok": true,
+          "found": [
+            "wifi"
+          ],
+          "time_sec": 1.2415495830355212,
+          "input_tokens": 4393,
+          "output_tokens": 43,
+          "cost_usd": 0.00013738
+        },
+        {
+          "id": "s2",
+          "turn": 2,
+          "tool": "run_check",
+          "input": {
+            "step": "wifi-profile-check"
+          },
+          "result": "No recorded result for wifi-profile-check on this ticket.",
+          "ok": true,
+          "found": [],
+          "time_sec": 0.9916660829912871,
+          "input_tokens": 4950,
+          "output_tokens": 28,
+          "cost_usd": 0.00015214
+        },
+        {
+          "id": "s3",
+          "turn": 3,
+          "tool": "record_decision",
+          "input": {
+            "rationale": "The issue is isolated to a single device (ThinkPad T14 Gen 4) on Floor 3. The most likely causes for a single device are a stale Wi-Fi profile/certificate or an outdated driver. Without specific driver version data, the standard first-step remediation for single-device Wi-Fi connectivity issues is to push the current corporate Wi-Fi profile and certificate. This is a safe, reversible action that resolves profile-related drops.",
+            "cause": "Stale profile on one device",
+            "path": "AUTO_FIX",
+            "tool": "push_wifi_profile",
+            "tool_input": {
+              "device_id": "LT-JWYSS"
+            },
+            "evidence": []
+          },
+          "result": "AUTO_FIX",
+          "ok": true,
+          "found": [],
+          "time_sec": 15.004766375059262,
+          "input_tokens": 5021,
+          "output_tokens": 1450,
+          "cost_usd": 0.000225466
+        }
+      ],
+      "stopped": null,
+      "citations": {
+        "kept": [],
+        "dropped": []
+      },
+      "investigation": {
+        "lookups": 2,
+        "checks_run": [],
+        "required": 0,
+        "required_run": 0,
+        "needless": null,
+        "cited": 0,
+        "dropped": 0
+      }
+    },
+    {
+      "id": "T-023",
+      "text": "My laptop battery barely lasts an hour now.",
+      "requester": "r.vogel",
+      "difficulty": "records",
+      "cause": "Unknown",
+      "expected_cause": null,
+      "expected_paths": [
+        "ESCALATE"
+      ],
+      "expected_tools": [],
+      "expected_queues": [
+        "DESK-HARDWARE"
+      ],
+      "expected_units": [
+        "laptop-performance"
+      ],
+      "family": "Rules set",
+      "expected_path": "ESCALATE",
+      "path": "ESCALATE",
+      "path_correct": true,
+      "action_correct": false,
+      "team_correct": false,
+      "mistake_cost_chf": 60,
+      "sec04_failure": false,
+      "tool": "create_escalation_ticket",
+      "queue": "DESK-SUPPORT",
+      "retrieved": [
+        "laptop-performance"
+      ],
+      "cause_correct": null,
+      "retrieval_correct": true,
+      "input_tokens": 4320,
+      "output_tokens": 182,
+      "cost_usd": 0.00015326,
+      "time_sec": 2.7877587500261143,
+      "error": null,
+      "invalid": true,
+      "rule": null,
+      "steps": [
+        {
+          "id": "s1",
+          "turn": 1,
+          "tool": "record_decision",
+          "input": {
+            "rationale": "The user's laptop (ThinkPad T14 Gen 4, device age 3 years) has a battery health of 52%, which is under the 60% threshold for devices over 2 years old as specified in the 'laptop-performance' playbook. This matches the known cause 'Ageing battery'. The playbook explicitly states to send such cases to DESK-HARDWARE.\", \"cause\": \"Ageing battery\", \"path\": \"ESCALATE\", \"queue\": \"DESK-HARDWARE\", \"summary\": \"Battery health at 52% on a 3-year-old ThinkPad T14 requires hardware replacement per policy.\", \"next_step\": \"Schedule battery replacement for device LT-RVOGEL.\", \"evidence\": []"
+          },
+          "result": "ESCALATE",
+          "ok": false,
+          "found": [],
+          "time_sec": 2.7877587500261143,
+          "input_tokens": 4320,
+          "output_tokens": 182,
+          "cost_usd": 0.00015326
+        }
+      ],
+      "stopped": null,
+      "citations": {
+        "kept": [],
+        "dropped": []
+      },
+      "investigation": {
+        "lookups": 0,
+        "checks_run": [],
+        "required": 0,
+        "required_run": 0,
+        "needless": null,
+        "cited": 0,
+        "dropped": 0
+      }
+    },
+    {
+      "id": "T-024",
+      "text": "My monitor says no signal since someone swapped it at my desk. The dock cable clicks in fine.",
+      "requester": "k.roth",
+      "difficulty": "hard",
+      "cause": "Unknown",
+      "expected_cause": null,
+      "expected_paths": [
+        "SELF_SERVE"
+      ],
+      "expected_tools": [],
+      "expected_queues": [],
+      "expected_units": [
+        "hardware-peripherals"
+      ],
+      "family": "Rules set",
+      "expected_path": "SELF_SERVE",
+      "path": "ESCALATE",
+      "path_correct": false,
+      "action_correct": false,
+      "team_correct": null,
+      "mistake_cost_chf": 120,
+      "sec04_failure": false,
+      "tool": "create_escalation_ticket",
+      "queue": "DESK-SUPPORT",
+      "retrieved": [
+        "hardware-peripherals"
+      ],
+      "cause_correct": null,
+      "retrieval_correct": true,
+      "input_tokens": 8563,
+      "output_tokens": 415,
+      "cost_usd": 0.00031084,
+      "time_sec": 6.1060904579935595,
+      "error": null,
+      "invalid": true,
+      "rule": null,
+      "steps": [
+        {
+          "id": "s1",
+          "turn": 1,
+          "tool": "run_check",
+          "input": {
+            "step": "dock-model-check"
+          },
+          "result": "No recorded result for dock-model-check on this ticket.",
+          "ok": true,
+          "found": [],
+          "time_sec": 1.3821494580479339,
+          "input_tokens": 4218,
+          "output_tokens": 58,
+          "cost_usd": 0.00013408
+        },
+        {
+          "id": "s2",
+          "turn": 1,
+          "tool": "run_check",
+          "input": {
+            "step": "firmware-version-check"
+          },
+          "result": "No recorded result for firmware-version-check on this ticket.",
+          "ok": true,
+          "found": [],
+          "time_sec": 8.750008419156075e-06,
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "cost_usd": 0.0
+        },
+        {
+          "id": "s3",
+          "turn": 2,
+          "tool": "record_decision",
+          "input": {
+            "rationale": "The most likely cause is **Thunderbolt cable not fully seated**, which is the most common cause for this symptom per the hardware-peripherals playbook. The fix is to reseat the cable until it clicks, which is a simple self-service step.",
+            "cause": "Thunderbolt cable not fully seated.",
+            "path": "SELF_SERVE",
+            "steps": "\n[1. Unplug the Thunderbolt/USB-C cable connecting the laptop to the WD22TB4 dock. 2. Wait a few seconds, then firmly plug it back in until you hear/feel it click. 3. Check if the monitor displays a signal. If not, try reseating the other end of the cable at the dock side as well.\", \"4. If the monitor still shows no signal, restart the laptop while the dock is connected.\"]\n",
+            "evidence": []
+          },
+          "result": "ESCALATE",
+          "ok": false,
+          "found": [],
+          "time_sec": 4.724021708010696,
+          "input_tokens": 4345,
+          "output_tokens": 357,
+          "cost_usd": 0.00017676
+        }
+      ],
+      "stopped": null,
+      "citations": {
+        "kept": [],
+        "dropped": []
+      },
+      "investigation": {
+        "lookups": 2,
+        "checks_run": [],
+        "required": 0,
+        "required_run": 0,
+        "needless": null,
+        "cited": 0,
+        "dropped": 0
+      }
+    },
+    {
+      "id": "T-025",
+      "text": "Can you recommend a good restaurant near Zürich for a team lunch?",
+      "requester": "b.brunner",
+      "difficulty": "routine",
+      "cause": "Unknown",
+      "expected_cause": null,
+      "expected_paths": [
+        "OUT_OF_SCOPE"
+      ],
+      "expected_tools": [],
+      "expected_queues": [],
+      "expected_units": [],
+      "family": "Rules set",
+      "expected_path": "OUT_OF_SCOPE",
+      "path": "ESCALATE",
+      "path_correct": false,
+      "action_correct": false,
+      "team_correct": null,
+      "mistake_cost_chf": 120,
+      "sec04_failure": false,
+      "tool": "create_escalation_ticket",
+      "queue": "DESK-SUPPORT",
+      "retrieved": [],
+      "cause_correct": null,
+      "retrieval_correct": true,
+      "input_tokens": 3915,
+      "output_tokens": 35,
+      "cost_usd": 0.000122,
+      "time_sec": 1.4701880840584636,
+      "error": null,
+      "invalid": true,
+      "rule": null,
+      "steps": [
+        {
+          "id": "s1",
+          "turn": 1,
+          "tool": "record_decision",
+          "input": {},
+          "result": "ESCALATE",
+          "ok": false,
+          "found": [],
+          "time_sec": 1.4701880840584636,
+          "input_tokens": 3915,
+          "output_tokens": 35,
+          "cost_usd": 0.000122
+        }
+      ],
+      "stopped": null,
+      "citations": {
+        "kept": [],
+        "dropped": []
+      },
+      "investigation": {
+        "lookups": 0,
+        "checks_run": [],
+        "required": 0,
+        "required_run": 0,
+        "needless": null,
+        "cited": 0,
+        "dropped": 0
+      }
+    }
+  ]
+}

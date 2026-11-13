@@ -140,3 +140,15 @@ What it says:
 - **It's cheap:** about CHF 0.005 and 5 seconds a ticket. All 206 practice tickets cost CHF 0.98, and re-scoring after a label change costs nothing.
 
 Nothing was tuned on the held-out sets, which run once at sprint review.
+
+### The loop against one call
+
+On 13 November 2026 the loop, which looks things up before it decides, ran beside one call on the same 67 tickets for three models, by a rule written first. The rule keeps it for none. Net saving per ticket on the 36 development tickets:
+
+| Model | One call | Loop | Lookups per ticket | Security mistakes, one call → loop |
+|---|---|---|---|---|
+| Claude Haiku 5.5 | CHF 9.25 | CHF -5.78 | 3.2 | 0 → 2 |
+| Gemini 3.1 Flash-Lite | CHF 1.78 | CHF 1.03 | 0.4 | 1 → 1 |
+| Qwen 3.7 Flash | CHF 0.94 | CHF -5.19 | 1.5 | 1 → 2 |
+
+Investigating more made decisions worse, because a lookup showed the model a lockout count of 0 from the records, which one call hides on purpose, and the models trusted it over a ticket that describes repeat lockouts. The Models view draws each pair, and `docs/DECISIONS.md` has the rule and the result.

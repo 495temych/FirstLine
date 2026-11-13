@@ -109,6 +109,7 @@ export const loopView: LoopView = {
         model: "gemini",
         label: "Gemini",
         n: 36,
+        same_instructions: true,
         one_call: model("gemini", "Gemini", {
           n: 36,
           net_chf: 4,

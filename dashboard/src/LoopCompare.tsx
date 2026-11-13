@@ -24,6 +24,14 @@ const setLabels: Record<BenchmarkSet, string> = {
 
 const x = (cost: number | null) => (cost ?? 0) * PER;
 
+/** Where an arrow from `a` should end so its head stops short of the dot at `b`. */
+function short(a: { x: number; y: number }, b: { x: number; y: number }) {
+  const length = Math.hypot(b.x - a.x, b.y - a.y);
+  if (length < 1) return b;
+  const keep = Math.max(length - 8, 0) / length;
+  return { x: a.x + (b.x - a.x) * keep, y: a.y + (b.y - a.y) * keep };
+}
+
 /** Each model's one call and its loop, as an arrow from one to the other: net
  * saving per ticket against cost per 1'000 tickets. */
 function ArrowChart({ pairs }: Readonly<{ pairs: LoopPair[] }>) {
@@ -108,8 +116,8 @@ function ArrowChart({ pairs }: Readonly<{ pairs: LoopPair[] }>) {
               className="loop-move"
               x1={d.from.x}
               y1={d.from.y}
-              x2={d.to.x}
-              y2={d.to.y}
+              x2={short(d.from, d.to).x}
+              y2={short(d.from, d.to).y}
               markerEnd="url(#loop-arrow)"
             />
             <circle className="loop-from" cx={d.from.x} cy={d.from.y} r={5} />
@@ -164,53 +172,63 @@ function PairTable({ pairs }: Readonly<{ pairs: LoopPair[] }>) {
           </tr>
         </thead>
         <tbody>
-          {pairs.map(({ model, label, n, one_call: one, loop }) => {
-            const inv = loop.investigation;
-            return (
-              <tr key={model}>
-                <th scope="row">
-                  {label}
-                  <span className="quiet"> {n} tickets</span>
-                  <br />
-                  <code className="quiet">{loop.source}</code>
-                </th>
-                <td>
-                  {step(francs(one.net_chf), francs(loop.net_chf))}
-                  <span className="quiet">
-                    {" "}
-                    loop {francs(loop.net_low)} to {francs(loop.net_high)}
-                  </span>
-                </td>
-                <td>
-                  {step(perThousand(one.cost_chf), perThousand(loop.cost_chf))}
-                </td>
-                <td>
-                  {step(
-                    percent(one.action_accuracy),
-                    percent(loop.action_accuracy),
-                  )}
-                </td>
-                <td>
-                  {step(
-                    String(one.security_mistakes ?? "n/a"),
-                    String(loop.security_mistakes ?? "n/a"),
-                  )}
-                </td>
-                <td>{inv?.lookups_per_ticket?.toFixed(1) ?? "n/a"}</td>
-                <td>
-                  {inv && inv.required_checks > 0
-                    ? `${inv.required_run.toString()} of ${inv.required_checks.toString()}`
-                    : "none labelled"}
-                </td>
-                <td>{inv?.needless_per_ticket?.toFixed(1) ?? "n/a"}</td>
-                <td>
-                  {inv && inv.citations > 0
-                    ? `${share(inv.citations_valid)} of ${inv.citations.toString()}`
-                    : "none cited"}
-                </td>
-              </tr>
-            );
-          })}
+          {pairs.map(
+            ({ model, label, n, same_instructions, one_call: one, loop }) => {
+              const inv = loop.investigation;
+              return (
+                <tr key={model}>
+                  <th scope="row">
+                    {label}
+                    <span className="quiet"> {n} tickets</span>
+                    {!same_instructions && (
+                      <span className="quiet">
+                        , one call on older instructions
+                      </span>
+                    )}
+                    <br />
+                    <code className="quiet">{loop.source}</code>
+                  </th>
+                  <td>
+                    {step(francs(one.net_chf), francs(loop.net_chf))}
+                    <span className="quiet">
+                      {" "}
+                      loop {francs(loop.net_low)} to {francs(loop.net_high)}
+                    </span>
+                  </td>
+                  <td>
+                    {step(
+                      perThousand(one.cost_chf),
+                      perThousand(loop.cost_chf),
+                    )}
+                  </td>
+                  <td>
+                    {step(
+                      percent(one.action_accuracy),
+                      percent(loop.action_accuracy),
+                    )}
+                  </td>
+                  <td>
+                    {step(
+                      String(one.security_mistakes ?? "n/a"),
+                      String(loop.security_mistakes ?? "n/a"),
+                    )}
+                  </td>
+                  <td>{inv?.lookups_per_ticket?.toFixed(1) ?? "n/a"}</td>
+                  <td>
+                    {inv && inv.required_checks > 0
+                      ? `${inv.required_run.toString()} of ${inv.required_checks.toString()}`
+                      : "none labelled"}
+                  </td>
+                  <td>{inv?.needless_per_ticket?.toFixed(1) ?? "n/a"}</td>
+                  <td>
+                    {inv && inv.citations > 0
+                      ? `${share(inv.citations_valid)} of ${inv.citations.toString()}`
+                      : "none cited"}
+                  </td>
+                </tr>
+              );
+            },
+          )}
         </tbody>
       </table>
     </div>
@@ -236,10 +254,10 @@ function Verdicts({
           <dd>
             Saves {francs(Math.abs(v.gain_chf))}{" "}
             {v.gain_chf >= 0 ? "more" : "less"} a ticket for{" "}
-            {francs(v.extra_cost_chf)} more in model cost. Clears the margin:{" "}
-            {yes(v.saves_more)}. No security mistake on any set: {yes(v.safe)}.
-            No more invalid answers than one call: {yes(v.valid)}. Under CHF
-            0.10 a ticket: {yes(v.cheap)}.
+            {perThousand(v.extra_cost_chf)} more per 1&apos;000 tickets in model
+            cost. Clears the margin: {yes(v.saves_more)}. No security mistake on
+            any set: {yes(v.safe)}. No more invalid answers than one call:{" "}
+            {yes(v.valid)}. Under CHF 0.10 a ticket: {yes(v.cheap)}.
           </dd>
         </div>
       ))}
@@ -293,7 +311,8 @@ export function LoopCompare({ view }: Readonly<{ view: LoopView }>) {
         </p>
       )}
       <p className="caption">
-        The rule, set before the runs: {view.rule.toLowerCase()} One call&apos;s
+        The rule, set before the runs:{" "}
+        {view.rule.charAt(0).toLowerCase() + view.rule.slice(1)} One call&apos;s
         numbers come from its saved run, cut to the loop&apos;s tickets, with no
         new model calls. The samples are small, so only a large difference can
         show.
