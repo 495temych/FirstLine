@@ -346,6 +346,10 @@ export interface QueueView {
   counts: Record<QueueState, number>;
   at_desk: number;
   batch_size: number;
+  /** The next batch's model cost, estimated before it starts, or null unpriced. */
+  batch_estimate_chf: number | null;
+  /** A batch estimated above this is refused. */
+  batch_cap_chf: number;
   queues: string[];
   value: QueueValue;
 }

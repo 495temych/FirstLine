@@ -11,6 +11,7 @@ agent then, and a ticket with a decision is never triaged again.
 """
 
 import json
+import os
 import time
 from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor
@@ -23,7 +24,7 @@ from typing import Annotated, Literal
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field, StringConstraints
 
-from agent import config, tools, tracing
+from agent import actions, config, tracing
 from agent.decision import DEFAULT_PRIORITY
 from agent.tool_schemas import ESCALATION_TOOL, QUEUES
 from agent.triage import run_triage
@@ -33,6 +34,7 @@ from evals.import_tickets import family_of
 
 SOURCE_SPLIT = "dev"  # the service desk's tickets, never the held-out ones
 BATCH_SIZE = 8
+BATCH_CAP_CHF = 0.25  # a batch estimated above this is refused before it starts
 WORKERS = 2
 PRIORITIES = ("critical", "high", "medium", "low")
 STATES = ("queued", "working", "review", "closed", "failed")
@@ -188,28 +190,84 @@ def restored(record: Saved, ticket: dict, user: dict) -> dict:
     return shown
 
 
-def _escalate(queue: str, summary: str, priority: str | None) -> dict:
-    return tools.dispatch(
-        ESCALATION_TOOL,
-        {"queue": queue, "summary": summary, "priority": priority or DEFAULT_PRIORITY},
-    )
+def _escalation(queue: str, summary: str, priority: str | None) -> tuple[str, dict]:
+    inputs = {
+        "queue": queue,
+        "summary": summary,
+        "priority": priority or DEFAULT_PRIORITY,
+    }
+    return ESCALATION_TOOL, inputs
 
 
-def carry_out(ticket: dict, review: Review) -> dict:
-    """What happens once a technician decides. Every action here is simulated."""
+def action_of(ticket: dict, review: Review) -> tuple[str, dict] | None:
+    """The tool a technician's decision runs, with its input, or None for no action."""
     decision = ticket["decision"]
     summary = decision["summary"] or ticket["title"]
     if review.verdict == "rejected":
-        return {"detail": "Returned to the desk to handle by hand."}
+        return None
     if review.verdict == "corrected":
-        return _escalate(review.queue or "", summary, decision["priority"])
+        return _escalation(review.queue or "", summary, decision["priority"])
     if decision["path"] == "AUTO_FIX":
-        return tools.dispatch(decision["tool"], decision["tool_input"] or {})
+        return decision["tool"], decision["tool_input"] or {}
     if decision["path"] == "ESCALATE":
-        return _escalate(decision["queue"], summary, decision["priority"])
-    if decision["path"] == "SELF_SERVE":
-        return {"detail": "Steps sent to the requester."}
-    return {"detail": "Closed as out of scope, and the requester was told."}
+        return _escalation(decision["queue"], summary, decision["priority"])
+    return None
+
+
+NO_ACTION = {
+    "rejected": "Returned to the desk to handle by hand.",
+    "SELF_SERVE": "Steps sent to the requester.",
+    "OUT_OF_SCOPE": "Closed as out of scope, and the requester was told.",
+}
+
+
+def carry_out(ticket: dict, review: Review, ledger: actions.Ledger) -> dict:
+    """What happens once a technician decides. Every action here is simulated, and
+    runs once: a second attempt, after a restart, returns the first outcome."""
+    action = action_of(ticket, review)
+    if action is None:
+        reason = (
+            "rejected" if review.verdict == "rejected" else ticket["decision"]["path"]
+        )
+        return {"detail": NO_ACTION[reason]}
+    tool, tool_input = action
+    return actions.perform(ledger, ticket["id"], tool, tool_input)
+
+
+@cache
+def _saved_runs() -> list[dict]:
+    """The saved evaluations, read once: only a new evaluation run changes them."""
+    return runner.load_runs()
+
+
+def batch_cap_chf() -> float:
+    """The most a batch may cost: `QUEUE_BATCH_CAP_CHF`, or CHF 0.25 when unset."""
+    return float(os.getenv("QUEUE_BATCH_CAP_CHF") or BATCH_CAP_CHF)
+
+
+def estimate_chf(tickets: int) -> float | None:
+    """What triaging `tickets` should cost on today's model, as the evaluations
+    estimate a run: the dearest saved run's cost per ticket, or a typical call's."""
+    return runner.estimate_chf(config.model_name(), tickets, _saved_runs())
+
+
+def afford(tickets: int) -> float:
+    """The batch's estimate, or a refusal when it's over the cap or can't be priced."""
+    cost, cap = estimate_chf(tickets), batch_cap_chf()
+    if cost is None:
+        raise HTTPException(
+            409,
+            f"{config.model_name()} has no price, so this batch's cost can't be "
+            "stated before it starts. Choose a model with a price.",
+        )
+    if cost > cap:
+        raise HTTPException(
+            409,
+            f"This batch is about CHF {cost:.2f} in model calls, over the "
+            f"CHF {cap:.2f} cap, so it hasn't started. Raise QUEUE_BATCH_CAP_CHF "
+            "to allow it.",
+        )
+    return cost
 
 
 def check(review: Review) -> None:
@@ -293,9 +351,11 @@ class Board:
         return [ticket for ticket in mixed if ticket is not None]
 
     def load(self, users: dict[str, dict]) -> list[str]:
-        """Take the next batch from the desk and start the agent on it."""
+        """Take the next batch from the desk and start the agent on it, once its
+        estimated cost is under the cap."""
         with self._lock:
             taken = sorted(self.waiting_at_desk()[:BATCH_SIZE], key=dispatch_order)
+            afford(len(taken))
             batch = self.store.add_batch(
                 datetime.now(UTC).strftime("%Y%m%dT%H%M%S"),
                 [
@@ -361,7 +421,7 @@ class Board:
             if ticket["state"] != "review":
                 raise HTTPException(409, "This ticket isn't waiting for a decision.")
             try:
-                outcome = carry_out(ticket, review)
+                outcome = carry_out(ticket, review, self.store)
             except (KeyError, TypeError) as exc:
                 raise HTTPException(
                     422, f"The proposed fix can't run as written: {exc}"
@@ -402,11 +462,14 @@ class Board:
         timed = [t["agent_seconds"] for t in tickets if t["agent_seconds"] is not None]
         approved = sum(r["verdict"] == "approved" for r in reviews)
         model_cost = sum(t["cost_chf"] or 0 for t in tickets)
+        at_desk = len(self.waiting_at_desk())
         return {
             "tickets": tickets,
             "counts": {s: sum(t["state"] == s for t in tickets) for s in STATES},
-            "at_desk": len(self.waiting_at_desk()),
+            "at_desk": at_desk,
             "batch_size": BATCH_SIZE,
+            "batch_estimate_chf": estimate_chf(min(BATCH_SIZE, at_desk) or BATCH_SIZE),
+            "batch_cap_chf": batch_cap_chf(),
             "queues": QUEUES,
             "value": {
                 "model_cost_chf": model_cost,

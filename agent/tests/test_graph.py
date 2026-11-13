@@ -3,15 +3,18 @@
 No API calls and no embeddings — `graph.retrieve` and `graph._get_llm` are patched.
 """
 
-from typing import cast
+from typing import Any, cast
 
+import anthropic
+import httpx
 import pytest
-from langchain_core.runnables import RunnableConfig
+from langchain_core.runnables import Runnable, RunnableConfig
 from langgraph.checkpoint.memory import InMemorySaver
 from langgraph.graph import END
 from langgraph.types import Command
 from qdrant_client.http.exceptions import ResponseHandlingException
 
+from agent import actions, tools
 from agent import graph as g
 from agent.tests.fakes import (
     UNIT,
@@ -70,6 +73,7 @@ def test_routers():
 @pytest.fixture
 def env(tmp_path, monkeypatch):
     monkeypatch.setattr(g, "retrieve", lambda q: [UNIT])
+    monkeypatch.setattr(actions, "_installed", [actions.MemoryLedger()])
 
     class Env:
         graph = g.build_graph(InMemorySaver())
@@ -100,6 +104,19 @@ def test_auto_fix_confirm(env):
     assert out["tool_result"]["action"] == "reset_vpn_profile"
     assert out["human_decision"] == {"fix": True}
     assert [u["doc"] for u in out["retrieved"]] == ["vpn"]
+
+
+def test_an_approved_fix_asked_for_again_returns_its_first_outcome(env, monkeypatch):
+    env.use(fix("reset_vpn_profile", "Stale cert.", username="current.user"))
+    ran = []
+    dispatch = tools.dispatch
+    monkeypatch.setattr(tools, "dispatch", lambda t, i: ran.append(t) or dispatch(t, i))
+    env.start()
+    first = env.resume(True)["tool_result"]
+    values = env.graph.get_state(env.config).values
+    again = g.execute_tool(values, env.config)["tool_result"]
+    assert again == first
+    assert ran == ["reset_vpn_profile"]
 
 
 def test_auto_fix_decline_then_send_ticket(env):
@@ -190,3 +207,76 @@ def test_a_search_that_cannot_reach_the_index_is_retried():
 
 def test_done_is_langgraphs_end():
     assert g.DONE == END
+
+
+# ── retries ─────────────────────────────────────────────────────────────────────
+def _dropped():
+    request = cast(Any, httpx.Request("POST", "https://x"))
+    return anthropic.APIConnectionError(request=request)
+
+
+class Flaky(FakeLLM):
+    """A model whose connection drops `drops` times before it answers."""
+
+    def __init__(self, blocks, drops):
+        super().__init__(blocks)
+        self.drops = drops
+        self.calls = 0
+
+    def invoke(self, messages):
+        self.calls += 1
+        if self.calls <= self.drops:
+            raise _dropped()
+        return super().invoke(messages)
+
+
+@pytest.fixture
+def no_wait(monkeypatch):
+    monkeypatch.setattr(g, "RETRY_WAIT_SEC", 0.0)
+
+
+def test_a_model_call_that_drops_is_tried_again_up_to_the_limit(env, no_wait):
+    flaky = Flaky(out_of_scope(), drops=g.MODEL_ATTEMPTS - 1)
+    env.use(flaky.blocks)
+    env.llm = flaky
+    out = env.start()
+    assert out["path"] == "OUT_OF_SCOPE"
+    assert flaky.calls == g.MODEL_ATTEMPTS
+
+
+def test_a_model_call_stops_at_the_limit(no_wait):
+    flaky = Flaky(out_of_scope(), drops=g.MODEL_ATTEMPTS)
+    with pytest.raises(anthropic.APIConnectionError):
+        g._ask(cast(Runnable, flaky), [])
+    assert flaky.calls == g.MODEL_ATTEMPTS
+
+
+def test_an_error_the_model_did_not_cause_to_pass_is_not_retried(no_wait):
+    class Refused(FakeLLM):
+        calls = 0
+
+        def invoke(self, messages):
+            self.calls += 1
+            raise ValueError("bad request")
+
+    refused = Refused([])
+    with pytest.raises(ValueError, match="bad request"):
+        g._ask(cast(Runnable, refused), [])
+    assert refused.calls == 1
+
+
+def test_a_failure_after_the_model_answered_never_asks_it_again(
+    env, no_wait, monkeypatch
+):
+    env.use(out_of_scope())
+    asked = []
+    answer = env.llm.invoke
+    monkeypatch.setattr(env.llm, "invoke", lambda m: asked.append(1) or answer(m))
+
+    def broken(*_args, **_kwargs):
+        raise _dropped()
+
+    monkeypatch.setattr(g, "read_decision", broken)
+    with pytest.raises(anthropic.APIConnectionError):
+        env.start()
+    assert len(asked) == 1

@@ -24,7 +24,6 @@ Rules this module follows:
 
 import time
 from functools import cache
-from pathlib import Path
 from typing import Literal
 
 import anthropic
@@ -37,13 +36,13 @@ from langchain_core.messages import (
     SystemMessage,
     ToolMessage,
 )
-from langchain_core.runnables import Runnable
+from langchain_core.runnables import Runnable, RunnableConfig
 from langgraph.graph import END, START, StateGraph
 from langgraph.types import RetryPolicy, interrupt
 from qdrant_client.http.exceptions import ResponseHandlingException
 from typing_extensions import TypedDict
 
-from agent import config, handover, loop, rules, tools
+from agent import actions, config, handover, loop, rules
 from agent.config import Design, model_name
 from agent.decision import (
     DECISION_TOOL,
@@ -56,9 +55,6 @@ from agent.decision import (
 )
 from agent.models import any_tool, chat_model, tool_choice
 from agent.retrieval import retrieve
-
-_PROMPT_FILE = Path(__file__).parent / "prompt.md"
-
 
 HEADER_MARKERS = 2  # the opening and closing ** of a bare markdown header
 MIN_SUMMARY_CHARS = 15  # shorter lines are labels, not a diagnosis
@@ -282,7 +278,24 @@ def _is_api_error(exc: BaseException) -> bool:
 
 
 MODEL_ATTEMPTS = 3  # a model call that fails for a passing reason is tried this often
-_API_RETRY = RetryPolicy(max_attempts=MODEL_ATTEMPTS, retry_on=_is_api_error)
+RETRY_WAIT_SEC = 1.0  # the wait before the second attempt, doubled before each next
+
+
+def _ask(model: Runnable, messages: list[AnyMessage]) -> AIMessage:
+    """One model call, tried again only while it fails before the model answers.
+
+    The retry wraps the call alone, not the node, so nothing that runs after an
+    answer (reading it, running lookups) can make the model be asked twice.
+    """
+    attempt = 1
+    while True:
+        try:
+            return model.invoke(messages)
+        except Exception as exc:
+            if attempt >= MODEL_ATTEMPTS or not _is_api_error(exc):
+                raise
+        time.sleep(RETRY_WAIT_SEC * 2 ** (attempt - 1))
+        attempt += 1
 
 
 def _is_search_error(exc: BaseException) -> bool:
@@ -295,7 +308,7 @@ _SEARCH_RETRY = RetryPolicy(max_attempts=3, retry_on=_is_search_error)
 
 def _opening(state: GraphState, extra: str = "") -> list[AnyMessage]:
     """The instructions and the ticket, as the model's first two messages."""
-    instructions = _PROMPT_FILE.read_text()
+    instructions = config.PROMPT_FILE.read_text()
     if state["use_retrieval"]:
         instructions += f"\n\n**Remediation tools**\n{tool_guide()}"
     message = build_user_message(
@@ -313,7 +326,7 @@ def _call_model(state: GraphState) -> tuple[AIMessage, float]:
         llm = llm.bind_tools([DECISION_TOOL], tool_choice=choice)
     messages = _opening(state)
     t0 = time.perf_counter()
-    msg = llm.invoke(messages)
+    msg = _ask(llm, messages)
     return msg, time.perf_counter() - t0
 
 
@@ -437,7 +450,7 @@ def investigate(state: GraphState) -> dict:
     left = config.MAX_LOOKUPS - loop.lookups_used(state["steps"])
     messages = state["messages"] or _opening(state, "\n\n" + loop.guide())
     t0 = time.perf_counter()
-    msg = _loop_model(left).invoke(messages)
+    msg = _ask(_loop_model(left), messages)
     cost = _turn_usage(msg, time.perf_counter() - t0)
     turn = sum(isinstance(m, AIMessage) for m in messages) + 1
     calls = _tool_calls(msg)
@@ -541,11 +554,18 @@ def self_serve_wait(state: GraphState) -> dict:
     return {"human_decision": {**state["human_decision"], "resolved": bool(resolved)}}
 
 
-def execute_tool(state: GraphState) -> dict:
+def _run_id(config: RunnableConfig) -> str:
+    """The run's own id, which keys its actions: the Assistant's run is its ticket."""
+    return str(config.get("configurable", {}).get("thread_id", ""))
+
+
+def execute_tool(state: GraphState, config: RunnableConfig) -> dict:
     tool_name = state["tool_name"]
     if tool_name is None:
         raise ValueError("execute_tool needs a proposed tool")
-    return {"tool_result": tools.dispatch(tool_name, state["tool_input"] or {})}
+    tool_input = state["tool_input"] or {}
+    done = actions.perform(actions.ledger(), _run_id(config), tool_name, tool_input)
+    return {"tool_result": done}
 
 
 def draft_ticket(state: GraphState) -> dict:
@@ -585,14 +605,17 @@ def draft_ticket(state: GraphState) -> dict:
     }
 
 
-def create_ticket(state: GraphState) -> dict:
+def create_ticket(state: GraphState, config: RunnableConfig) -> dict:
     t = ticket_for(state)
-    return {
-        "tool_result": tools.dispatch(
-            "create_escalation_ticket",
-            {"queue": t["queue"], "summary": t["summary"], "priority": t["priority"]},
-        )
+    tool_input = {
+        "queue": t["queue"],
+        "summary": t["summary"],
+        "priority": t["priority"],
     }
+    done = actions.perform(
+        actions.ledger(), _run_id(config), "create_escalation_ticket", tool_input
+    )
+    return {"tool_result": done}
 
 
 # LangGraph's END, whose value this is, typed so the routers can return it.
@@ -648,8 +671,8 @@ def build_graph(checkpointer):
     g = StateGraph(GraphState)
 
     g.add_node("retrieve", retrieve_node, retry_policy=_SEARCH_RETRY)
-    g.add_node("triage", triage, retry_policy=_API_RETRY)
-    g.add_node("no_tools", no_tools, retry_policy=_API_RETRY)
+    g.add_node("triage", triage)
+    g.add_node("no_tools", no_tools)
     g.add_node("confirm_fix", confirm_fix)
     g.add_node("confirm_ticket", confirm_ticket)
     g.add_node("self_serve_wait", self_serve_wait)
@@ -659,7 +682,7 @@ def build_graph(checkpointer):
 
     g.add_conditional_edges(START, route_start)
     g.add_edge("no_tools", END)
-    g.add_node("investigate", investigate, retry_policy=_API_RETRY)
+    g.add_node("investigate", investigate)
     g.add_node("at_limit", at_limit)
     g.add_node("enforce", enforce)
     g.add_conditional_edges("retrieve", route_design)

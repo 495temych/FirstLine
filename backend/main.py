@@ -14,7 +14,7 @@ from langchain_core.runnables import RunnableConfig
 from langgraph.types import Command, StateSnapshot
 from pydantic import BaseModel, StringConstraints
 
-from agent import config, models, records, tracing
+from agent import actions, config, models, records, tracing
 from agent.graph import GraphState, build_graph, initial_state
 from backend import (
     benchmark,
@@ -49,7 +49,9 @@ EXAMPLE_SPLIT = "dev"  # the Assistant's real examples, one per family
 @asynccontextmanager
 async def lifespan(_: FastAPI) -> AsyncIterator[None]:
     """The Queue reads its record back, from Supabase when it's set up."""
-    queue_board.start(store.shared())
+    record = store.shared()
+    actions.use(record)
+    queue_board.start(record)
     yield
 
 

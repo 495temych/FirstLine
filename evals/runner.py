@@ -144,7 +144,7 @@ def _hash(content: bytes) -> str:
 
 
 def instructions_version() -> str:
-    return _hash((config.ROOT / "agent" / "prompt.md").read_bytes())
+    return _hash(config.PROMPT_FILE.read_bytes())
 
 
 def tools_version() -> str:

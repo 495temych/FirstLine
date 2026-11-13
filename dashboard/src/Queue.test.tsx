@@ -71,7 +71,11 @@ it("starts empty and loads a batch from the service desk", async () => {
   replies["/api/queue"] = emptyQueue;
   render(<Queue />);
   expect(await screen.findByText(/The board is empty/)).toBeDefined();
-  expect(screen.getByText("129 waiting at the desk")).toBeDefined();
+  expect(
+    screen.getByText(
+      "129 waiting at the desk. About CHF 0.03 in model calls, capped at CHF 0.25.",
+    ),
+  ).toBeDefined();
   click("Load 8 tickets from the service desk");
   expect(await screen.findByText(queueTicket.title)).toBeDefined();
   expect(calls.some((c) => c.url === "/api/queue/load")).toBe(true);

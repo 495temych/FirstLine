@@ -6,7 +6,7 @@ from datetime import UTC, datetime, timedelta
 import pytest
 from fastapi.testclient import TestClient
 
-from agent import config
+from agent import config, tools
 from backend import main, queue_board
 
 FIX = {
@@ -358,3 +358,112 @@ def test_the_backend_opens_its_record_when_it_starts(board):
     with TestClient(main.app) as started:
         assert started.get("/api/queue").json()["tickets"] == []
     assert isinstance(board.store, queue_board.MemoryStore)
+
+
+# ── killed mid-batch ────────────────────────────────────────────────────────────
+class Killed(BaseException):
+    """The backend stopped here, as a kill would stop it: nothing after runs."""
+
+
+@pytest.fixture
+def counted(monkeypatch):
+    """Each ticket the agent finished triaging, and each action that ran."""
+    seen = {"triaged": [], "ran": []}
+
+    def triage(text, use_retrieval, ticket_id=None, **_):
+        seen["triaged"].append(ticket_id)
+        return ESCALATION if len(seen["triaged"]) % 2 else FIX
+
+    dispatch = tools.dispatch
+
+    def run(tool, tool_input):
+        seen["ran"].append(tool)
+        return dispatch(tool, tool_input)
+
+    monkeypatch.setattr(queue_board, "run_triage", triage)
+    monkeypatch.setattr(tools, "dispatch", run)
+    return seen
+
+
+@pytest.mark.parametrize("steps", range(queue_board.BATCH_SIZE + 1))
+def test_a_batch_killed_between_steps_finishes_after_a_restart(counted, steps):
+    jobs = []
+    killed = queue_board.Board(submit=jobs.append)
+    taken = killed.load(queue_board.staff())
+    for job in jobs[:steps]:  # the rest never ran: the backend was killed
+        job()
+    again = restarted(killed.store)
+    assert again.view()["counts"]["review"] == queue_board.BATCH_SIZE
+    assert sorted(counted["triaged"]) == sorted(taken)  # each ticket once
+
+
+def test_a_review_killed_after_its_action_ran_does_not_run_it_again(
+    counted, monkeypatch
+):
+    board = queue_board.Board(submit=lambda work: work())
+    first, *_ = board.load(queue_board.staff())
+    store = board.store
+
+    def kill(*_args):
+        raise Killed
+
+    with monkeypatch.context() as stopped:
+        stopped.setattr(store, "reviewed", kill)  # the action ran, then it died
+        with pytest.raises(Killed):
+            board.review(first, queue_board.Review(verdict="approved", seconds=20))
+    again = restarted(store)
+    assert again.get(first)["state"] == "review"
+    closed = again.review(first, queue_board.Review(verdict="approved", seconds=20))
+    assert counted["ran"] == ["create_escalation_ticket"]
+    assert closed["review"]["outcome"]["ticket_number"]
+    assert closed["review"]["outcome"] == store.outcome(
+        closed["review"]["outcome"]["action_key"]
+    )
+    assert len(counted["triaged"]) == queue_board.BATCH_SIZE
+
+
+def test_an_action_cut_off_mid_run_is_held_for_a_person(counted, monkeypatch):
+    board = queue_board.Board(submit=lambda work: work())
+    first, *_ = board.load(queue_board.staff())
+
+    def cut_off(tool, tool_input):
+        counted["ran"].append(tool)
+        raise Killed
+
+    monkeypatch.setattr(tools, "dispatch", cut_off)
+    with pytest.raises(Killed):
+        board.review(first, queue_board.Review(verdict="approved", seconds=20))
+    again = restarted(board.store)
+    closed = again.review(first, queue_board.Review(verdict="approved", seconds=20))
+    assert closed["review"]["outcome"]["status"] == "held"
+    assert counted["ran"] == ["create_escalation_ticket"]
+
+
+# ── what a batch costs ──────────────────────────────────────────────────────────
+def test_the_board_states_the_next_batchs_cost_before_it_starts(client):
+    view = client.get("/api/queue").json()
+    assert view["batch_cap_chf"] == queue_board.BATCH_CAP_CHF
+    assert 0 < view["batch_estimate_chf"] < view["batch_cap_chf"]
+    assert view["batch_estimate_chf"] == queue_board.estimate_chf(
+        queue_board.BATCH_SIZE
+    )
+
+
+def test_a_batch_over_its_cap_is_refused_before_anything_runs(client, monkeypatch):
+    triaged = []
+    monkeypatch.setattr(
+        queue_board, "run_triage", lambda text, use_retrieval, **_: triaged.append(1)
+    )
+    monkeypatch.setenv("QUEUE_BATCH_CAP_CHF", "0.0001")
+    response = client.post("/api/queue/load")
+    assert response.status_code == 409
+    assert "over the CHF 0.00 cap" in response.json()["detail"]
+    assert client.get("/api/queue").json()["tickets"] == []
+    assert triaged == []
+
+
+def test_a_batch_whose_cost_cannot_be_stated_is_refused(client, monkeypatch):
+    monkeypatch.setattr(queue_board, "estimate_chf", lambda tickets: None)
+    response = client.post("/api/queue/load")
+    assert response.status_code == 409
+    assert "has no price" in response.json()["detail"]

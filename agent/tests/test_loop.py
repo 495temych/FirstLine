@@ -34,7 +34,7 @@ def run(monkeypatch):
         ran.append(name)
         return real_dispatch(name, inp)
 
-    monkeypatch.setattr(g.tools, "dispatch", dispatch)
+    monkeypatch.setattr(tools, "dispatch", dispatch)
     monkeypatch.setattr(lookups, "retrieve", lambda q: [UNIT])
     monkeypatch.setenv("DESIGN", "loop")
 

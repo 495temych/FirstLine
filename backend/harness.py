@@ -190,7 +190,7 @@ def _examples() -> list[dict]:
 
 
 def view() -> dict:
-    text = (config.ROOT / "agent" / "prompt.md").read_text()
+    text = config.PROMPT_FILE.read_text()
     gates = [s["name"] for s in overview.STATIONS.values() if s.get("gate")]
     return {
         "answer": ANSWER,

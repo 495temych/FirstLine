@@ -210,7 +210,7 @@ The number after each one is the commit that meets it.
 | 4 | 🟡 **The Queue.** Load a batch, order it in code, and approve, correct or reject each decision with its evidence | A technician clears a morning batch, and technician time per ticket is measured | The human's step |
 | 6 ✅ | **How it works.** An overview page of the goal, the route a ticket takes, the model, the tools and the services, built from the code | A recruiter understands the agent in two minutes without opening the repository | Explainability, a single source of truth |
 | 7 | **Retrieval.** A page of the core retrieval measures, how sure each match is, and a search anyone can try | Type a request and watch which playbook it finds, and how strongly | RAG evaluation |
-| 5 | **Durable and gated.** Retries, no repeated actions, spending limits per batch, and a release gate: a change ships only if its Langfuse experiment passes | Kill a batch mid-run and it carries on without doing anything twice. A worse change is refused | Idempotency, `RetryPolicy`, evals as a release gate |
+| 5 | ✅ **Durable and gated.** Retries, no repeated actions, spending limits per batch, and a release gate: a change ships only if its Langfuse experiment passes | Kill a batch mid-run and it carries on without doing anything twice. A worse change is refused | Idempotency, `RetryPolicy`, evals as a release gate |
 | 9 ✅ | **Three groups.** The tabs regroup into Try it (Queue, Assistant), Is it worth it? (Money, Models) and How it works (Workflow, Harness, Knowledge base, Retrieval, Tickets, Evaluations), each view with its own link, and each group opens with what its views show | Send someone a link straight to a playbook or a model's run | Explain the system in layers |
 | 10 | **Knowledge base.** A tab to explore what the agent knows: a cause map from each playbook's causes to the path, fix or queue they lead to, the policies that override them, the families with no playbook, and how the agent does on each | Click a cause and see the fix it allows, its risk tier, and how often the agent gets it right | Make the knowledge, not just the answer, inspectable |
 | 11 ✅ | **The harness.** A tab that draws what surrounds the model on one ticket: what it reads, the one tool it can call to decide, the form it fills, the limits it runs under, and the checks code makes on its answer. The fixes it proposes stay on Workflow | Pick a ticket and see exactly what the model read and what it answered | Agents need a harness: instructions, tools, limits and checks |
@@ -231,7 +231,7 @@ The number after each one is the commit that meets it. The Queue's investigation
 - [x] (1) Every Assistant, Queue and evaluation run is one trace in Langfuse Cloud's EU region, tagged by mode, with emails, employee ids and IP addresses masked before it leaves the Mac. A test proves the masking.
 - [x] (1) The practice sets are Langfuse datasets, and saved runs are experiments scored by our own code, replayed with no model calls. Held-out tickets are never sent, checked by a test.
 - [x] (4) A technician's verdict is a score on the ticket's trace, and the dashboard shows the trace's steps with time, tokens and cost.
-- [ ] (5) The release gate reads its two experiments from Langfuse, so a refused change can be opened and compared there.
+- [x] (5) The release gate reads its two experiments from Langfuse, so a refused change can be opened and compared there.
 
 **Search: Qdrant (`agent/retrieval.py`)**
 
@@ -315,11 +315,11 @@ The number after each one is the commit that meets it. The Queue's investigation
 
 **Durable and gated (`agent/`, `backend/`, `evals/`)**
 
-- [ ] (5) Model calls and searches retry on connection errors, with limits, and a model call isn't retried after the model has answered. *(Searches retry since commit 4.)*
-- [ ] (5) Every action carries a key made from its ticket and decision, and a second attempt with the same key returns the first result without running again, checked by a test.
-- [ ] (5) Killing the backend mid-batch and starting it again finishes the batch, with no ticket triaged twice and no action run twice. A test kills it between steps.
-- [ ] (5) A batch states its estimated cost before it starts and refuses to start above its cap, CHF 0.25 by default.
-- [ ] (5) `uv run -m evals.gate` runs a change on the samples and refuses it if path accuracy falls by more than the margin of error or the mistake bill rises, against the saved baseline. A deliberately worse instruction is refused, with no model calls in the test.
+- [x] (5) Model calls and searches retry on connection errors, with limits, and a model call isn't retried after the model has answered. *(Searches retry since commit 4.)*
+- [x] (5) Every action carries a key made from its ticket and decision, and a second attempt with the same key returns the first result without running again, checked by a test.
+- [x] (5) Killing the backend mid-batch and starting it again finishes the batch, with no ticket triaged twice and no action run twice. A test kills it between steps.
+- [x] (5) A batch states its estimated cost before it starts and refuses to start above its cap, CHF 0.25 by default.
+- [x] (5) `uv run -m evals.gate` runs a change on the samples and refuses it if path accuracy falls by more than the margin of error or the mistake bill rises, against the saved baseline. A deliberately worse instruction is refused, with no model calls in the test.
 
 **Checks and CI**
 

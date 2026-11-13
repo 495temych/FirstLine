@@ -1,0 +1,8 @@
+{
+  "model": "google/gemini-3.1-flash-lite",
+  "design": "one call",
+  "runs": {
+    "dev": "20261113T114657-dev-sample",
+    "unseen_dev": "20261113T114700-unseen_dev-sample"
+  }
+}

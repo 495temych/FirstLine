@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { api, type QueueTicket, type QueueView } from "./api";
 import { QueueDetail } from "./QueueDetail";
-import { rappen, seconds } from "./format";
+import { francs, rappen, seconds } from "./format";
 import { Board } from "./QueueBoard";
 
 const POLL_MS = 1000;
@@ -123,7 +123,12 @@ export function Queue() {
               : "Load tickets from the service desk"}
           </button>
           {view && (
-            <small className="quiet">{view.at_desk} waiting at the desk</small>
+            <small className="quiet">
+              {view.at_desk} waiting at the desk.{" "}
+              {view.batch_estimate_chf === null
+                ? "This model has no price, so a batch can't start."
+                : `About ${francs(view.batch_estimate_chf)} in model calls, capped at ${francs(view.batch_cap_chf)}.`}
+            </small>
           )}
         </div>
       </section>

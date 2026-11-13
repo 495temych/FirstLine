@@ -10,6 +10,7 @@ from agent.models import MODELS
 
 ROOT = Path(__file__).resolve().parent.parent
 KB_DIR = ROOT / "data" / "kb"
+PROMPT_FILE = ROOT / "agent" / "prompt.md"  # the instructions
 # The usage log before Supabase. Only the Langfuse upload reads it now.
 LOG_FILE = ROOT / "logs.csv"
 USERS_FILE = ROOT / "data" / "records" / "users.json"

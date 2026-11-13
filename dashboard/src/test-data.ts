@@ -416,6 +416,8 @@ export const emptyQueue: QueueView = {
   counts: noTickets,
   at_desk: 129,
   batch_size: 8,
+  batch_estimate_chf: 0.031,
+  batch_cap_chf: 0.25,
   queues: ["NET-VPN", "SEC-INCIDENT"],
   value,
 };

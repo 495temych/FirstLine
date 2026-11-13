@@ -28,6 +28,8 @@ from psycopg.rows import DictRow, dict_row
 from psycopg.types.json import Jsonb
 from psycopg_pool import ConnectionPool
 
+from agent.actions import MemoryLedger
+
 REVIEWER = "technician"  # until people sign in
 CONNECT_TIMEOUT_SEC = 30  # the session pooler can be slow to answer on a bad network
 POOL_SIZE = 4  # two workers, a review and the board's reads
@@ -160,12 +162,18 @@ class Store(Protocol):
     ) -> None: ...
     def answered(self, run_id: str, answer: Answer, outcome: dict | None) -> None: ...
     def runs(self) -> list[Run]: ...
+    # The action ledger, as agent/actions.py reads it.
+    def claim(self, key: str, ticket_id: str, tool: str, tool_input: dict) -> bool: ...
+    def outcome(self, key: str) -> dict | None: ...
+    def finish(self, key: str, outcome: dict) -> None: ...
+    def release(self, key: str) -> None: ...
 
 
-class MemoryStore:
+class MemoryStore(MemoryLedger):
     """The same record, kept in memory, for tests and for running without Supabase."""
 
     def __init__(self) -> None:
+        super().__init__()
         self._lock = Lock()
         self._batches: list[str] = []
         self._batch_of: dict[str, str] = {}
@@ -479,6 +487,35 @@ class PostgresStore:
             {"path": r["path"], "latency_ms": r["latency_ms"], "answers": r["answers"]}
             for r in rows
         ]
+
+    def claim(self, key: str, ticket_id: str, tool: str, tool_input: dict) -> bool:
+        with self._conn() as conn:
+            row = conn.execute(
+                "insert into actions (key, ticket_id, tool, tool_input)"
+                " values (%s, %s, %s, %s) on conflict (key) do nothing returning key",
+                [key, ticket_id, tool, Jsonb(tool_input)],
+            ).fetchone()
+            return row is not None
+
+    def outcome(self, key: str) -> dict | None:
+        with self._conn() as conn:
+            row = conn.execute(
+                "select outcome from actions where key = %s", [key]
+            ).fetchone()
+            return None if row is None else row[0]
+
+    def finish(self, key: str, outcome: dict) -> None:
+        with self._conn() as conn:
+            conn.execute(
+                "update actions set outcome = %s, done_at = now() where key = %s",
+                [Jsonb(outcome), key],
+            )
+
+    def release(self, key: str) -> None:
+        with self._conn() as conn:
+            conn.execute(
+                "delete from actions where key = %s and outcome is null", [key]
+            )
 
 
 def open_store() -> Store:

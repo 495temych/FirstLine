@@ -28,7 +28,7 @@ def postgres_url() -> Iterator[str]:
 def empty_postgres(postgres_url: str) -> str:
     with psycopg.connect(postgres_url, autocommit=True) as conn:
         conn.execute(
-            "truncate events, reviews, decisions, tickets, batches"
+            "truncate actions, events, reviews, decisions, tickets, batches"
             " restart identity cascade"
         )
     return postgres_url

@@ -6,6 +6,7 @@ import time
 import psycopg
 import pytest
 
+from agent import actions, tools
 from backend import migrate
 from backend import store as record
 from backend.store import MemoryStore, PostgresStore, Proposal, Verdict
@@ -237,3 +238,31 @@ def test_two_first_calls_at_once_build_one_value():
     assert all(value is built[0] for value in got)
     slow.cache_clear()
     assert slow() is not built[0]
+
+
+# ── the action ledger ───────────────────────────────────────────────────────────
+def test_a_key_is_claimed_once_and_keeps_its_outcome(store):
+    assert store.claim("k1", "INC1", "reset_vpn_profile", {"username": "a.b"})
+    assert not store.claim("k1", "INC1", "reset_vpn_profile", {"username": "a.b"})
+    assert store.outcome("k1") is None  # claimed, not yet finished
+    store.finish("k1", OUTCOME)
+    assert store.outcome("k1") == OUTCOME
+    assert store.outcome("k2") is None
+
+
+def test_a_released_key_can_be_claimed_again_but_a_finished_one_cannot(store):
+    store.claim("k1", "INC1", "reset_vpn_profile", {})
+    store.release("k1")
+    assert store.claim("k1", "INC1", "reset_vpn_profile", {})
+    store.finish("k1", OUTCOME)
+    store.release("k1")
+    assert store.outcome("k1") == OUTCOME
+
+
+def test_an_action_runs_once_through_either_store(store, monkeypatch):
+    ran = []
+    monkeypatch.setattr(tools, "dispatch", lambda t, i: ran.append(t) or OUTCOME)
+    first = actions.perform(store, "INC1", "reset_vpn_profile", {"username": "a.b"})
+    again = actions.perform(store, "INC1", "reset_vpn_profile", {"username": "a.b"})
+    assert again == first
+    assert ran == ["reset_vpn_profile"]

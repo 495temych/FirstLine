@@ -193,7 +193,7 @@ Each design decision so far, with its reason and its trade-off.
 
 - **Decision:** the loop is one `investigate` node, run once per model turn, that routes back to itself until the model decides or a limit stops it. The lookups it asks for run inside the node. The conversation and each step are in the graph's state, so each turn is a checkpoint.
 - **Reason:** a checkpoint per turn is what lets 7c's checklist show each step as it lands, by reading the run's state, and lets a crashed run resume at its last turn. Running the lookups in the same node keeps a turn's tokens and cost on its own steps.
-- **Trade-off:** a model call that fails and is retried runs that turn's lookups again. They only read, so it costs time, not correctness.
+- **Trade-off:** a turn's lookups run after its model call, in the same node. Since commit 5 the retry wraps the model call alone, so a failure after the answer never asks the model again.
 
 ## The last turn may only decide
 
@@ -377,6 +377,30 @@ Each design decision so far, with its reason and its trade-off.
 - **Decision:** on 10 November 2026 the owner chose Gemini 3.1 Flash-Lite, through OpenRouter pinned to Google Vertex in the EU, over the rule's pick, Qwen 3.7 Flash.
 - **Reason:** the four leaders tie on development, and paired tests can't separate them. Gemini saves the most on families with no playbook, CHF 3.31 a ticket against Qwen's loss of CHF 2.46, gives no invalid answers on either set, is the fastest at a median of 1.3 s, and keeps data in the EU. Qwen is cheaper by CHF 0.80 per 1'000 tickets, which is negligible next to a CHF 6 saving. `labs/model-comparison.ipynb` has the analysis.
 - **Trade-off:** the rule written before the runs is overridden by conditions it didn't cover: saving on unseen families, invalid answers and region. The next benchmark should write them into the rule first. Gemini is weaker on disk encryption and laptop performance, and the loop is to be measured on it, so the choice may change once the loop runs.
+
+## Retries around the call, not the node
+
+- **Decision:** a model call that fails before the model answers, on a dropped connection, a rate limit or a server error, is tried again up to 3 times, with a wait of 1, then 2 seconds. The retry wraps the call itself, in `_ask` in `agent/graph.py`, not the LangGraph node that holds it. Searches keep their node retry.
+- **Reason:** a node retry runs the whole node again, so anything that fails after the answer, such as reading the decision or running a lookup, would ask the model again and pay for a second answer. Around the call, only a call that never answered is repeated. A retried search costs nothing, so it can stay on the node.
+- **Trade-off:** waits are short, so a provider down for longer than about 3 seconds fails the ticket, which the Queue then shows as failed.
+
+## Each action runs once, by its key
+
+- **Decision:** every action is keyed by its ticket and what it does, the tool and its input, in `agent/actions.py`. The key is claimed in the `actions` table before the action runs and keeps its outcome after. A second attempt returns the first outcome. A key claimed with no outcome, an action cut off by a restart, is held for a person, not run again. An action whose input doesn't fit its tool gives its key back, since nothing ran. The Assistant's actions are keyed by its run.
+- **Reason:** a restart can come between an action and its record, and the board then waits for a decision that was already carried out. Running a real reset or opening a real ticket twice is worse than asking a person whether it happened. Claiming before running is the only order where a crash can't lead to a repeat.
+- **Trade-off:** an action cut off mid-run needs a person to check it. A corrected decision is a different action, so it has its own key, and the same fix approved for the same ticket in two Assistant runs runs twice, because each run is its own ticket. The ticket isn't a foreign key, because an Assistant run acts before its record is saved.
+
+## A batch's cost is stated before it starts
+
+- **Decision:** the Queue states the next batch's model cost from the evaluations' own estimate, the dearest saved run's cost per ticket for today's model, and refuses a batch above CHF 0.25 or `QUEUE_BATCH_CAP_CHF`. A model with no price can't start a batch.
+- **Reason:** one estimate for evaluations and the Queue means one number to trust. The dearest saved run errs on the side of stopping.
+- **Trade-off:** a batch with the default model costs about CHF 0.01, so the cap only bites on a dear model or a much larger batch. A batch already started isn't stopped mid-way.
+
+## A change ships only through the release gate
+
+- **Decision:** `uv run -m evals.gate` runs a change on the two samples, 36 development and 6 unseen-family tickets, for about CHF 0.04 with the default model, or reuses a saved run of the same code. It refuses the change when, on either sample, path accuracy falls by more than the baseline's 95% margin of error or the mistake bill rises at all. Both runs of each sample go to Langfuse as experiments on the same dataset, and the gate reads their numbers back from there; if Langfuse hasn't shown them within a minute, it judges from the saved runs and says so. `--keep` makes a passing change the baseline, in `data/evals/baseline.json`.
+- **Reason:** the margin on accuracy keeps the gate from refusing noise, and the mistake bill is the measure the business case turns on, so any rise is a reason to look. Reading back from Langfuse means what the gate judged is what anyone opening the experiments sees.
+- **Trade-off:** the samples are small, so only a large fall in accuracy shows, and a rise of one mistake can refuse a harmless change from run to run. The live check showed both: a worse instruction left the development sample unchanged, 75% to 78%, and was refused on unseen families, 100% to 50%. A refused change's runs stay out of the repository. The gate isn't in CI yet, since it needs a model key.
 
 ## Known limitations
 
